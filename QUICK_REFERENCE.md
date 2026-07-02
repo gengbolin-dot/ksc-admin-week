@@ -19,16 +19,16 @@ node check-env.cjs
 
 | 模式 | 前端地址 | 后端地址 | 认证方式 |
 |------|----------|----------|----------|
-| 开发 | http://localhost:5173/ | http://localhost:9000/ | 模拟用户(刘媛) |
-| 生产 | http://120.92.44.21:5173/ | http://120.92.44.21:9000/ | OIDC认证 |
+| 开发 | http://localhost:5173/ | http://localhost:9000/ | 模拟用户(耿博琳) |
+| 生产 | http://120.92.123.190:5173/ | http://120.92.123.190:9000/ | OIDC认证 |
 
 ## 环境变量对照
 
 | 变量名 | 开发模式 | 生产模式 |
 |--------|----------|----------|
 | VITE_ENABLE_OIDC | false | true |
-| VITE_MOCK_USER_ID | 52688 | (空) |
-| VITE_API_BASE_URL | localhost:9000/api | 120.92.44.21:9000/api |
+| VITE_MOCK_USER_ID | 31784 | (空) |
+| VITE_API_BASE_URL | localhost:9000/api | 120.92.123.190:9000/api |
 
 ## 常用命令
 

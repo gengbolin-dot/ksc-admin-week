@@ -23,7 +23,7 @@ echo "🗄️  初始化数据库..."
 echo "正在连接数据库并创建表结构..."
 
 # 设置环境变量（如果需要）
-export DATABASE_URL="postgresql://admin:Kingsoft0531@120.92.122.77:59971/project_codebuddy?sslmode=disable"
+export DATABASE_URL="postgresql://admin:Kingsoft0531@120.92.123.68:39944/project_codebuddy?sslmode=disable"
 export PORT="9000"
 
 echo "🌱 启动服务..."
@@ -34,13 +34,13 @@ SERVER_PID=$!
 sleep 5
 
 echo "🔍 检查服务状态..."
-if curl -s http://120.92.44.21:9000/health > /dev/null; then
+if curl -s http://120.92.123.190:9000/health > /dev/null; then
     echo "✅ 服务启动成功！"
-    echo "🌐 健康检查: http://120.92.44.21:9000/health"
-    echo "📊 API文档: http://120.92.44.21:9000/api/"
+    echo "🌐 健康检查: http://120.92.123.190:9000/health"
+    echo "📊 API文档: http://120.92.123.190:9000/api/"
     
     echo "📥 执行数据迁移..."
-    if curl -X POST http://120.92.44.21:9000/api/migrate-initial-data > /dev/null 2>&1; then
+    if curl -X POST http://120.92.123.190:9000/api/migrate-initial-data > /dev/null 2>&1; then
         echo "✅ 初始数据迁移完成！"
     else
         echo "⚠️  数据迁移可能失败，请手动执行"
@@ -48,7 +48,7 @@ if curl -s http://120.92.44.21:9000/health > /dev/null; then
     
     echo ""
     echo "🎉 部署完成！"
-    echo "服务运行在: http://120.92.44.21:9000"
+    echo "服务运行在: http://120.92.123.190:9000"
     echo "进程ID: $SERVER_PID"
     echo ""
     echo "📋 可用的API端点:"

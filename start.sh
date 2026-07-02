@@ -44,7 +44,7 @@ sleep 3
 # 启动后端服务
 echo "启动后端服务..."
 cd backend
-export DATABASE_URL="postgresql://admin:Kingsoft0531@120.92.122.77:59971/project_codebuddy?sslmode=disable"
+export DATABASE_URL="postgresql://admin:Kingsoft0531@120.92.123.68:39944/project_codebuddy?sslmode=disable"
 export PORT="9000"
 source /root/.bash_profile
 
@@ -86,8 +86,8 @@ npm install
 
 # 设置生产环境变量
 export VITE_APP_ENV=production
-export VITE_API_BASE_URL=http://120.92.44.21:9000/api
-export VITE_FRONTEND_URL=http://120.92.44.21:5173
+export VITE_API_BASE_URL=http://120.92.123.190:9000/api
+export VITE_FRONTEND_URL=http://120.92.123.190:5173
 export VITE_ENABLE_OIDC=true
 export VITE_MOCK_USER_ID=
 source /root/.bash_profile

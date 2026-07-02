@@ -9,12 +9,12 @@ const envConfigs = {
     VITE_API_BASE_URL: 'http://localhost:9000/api',
     VITE_FRONTEND_URL: 'http://localhost:5173',
     VITE_ENABLE_OIDC: 'false',
-    VITE_MOCK_USER_ID: '52688'
+    VITE_MOCK_USER_ID: '31784'
   },
   production: {
     VITE_APP_ENV: 'production',
-    VITE_API_BASE_URL: 'http://120.92.44.21:9000/api',
-    VITE_FRONTEND_URL: 'http://120.92.44.21:5173',
+    VITE_API_BASE_URL: 'http://120.92.123.190:9000/api',
+    VITE_FRONTEND_URL: 'http://120.92.123.190:5173',
     VITE_ENABLE_OIDC: 'true',
     VITE_MOCK_USER_ID: ''
   }
