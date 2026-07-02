@@ -26,6 +26,12 @@ echo "正在连接数据库并创建表结构..."
 export DATABASE_URL="postgresql://admin:Kingsoft0531@120.92.123.68:39944/project_codebuddy?sslmode=disable"
 export PORT="9000"
 
+# OIDC 凭据：从环境变量读取（部署前需提前 export OIDC_CLIENT_SECRET，禁止硬编码进源码）
+export OIDC_CLIENT_ID="${OIDC_CLIENT_ID:-codebuddy}"
+if [ -z "$OIDC_CLIENT_SECRET" ]; then
+    echo "⚠️  OIDC_CLIENT_SECRET 未设置，OIDC token 交换将失败。请在部署前执行: export OIDC_CLIENT_SECRET=<密钥>"
+fi
+
 echo "🌱 启动服务..."
 ./project-management-backend &
 SERVER_PID=$!

@@ -18,6 +18,12 @@ export DATABASE_URL="postgresql://admin:Kingsoft0531@120.92.123.68:39944/project
 export DISABLE_SCHEDULER="true"
 export PORT="9000"
 
+# OIDC 凭据：从环境变量读取（联调前需提前 export OIDC_CLIENT_SECRET，禁止硬编码进源码）
+export OIDC_CLIENT_ID="${OIDC_CLIENT_ID:-codebuddy}"
+if [ -z "$OIDC_CLIENT_SECRET" ]; then
+    echo "⚠️  OIDC_CLIENT_SECRET 未设置，OIDC token 交换将失败。请执行: export OIDC_CLIENT_SECRET=<密钥>"
+fi
+
 echo "DATABASE_URL=$DATABASE_URL"
 echo "DISABLE_SCHEDULER=$DISABLE_SCHEDULER"
 

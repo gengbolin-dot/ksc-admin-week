@@ -46,6 +46,9 @@ echo "启动后端服务..."
 cd backend
 export DATABASE_URL="postgresql://admin:Kingsoft0531@120.92.123.68:39944/project_codebuddy?sslmode=disable"
 export PORT="9000"
+# OIDC 凭据：从环境变量读取（部署前需提前 export OIDC_CLIENT_SECRET，禁止硬编码进源码）
+export OIDC_CLIENT_ID="${OIDC_CLIENT_ID:-codebuddy}"
+[ -z "$OIDC_CLIENT_SECRET" ] && echo "⚠️  OIDC_CLIENT_SECRET 未设置，OIDC token 交换将失败"
 source /root/.bash_profile
 
 # 编译后端服务（如果需要）

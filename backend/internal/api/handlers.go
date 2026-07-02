@@ -977,9 +977,17 @@ func (h *Handler) OIDCTokenExchange(c *gin.Context) {
 		return
 	}
 
-	// OIDC配置
-	clientID := "codebuddy"
-	clientSecret := "e11cda4fdd2f6d24cce9b97feeadd4b4"
+	// OIDC配置：从环境变量读取，避免凭据硬编码进源码
+	clientID := os.Getenv("OIDC_CLIENT_ID")
+	if clientID == "" {
+		clientID = "codebuddy"
+	}
+	clientSecret := os.Getenv("OIDC_CLIENT_SECRET")
+	if clientSecret == "" {
+		fmt.Printf("OIDC Token Exchange - OIDC_CLIENT_SECRET 未配置，token 交换将失败\n")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "OIDC client secret not configured"})
+		return
+	}
 	tokenEndpoint := "https://oidc-public.ksyun.com:443/token"
 
 	// 准备token交换请求
