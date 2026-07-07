@@ -419,3 +419,57 @@ table td:nth-child(3) span, table td:nth-child(4) span {
 .dark .rich-text-display [style*="color: #008000"] {
   color: #4ade80 !important;
 }
+
+/* ====== 行政周报表样式 ====== */
+.admin-report-table {
+  border-collapse: collapse;
+}
+
+.admin-report-table th,
+.admin-report-table td {
+  border-bottom: 1px solid rgb(229 231 235);
+}
+
+.dark .admin-report-table th,
+.dark .admin-report-table td {
+  border-bottom: 1px solid rgb(54 54 54);
+}
+
+/* 编号列表子项间距 */
+.admin-report-table .rich-item-list li {
+  line-height: 1.6;
+}
+
+/* ====== 附件上传拖拽区样式 ====== */
+.attachment-drop-zone {
+  transition: all 0.2s ease;
+}
+
+.attachment-drop-zone.drag-over {
+  border-color: #6C63FF;
+  background-color: rgba(108, 99, 255, 0.06);
+}
+
+.dark .attachment-drop-zone.drag-over {
+  background-color: rgba(108, 99, 255, 0.1);
+}
+
+/* 附件缩略图悬停效果 */
+.attachment-thumb:hover .attachment-overlay {
+  opacity: 1;
+}
+
+.attachment-thumb .attachment-overlay {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Lightbox 动画 */
+.lightbox-enter {
+  animation: lightboxFadeIn 0.2s ease;
+}
+
+@keyframes lightboxFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

@@ -3,32 +3,38 @@ import { api } from '../api';
 import { LoadingSpinner } from './LoadingSpinner';
 import { IconEdit2, IconCheck } from './Icons';
 
-interface ProjectWeeklySummary {
-  projectId: string;
-  projectName: string;
-  weeklyUpdate: string;
-  status: string;
-  priority: string;
-  owners: string[];
-  memberAlerts?: string[];
-  scheduleChanges?: string[];
-  delayRisks?: string[];
+// ================== 新数据接口 ==================
+
+/** 编号列表中的一个条目 */
+interface RichItem {
+  number: number;
+  text: string;
+  subItems?: string[];
+  progress?: string;
 }
 
-interface KrWeeklySummary {
-  krId: string;
-  krDesc: string;
-  projectSummaries: ProjectWeeklySummary[];
+/** 表格中一行 = 一个人的周报 */
+interface PersonWeekEntry {
+  personId: string;
+  personName: string;
+  responsibility: string;
+  supportedExecutives: string;
+  thisWeekTop3: RichItem[];
+  dailyRoutineWork: string;
+  nextWeekTop3: RichItem[];
+  issuesAndCrossDept: string;
 }
 
-interface OkrWeeklySummary {
-  okrId: string;
-  objective: string;
-  krSummaries: KrWeeklySummary[];
+/** 模块分组 */
+interface ModuleGroup {
+  moduleId: string;
+  moduleName: string;
+  entries: PersonWeekEntry[];
 }
 
-interface WeeklyReportContent {
-  okrSummaries: OkrWeeklySummary[];
+/** 周报内容 */
+interface AdminWeeklyContent {
+  modules: ModuleGroup[];
 }
 
 interface WeeklyReport {
@@ -38,29 +44,29 @@ interface WeeklyReport {
   startDate: string;
   endDate: string;
   status: string;
-  content: WeeklyReportContent;
+  content: AdminWeeklyContent;
   summary: string;
   createdAt: string;
   updatedAt: string;
   generatedBy: string;
 }
 
-// 历史版本（列表接口不返 content，详情接口返完整 content）
 interface WeeklyReportVersion {
   id: string;
   reportId: string;
   weekYear: number;
   weekNumber: number;
   versionNo: number;
-  content?: WeeklyReportContent;
+  content?: AdminWeeklyContent;
   summary: string;
   generatedBy: string;
   archivedAt: string;
 }
 
-// ---- 视觉辅助 ----
+// ================== 辅助函数 ==================
+
 const pad2 = (n: number) => String(n).padStart(2, '0');
-const shortDate = (s: string) => (s || '').slice(5); // MM-DD
+const shortDate = (s: string) => (s || '').slice(5);
 
 const reportStatusMeta = (s: string) => {
   if (s === 'finalized') return { label: '已归档', cls: 'text-emerald-700 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-500/10', dot: 'bg-emerald-500' };
@@ -68,28 +74,10 @@ const reportStatusMeta = (s: string) => {
   return { label: '已生成', cls: 'text-sky-700 bg-sky-50 dark:text-sky-300 dark:bg-sky-500/10', dot: 'bg-sky-500' };
 };
 
-const projStatusCls = (s: string) => {
-  if (s === '已完成') return 'text-emerald-700 bg-emerald-50 dark:text-emerald-300 dark:bg-emerald-500/10';
-  if (s === '进行中') return 'text-sky-700 bg-sky-50 dark:text-sky-300 dark:bg-sky-500/10';
-  if (s === '已暂停' || s === '已取消') return 'text-zinc-500 bg-zinc-100 dark:text-zinc-400 dark:bg-zinc-500/10';
-  return 'text-zinc-600 bg-zinc-100 dark:text-zinc-300 dark:bg-zinc-500/10';
-};
-
-const projPriorityCls = (p: string) => {
-  if (p === '高' || p === 'P0' || p === '临时重要需求')
-    return 'text-rose-600 border-rose-200 dark:text-rose-400 dark:border-rose-500/30';
-  if (p === '中' || p === 'P1' || p === '部门OKR' || p === '个人OKR')
-    return 'text-amber-600 border-amber-200 dark:text-amber-400 dark:border-amber-500/30';
-  return 'text-zinc-500 border-zinc-200 dark:text-zinc-400 dark:border-zinc-600/40';
-};
-
-// 绝对时间："YYYY-MM-DD HH:mm"
-// 北京时间格式化（UTC+8）
 const formatDateTime = (iso: string) => {
   if (!iso) return '';
   const d = new Date(iso);
   if (isNaN(+d)) return iso;
-  // 转换为北京时间 (UTC+8)
   const utc = d.getTime() + d.getTimezoneOffset() * 60000;
   const bj = new Date(utc + 8 * 3600000);
   const y = bj.getFullYear();
@@ -100,12 +88,10 @@ const formatDateTime = (iso: string) => {
   return `${y}-${m}-${day} ${h}:${min}`;
 };
 
-// 相对时间（基于北京时间）："2 小时前" / "3 天前"
 const timeAgo = (iso: string) => {
   if (!iso) return '';
   const d = new Date(iso);
   if (isNaN(+d)) return '';
-  // 当前北京时间
   const nowUtc = Date.now() + (new Date().getTimezoneOffset() * 60000) + 8 * 3600000;
   const bjTime = d.getTime() + (d.getTimezoneOffset() * 60000) + 8 * 3600000;
   const diff = (nowUtc - bjTime) / 1000;
@@ -115,6 +101,8 @@ const timeAgo = (iso: string) => {
   if (diff < 86400 * 7) return `${Math.floor(diff / 86400)} 天前`;
   return formatDateTime(iso).slice(0, 10);
 };
+
+// ================== 子组件 ==================
 
 const Kicker: React.FC<{ en: string; zh?: string }> = ({ en, zh }) => (
   <div className="flex items-baseline gap-2">
@@ -147,6 +135,59 @@ const MainSkeleton: React.FC = () => (
   </div>
 );
 
+/** 渲染编号列表（本周/下周重点3件事） */
+const RichItemList: React.FC<{ items: RichItem[] }> = ({ items }) => (
+  <div className="space-y-2.5">
+    {items.map((item) => (
+      <div key={item.number}>
+        <div className="font-medium text-zinc-800 dark:text-zinc-200 text-[13px]">
+          {item.number}. {item.text}
+          {item.progress && (
+            <span className="ml-1.5 text-[10px] font-medium px-1.5 py-0.5 rounded bg-sky-100 dark:bg-sky-500/15 text-sky-700 dark:text-sky-300">
+              {item.progress}
+            </span>
+          )}
+        </div>
+        {item.subItems && item.subItems.length > 0 && (
+          <ul className="ml-4 mt-1 space-y-0.5">
+            {item.subItems.map((sub, idx) => (
+              <li key={idx} className="text-[12px] text-zinc-500 dark:text-zinc-400 leading-[1.6] list-disc marker:text-zinc-400 dark:marker:text-zinc-500">
+                {sub}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    ))}
+  </div>
+);
+
+// ================== 表格列定义 ==================
+
+const COL_WIDTHS = {
+  module: '80px',
+  person: '70px',
+  responsibility: '140px',
+  executives: '100px',
+  thisWeek: '300px',
+  dailyWork: '160px',
+  nextWeek: '300px',
+  issues: '160px',
+};
+
+const TABLE_HEADERS = [
+  { key: 'module', label: '模块', width: COL_WIDTHS.module },
+  { key: 'person', label: '人员', width: COL_WIDTHS.person },
+  { key: 'responsibility', label: '职责', width: COL_WIDTHS.responsibility },
+  { key: 'executives', label: '支持高管', width: COL_WIDTHS.executives },
+  { key: 'thisWeek', label: '本周重点3件事', width: COL_WIDTHS.thisWeek },
+  { key: 'dailyWork', label: '日常事务性工作', width: COL_WIDTHS.dailyWork },
+  { key: 'nextWeek', label: '下周重点3件事', width: COL_WIDTHS.nextWeek },
+  { key: 'issues', label: '问题及跨部门协同', width: COL_WIDTHS.issues },
+];
+
+// ================== 主组件 ==================
+
 const WeeklyReportView: React.FC = () => {
   const [reports, setReports] = useState<WeeklyReport[]>([]);
   const [selectedReport, setSelectedReport] = useState<WeeklyReport | null>(null);
@@ -156,7 +197,6 @@ const WeeklyReportView: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editSummary, setEditSummary] = useState('');
   const [error, setError] = useState<string | null>(null);
-  // 历史版本列表 & 当前查看的历史版本（非空时只读预览）
   const [versions, setVersions] = useState<WeeklyReportVersion[]>([]);
   const [viewingVersion, setViewingVersion] = useState<WeeklyReportVersion | null>(null);
   const [versionsOpen, setVersionsOpen] = useState(false);
@@ -180,34 +220,24 @@ const WeeklyReportView: React.FC = () => {
     }
   }, [selectedReport]);
 
-  useEffect(() => {
-    fetchReports();
-  }, [fetchReports]);
+  useEffect(() => { fetchReports(); }, [fetchReports]);
 
-  // 切换周报 tab 时拉历史版本 & 退出历史预览
   useEffect(() => {
     if (!selectedReport?.id) {
-      setVersions([]);
-      setViewingVersion(null);
-      setVersionsOpen(false);
+      setVersions([]); setViewingVersion(null); setVersionsOpen(false);
       return;
     }
-    setViewingVersion(null);
-    setVersionsOpen(false);
-    api
-      .fetchWeeklyReportVersions(selectedReport.id)
+    setViewingVersion(null); setVersionsOpen(false);
+    api.fetchWeeklyReportVersions(selectedReport.id)
       .then((data: any) => setVersions(Array.isArray(data) ? data : []))
       .catch(() => setVersions([]));
   }, [selectedReport?.id]);
 
-  // 点击项外关闭版本下拉
   useEffect(() => {
     if (!versionsOpen) return;
     const onDocClick = (e: MouseEvent) => {
       if (!versionsMenuRef.current) return;
-      if (!versionsMenuRef.current.contains(e.target as Node)) {
-        setVersionsOpen(false);
-      }
+      if (!versionsMenuRef.current.contains(e.target as Node)) setVersionsOpen(false);
     };
     document.addEventListener('mousedown', onDocClick);
     return () => document.removeEventListener('mousedown', onDocClick);
@@ -215,85 +245,54 @@ const WeeklyReportView: React.FC = () => {
 
   const handleGenerate = async () => {
     if (isGenerating || isRegenerating) return;
-    setIsGenerating(true);
-    setError(null);
+    setIsGenerating(true); setError(null);
     try {
       const report = await api.generateWeeklyReport();
       setSelectedReport(report);
       await fetchReports();
-    } catch (err) {
-      setError('生成周报失败');
-      console.error(err);
-    } finally {
-      setIsGenerating(false);
-    }
+    } catch (err) { setError('生成周报失败'); console.error(err); }
+    finally { setIsGenerating(false); }
   };
 
   const handleRegenerate = async () => {
     if (!selectedReport) return;
     if (isGenerating || isRegenerating) return;
-    // v4.3：去除 window.confirm 拦截——清单进入后台，用户可继续操作其它页面
-    setIsRegenerating(true);
-    setError(null);
+    setIsRegenerating(true); setError(null);
     try {
       const report = await api.regenerateWeeklyReport(selectedReport.id);
-      // 后端返回的 archivedVersion 只是归档摘要，这里不处理，再拉一次列表以保持统一
-      const refreshed: WeeklyReport = {
-        ...selectedReport,
-        ...report,
-        id: selectedReport.id,
-      };
+      const refreshed: WeeklyReport = { ...selectedReport, ...report, id: selectedReport.id };
       setSelectedReport(refreshed);
       const list = await api.fetchWeeklyReportVersions(selectedReport.id);
       setVersions(Array.isArray(list) ? list : []);
       await fetchReports();
-    } catch (err) {
-      setError('重新生成失败');
-      console.error(err);
-    } finally {
-      setIsRegenerating(false);
-    }
+    } catch (err) { setError('重新生成失败'); console.error(err); }
+    finally { setIsRegenerating(false); }
   };
 
   const handleOpenVersion = async (versionId: string) => {
     try {
       const v = await api.fetchWeeklyReportVersion(versionId);
-      setViewingVersion(v);
-      setVersionsOpen(false);
-      setIsEditing(false);
-    } catch (err) {
-      setError('加载历史版本失败');
-      console.error(err);
-    }
+      setViewingVersion(v); setVersionsOpen(false); setIsEditing(false);
+    } catch (err) { setError('加载历史版本失败'); console.error(err); }
   };
 
   const handleUpdateSummary = async () => {
     if (!selectedReport) return;
     try {
       const updated = await api.updateWeeklyReport(selectedReport.id, {
-        summary: editSummary,
-        status: 'editing',
+        summary: editSummary, status: 'editing',
       });
-      setSelectedReport(updated);
-      setIsEditing(false);
+      setSelectedReport(updated); setIsEditing(false);
       await fetchReports();
-    } catch (err) {
-      setError('更新周报失败');
-      console.error(err);
-    }
+    } catch (err) { setError('更新周报失败'); console.error(err); }
   };
 
   const getCurrentWeekInfo = () => {
     const now = new Date();
-    return {
-      year: now.getFullYear(),
-      week: getWeekNumber(now),
-    };
+    return { year: now.getFullYear(), week: getWeekNumber(now) };
   };
 
   const getWeekNumber = (date: Date) => {
-    // 按本地时间计算 ISO 周号：走 UTC 会导致北京时区周一 00:00~08:00 与后端（按服务器本地时区 ISOWeek）不一致，
-    // 出现"已生成本周周报但前端仍显示上一周"的边缘误判。
     const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
     const dayNum = d.getDay() || 7;
     d.setDate(d.getDate() + 4 - dayNum);
@@ -302,33 +301,19 @@ const WeeklyReportView: React.FC = () => {
   };
 
   const currentWeek = getCurrentWeekInfo();
-  const hasCurrentWeekReport = reports.some(
-    r => r.weekYear === currentWeek.year && r.weekNumber === currentWeek.week
-  );
+  const hasCurrentWeekReport = reports.some(r => r.weekYear === currentWeek.year && r.weekNumber === currentWeek.week);
 
-  const stripHtml = (html: string) => {
-    if (!html) return '';
-    return html
-      .replace(/<p>/g, '')
-      .replace(/<\/p>/g, '\n')
-      .replace(/<strong>/g, '')
-      .replace(/<\/strong>/g, '')
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/&nbsp;/g, ' ')
-      // 兜底：清除富文本编辑器产生的其它标签（<ul>/<li>/<h3>/<span> 等）
-      .replace(/<[^>]+>/g, '')
-      .trim();
-  };
-
-  // 按时间倒序排序的周报 tabs
   const sortedReports = [...reports].sort((a, b) => {
     if (a.weekYear !== b.weekYear) return b.weekYear - a.weekYear;
     return b.weekNumber - a.weekNumber;
   });
 
+  // 获取当前应展示的 content（考虑历史版本预览）
+  const activeContent = (viewingVersion?.content || selectedReport?.content) as AdminWeeklyContent | undefined;
+
   return (
     <div className="flex-1 h-full flex flex-col bg-zinc-50 dark:bg-[#181818] overflow-hidden">
-      {/* Top Chrome */}
+      {/* ====== Header ====== */}
       <header className="bg-white dark:bg-[#222] border-b border-zinc-200 dark:border-[#333]">
         {/* Row 1: Title + Generate */}
         <div className="flex items-center justify-between gap-6 px-8 pt-5 pb-4">
@@ -371,12 +356,8 @@ const WeeklyReportView: React.FC = () => {
             >
               {(isGenerating || isRegenerating) && <LoadingSpinner size="sm" />}
               {hasCurrentWeekReport
-                ? isRegenerating
-                  ? '重新生成中…'
-                  : '重新生成'
-                : isGenerating
-                ? '生成中…'
-                : '生成本周周报'}
+                ? isRegenerating ? '重新生成中…' : '重新生成'
+                : isGenerating ? '生成中…' : '生成本周周报'}
             </button>
           </div>
         </div>
@@ -419,9 +400,10 @@ const WeeklyReportView: React.FC = () => {
         )}
       </header>
 
-      {/* Main */}
+      {/* ====== Main ====== */}
       <main className="flex-1 overflow-y-auto">
-        <div className="w-full px-8 py-8 lg:px-12 xl:px-16 2xl:px-24 xl:py-10">
+        <div className="w-full px-6 py-6 lg:px-10 xl:px-14 xl:py-8">
+
           {error && (
             <div className="mb-6 rounded-md border border-rose-200/70 bg-rose-50/80 dark:border-rose-500/20 dark:bg-rose-500/5 px-4 py-2.5 text-[13px] text-rose-600 dark:text-rose-400">
               {error}
@@ -456,13 +438,12 @@ const WeeklyReportView: React.FC = () => {
                 </div>
               )}
 
-              {/* Hero — 紧凑信息条（周期 · 状态 · 最后修改 · 生成方 · 版本） */}
-              <section className="pb-6 border-b border-zinc-200 dark:border-[#333]">
+              {/* Hero — 元信息条 */}
+              <section className="pb-5 border-b border-zinc-200 dark:border-[#333]">
                 <div className="mb-3">
                   <Kicker en={`Week ${pad2(selectedReport.weekNumber)} / ${selectedReport.weekYear}`} zh="本期周报" />
                 </div>
                 <div className="flex items-end justify-between gap-6 flex-wrap">
-                  {/* 左：周期 */}
                   <h2 className="flex items-baseline gap-3 font-mono tracking-tight text-zinc-900 dark:text-white leading-none">
                     <span className="text-[28px] md:text-[32px] font-semibold">
                       {selectedReport.startDate}
@@ -475,12 +456,9 @@ const WeeklyReportView: React.FC = () => {
                     </span>
                   </h2>
 
-                  {/* 右：元信息（状态 · 最后修改 · 生成方 · 版本） */}
                   <dl className="flex flex-wrap items-baseline gap-x-8 gap-y-2 text-[12px]">
                     <div className="flex flex-col gap-1">
-                      <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-                        Status
-                      </dt>
+                      <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">Status</dt>
                       <dd>
                         {viewingVersion ? (
                           <span className="inline-flex items-center gap-1.5 text-[11.5px] font-medium h-6 px-2 rounded text-amber-700 dark:text-amber-300 bg-amber-100/70 dark:bg-amber-500/15">
@@ -500,7 +478,7 @@ const WeeklyReportView: React.FC = () => {
                     </div>
                     <div className="flex flex-col gap-1">
                       <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-                        {viewingVersion ? 'Archived\u00a0At' : 'Last\u00a0Modified'}
+                        {viewingVersion ? 'Archived At' : 'Last Modified'}
                       </dt>
                       <dd className="flex items-baseline gap-2">
                         <span className="font-mono text-[12.5px] text-zinc-800 dark:text-zinc-200">
@@ -512,9 +490,7 @@ const WeeklyReportView: React.FC = () => {
                       </dd>
                     </div>
                     <div className="flex flex-col gap-1">
-                      <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-                        Generated&nbsp;By
-                      </dt>
+                      <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">Generated&nbsp;By</dt>
                       <dd className="font-mono text-[12.5px] text-zinc-600 dark:text-zinc-300">
                         {(() => {
                           const by = viewingVersion ? viewingVersion.generatedBy : selectedReport.generatedBy;
@@ -522,16 +498,14 @@ const WeeklyReportView: React.FC = () => {
                         })()}
                       </dd>
                     </div>
-                    {/* Version 列 + 下拉 */}
+                    {/* Version dropdown */}
                     <div className="flex flex-col gap-1 relative" ref={versionsMenuRef}>
-                      <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-                        Version
-                      </dt>
+                      <dt className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">Version</dt>
                       <dd>
                         {(() => {
                           const currentVersionNo = versions.length + 1;
                           const showingVer = viewingVersion ? viewingVersion.versionNo : currentVersionNo;
-                          const totalVersions = versions.length + 1; // 当前 + 历史
+                          const totalVersions = versions.length + 1;
                           const clickable = versions.length > 0 || !!viewingVersion;
                           return (
                             <button
@@ -555,14 +529,11 @@ const WeeklyReportView: React.FC = () => {
                           );
                         })()}
                         {versionsOpen && (
-                          <div className="absolute right-0 top-full mt-2 z-20 w-[320px] rounded-md border border-zinc-200 dark:border-[#363636] bg-white dark:bg-[#1f1f1f] shadow-lg overflow-hidden">
+                          <div className="absolute right-0 top-full mt-2 z-20 w-[280px] rounded-md border border-zinc-200 dark:border-[#363636] bg-white dark:bg-[#1f1f1f] shadow-lg overflow-hidden">
                             <div className="px-3 py-2 border-b border-zinc-100 dark:border-[#2a2a2a]">
-                              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-                                Versions
-                              </div>
+                              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">Versions</div>
                             </div>
-                            <ul className="max-h-[340px] overflow-y-auto">
-                              {/* 当前版本 */}
+                            <ul className="max-h-[280px] overflow-y-auto">
                               <li>
                                 <button
                                   type="button"
@@ -571,23 +542,13 @@ const WeeklyReportView: React.FC = () => {
                                 >
                                   <div className="flex items-center justify-between gap-2">
                                     <div className="flex items-baseline gap-2">
-                                      <span className="font-mono text-[12.5px] font-semibold text-[#6C63FF] dark:text-[#B4AEFF]">
-                                        v{versions.length + 1}
-                                      </span>
-                                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-sky-100 dark:bg-sky-500/15 text-sky-700 dark:text-sky-300 font-medium">
-                                        当前
-                                      </span>
+                                      <span className="font-mono text-[12.5px] font-semibold text-[#6C63FF] dark:text-[#B4AEFF]">v{versions.length + 1}</span>
+                                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-sky-100 dark:bg-sky-500/15 text-sky-700 dark:text-sky-300 font-medium">当前</span>
                                     </div>
-                                    <span className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
-                                      {formatDateTime(selectedReport.updatedAt)}
-                                    </span>
-                                  </div>
-                                  <div className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
-                                    {selectedReport.generatedBy === 'system' ? 'GLM-5 · auto' : (selectedReport.generatedBy || '—')}
+                                    <span className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">{formatDateTime(selectedReport.updatedAt)}</span>
                                   </div>
                                 </button>
                               </li>
-                              {/* 历史版本（按 versionNo 倒序） */}
                               {versions.map((v) => (
                                 <li key={v.id} className="border-t border-zinc-100 dark:border-[#2a2a2a]">
                                   <button
@@ -597,16 +558,10 @@ const WeeklyReportView: React.FC = () => {
                                   >
                                     <div className="flex items-center justify-between gap-2">
                                       <div className="flex items-baseline gap-2">
-                                        <span className="font-mono text-[12.5px] font-semibold text-zinc-700 dark:text-zinc-200">
-                                          v{v.versionNo}
-                                        </span>
-                                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-500/15 text-zinc-600 dark:text-zinc-300">
-                                          历史
-                                        </span>
+                                        <span className="font-mono text-[12.5px] font-semibold text-zinc-700 dark:text-zinc-200">v{v.versionNo}</span>
+                                        <span className="text-[11px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-500/15 text-zinc-600 dark:text-zinc-300">历史</span>
                                       </div>
-                                      <span className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
-                                        {formatDateTime(v.archivedAt)}
-                                      </span>
+                                      <span className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">{formatDateTime(v.archivedAt)}</span>
                                     </div>
                                     <div className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
                                       {v.generatedBy === 'system' ? 'GLM-5 · auto' : (v.generatedBy || '—')}
@@ -626,7 +581,7 @@ const WeeklyReportView: React.FC = () => {
               </section>
 
               {/* AI Summary */}
-              <section className="pt-8 pb-10 border-b border-zinc-200 dark:border-[#333]">
+              <section className="pt-6 pb-8 border-b border-zinc-200 dark:border-[#333]">
                 <div className="flex items-baseline justify-between mb-5">
                   <Kicker en="Summary" zh={viewingVersion ? `AI 总结 · 历史版 v${viewingVersion.versionNo}` : 'AI 总结'} />
                   {!viewingVersion && (!isEditing ? (
@@ -660,28 +615,16 @@ const WeeklyReportView: React.FC = () => {
                   <textarea
                     value={editSummary}
                     onChange={(e) => setEditSummary(e.target.value)}
-                    className="w-full min-h-[360px] p-4 rounded-md bg-white dark:bg-[#1F1F1F] border border-zinc-200 dark:border-[#363636] text-[14.5px] text-zinc-800 dark:text-zinc-100 leading-[1.75] focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/15 transition-all"
+                    className="w-full min-h-[240px] p-4 rounded-md bg-white dark:bg-[#1F1F1F] border border-zinc-200 dark:border-[#363636] text-[14px] text-zinc-800 dark:text-zinc-100 leading-[1.75] focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/15 transition-all"
                     placeholder="输入周报总结..."
                   />
                 ) : (
-                  <article className="max-w-[80ch] text-[14.5px] text-zinc-700 dark:text-zinc-300 leading-[1.8]">
+                  <article className="max-w-[80ch] text-[14px] text-zinc-700 dark:text-zinc-300 leading-[1.8]">
                     {(() => {
                       const text = (viewingVersion ? viewingVersion.summary : selectedReport.summary) || '';
                       if (!text) return <span className="text-zinc-400 dark:text-zinc-500 italic">暂无总结</span>;
                       return text.split('\n').map((line: string, i: number) => {
-                        // OKR Objective 标题行：匹配 "1. xxx" 或 "第 X 周周报" 或 "临时重要需求"
-                        const isObjLine = /^\d+\.\s+\S/.test(line) || /^第\s*\d+\s*周周报/.test(line) || /^临时重要需求/.test(line) || /^本周排期空闲人员/.test(line);
-                        // KR 标题行：匹配 "1.1 xxx"
-                        const isKrLine = /^\d+\.\d+\s+\S/.test(line);
-                        if (isObjLine) {
-                          return <div key={i} className="font-bold text-zinc-900 dark:text-white mt-4 mb-1 first:mt-0">{line}</div>;
-                        }
-                        if (isKrLine) {
-                          return <div key={i} className="font-semibold text-zinc-800 dark:text-zinc-200 mt-2 mb-0.5">{line}</div>;
-                        }
-                        if (line.trim() === '') {
-                          return <div key={i} className="h-2" />;
-                        }
+                        if (line.trim() === '') return <div key={i} className="h-2" />;
                         return <div key={i} className="whitespace-pre-wrap">{line}</div>;
                       });
                     })()}
@@ -689,156 +632,97 @@ const WeeklyReportView: React.FC = () => {
                 )}
               </section>
 
-              {/* OKR Breakdown */}
-              <section className="pt-10 pb-16">
-                <div className="mb-8">
-                  <Kicker en="Breakdown" zh="按 OKR 维度汇总" />
+              {/* ====== 行政周报表 ====== */}
+              <section className="pt-8 pb-12">
+                <div className="mb-6">
+                  <Kicker en="Admin Weekly" zh="行政周报表" />
                 </div>
 
-                <div className="space-y-12">
-                  {[...(((viewingVersion ? viewingVersion.content : selectedReport.content)?.okrSummaries) || [])]
-                    .sort((a, b) => (a.okrId || '').localeCompare(b.okrId || ''))
-                    .map((okr, okrIdx) => {
-                      const sortedKrs = [...(okr.krSummaries || [])].sort((a, b) =>
-                        (a.krId || '').localeCompare(b.krId || '')
-                      );
-                      const projectCount = sortedKrs.reduce(
-                        (acc, kr) => acc + (kr.projectSummaries?.length || 0), 0
-                      );
-                      const isUrgent = okr.okrId === 'zz-urgent';
-                      const accent = isUrgent ? '#F59E0B' : '#6C63FF';
-                      const badge = isUrgent ? '临' : `O${okrIdx + 1}`;
-
-                      return (
-                        <section key={okr.okrId} className="relative pl-8">
-                          <span
-                            className="absolute left-0 top-[6px] bottom-2 w-[3px] rounded-full"
-                            style={{ backgroundColor: accent }}
-                          />
-                          <header className="mb-6">
-                            <div className="flex items-baseline gap-3 mb-2">
-                              <span
-                                className="inline-flex items-center justify-center h-[22px] min-w-[28px] px-1.5 rounded text-[11px] font-bold text-white tracking-wide"
-                                style={{ backgroundColor: accent }}
+                {activeContent && activeContent.modules && activeContent.modules.length > 0 ? (
+                  <div className="overflow-x-auto border border-zinc-200 dark:border-[#333] rounded-lg bg-white dark:bg-[#232323]">
+                    <table
+                      className="admin-report-table w-full"
+                      style={{ tableLayout: 'fixed', minWidth: '1300px' }}
+                    >
+                      <colgroup>
+                        {TABLE_HEADERS.map((h) => (
+                          <col key={h.key} style={{ width: h.width }} />
+                        ))}
+                      </colgroup>
+                      <thead>
+                        <tr className="bg-zinc-50 dark:bg-[#1a1a1a] border-b border-zinc-200 dark:border-[#333]">
+                          {TABLE_HEADERS.map((h) => (
+                            <th
+                              key={h.key}
+                              className="px-3 py-2.5 text-[11.5px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-[0.1em] text-left align-top whitespace-nowrap"
+                            >
+                              {h.label}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {activeContent.modules.map((mod) => (
+                          <React.Fragment key={mod.moduleId}>
+                            {/* 模块分组行 */}
+                            <tr>
+                              <td
+                                colSpan={8}
+                                className="bg-[#6C63FF]/[0.06] dark:bg-[#6C63FF]/[0.12] px-4 py-2.5 text-[13px] font-semibold text-[#6C63FF] dark:text-[#B4AEFF] border-b border-zinc-200 dark:border-[#333]"
                               >
-                                {badge}
-                              </span>
-                              <h3 className="text-[17px] font-semibold tracking-tight text-zinc-900 dark:text-white leading-snug">
-                                {okr.objective || '未关联目标'}
-                              </h3>
-                            </div>
-                            <div className="text-[11px] font-mono tracking-tight text-zinc-400 dark:text-zinc-500 uppercase">
-                              {isUrgent
-                                ? `${pad2(projectCount)} projects · 非 OKR 需求`
-                                : `${pad2(sortedKrs.length)} KR · ${pad2(projectCount)} projects`}
-                            </div>
-                          </header>
-
-                          <div className="space-y-8">
-                            {sortedKrs.map((kr, krIdx) => (
-                              <div key={kr.krId}>
-                                <div className="flex items-baseline gap-2.5 mb-3">
-                                  {!isUrgent && (
-                                    <span
-                                      className="text-[10px] font-mono font-semibold tracking-[0.12em]"
-                                      style={{ color: accent }}
-                                    >
-                                      KR{okrIdx + 1}.{krIdx + 1}
-                                    </span>
-                                  )}
-                                  <span className="text-[13.5px] font-medium text-zinc-700 dark:text-zinc-200">
-                                    {kr.krDesc || '未命名关键结果'}
-                                  </span>
-                                </div>
-
-                                {kr.projectSummaries && kr.projectSummaries.length > 0 ? (
-                                  <ul className="divide-y divide-zinc-200/70 dark:divide-[#333] border-y border-zinc-200/70 dark:border-[#333]">
-                                    {kr.projectSummaries.map((proj) => (
-                                      <li
-                                        key={proj.projectId}
-                                        className="group py-4 transition-colors hover:bg-zinc-50/70 dark:hover:bg-[#1f1f1f]/60 rounded-sm"
-                                      >
-                                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                                          <h4 className="text-[14px] font-medium text-zinc-900 dark:text-white">
-                                            {proj.projectName}
-                                          </h4>
-                                          {proj.status && (
-                                            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${projStatusCls(proj.status)}`}>
-                                              {proj.status}
-                                            </span>
-                                          )}
-                                          {proj.priority && (
-                                            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded border ${projPriorityCls(proj.priority)}`}>
-                                              {proj.priority}
-                                            </span>
-                                          )}
-                                        </div>
-
-                                        <p className="text-[13.5px] text-zinc-600 dark:text-zinc-300 leading-[1.75] whitespace-pre-wrap">
-                                          {stripHtml(proj.weeklyUpdate) || (
-                                            <span className="text-zinc-400 dark:text-zinc-500">—</span>
-                                          )}
-                                        </p>
-
-                                        {proj.owners && proj.owners.filter(Boolean).length > 0 && (
-                                          <div className="mt-2.5 flex items-center gap-2 text-[11px]">
-                                            <span className="font-semibold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
-                                              负责人
-                                            </span>
-                                            <span className="text-zinc-600 dark:text-zinc-300">
-                                              {proj.owners.filter(Boolean).join(' · ')}
-                                            </span>
-                                          </div>
-                                        )}
-
-                                        {/* 项目告警信息：排期缺失、排期延后、延期风险、无进展 */}
-                                        {(() => {
-                                          const allAlerts = [
-                                            ...(proj.memberAlerts || []),
-                                            ...(proj.scheduleChanges || []),
-                                            ...(proj.delayRisks || []),
-                                          ];
-                                          if (allAlerts.length === 0) return null;
-                                          return (
-                                            <div className="mt-2.5 space-y-1">
-                                              {allAlerts.map((alert, idx) => (
-                                                <div
-                                                  key={idx}
-                                                  className="text-[12px] leading-relaxed text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded px-2.5 py-1.5"
-                                                >
-                                                  {alert}
-                                                </div>
-                                              ))}
-                                            </div>
-                                          );
-                                        })()}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                ) : (
-                                  <div className="text-[11px] italic text-zinc-400 dark:text-zinc-500">
-                                    本周该 KR 下暂无项目进展
-                                  </div>
-                                )}
-                              </div>
+                                {mod.moduleName}
+                              </td>
+                            </tr>
+                            {/* 人员行 */}
+                            {mod.entries.map((entry, entryIdx) => (
+                              <tr key={entry.personId} className="hover:bg-zinc-50/60 dark:hover:bg-[#1f1f1f]/40 transition-colors">
+                                {/* 模块列 - 仅模块第一行显示 */}
+                                <td className="px-3 py-3 text-[13px] text-zinc-400 dark:text-zinc-500 align-top border-b border-zinc-100 dark:border-[#2a2a2a]">
+                                  {entryIdx === 0 ? mod.moduleName : ''}
+                                </td>
+                                {/* 人员 */}
+                                <td className="px-3 py-3 text-[13px] font-medium text-zinc-800 dark:text-zinc-200 align-top border-b border-zinc-100 dark:border-[#2a2a2a]">
+                                  {entry.personName}
+                                </td>
+                                {/* 职责 */}
+                                <td className="px-3 py-3 text-[12.5px] text-zinc-600 dark:text-zinc-400 align-top whitespace-pre-wrap border-b border-zinc-100 dark:border-[#2a2a2a] leading-[1.6]">
+                                  {entry.responsibility}
+                                </td>
+                                {/* 支持高管 */}
+                                <td className="px-3 py-3 text-[12.5px] text-zinc-600 dark:text-zinc-400 align-top whitespace-pre-wrap border-b border-zinc-100 dark:border-[#2a2a2a] leading-[1.6]">
+                                  {entry.supportedExecutives}
+                                </td>
+                                {/* 本周重点3件事 */}
+                                <td className="px-3 py-3 align-top border-b border-zinc-100 dark:border-[#2a2a2a]">
+                                  <RichItemList items={entry.thisWeekTop3} />
+                                </td>
+                                {/* 日常事务性工作 */}
+                                <td className="px-3 py-3 text-[12.5px] text-zinc-600 dark:text-zinc-400 align-top whitespace-pre-wrap border-b border-zinc-100 dark:border-[#2a2a2a] leading-[1.6]">
+                                  {entry.dailyRoutineWork || <span className="text-zinc-400 dark:text-zinc-500">/</span>}
+                                </td>
+                                {/* 下周重点3件事 */}
+                                <td className="px-3 py-3 align-top border-b border-zinc-100 dark:border-[#2a2a2a]">
+                                  <RichItemList items={entry.nextWeekTop3} />
+                                </td>
+                                {/* 问题及跨部门协同 */}
+                                <td className="px-3 py-3 text-[12.5px] text-zinc-600 dark:text-zinc-400 align-top whitespace-pre-wrap border-b border-zinc-100 dark:border-[#2a2a2a] leading-[1.6]">
+                                  {entry.issuesAndCrossDept || <span className="text-zinc-400 dark:text-zinc-500">/</span>}
+                                </td>
+                              </tr>
                             ))}
-                          </div>
-                        </section>
-                      );
-                    })}
-
-                  {(() => {
-                    const src = viewingVersion ? viewingVersion.content : selectedReport.content;
-                    return (!src?.okrSummaries || src.okrSummaries.length === 0) ? (
-                      <div className="py-16 text-center">
-                        <p className="text-[13px] text-zinc-500 dark:text-zinc-400">暂无 OKR 汇总数据</p>
-                        <p className="mt-1 text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
-                          No projects attached to active OKRs this week
-                        </p>
-                      </div>
-                    ) : null;
-                  })()}
-                </div>
+                          </React.Fragment>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="py-12 text-center">
+                    <p className="text-[13px] text-zinc-500 dark:text-zinc-400">暂无行政周报表数据</p>
+                    <p className="mt-1 text-[11px] font-mono text-zinc-400 dark:text-zinc-500">
+                      No admin weekly table data available for this period
+                    </p>
+                  </div>
+                )}
               </section>
             </div>
           ) : (

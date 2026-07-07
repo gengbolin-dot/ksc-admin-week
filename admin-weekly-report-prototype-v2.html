@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>行政周报看板 v2</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-family:'Inter','PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;height:100%;}
+body{height:100%;display:flex;flex-direction:column;background:#F3F4F6;color:#111827;transition:background .2s,color .2s;}
+/* dark */
+html.dark body{background:#121212;color:#F9FAFB;}
+html.dark .sidebar{background:#1F1F1F;border-color:#363636;}
+html.dark .topbar{background:#1F1F1F;border-color:#363636;}
+html.dark .card,.dark-card{background:#1F1F1F;border-color:#363636;}
+html.dark .gh{background:#1a1a2e;border-color:#2d2d5e;}
+html.dark .week-btn{background:#2a2a2a;color:#9CA3AF;}
+html.dark .week-btn.active{background:#6C63FF;color:#fff;}
+html.dark .search-input{background:#2a2a2a;border-color:#363636;color:#F9FAFB;}
+html.dark .search-input::placeholder{color:#6B7280;}
+html.dark .nav-item:hover{background:#2a2a2a;}
+html.dark .nav-item.active{background:#1e1b4b;color:#818cf8;}
+html.dark .stat-box{background:#2a2a2a;}
+html.dark .modal-bg{background:rgba(0,0,0,.75);}
+html.dark .modal{background:#1F1F1F;border-color:#363636;}
+html.dark .person-list-item{border-color:#2a2a2a;}
+html.dark .person-list-item:hover{background:#252525;}
+html.dark .person-list-item.active{background:#1e1b4b;border-color:#6C63FF;}
+html.dark .timeline-entry{border-color:#2a2a2a;background:#252525;}
+html.dark .proj-card{background:#252525;border-color:#363636;}
+html.dark .proj-card:hover{border-color:#6C63FF;}
+html.dark .quarter-header{background:#1a1a2e;border-color:#2d2d5e;color:#818cf8;}
+html.dark .filter-select{background:#2a2a2a;border-color:#363636;color:#F9FAFB;}
+html.dark input,html.dark textarea,html.dark select{background:#2a2a2a;border-color:#363636;color:#F9FAFB;}
+html.dark .chip{background:#2a2a2a;color:#9CA3AF;}
+html.dark .chip.active{background:#1e1b4b;color:#818cf8;border-color:#6C63FF;}
+html.dark .tag-sm{background:#2a2a2a;}
+html.dark .divider{border-color:#2a2a2a;}
+html.dark .empty{color:#6B7280;}
+/* layout */
+.app{display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:220px;flex-shrink:0;background:#fff;border-right:1px solid #E5E7EB;display:flex;flex-direction:column;padding:16px 12px;transition:width .25s;overflow:hidden;}
+.sidebar.collapsed{width:68px;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:#fff;border-bottom:1px solid #E5E7EB;padding:10px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap;}
+.content{flex:1;overflow-y:auto;padding:20px;}
+/* sidebar */
+.logo-wrap{display:flex;align-items:center;gap:10px;margin-bottom:20px;overflow:hidden;}
+.logo-icon{width:36px;height:36px;background:#6C63FF;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:17px;font-weight:700;}
+.logo-text{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;}
+html.dark .logo-text{color:#F9FAFB;}
+.collapse-btn{margin-left:auto;padding:4px;border:none;background:none;cursor:pointer;color:#9CA3AF;border-radius:6px;flex-shrink:0;}
+.collapse-btn:hover{background:#F3F4F6;}
+html.dark .collapse-btn:hover{background:#2a2a2a;}
+.nav-section{font-size:11px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.05em;padding:0 8px;margin:12px 0 4px;white-space:nowrap;overflow:hidden;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:#6B7280;font-weight:500;transition:all .15s;text-decoration:none;white-space:nowrap;overflow:hidden;}
+.nav-item:hover{background:#F3F4F6;color:#111827;}
+.nav-item.active{background:#EEF2FF;color:#6C63FF;font-weight:600;}
+.nav-icon{width:20px;height:20px;flex-shrink:0;}
+.sidebar-footer{margin-top:auto;padding-top:12px;border-top:1px solid #E5E7EB;}
+html.dark .sidebar-footer{border-color:#363636;}
+.user-wrap{display:flex;align-items:center;gap:10px;padding:6px;overflow:hidden;}
+.user-av{width:32px;height:32px;background:#6C63FF;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0;}
+.user-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-role{font-size:11px;color:#9CA3AF;}
+/* topbar */
+.topbar-title{font-size:17px;font-weight:700;}
+.week-switcher{display:flex;align-items:center;gap:4px;}
+.week-btn{padding:5px 12px;border-radius:7px;border:none;background:#F3F4F6;color:#6B7280;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;}
+.week-btn.active{background:#6C63FF;color:#fff;}
+.week-arr{padding:5px;border:none;background:none;cursor:pointer;color:#9CA3AF;border-radius:6px;}
+.week-arr:hover{background:#F3F4F6;}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.search-wrap{position:relative;}
+.search-input{padding:7px 12px 7px 34px;border:1px solid #E5E7EB;border-radius:8px;background:#F9FAFB;font-size:13px;width:200px;outline:none;transition:border-color .15s;}
+.search-input:focus{border-color:#6C63FF;box-shadow:0 0 0 3px rgba(108,99,255,.1);}
+.search-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9CA3AF;}
+.btn{padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:all .15s;}
+.btn-primary{background:#6C63FF;color:#fff;}
+.btn-primary:hover{background:#5a52e8;}
+.btn-ghost{background:transparent;color:#6B7280;}
+.btn-ghost:hover{background:#F3F4F6;color:#111827;}
+html.dark .btn-ghost:hover{background:#2a2a2a;color:#F9FAFB;}
+.btn-danger{background:#FEE2E2;color:#DC2626;}
+.btn-danger:hover{background:#FECACA;}
+/* stats */
+.stats-bar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.stat-box{background:#fff;border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;flex:1;min-width:140px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.stat-icon.purple{background:#EEF2FF;color:#6C63FF;}
+.stat-icon.green{background:#ECFDF5;color:#10B981;}
+.stat-icon.orange{background:#FFF7ED;color:#F97316;}
+.stat-icon.blue{background:#EFF6FF;color:#3B82F6;}
+.stat-value{font-size:22px;font-weight:700;}
+.stat-label{font-size:12px;color:#9CA3AF;margin-top:1px;}
+/* chips filter */
+.chips-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.chip{padding:5px 12px;border-radius:20px;border:1px solid #E5E7EB;background:#fff;color:#6B7280;cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;user-select:none;}
+.chip:hover{border-color:#6C63FF;color:#6C63FF;}
+.chip.active{background:#EEF2FF;border-color:#6C63FF;color:#6C63FF;font-weight:600;}
+/* group header */
+.gh{background:#EEF2FF;border:1px solid #C7D2FE;border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
+.gh-title{font-weight:700;color:#4338CA;font-size:14px;}
+.gh-count{font-size:12px;color:#6C63FF;background:#fff;padding:2px 8px;border-radius:10px;margin-left:4px;}
+.gh-arrow{margin-left:auto;color:#6C63FF;transition:transform .2s;}
+.gh-arrow.open{transform:rotate(180deg);}
+/* person cards grid */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:20px;}
+.card{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:box-shadow .15s;}
+.card:hover{box-shadow:0 4px 12px rgba(108,99,255,.1);}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;flex-shrink:0;}
+.card-name{font-weight:700;font-size:14px;}
+.card-module{font-size:11px;color:#9CA3AF;margin-top:1px;}
+.tag-sm{display:inline-block;padding:2px 7px;border-radius:5px;font-size:11px;font-weight:500;background:#F3F4F6;color:#6B7280;margin-right:4px;margin-bottom:2px;}
+.section-row{margin-top:10px;border-top:1px solid #F3F4F6;padding-top:8px;}
+html.dark .section-row{border-color:#2a2a2a;}
+.section-label{font-size:11px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+.section-text{font-size:12px;line-height:1.6;color:#374151;white-space:pre-line;max-height:80px;overflow:hidden;mask-image:linear-gradient(to bottom,#000 60%,transparent 100%);}
+html.dark .section-text{color:#D1D5DB;}
+.expand-btn{font-size:11px;color:#6C63FF;cursor:pointer;margin-top:4px;display:inline-flex;align-items:center;gap:3px;}
+.expand-btn:hover{text-decoration:underline;}
+/* personal view */
+.personal-layout{display:flex;gap:16px;height:calc(100vh - 120px);}
+.person-list{width:200px;flex-shrink:0;background:#fff;border:1px solid #E5E7EB;border-radius:12px;overflow-y:auto;}
+html.dark .person-list{background:#1F1F1F;border-color:#363636;}
+.person-list-item{padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;border-bottom:1px solid #F3F4F6;transition:background .15s;}
+.person-list-item:hover{background:#F9FAFB;}
+.person-list-item.active{background:#EEF2FF;border-left:3px solid #6C63FF;}
+.person-detail{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
+.personal-stats{display:flex;gap:12px;flex-shrink:0;}
+.personal-stat{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:14px 18px;flex:1;display:flex;align-items:center;gap:12px;}
+html.dark .personal-stat{background:#1F1F1F;border-color:#363636;}
+.timeline-wrap{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:16px;flex:1;}
+html.dark .timeline-wrap{background:#1F1F1F;border-color:#363636;}
+.timeline-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.timeline-entry{border:1px solid #E5E7EB;border-radius:10px;padding:14px;margin-bottom:10px;background:#FAFAFA;}
+.timeline-week{font-size:12px;font-weight:700;color:#6C63FF;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.timeline-week::before{content:'';display:inline-block;width:8px;height:8px;background:#6C63FF;border-radius:50%;}
+.timeline-section{margin-top:8px;}
+.timeline-section-label{font-size:11px;font-weight:600;color:#9CA3AF;text-transform:uppercase;margin-bottom:4px;}
+.timeline-text{font-size:12px;line-height:1.6;color:#374151;white-space:pre-line;}
+html.dark .timeline-text{color:#D1D5DB;}
+/* annual projects */
+.annual-toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.filter-select{padding:6px 10px;border:1px solid #E5E7EB;border-radius:8px;background:#fff;font-size:13px;outline:none;color:#374151;cursor:pointer;}
+.filter-select:focus{border-color:#6C63FF;}
+.quarter-section{margin-bottom:20px;}
+.quarter-header{background:#EEF2FF;border:1px solid #C7D2FE;border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer;user-select:none;}
+.quarter-label{font-weight:700;color:#4338CA;font-size:14px;}
+.quarter-count{font-size:12px;color:#6C63FF;background:#fff;padding:2px 8px;border-radius:10px;}
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+.proj-card{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:14px;cursor:pointer;transition:all .15s;position:relative;}
+.proj-card:hover{box-shadow:0 4px 14px rgba(108,99,255,.12);border-color:#A5B4FC;}
+.proj-name{font-weight:700;font-size:13px;margin-bottom:6px;padding-right:24px;}
+.proj-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;}
+.badge-planned{background:#F3F4F6;color:#6B7280;}
+.badge-doing{background:#DBEAFE;color:#1D4ED8;}
+.badge-done{background:#D1FAE5;color:#065F46;}
+.badge-paused{background:#FEF3C7;color:#92400E;}
+.badge-p0{background:#FEE2E2;color:#991B1B;}
+.badge-p1{background:#FFF7ED;color:#9A3412;}
+.badge-p2{background:#F3F4F6;color:#6B7280;}
+.proj-owner{font-size:12px;color:#6B7280;display:flex;align-items:center;gap:4px;}
+.proj-progress{font-size:12px;color:#6B7280;line-height:1.5;margin-top:6px;border-top:1px solid #F3F4F6;padding-top:6px;}
+html.dark .proj-progress{border-color:#2a2a2a;}
+.proj-actions{position:absolute;top:10px;right:10px;display:flex;gap:4px;opacity:0;transition:opacity .15s;}
+.proj-card:hover .proj-actions{opacity:1;}
+.icon-btn{width:26px;height:26px;border-radius:6px;border:none;background:#F3F4F6;color:#6B7280;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+html.dark .icon-btn{background:#363636;color:#9CA3AF;}
+.icon-btn:hover{background:#EEF2FF;color:#6C63FF;}
+.icon-btn.del:hover{background:#FEE2E2;color:#DC2626;}
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;}
+.modal-bg.hidden{display:none;}
+.modal{background:#fff;border-radius:16px;padding:24px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.modal-title{font-size:16px;font-weight:700;flex:1;}
+.modal-close{width:32px;height:32px;border-radius:8px;border:none;background:none;cursor:pointer;color:#9CA3AF;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{background:#F3F4F6;color:#111827;}
+html.dark .modal-close:hover{background:#2a2a2a;color:#F9FAFB;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:12px;font-weight:600;color:#6B7280;margin-bottom:6px;display:block;}
+.form-input{width:100%;padding:8px 12px;border:1px solid #E5E7EB;border-radius:8px;font-size:13px;outline:none;font-family:inherit;}
+.form-input:focus{border-color:#6C63FF;box-shadow:0 0 0 3px rgba(108,99,255,.1);}
+.form-row{display:flex;gap:10px;}
+.form-row .form-group{flex:1;}
+textarea.form-input{resize:vertical;min-height:70px;}
+.form-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px;border-top:1px solid #E5E7EB;padding-top:16px;}
+html.dark .form-footer{border-color:#363636;}
+/* detail modal */
+.dm-section{margin-top:14px;border-top:1px solid #E5E7EB;padding-top:12px;}
+html.dark .dm-section{border-color:#363636;}
+.dm-label{font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;margin-bottom:6px;}
+.dm-text{font-size:13px;line-height:1.7;white-space:pre-line;color:#374151;}
+html.dark .dm-text{color:#D1D5DB;}
+/* quarter multi-select */
+.q-checks{display:flex;gap:8px;flex-wrap:wrap;}
+.q-check{padding:5px 12px;border:1px solid #E5E7EB;border-radius:7px;cursor:pointer;font-size:13px;user-select:none;transition:all .15s;}
+.q-check.selected{background:#EEF2FF;border-color:#6C63FF;color:#6C63FF;font-weight:600;}
+.empty{text-align:center;padding:48px 20px;color:#9CA3AF;font-size:14px;}
+.divider{border:none;border-top:1px solid #E5E7EB;margin:16px 0;}
+</style>
+</head>
+<body>
+<div class="app">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo-wrap">
+    <div class="logo-icon">行</div>
+    <span class="logo-text">行政周报看板</span>
+    <button class="collapse-btn" onclick="toggleSidebar()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+  </div>
+  <div class="nav-section">视图</div>
+  <nav id="nav">
+    <a class="nav-item active" id="nav-kanban" onclick="setView('kanban')" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span>周报看板</span>
+    </a>
+    <a class="nav-item" id="nav-personal" onclick="setView('personal')" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>个人视图</span>
+    </a>
+    <a class="nav-item" id="nav-annual" onclick="setView('annual')" href="#">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3z"/><path d="M14 3h7v7h-7z"/><path d="M14 14h7v7h-7z"/><path d="M3 14h7v7H3z"/></svg>
+      <span>年度项目</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-wrap">
+      <div class="user-av">管</div>
+      <div>
+        <div class="user-name">耿博琳</div>
+        <div class="user-role">大行政</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar" id="topbar">
+    <div class="topbar-title" id="topbar-title">2026.6.11 行政周报</div>
+    <div class="week-switcher" id="week-switcher">
+      <button class="week-arr" onclick="prevWeek()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <button class="week-btn" id="wb0" onclick="switchWeek(0)">4.16</button>
+      <button class="week-btn" id="wb1" onclick="switchWeek(1)">5.28</button>
+      <button class="week-btn active" id="wb2" onclick="switchWeek(2)">6.11</button>
+      <button class="week-arr" onclick="nextWeek()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </div>
+    <div class="topbar-right">
+      <div class="search-wrap">
+        <svg class="search-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" id="searchInput" type="text" placeholder="搜索内容…" oninput="onSearch()" />
+      </div>
+      <button class="btn btn-ghost" onclick="toggleDark()" style="padding:7px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+</div>
+
+<!-- Project modal -->
+<div class="modal-bg hidden" id="projModal" onclick="closeProjModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="projModalTitle">新建项目</div>
+      <button class="modal-close" onclick="closeProjModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="flex:2">
+        <label class="form-label">项目名称 *</label>
+        <input class="form-input" id="pf-name" type="text" placeholder="项目名称" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">优先级</label>
+        <select class="form-input" id="pf-priority">
+          <option>P0</option><option>P1</option><option>P2</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">负责人</label>
+        <select class="form-input" id="pf-owner">
+          <option>耿博琳</option><option>高琳</option><option>丁玉萍</option><option>张灵玉</option>
+          <option>傅中南</option><option>程宇亮</option><option>聂茜茜</option><option>董诗昀</option>
+          <option>胡丽婷</option><option>王琳琳</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">类别</label>
+        <select class="form-input" id="pf-category">
+          <option>职场运营</option><option>文化活动</option><option>行政数字化</option>
+          <option>费用管控</option><option>福利管理</option><option>高管支持</option>
+          <option>政府申报</option><option>其他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">状态</label>
+        <select class="form-input" id="pf-status">
+          <option>规划中</option><option>进行中</option><option>已完成</option><option>暂停</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">执行季度（可多选）</label>
+      <div class="q-checks" id="pf-quarters">
+        <div class="q-check" data-q="Q1" onclick="toggleQ(this)">Q1</div>
+        <div class="q-check" data-q="Q2" onclick="toggleQ(this)">Q2</div>
+        <div class="q-check" data-q="Q3" onclick="toggleQ(this)">Q3</div>
+        <div class="q-check" data-q="Q4" onclick="toggleQ(this)">Q4</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">项目背景</label>
+      <textarea class="form-input" id="pf-bg" placeholder="项目背景/目标…"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">最新进展</label>
+      <textarea class="form-input" id="pf-progress" placeholder="当前进展…"></textarea>
+    </div>
+    <div class="form-footer">
+      <button class="btn btn-ghost" onclick="closeProjModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveProject()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail modal -->
+<div class="modal-bg hidden" id="detailModal" onclick="closeDetailModal(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="width:580px;">
+    <div class="modal-header">
+      <div id="dm-av" style="width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;flex-shrink:0;"></div>
+      <div>
+        <div class="modal-title" id="dm-name"></div>
+        <div id="dm-module" style="font-size:12px;color:#9CA3AF;"></div>
+      </div>
+      <button class="modal-close" onclick="closeDetailModal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="dm-body"></div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───
+const WEEKS=[{label:'2026.4.16',short:'4.16'},{label:'2026.5.28',short:'5.28'},{label:'2026.6.11',short:'6.11'}];
+
+const REPORT_DATA=[
+ // week 0
+ [{group:'大行政',name:'耿博琳',module:'职场管理（北京+异地）\n行政数字化、文化运营',supportExec:'/',
+   weekly3:'一、2025双刊项目\n整体进度：议价调整沟通中，五一假期前线上征集推出，五一后线下宣发推广。\n\n1、2025时光相册\n各部门素材精选与优化，按相册大框架进行分版块素材整理。\n大事记：融资素材已完成；AI战略落地-智算云部分今天可全部补齐\n\n2、故事集\n招标进程跟进\n\n二、行政数字化行业分享\nPPT优化及演示准备\n\n三、全职场标准化考勤系统\n配合人力IT节奏，配合相应职场信息提供及落地',
+   daily:'其他跨部门沟通工作',next3:'',issues:''},
+  {group:'大行政',name:'高琳',module:'行政数字化后台相关',supportExec:'/',
+   weekly3:'一、趣味运动会：跃动2026——夯爆了\n时间：预计下周二发起报名，下下周二举办\n项目：跳绳、AI马拉松\n\n二、儿童节礼品\n方向1：小小探险家·户外安全套装\n方向2：定制夏凉被\n方向3：定制沙滩套装（书包、水枪、浴巾、浴帽、臂圈）\n\n三、家庭日\n陆续看场地\n\n四、行政服务台：本周创建工单数82个，其中人工工单数21，机器人拦截工单数60，100%',
+   daily:'日常行政后台事务处理',next3:'',issues:''},
+  {group:'大行政',name:'丁玉萍',module:'行政数字化后台相关',supportExec:'/',
+   weekly3:'一、费用相关\n月结凭证整理，火车费用提报中、北美信用卡还款提报、北京能源费、房租保证金借款，滴滴敏感订单定向推送\n\n二、用车、商旅、三项\n3月底员工三项额度录入；差旅问题处理；滴滴问题处理\n\n三、社团其他\n1、协议酒店：协议酒店问卷调研礼品发放、第一期北京武汉各2家谈价中\n2、健康系列活动：color run借款及报名、乒乓球对外交流赛',
+   daily:'',next3:'',issues:''},
+  {group:'大行政',name:'张灵玉',module:'职场运营、文化运营',supportExec:'/',
+   weekly3:'一、职场运营\n1）北京职场：工位调整两版方案完善，等待确认调整；访客流程异常已修复\n2）上海职场：日常行政事务/下午茶等支持\n\n二、福利\n1）端午全员礼：四个方案已完成，等待智囊确认时间后开启投票\n2）入职包：智囊团已选定包形，lulu同款黑色胜出，设计师调整设计中\n3）五周年金钞：采购申请通过，供应链合同沟通中',
+   daily:'',next3:'',issues:''},
+  {group:'大行政',name:'傅中南',module:'行政：异地办公室管理\n总办支持',supportExec:'/',
+   weekly3:'异地职场\n庆阳：家具已完成交付，目前强电改造中，推进焕新仪式中，预计五一后\n珠海：装修中，预计424验收，427搬家，保洁服务对接中\n厦门：空调维修及清洗\n\n异地职场费用提报：广州、厦门、新加坡、马来、杭州、深圳、南京费用提报',
+   daily:'',next3:'',issues:''},
+  {group:'大行政',name:'程宇亮',module:'行政运营（武汉）',supportExec:'/',
+   weekly3:'流程相关\n1）投屏流程：与IT同事沟通公共区域投屏流程合并\n2）巡查流程：职场内部巡查已上线，开始测试\n\n职场相关\n1）政企工位：集团明确租赁方式为1000元/个，按年租\n\n黑马大赛\n1）路演答辩：完成黑马2天路演决赛现场落地\n2）后续宣发：勋章发布、圆满落幕长图整体宣发',
+   daily:'运动会活动现场协助、家庭日筹备启动',next3:'',issues:''},
+  {group:'大行政',name:'聂茜茜',module:'行政运营（武汉）',supportExec:'/',
+   weekly3:'一、活动相关\n1.黑马大赛路演答辩现场支持，高校奖金发放事宜跟进\n2.樱花节活动收尾，AI线上创意大赛奖品发放完毕\n3.云上智囊团碰头会（议题：露台改造方案+入职包方案）\n4.趣味运动会（明天下午16:30开始，物料搭建+奖品采购完成）',
+   daily:'行政服务台及员工日常问题答疑、社团活动支持',next3:'',issues:''},
+  {group:'大行政',name:'董诗昀',module:'行政运营（武汉）',supportExec:'/',
+   weekly3:'职场相关\n1、报修二维码试运行，已投放73处特殊点位二维码\n2、户外露台供应商现场侦查，已提供露台重点规划及建筑结构图\n3、本周公寓新增2名同学入住，二期公寓已开放约80间房源\n4、三家主体公司费用整理，费用提报\n5、会务支持：本周进行两场会务接待，满意度100%',
+   daily:'工区日常巡查维护，报修事宜跟踪整理',next3:'',issues:''},
+  {group:'大行政',name:'黄洁',module:'行政运营（深圳）',supportExec:'王羲桀（base深圳，非总办）',
+   weekly3:'1.职场运营相关\n深圳职场日常环境维护：环境巡检、每日下午茶准备，每月零食柜补充\n人力侧：协助入职1名&办理工牌1张\n财务侧：百望云开票系统每日登录&开票\n法务侧：合同章管理，盖章1则\nkoa计提报销9则\n\n2.政府项目申报&补贴\n完成高企发展年报填写\n\n3.羲桀总日常事务支持',
+   daily:'',next3:'',issues:''},
+  {group:'高管支持',name:'王琳琳',module:'高管支持',supportExec:'田开颜\n王首虎\n崔丽',
+   weekly3:'高管支持\nRex：出差规划与安排，招待安排；供应商拜访安排；部门例会及重要代办进度跟进\n崔丽：物品采购；用餐安排；其他临时安排的事项处理\n王首虎：物品闪送邮寄，以及其他临时安排的事务\n\n支持部门\n1、无锡团建活动落地，共计100人参加（资产&参谋）\n2、部门事务支持工作、部门内部聚餐安排\n3、各部门例会支持，周报收集以及其他材料整理安排',
+   daily:'资产管理采购支持工作',next3:'',issues:''}],
+ // week 1
+ [{group:'大行政',name:'耿博琳',module:'职场管理（北京+异地）\n行政数字化、文化运营',supportExec:'/',
+   weekly3:'一、2025双刊项目\n故事集全员征集阶段已结束，相册设计优化过程中，持续优化设计及素材细节。\n\n1、2025时光相册\n完成第二版设计方案的沟通与确认。补充五周年、十周年、全员大合影等核心素材。\n\n2、故事集\n完成面向全员的征集环节。整体参与度较低，本周转向完成了对管理层的定向约稿。\n\n二、智能数据推送项目\n1、需求文档已完成定稿并与BI中心、技术委员会完成对接\n2、用车及差旅（机酒火）数据接口已调试通过，数据拉取无阻塞\n3、已产出可视化小原型，优化交互细节中\n4、推送方式：确定为协作订阅号，已完成新建订阅号名称、头像、流程申请',
+   daily:'其他跨部门沟通工作',next3:'',issues:''},
+  {group:'大行政',name:'高琳',module:'行政数字化后台相关',supportExec:'/',
+   weekly3:'一、儿童节礼品\n登记：1073个，超73个，补50个\n【北京】发放770，差53【武汉】发放230，差20个【其余地区】发放67\n\n二、甩肉大赛\n个人报名：344  团队报名：61组（已进行15天，下周二最终测量）\n目前单人减重率：10.1%    团队减重总数：22.6斤\n\n三、家庭日\n报名情况：220组家庭，740人（大人439小孩301）\n活动时间：6月6日 9:30-14:00\n\n四、行政服务台：本周工单数82个，其中人工工单数21，机器人拦截61，100%',
+   daily:'',next3:'',issues:''},
+  {group:'大行政',name:'丁玉萍',module:'行政数字化后台相关',supportExec:'/',
+   weekly3:'一、费用相关\n月结凭证整理，火车费用提报中、北美信用卡还款提报\n\n二、用车、商旅、三项\n5月底员工三项额度录入；差旅问题处理；滴滴问题处理\n\n三、社团其他\n1、协议酒店：协议酒店问卷调研礼品发放、第一期北京武汉各2家谈价中\n2、健康系列活动：color run借款及报名',
+   daily:'',next3:'',issues:''},
+  {group:'大行政',name:'张灵玉',module:'职场运营、文化运营',supportExec:'/',
+   weekly3:'一、职场运营\n1）北京职场：10层风控和翊姐办公室对调，已完成配置；8层平开门异常更换控制器\n2）上海职场：日常行政事务/下午茶等支持\n\n二、福利\n1）端午全员礼：两个方案均在拍摄样品中，下周二家居品类装箱发往各地\n2）五周年金钞：大货生产中，仅更改年份（13周年更改为14周年），预计7月1日收货\n3）下午茶切换：招标方案问题答疑，北京武汉规则拉齐',
+   daily:'',next3:'',issues:''},
+  {group:'大行政',name:'傅中南',module:'行政：异地办公室管理\n总办支持',supportExec:'/',
+   weekly3:'异地职场\n庆阳：新增追采，正在评估成本中\n兰州：选址方案已输出，待评估\n上海：星扬45层以上没资源，59层以上在谈整层客户\n\n总办\n公务车：西北车已提，武汉预计本周五提车，深圳预计下周提车\n胸针：大货今明两天到\n文化衫：统计尺码后下大货',
+   daily:'异地职场费用提报',next3:'',issues:''},
+  {group:'大行政',name:'程宇亮',module:'行政运营（武汉）',supportExec:'/',
+   weekly3:'露台改造\n1）需求调整：按照30万整体预算，调整优先级落地需求\n2）露台答疑：供应商问题答疑，已对接集团工程部答疑完成\n3）现有进度：供应商调整最新方案，持续跟进中\n\n黑马大赛收尾\n1）intel赞助：统计整体花费金额约35万\n2）勋章制作：供应链寻供应商中\n\n福利活动\n家庭日整体筹备：场地确定、方案整体策划沟通\n活动时间：2026年6月6日，10:00开场，报名110组家庭',
+   daily:'',next3:'',issues:''},
+  {group:'大行政',name:'聂茜茜',module:'行政运营（武汉）',supportExec:'/',
+   weekly3:'一、2026家庭日筹备\n1.现场确认搭建及用餐细节、场地方对接\n2.方案流程沟通细化\n3.宣传海报文案梳理修改及表单设计\n4.报名数据及儿童信息整理统计\n\n二、公益行-黄石市儿童福利院\n本周五早上出发\n1.对接当地商店采购捐赠物资：18箱日用品 3箱笔记本\n2.横幅制作及慰问流程\n\n三、儿童节礼品发放\n截止目前23个未领',
+   daily:'行政服务台答疑，协议酒店更新续签一家',next3:'',issues:''},
+  {group:'大行政',name:'董诗昀',module:'行政运营（武汉）',supportExec:'/',
+   weekly3:'职场相关\n1、武汉园区二期公寓摇号圆满结束：共计144人参与报名，有效报名136人，40人报名成功\n2、一楼职场28个工位租赁合同推进，武汉职场绿植材料整理\n3、庆阳职场工卡人脸权限：后续由武汉开物理工卡分配权限寄给员工\n4、计划在一楼前台新增失物招领处，方案细化中',
+   daily:'',next3:'',issues:''},
+  {group:'大行政',name:'胡丽婷',module:'行政运营（深圳）',supportExec:'王羲桀（base深圳，非总办）',
+   weekly3:'1.职场运营相关\n深圳职场日常环境维护\n职场管理：\n（1）续租事项已完成，续签一年，于2027年5月31日到期，租金单价下调为90/m²，租赁保证金退回75456元\n（2）职场装修：装修需求、品牌、尺寸已确认，目前待确认是否延迟一个月\n人力侧：协助入职4名&办理工牌4张\n财务侧：百望云开票系统每日登录&开票\n法务侧：合同章管理，盖章12则\n\n2.政府项目申报&补贴\n高新技术企业认证：目前正在推进前期资料筹备，预计6月底进行申报\n技术转移项目：已公示进入拨款阶段，补贴金额25万',
+   daily:'协助AIPC部门加班餐食报销工作、协助完成产品发货邮寄',next3:'',issues:''},
+  {group:'高管支持',name:'王琳琳',module:'高管支持',supportExec:'田开颜\n王首虎\n崔丽',
+   weekly3:'高管支持\nRex：出差规划与安排，招待安排；供应商拜访安排；部门例会及重要代办进度跟进\n崔丽：物品采购；用餐安排；其他临时安排的事项处理\n王首虎：物品闪送邮寄，以及其他临时安排的事务\n\n支持部门\n1、部门季度会顺利落地\n2、部门事务支持工作、部门内部聚餐安排\n3、各部门例会支持，周报收集以及其他材料整理安排',
+   daily:'',next3:'',issues:''}],
+ // week 2
+ [{group:'大行政',name:'耿博琳',module:'职场管理（北京+异地）\n行政数字化、文化运营',supportExec:'/',
+   weekly3:'一、2025双刊项目\n相册设计优化过程中，持续优化设计及素材细节。\n\n1、2025时光相册\n完成第二版设计方案的沟通与确认。补充五周年、十周年、全员大合影等核心素材。\n待确定：总裁室大合影是否用年初全员大会合影——单独拍摄\n\n2、故事集\n整体参与度较低，本周转向完成了对管理层的定向约稿，确保内容质量与覆盖面。\n\n二、智能数据推送项目\n1、需求文档已完成定稿并与BI中心、技术委员会完成对接\n2、用车及差旅（机酒火）数据接口已调试通过，数据拉取无阻塞\n3、已产出可视化小原型，优化交互细节中\n4、推送方式：已确定为协作订阅号，已完成新建订阅号名称、头像、流程申请',
+   daily:'其他跨部门沟通工作',next3:'',issues:''},
+  {group:'大行政',name:'高琳',module:'行政数字化后台相关',supportExec:'/',
+   weekly3:'一、儿童节礼品\n登记：补70套，收尾，申请预算\n\n二、甩肉大赛\n收尾总结、发奖牌\n报名343人，总减重1411.2KG，单人减重率：16.18%，团队减重总数：62.8斤\n\n三、家庭日\n收尾，活动回顾今天或者明天发出\n\n四、端午手工DIY活动\n\n五、整理北京公益内容\n\n六、行政服务台：本周创建工单数57个，其中人工工单数19，机器人拦截工单数38，100%',
+   daily:'',next3:'',issues:''},
+  {group:'大行政',name:'丁玉萍',module:'行政数字化后台相关',supportExec:'/',
+   weekly3:'一、费用结算\n1、月结凭证整理对账：机票费用完成对账提报中、顺丰IDC账单对账中\n\n二、平台方面\n1、差旅平台问题处理、5月底员工三项额度录入\n\n三、其他\n1、协议酒店：单体签约覆盖5城19家，已全部托管上线，等设计稿，输出年度协议酒店信息\n2、健康体检：预计6月30日开启，目前配合供应链招标流程，技术条款制定\n3、相册素材优化：6.9素材全部提交完成及整体图文刷新优化',
+   daily:'',next3:'',issues:''},
+  {group:'大行政',name:'张灵玉',module:'职场运营、文化运营',supportExec:'/',
+   weekly3:'一、职场运营\n1）北京职场：\n维修部分：6-11层茶水间吊顶维修，6-8层连廊电路维修，已完成。\n车位：4、5、6月均预留3个访客车位\n2）上海职场：日常行政事务/下午茶等支持，职场相关费用提报付款\n\n二、福利\n1）端午全员礼\n北京武汉及异地已全部发放完毕\n2）五周年金钞\n年中大会暂未确定地点，外包装先邮寄至北京，等待后续确认后转交HR\n3）下午茶\n端午节粽子下午茶',
+   daily:'',next3:'',issues:''},
+  {group:'大行政',name:'傅中南',module:'行政：异地办公室管理\n总办支持',supportExec:'/',
+   weekly3:'异地职场\n庆阳：文化墙已确定方案，待供应商施工。前台墙体最新解决方案为在原有墙体基础上加厚加固，方案已确认\n兰州：待邹总审批预算外邮件，租赁合同商务条款沟通中，目前计划8月1日起租\n上海：整合最新资源情况，待政企反馈下周踏勘时间\n\n总办\n公务车：庆阳武汉公务车已上牌，兰州公务车车款已付\n流程：规章制度及责任承担协议已定稿，参谋部修改流程中\n一级班子：本周凯博、韩博生日',
+   daily:'异地职场费用提报',next3:'',issues:''},
+  {group:'大行政',name:'程宇亮',module:'行政运营（武汉）',supportExec:'/',
+   weekly3:'露台改造\n1）需求调整：确定集装箱、部分家具、舞台区域为高优先级，将真草坪改为砾石区暂时放弃\n2）现有进度：已进入筹备供应商招标，确定供应商应标材料\n\n福利活动\n1）武汉家庭日：\n到场人数：90组，报名数据：120组家庭\n后续宣发：整体完成订阅号、公众号回顾宣发，整体费用：14万+\n2）集团运动会：活动现场支持\n\n星云训练营\n暂定7月10日办理新员工入职，7月12日开营仪式，人数初步为90人',
+   daily:'库存系统：完成PRD需求文档2.0版本\n空调延时：已正式向集团发出延时邮件申请',next3:'',issues:''},
+  {group:'大行政',name:'聂茜茜',module:'行政运营（武汉）',supportExec:'/',
+   weekly3:'一、活动相关\n1.家庭日活动的落地完成及收尾工作\na.前期分工宣贯、保险信息收集等；现场票券的总体发放工作\nb.场地方合同对方确认中，费用明细单已确认\nc.微信公众号宣发收尾\n\n2.Q2生日会——minions party 快乐加码\n方案策划基本完成，小黄人ip搭建主题\n礼品完成选品下单，覆盖季度寿星人数87%以上\n\n3.公益活动输出\n武汉、北京已完成资料输出\n\n4.端午手工活动\n艾草门挂*20+非遗端午竹编蒲扇*30，下周三举办，活动物资已采买',
+   daily:'月度费用整理；服务台答疑',next3:'',issues:''},
+  {group:'大行政',name:'董诗昀',module:'行政运营（武汉）',supportExec:'/',
+   weekly3:'职场相关\n1、武汉职场矿泉水定制已提PR流程\n2、对电子流"名片申请"、"金山云工卡维护"进行线上流程配置申请\n3、一楼职场租赁合同集团已走完盖章流程，续租合同由季付变更为月付\n4、端午节特色下午茶北京武汉两地职场同步发放 山姆甜粽\n5、武汉职场2-5层工椅数量明细统计\n\n物业相关\n1、统计截止目前职场所有报事报修问题，计划明天协同大小物业开展Q2季度报修进度拉起会\n2、工区日常巡查',
+   daily:'',next3:'',issues:''},
+  {group:'大行政',name:'胡丽婷',module:'行政运营（深圳）',supportExec:'王羲桀（base深圳，非总办）',
+   weekly3:'1.职场运营相关\n深圳职场日常环境维护：环境巡检、每日下午茶准备，每月零食柜补充\n职场管理：\n（1）职场装修：采购pr已提交，总预算10万，期望最晚交付时间7月底\n（2）续租租赁保证金差额75456已退回公司\n（3）端午礼盒款式一已全部发放完毕，款式二运输中预计下周一前能发放完\n人力侧：协助入职1名&办理工牌1张\n财务侧：百望云开票系统每日登录&开票\n法务侧：合同章管理，盖章1则\n\n2.政府项目申报&补贴\n高新技术企业认证：目前完成申报前期附件资料，其余材料正在推进中\n技术转移项目：已公示进入拨款阶段，补贴金额25万，资料已备齐本月内完成提交\n\n3.羲桀总日常事务支持',
+   daily:'企微申请以及完成企业认证，协助AIPC部门加班餐食报销工作',next3:'',issues:''},
+  {group:'高管支持',name:'王琳琳',module:'高管支持',supportExec:'田开颜\n李翊\n王首虎\n崔丽',
+   weekly3:'高管支持\nRex：出差规划与安排，招待安排；供应商拜访安排；部门例会及重要代办进度跟进；重要会议安排与处理\n李翊：日程安排、用餐安排、访客接待\n崔丽：物品采购；用餐安排；其他临时安排的事项处理\n王首虎：物品闪送邮寄，以及其他临时安排的事务\n\n支持部门\n1、部门事务支持工作、部门内部聚餐安排\n2、各部门例会支持，周报收集以及其他材料整理安排\n3、资产管理采购支持与学习',
+   daily:'',next3:'',issues:''}]
+];
+
+let annualProjects=[
+ {id:1,name:'2025双刊项目',owner:'耿博琳',category:'文化活动',status:'进行中',priority:'P0',quarters:['Q1','Q2'],bg:'公司年度记忆产品，含时光相册和故事集两个子项目',progress:'相册设计第二版完成，故事集管理层定向约稿完成，素材整理中'},
+ {id:2,name:'智能数据推送项目',owner:'耿博琳',category:'行政数字化',status:'进行中',priority:'P0',quarters:['Q2'],bg:'用车及差旅数据智能推送到协作订阅号，提升数据利用效率',progress:'需求文档定稿，接口调试通过，可视化原型已产出，推送方式已确定为协作订阅号'},
+ {id:3,name:'武汉露台改造',owner:'程宇亮',category:'职场运营',status:'进行中',priority:'P1',quarters:['Q2','Q3'],bg:'武汉职场露台改造，整体预算30万',progress:'供应商招标进行中，高优先级需求（集装箱、家具、舞台区域）已确认'},
+ {id:4,name:'家庭日2026',owner:'高琳',category:'文化活动',status:'已完成',priority:'P0',quarters:['Q2'],bg:'全员家庭日活动，北京武汉两地联办',progress:'已完成，北京武汉两地共90+组家庭参与，整体费用14万+'},
+ {id:5,name:'甩肉大赛',owner:'高琳',category:'文化活动',status:'已完成',priority:'P1',quarters:['Q2'],bg:'全员健康激励活动',progress:'已完成，报名343人，总减重1411.2KG，单人减重率16.18%'},
+ {id:6,name:'协议酒店签约覆盖',owner:'丁玉萍',category:'费用管控',status:'进行中',priority:'P1',quarters:['Q1','Q2'],bg:'签约覆盖主要城市协议酒店，降低出行成本',progress:'单体签约覆盖5城19家，已全部托管上线'},
+ {id:7,name:'健康体检招标',owner:'丁玉萍',category:'福利管理',status:'规划中',priority:'P1',quarters:['Q3'],bg:'年度全员健康体检供应商招标采购',progress:'配合供应链招标流程，技术条款制定中，预计6月30日开启'},
+ {id:8,name:'兰州新职场',owner:'傅中南',category:'职场运营',status:'进行中',priority:'P0',quarters:['Q2','Q3'],bg:'兰州办公室选址落地，支持西北业务扩张',progress:'选址方案已输出，商务条款沟通中，计划2026年8月1日起租'},
+ {id:9,name:'深圳职场装修',owner:'胡丽婷',category:'职场运营',status:'进行中',priority:'P1',quarters:['Q2','Q3'],bg:'深圳职场内部装修改造，总预算10万',progress:'采购PR已提交，期望最晚7月底前交付'},
+ {id:10,name:'五周年金钞',owner:'张灵玉',category:'文化活动',status:'已完成',priority:'P1',quarters:['Q2'],bg:'公司五周年纪念金钞制作发放',progress:'大货生产完成，年中大会地点确认后转交HR发放'},
+ {id:11,name:'行政服务台升级',owner:'高琳',category:'行政数字化',status:'进行中',priority:'P0',quarters:['Q1','Q2','Q3','Q4'],bg:'行政智能服务台全年持续迭代升级，提升机器人拦截率',progress:'机器人拦截率稳定100%，本周工单57个，持续优化中'},
+ {id:12,name:'星云训练营2026',owner:'程宇亮',category:'文化活动',status:'规划中',priority:'P1',quarters:['Q3'],bg:'2026年新员工星云训练营',progress:'暂定7月10日办理新员工入职，7月12日开营仪式，初步90人'},
+ {id:13,name:'高企认证申报',owner:'胡丽婷',category:'政府申报',status:'进行中',priority:'P1',quarters:['Q2','Q3'],bg:'深圳高新技术企业认证申报',progress:'前期附件资料已完成，其余材料推进中，预计6月底完成申报'}
+];
+let nextProjId=14;
+
+// ─── STATE ───
+let currentView='kanban';
+let currentWeek=2;
+let searchQ='';
+let filterPerson='';
+let collapsedGroups={};
+let selectedPerson=null;
+let annualFilters={category:'',owner:'',status:''};
+let editingProject=null;
+const ACOLORS=['#6C63FF','#10B981','#3B82F6','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6','#F97316','#6366F1'];
+
+function aColor(n){let h=0;for(let i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))&0xFFFF;return ACOLORS[h%ACOLORS.length];}
+function ini(n){return n?n[0]:'?';}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function statusBadge(s){const m={'规划中':'badge-planned','进行中':'badge-doing','已完成':'badge-done','暂停':'badge-paused'};return`<span class="badge ${m[s]||'badge-planned'}">${s}</span>`;}
+function priBadge(p){const m={'P0':'badge-p0','P1':'badge-p1','P2':'badge-p2'};return`<span class="badge ${m[p]||'badge-p2'}">${p}</span>`;}
+
+// ─── VIEW ROUTER ───
+function setView(v){
+  currentView=v;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('nav-'+v).classList.add('active');
+  const ws=document.getElementById('week-switcher');
+  ws.style.display=v==='kanban'?'flex':'none';
+  document.getElementById('topbar-title').textContent=
+    v==='kanban'?WEEKS[currentWeek].label+' 行政周报':v==='personal'?'个人视图':'年度项目';
+  document.getElementById('searchInput').value='';
+  searchQ='';filterPerson='';
+  render();
+  return false;
+}
+
+function render(){
+  if(currentView==='kanban')renderKanban();
+  else if(currentView==='personal')renderPersonal();
+  else renderAnnual();
+}
+
+// ─── KANBAN VIEW ───
+function renderKanban(){
+  const data=REPORT_DATA[currentWeek];
+  const q=searchQ.toLowerCase();
+  let filtered=q?data.filter(p=>p.name.includes(q)||p.module.includes(q)||p.weekly3.toLowerCase().includes(q)||p.daily.toLowerCase().includes(q)):data;
+  if(filterPerson)filtered=filtered.filter(p=>p.name===filterPerson);
+  const allPeople=[...new Set(data.map(p=>p.name))];
+  const groups=[...new Set(data.map(p=>p.group))];
+  const withSupport=data.filter(p=>p.supportExec&&p.supportExec!=='/').length;
+  let html=`<div class="stats-bar">
+    <div class="stat-box"><div class="stat-icon purple">${svgPeople()}</div><div><div class="stat-value">${data.length}</div><div class="stat-label">参与人员</div></div></div>
+    <div class="stat-box"><div class="stat-icon green">${svgCalc()}</div><div><div class="stat-value">${groups.length}</div><div class="stat-label">行政模块</div></div></div>
+    <div class="stat-box"><div class="stat-icon orange">${svgStar()}</div><div><div class="stat-value">${withSupport}</div><div class="stat-label">高管支持</div></div></div>
+    <div class="stat-box"><div class="stat-icon blue">${svgDoc()}</div><div><div class="stat-value">${WEEKS.length}</div><div class="stat-label">已归档期数</div></div></div>
+  </div>
+  <div class="chips-row">
+    <span class="chip${!filterPerson?' active':''}" onclick="setPersonFilter('')">全部</span>
+    ${allPeople.map(n=>`<span class="chip${filterPerson===n?' active':''}" onclick="setPersonFilter('${esc(n)}')">${n}</span>`).join('')}
+  </div>`;
+  groups.forEach(g=>{
+    const gdata=filtered.filter(p=>p.group===g);
+    if(!gdata.length)return;
+    const collapsed=collapsedGroups[g];
+    html+=`<div class="gh" onclick="toggleGroup('${esc(g)}')">
+      <span class="gh-title">${g}</span><span class="gh-count">${gdata.length} 人</span>
+      <svg class="gh-arrow${collapsed?'':' open'}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+    </div>`;
+    if(!collapsed){
+      html+=`<div class="cards-grid">`;
+      gdata.forEach(p=>{
+        const c=aColor(p.name);
+        html+=`<div class="card" onclick="openDetail('${esc(p.name)}',${currentWeek})">
+          <div class="card-header">
+            <div class="av" style="background:${c}">${ini(p.name)}</div>
+            <div>
+              <div class="card-name">${p.name}</div>
+              <div class="card-module">${p.module.replace(/\n/g,' · ')}</div>
+            </div>
+          </div>
+          ${p.supportExec&&p.supportExec!=='/'?`<div style="margin-bottom:6px;">${p.supportExec.split('\n').map(e=>`<span class="tag-sm">支持 ${e}</span>`).join('')}</div>`:''}
+          <div class="section-row">
+            <div class="section-label">本周重点工作</div>
+            <div class="section-text" id="st-${currentWeek}-${p.name}">${esc(p.weekly3).substring(0,200)}${p.weekly3.length>200?'…':''}</div>
+            ${p.weekly3.length>100?`<span class="expand-btn" onclick="event.stopPropagation();openDetail('${esc(p.name)}',${currentWeek})">展开查看 ↗</span>`:''}
+          </div>
+          ${p.daily?`<div class="section-row"><div class="section-label">日常事务</div><div class="section-text">${esc(p.daily)}</div></div>`:''}
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+  });
+  if(!filtered.length)html+=`<div class="empty">暂无匹配内容</div>`;
+  document.getElementById('content').innerHTML=html;
+}
+
+function setPersonFilter(name){filterPerson=name;render();}
+function toggleGroup(g){collapsedGroups[g]=!collapsedGroups[g];render();}
+
+// ─── PERSONAL VIEW ───
+function renderPersonal(){
+  const allPeople=getAllPeople();
+  if(!selectedPerson)selectedPerson=allPeople[0];
+  let listHtml=allPeople.map(p=>{
+    const c=aColor(p);
+    return`<div class="person-list-item${p===selectedPerson?' active':''}" onclick="selectPerson('${esc(p)}')">
+      <div class="av" style="background:${c};width:32px;height:32px;font-size:13px;">${ini(p)}</div>
+      <div style="font-weight:600;font-size:13px;">${p}</div>
+    </div>`;
+  }).join('');
+  const weekCount=REPORT_DATA.filter(w=>w.some(r=>r.name===selectedPerson)).length;
+  const personGroup=getPersonGroup(selectedPerson);
+  let detailHtml=`<div class="personal-stats">
+    <div class="personal-stat"><div class="stat-icon purple">${svgDoc()}</div><div><div class="stat-value">${weekCount}</div><div class="stat-label">参与周报期数</div></div></div>
+    <div class="personal-stat"><div class="stat-icon green">${svgPeople()}</div><div><div class="stat-value">${personGroup}</div><div class="stat-label">所属组别</div></div></div>
+    <div class="personal-stat"><div class="stat-icon orange">${svgStar()}</div><div><div class="stat-value">${getPersonProjCount(selectedPerson)}</div><div class="stat-label">年度参与项目</div></div></div>
+  </div>
+  <div class="timeline-wrap">
+    <div class="timeline-title">${svgClock()} 历史周报动态</div>`;
+  const entries=REPORT_DATA.map((w,i)=>({week:WEEKS[i],entry:w.find(r=>r.name===selectedPerson)}))
+    .filter(x=>x.entry).reverse();
+  if(!entries.length){detailHtml+=`<div class="empty">暂无周报记录</div>`;}
+  else{
+    entries.forEach(({week,entry})=>{
+      detailHtml+=`<div class="timeline-entry">
+        <div class="timeline-week">${week.label}</div>
+        <div class="timeline-section"><div class="timeline-section-label">本周重点</div><div class="timeline-text">${esc(entry.weekly3)}</div></div>
+        ${entry.daily?`<div class="timeline-section" style="margin-top:10px;"><div class="timeline-section-label">日常事务</div><div class="timeline-text">${esc(entry.daily)}</div></div>`:''}
+      </div>`;
+    });
+  }
+  detailHtml+=`</div>`;
+  document.getElementById('content').innerHTML=`<div class="personal-layout">
+    <div class="person-list">${listHtml}</div>
+    <div class="person-detail">${detailHtml}</div>
+  </div>`;
+}
+
+function selectPerson(name){selectedPerson=name;render();}
+function getAllPeople(){const s=new Set();REPORT_DATA.forEach(w=>w.forEach(r=>s.add(r.name)));return[...s];}
+function getPersonGroup(name){for(const w of REPORT_DATA){const r=w.find(x=>x.name===name);if(r)return r.group;}return'';}
+function getPersonProjCount(name){return annualProjects.filter(p=>p.owner===name||p.owner.includes(name)).length;}
+
+// ─── ANNUAL VIEW ───
+function renderAnnual(){
+  const owners=[...new Set(annualProjects.map(p=>p.owner))].sort();
+  const categories=[...new Set(annualProjects.map(p=>p.category))].sort();
+  let projects=annualProjects;
+  if(annualFilters.category)projects=projects.filter(p=>p.category===annualFilters.category);
+  if(annualFilters.owner)projects=projects.filter(p=>p.owner===annualFilters.owner);
+  if(annualFilters.status)projects=projects.filter(p=>p.status===annualFilters.status);
+  if(searchQ)projects=projects.filter(p=>p.name.includes(searchQ)||p.owner.includes(searchQ)||p.progress.includes(searchQ)||p.bg.includes(searchQ));
+  let html=`<div class="annual-toolbar">
+    <select class="filter-select" onchange="setAFilter('category',this.value)">
+      <option value="">全部类别</option>
+      ${categories.map(c=>`<option value="${esc(c)}"${annualFilters.category===c?' selected':''}>${c}</option>`).join('')}
+    </select>
+    <select class="filter-select" onchange="setAFilter('owner',this.value)">
+      <option value="">全部负责人</option>
+      ${owners.map(o=>`<option value="${esc(o)}"${annualFilters.owner===o?' selected':''}>${o}</option>`).join('')}
+    </select>
+    <select class="filter-select" onchange="setAFilter('status',this.value)">
+      <option value="">全部状态</option>
+      <option value="规划中"${annualFilters.status==='规划中'?' selected':''}>规划中</option>
+      <option value="进行中"${annualFilters.status==='进行中'?' selected':''}>进行中</option>
+      <option value="已完成"${annualFilters.status==='已完成'?' selected':''}>已完成</option>
+      <option value="暂停"${annualFilters.status==='暂停'?' selected':''}>暂停</option>
+    </select>
+    <button class="btn btn-primary" onclick="openProjModal(null)" style="margin-left:auto;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 新建项目
+    </button>
+  </div>`;
+  const totals={running:projects.filter(p=>p.status==='进行中').length,done:projects.filter(p=>p.status==='已完成').length,planned:projects.filter(p=>p.status==='规划中').length};
+  html+=`<div class="stats-bar" style="margin-bottom:16px;">
+    <div class="stat-box"><div class="stat-icon purple">${svgDoc()}</div><div><div class="stat-value">${projects.length}</div><div class="stat-label">年度项目总数</div></div></div>
+    <div class="stat-box"><div class="stat-icon blue">${svgStar()}</div><div><div class="stat-value">${totals.running}</div><div class="stat-label">进行中</div></div></div>
+    <div class="stat-box"><div class="stat-icon green">${svgCalc()}</div><div><div class="stat-value">${totals.done}</div><div class="stat-label">已完成</div></div></div>
+    <div class="stat-box"><div class="stat-icon orange">${svgPeople()}</div><div><div class="stat-value">${totals.planned}</div><div class="stat-label">规划中</div></div></div>
+  </div>`;
+  ['Q1','Q2','Q3','Q4'].forEach(q=>{
+    const qp=projects.filter(p=>p.quarters.includes(q));
+    if(!qp.length)return;
+    html+=`<div class="quarter-section">
+      <div class="quarter-header">
+        <span class="quarter-label">${q}</span>
+        <span class="quarter-count">${qp.length} 个项目</span>
+      </div>
+      <div class="proj-grid">
+        ${qp.map(p=>`
+          <div class="proj-card">
+            <div class="proj-actions">
+              <button class="icon-btn" onclick="event.stopPropagation();openProjModal(${p.id})" title="编辑">${svgEdit()}</button>
+              <button class="icon-btn del" onclick="event.stopPropagation();deleteProj(${p.id})" title="删除">${svgTrash()}</button>
+            </div>
+            <div class="proj-name">${esc(p.name)}</div>
+            <div class="proj-meta">${statusBadge(p.status)}${priBadge(p.priority)}<span class="tag-sm">${p.category}</span></div>
+            <div class="proj-owner"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${esc(p.owner)}</div>
+            ${p.progress?`<div class="proj-progress">${esc(p.progress)}</div>`:''}
+          </div>`).join('')}
+      </div>
+    </div>`;
+  });
+  if(!projects.length)html+=`<div class="empty">暂无匹配项目</div>`;
+  document.getElementById('content').innerHTML=html;
+}
+
+function setAFilter(k,v){annualFilters[k]=v;render();}
+
+// ─── DETAIL MODAL ───
+function openDetail(name,weekIdx){
+  const p=REPORT_DATA[weekIdx].find(r=>r.name===name);
+  if(!p)return;
+  const c=aColor(p.name);
+  document.getElementById('dm-av').style.background=c;
+  document.getElementById('dm-av').textContent=ini(p.name);
+  document.getElementById('dm-name').textContent=p.name;
+  document.getElementById('dm-module').textContent=WEEKS[weekIdx].label+' · '+p.module.replace(/\n/g,' · ');
+  let body='';
+  if(p.supportExec&&p.supportExec!=='/')
+    body+=`<div class="dm-section"><div class="dm-label">支持高管</div><div class="dm-text">${esc(p.supportExec)}</div></div>`;
+  body+=`<div class="dm-section"><div class="dm-label">本周重点工作</div><div class="dm-text">${esc(p.weekly3)}</div></div>`;
+  if(p.daily)body+=`<div class="dm-section"><div class="dm-label">日常事务</div><div class="dm-text">${esc(p.daily)}</div></div>`;
+  if(p.next3)body+=`<div class="dm-section"><div class="dm-label">下周计划</div><div class="dm-text">${esc(p.next3)}</div></div>`;
+  if(p.issues)body+=`<div class="dm-section"><div class="dm-label">问题/跨部门协作</div><div class="dm-text">${esc(p.issues)}</div></div>`;
+  document.getElementById('dm-body').innerHTML=body;
+  document.getElementById('detailModal').classList.remove('hidden');
+}
+function closeDetailModal(e){if(!e||e.target===document.getElementById('detailModal'))document.getElementById('detailModal').classList.add('hidden');}
+
+// ─── PROJECT MODAL ───
+function openProjModal(id){
+  editingProject=id?annualProjects.find(p=>p.id===id):null;
+  document.getElementById('projModalTitle').textContent=editingProject?'编辑项目':'新建项目';
+  document.getElementById('pf-name').value=editingProject?editingProject.name:'';
+  document.getElementById('pf-priority').value=editingProject?editingProject.priority:'P1';
+  document.getElementById('pf-owner').value=editingProject?editingProject.owner:'耿博琳';
+  document.getElementById('pf-category').value=editingProject?editingProject.category:'职场运营';
+  document.getElementById('pf-status').value=editingProject?editingProject.status:'规划中';
+  document.getElementById('pf-bg').value=editingProject?editingProject.bg:'';
+  document.getElementById('pf-progress').value=editingProject?editingProject.progress:'';
+  const qchecks=document.querySelectorAll('.q-check');
+  qchecks.forEach(el=>{
+    el.classList.toggle('selected',!!(editingProject&&editingProject.quarters.includes(el.dataset.q)));
+  });
+  document.getElementById('projModal').classList.remove('hidden');
+}
+function closeProjModal(e){if(!e||e.target===document.getElementById('projModal'))document.getElementById('projModal').classList.add('hidden');}
+function toggleQ(el){el.classList.toggle('selected');}
+function saveProject(){
+  const name=document.getElementById('pf-name').value.trim();
+  if(!name){alert('请填写项目名称');return;}
+  const quarters=[...document.querySelectorAll('.q-check.selected')].map(el=>el.dataset.q);
+  if(!quarters.length){alert('请选择至少一个执行季度');return;}
+  const proj={
+    id:editingProject?editingProject.id:nextProjId++,
+    name,
+    owner:document.getElementById('pf-owner').value,
+    category:document.getElementById('pf-category').value,
+    status:document.getElementById('pf-status').value,
+    priority:document.getElementById('pf-priority').value,
+    quarters,
+    bg:document.getElementById('pf-bg').value.trim(),
+    progress:document.getElementById('pf-progress').value.trim()
+  };
+  if(editingProject){
+    const idx=annualProjects.findIndex(p=>p.id===editingProject.id);
+    annualProjects[idx]=proj;
+  }else{annualProjects.push(proj);}
+  document.getElementById('projModal').classList.add('hidden');
+  render();
+}
+function deleteProj(id){
+  if(!confirm('确定删除该项目？'))return;
+  annualProjects=annualProjects.filter(p=>p.id!==id);
+  render();
+}
+
+// ─── NAV / WEEK / SEARCH ───
+function switchWeek(i){
+  currentWeek=i;
+  document.querySelectorAll('.week-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  document.getElementById('topbar-title').textContent=WEEKS[i].label+' 行政周报';
+  filterPerson='';render();
+}
+function prevWeek(){if(currentWeek>0)switchWeek(currentWeek-1);}
+function nextWeek(){if(currentWeek<WEEKS.length-1)switchWeek(currentWeek+1);}
+function onSearch(){searchQ=document.getElementById('searchInput').value.trim();render();}
+function toggleSidebar(){
+  const s=document.getElementById('sidebar');s.classList.toggle('collapsed');
+}
+function toggleDark(){
+  const isDark=document.documentElement.classList.toggle('dark');
+  document.getElementById('themeIcon').innerHTML=isDark
+    ?'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    :'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+
+// ─── SVG HELPERS ───
+function svgPeople(){return'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';}
+function svgCalc(){return'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';}
+function svgStar(){return'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';}
+function svgDoc(){return'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';}
+function svgClock(){return'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';}
+function svgEdit(){return'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';}
+function svgTrash(){return'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';}
+
+// ─── INIT ───
+render();
+</script>
+</body>
+</html>

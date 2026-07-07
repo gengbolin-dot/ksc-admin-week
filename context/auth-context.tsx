@@ -62,47 +62,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             // 注意：使用宽松判断，确保开发模式能正确识别
             const isDevMode = isDevelopment || appConfig.env === 'development';
             const isOIDCEnabled = appConfig.enableOIDC === true;
-            
+
             if (isDevMode && !isOIDCEnabled) {
                 console.log('🔧 Development mode: Using mock authentication (isDevMode:', isDevMode, ', isOIDCEnabled:', isOIDCEnabled, ')');
                 console.log('🔧 Development mode: Using mock authentication');
-                try {
-                    // 开发模式下调用不需要认证的模拟用户端点
-                    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:9000/api'}/dev/mock-user`);
-                    if (response.ok) {
-                        const mockUser = await response.json();
-                        setUser(mockUser);
-                        setIsAuthenticated(true);
-                        console.log('🔧 Mock user loaded from API:', mockUser.name);
-                    } else {
-                        // 如果 API 调用失败，使用本地模拟数据
-                        const mockUser: User = {
-                            id: appConfig.mockUserId || '31784',
-                            name: '耿博琳',
-                            email: 'gengbolin@kingsoft.com',
-                            avatarUrl: `https://picsum.photos/seed/31784/40/40`,
-                            deptId: undefined,
-                            deptName: '市场和行政部/行政部'
-                        };
-                        setUser(mockUser);
-                        setIsAuthenticated(true);
-                        console.log('🔧 Mock user loaded locally (API unavailable):', mockUser.name);
-                    }
-                } catch (error) {
-                    console.error('🔧 Failed to load mock user from API, using local fallback:', error);
-                    // API 调用失败时的备选方案
-                    const mockUser: User = {
-                        id: appConfig.mockUserId || '31784',
-                        name: '耿博琳',
-                        email: 'gengbolin@kingsoft.com',
-                        avatarUrl: `https://picsum.photos/seed/31784/40/40`,
-                        deptId: undefined,
-                        deptName: '市场和行政部/行政部'
-                    };
-                    setUser(mockUser);
-                    setIsAuthenticated(true);
-                    console.log('🔧 Mock user loaded locally (fallback):', mockUser.name);
-                }
+                // 直接使用本地模拟数据，无需调用后端
+                const mockUser: User = {
+                    id: appConfig.mockUserId || '31784',
+                    name: '耿博琳',
+                    email: 'gengbolin@kingsoft.com',
+                    avatarUrl: `https://picsum.photos/seed/31784/40/40`,
+                    deptId: undefined,
+                    deptName: '市场和行政部/行政部'
+                };
+                setUser(mockUser);
+                setIsAuthenticated(true);
+                console.log('🔧 Mock user loaded:', mockUser.name);
             } else {
                 // 生产模式：检查OIDC和JWT认证状态
                 console.log('🔐 Production mode: Checking OIDC authentication');

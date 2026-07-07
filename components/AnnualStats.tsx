@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Project, User, OKR, ProjectStatus } from '../types';
-import { IconBriefcase, IconRocket, IconClipboard, IconTarget } from './Icons';
+import { IconClipboard, IconTarget } from './Icons';
 
 interface AnnualStatsProps {
   projects: Project[];
@@ -31,12 +31,6 @@ export const AnnualStats: React.FC<AnnualStatsProps> = ({ projects, activeOkrs, 
 
         const annualProjects = myProjects.filter(p =>
             p.proposedDate && new Date(p.proposedDate).getFullYear() === currentYear
-        );
-
-        // 年度完成项目：状态为"已完成"、"本周已上线"且完成日期在当前年度的项目
-        const launchedProjects = myProjects.filter(p =>
-            (p.status === ProjectStatus.Completed || p.status === ProjectStatus.LaunchedThisWeek) &&
-            p.completionDate && new Date(p.completionDate).getFullYear() === currentYear
         );
 
         // 我参与的正在进行的项目：只排除"暂停"和"已完成"状态的项目
@@ -71,27 +65,20 @@ export const AnnualStats: React.FC<AnnualStatsProps> = ({ projects, activeOkrs, 
         });
 
         return {
-            launchedCount: launchedProjects.length,
             ongoingOkrCount: ongoingOkrProjects.length,
             launchedOkrCount: launchedOkrProjects.length,
         };
     }, [projects, activeOkrs, currentUser]);
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <StatCard 
-                icon={<IconRocket className="w-6 h-6"/>}
-                title="年度上线项目"
-                value={stats.launchedCount}
-                colorClasses="bg-green-500 text-white"
-            />
-            <StatCard 
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+            <StatCard
                 icon={<IconClipboard className="w-6 h-6"/>}
                 title="我参与的正在进行的项目"
                 value={stats.ongoingOkrCount}
                 colorClasses="bg-orange-500 text-white"
             />
-            <StatCard 
+            <StatCard
                 icon={<IconTarget className="w-6 h-6"/>}
                 title="年度已上线OKR项目"
                 value={stats.launchedOkrCount}

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>行政周报看板</title>
+<style>
+  /* ─── Reset & Base ─── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 14px; height: 100%; }
+  body { height: 100%; display: flex; flex-direction: column; background: #F3F4F6; color: #111827; transition: background .2s, color .2s; }
+
+  /* ─── Dark mode ─── */
+  html.dark body { background: #121212; color: #F9FAFB; }
+  html.dark .sidebar { background: #1F1F1F; border-color: #363636; }
+  html.dark .topbar { background: #1F1F1F; border-color: #363636; }
+  html.dark .card { background: #1F1F1F; border-color: #363636; }
+  html.dark .card-section { border-color: #2a2a2a; }
+  html.dark .group-header { background: #1a1a2e; border-color: #2d2d5e; }
+  html.dark .week-btn { background: #2a2a2a; color: #9CA3AF; }
+  html.dark .week-btn:hover { background: #363636; color: #F9FAFB; }
+  html.dark .week-btn.active { background: #6C63FF; color: #fff; }
+  html.dark .week-chip { background: #2a2a2a; color: #9CA3AF; }
+  html.dark .search-input { background: #2a2a2a; border-color: #363636; color: #F9FAFB; }
+  html.dark .search-input::placeholder { color: #6B7280; }
+  html.dark .nav-item:hover { background: #2a2a2a; }
+  html.dark .tag { background: #2a2a2a; }
+  html.dark .section-label { color: #6B7280; }
+  html.dark .expand-btn { color: #9CA3AF; }
+  html.dark .expand-btn:hover { color: #F9FAFB; }
+  html.dark .stat-box { background: #2a2a2a; }
+  html.dark .modal-overlay { background: rgba(0,0,0,.7); }
+  html.dark .modal { background: #1F1F1F; border-color: #363636; }
+  html.dark .modal-section { border-color: #2a2a2a; }
+  html.dark .person-avatar { border-color: #363636; }
+  html.dark .empty-state { color: #6B7280; }
+
+  /* ─── Layout ─── */
+  .app { display: flex; height: 100vh; overflow: hidden; }
+  .sidebar {
+    width: 220px; flex-shrink: 0;
+    background: #fff; border-right: 1px solid #E5E7EB;
+    display: flex; flex-direction: column; padding: 16px 12px;
+    transition: width .25s, background .2s;
+    overflow: hidden;
+  }
+  .sidebar.collapsed { width: 68px; }
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar {
+    background: #fff; border-bottom: 1px solid #E5E7EB;
+    padding: 12px 24px; display: flex; align-items: center; gap: 12px;
+    flex-shrink: 0; transition: background .2s;
+  }
+  .content { flex: 1; overflow-y: auto; padding: 24px; }
+
+  /* ─── Sidebar ─── */
+  .sidebar-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; overflow: hidden; }
+  .logo-icon {
+    width: 36px; height: 36px; background: #6C63FF; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    color: #fff; font-size: 18px; font-weight: 700;
+  }
+  .logo-text { font-size: 15px; font-weight: 700; color: #111827; white-space: nowrap; overflow: hidden; }
+  html.dark .logo-text { color: #F9FAFB; }
+  .sidebar-collapse-btn {
+    margin-left: auto; padding: 4px; border: none; background: none;
+    cursor: pointer; color: #9CA3AF; border-radius: 6px; flex-shrink: 0;
+  }
+  .sidebar-collapse-btn:hover { background: #F3F4F6; color: #374151; }
+  html.dark .sidebar-collapse-btn:hover { background: #2a2a2a; color: #F9FAFB; }
+  .sidebar-section-label { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: .05em; padding: 0 8px; margin: 12px 0 4px; white-space: nowrap; overflow: hidden; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px;
+    cursor: pointer; color: #6B7280; font-weight: 500; transition: all .15s;
+    text-decoration: none; white-space: nowrap; overflow: hidden;
+  }
+  .nav-item:hover { background: #F3F4F6; color: #111827; }
+  .nav-item.active { background: #EEF2FF; color: #6C63FF; font-weight: 600; }
+  html.dark .nav-item.active { background: #1e1b4b; color: #818cf8; }
+  .nav-icon { width: 20px; height: 20px; flex-shrink: 0; }
+  .sidebar-footer { margin-top: auto; padding-top: 12px; border-top: 1px solid #E5E7EB; }
+  html.dark .sidebar-footer { border-color: #363636; }
+  .user-info { display: flex; align-items: center; gap: 10px; padding: 8px 6px; overflow: hidden; }
+  .user-avatar { width: 32px; height: 32px; background: #6C63FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+  .user-name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-role { font-size: 11px; color: #9CA3AF; white-space: nowrap; overflow: hidden; }
+
+  /* ─── Topbar ─── */
+  .topbar-title { font-size: 18px; font-weight: 700; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .search-input {
+    padding: 7px 12px 7px 36px; border: 1px solid #E5E7EB; border-radius: 8px;
+    background: #F9FAFB; font-size: 13px; width: 220px; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .search-input:focus { border-color: #6C63FF; box-shadow: 0 0 0 3px rgba(108,99,255,.12); }
+  .search-wrap { position: relative; }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #9CA3AF; width: 16px; height: 16px; }
+  .btn {
+    padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer;
+    font-size: 13px; font-weight: 600; transition: all .15s; display: flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: #6C63FF; color: #fff; }
+  .btn-primary:hover { background: #5a52d5; }
+  .btn-ghost { background: transparent; color: #6B7280; border: 1px solid #E5E7EB; }
+  html.dark .btn-ghost { border-color: #363636; color: #9CA3AF; }
+  .btn-ghost:hover { background: #F3F4F6; }
+  html.dark .btn-ghost:hover { background: #2a2a2a; }
+  .icon-btn { padding: 8px; border-radius: 8px; border: none; background: none; cursor: pointer; color: #6B7280; }
+  .icon-btn:hover { background: #F3F4F6; color: #374151; }
+  html.dark .icon-btn:hover { background: #2a2a2a; color: #F9FAFB; }
+
+  /* ─── Week switcher ─── */
+  .week-switcher { display: flex; align-items: center; gap: 4px; }
+  .week-btn {
+    padding: 6px 14px; border-radius: 8px; border: none; cursor: pointer;
+    font-size: 13px; font-weight: 500; background: #F3F4F6; color: #6B7280;
+    transition: all .15s;
+  }
+  .week-btn:hover { background: #E5E7EB; color: #374151; }
+  .week-btn.active { background: #6C63FF; color: #fff; font-weight: 600; }
+  .week-arrow { padding: 6px; border-radius: 6px; border: none; background: none; cursor: pointer; color: #6B7280; }
+  .week-arrow:hover { background: #E5E7EB; }
+  html.dark .week-arrow:hover { background: #2a2a2a; }
+
+  /* ─── Stats bar ─── */
+  .stats-bar { display: flex; gap: 16px; margin-bottom: 24px; }
+  .stat-box {
+    background: #fff; border: 1px solid #E5E7EB; border-radius: 12px;
+    padding: 14px 20px; flex: 1; display: flex; align-items: center; gap: 14px;
+    transition: background .2s;
+  }
+  .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .stat-icon.purple { background: #EEF2FF; color: #6C63FF; }
+  .stat-icon.green { background: #ECFDF5; color: #059669; }
+  .stat-icon.blue { background: #EFF6FF; color: #3B82F6; }
+  .stat-icon.orange { background: #FFF7ED; color: #F59E0B; }
+  .stat-value { font-size: 24px; font-weight: 700; line-height: 1; }
+  .stat-label { font-size: 12px; color: #9CA3AF; margin-top: 4px; }
+
+  /* ─── Group ─── */
+  .group-block { margin-bottom: 32px; }
+  .group-header {
+    display: flex; align-items: center; gap: 10px;
+    background: #F0EEFF; border: 1px solid #DDD6FE; border-radius: 10px;
+    padding: 10px 16px; margin-bottom: 16px;
+  }
+  .group-dot { width: 10px; height: 10px; border-radius: 50%; background: #6C63FF; }
+  .group-name { font-size: 15px; font-weight: 700; color: #5b4ee8; }
+  html.dark .group-name { color: #818cf8; }
+  .group-count { font-size: 12px; color: #9CA3AF; background: #E0E7FF; padding: 2px 8px; border-radius: 20px; margin-left: auto; }
+  html.dark .group-count { background: #1e1b4b; color: #818cf8; }
+
+  /* ─── Cards grid ─── */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
+
+  /* ─── Person card ─── */
+  .card {
+    background: #fff; border: 1px solid #E5E7EB; border-radius: 12px;
+    overflow: hidden; transition: box-shadow .2s, border-color .2s;
+  }
+  .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.08); border-color: #C4B5FD; }
+  html.dark .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.3); border-color: #4f46e5; }
+  .card-header { padding: 14px 16px 12px; display: flex; align-items: flex-start; gap: 12px; border-bottom: 1px solid #F3F4F6; }
+  html.dark .card-header { border-color: #2a2a2a; }
+  .person-avatar {
+    width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; color: #fff;
+  }
+  .person-info { flex: 1; min-width: 0; }
+  .person-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .person-module { font-size: 12px; color: #6B7280; line-height: 1.4; }
+  .support-exec-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #FEF3C7; color: #92400E; font-size: 11px; font-weight: 600;
+    padding: 3px 8px; border-radius: 20px; margin-top: 5px; white-space: nowrap;
+  }
+  html.dark .support-exec-badge { background: #451a03; color: #fcd34d; }
+
+  /* Card sections */
+  .card-body { padding: 0; }
+  .card-section { border-bottom: 1px solid #F3F4F6; }
+  .card-section:last-child { border-bottom: none; }
+  .section-head {
+    display: flex; align-items: center; gap: 8px; padding: 10px 16px;
+    cursor: pointer; user-select: none;
+  }
+  .section-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .dot-blue { background: #3B82F6; }
+  .dot-gray { background: #9CA3AF; }
+  .dot-green { background: #10B981; }
+  .dot-orange { background: #F59E0B; }
+  .section-label { font-size: 12px; font-weight: 600; color: #6B7280; flex: 1; }
+  .section-content { padding: 0 16px 12px; font-size: 13px; line-height: 1.7; color: #374151; white-space: pre-wrap; }
+  html.dark .section-content { color: #D1D5DB; }
+  .section-chevron { width: 16px; height: 16px; color: #9CA3AF; transition: transform .2s; flex-shrink: 0; }
+  .section-chevron.open { transform: rotate(180deg); }
+
+  /* Primary section (always visible) */
+  .primary-section { padding: 12px 16px; }
+  .primary-label { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .primary-label-text { font-size: 12px; font-weight: 600; color: #3B82F6; }
+  .primary-content { font-size: 13px; line-height: 1.75; color: #374151; white-space: pre-wrap; }
+  html.dark .primary-content { color: #D1D5DB; }
+
+  /* Expand controls */
+  .expand-bar {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px 16px 10px; cursor: pointer; color: #6B7280; font-size: 12px; font-weight: 500;
+    border-top: 1px dashed #E5E7EB; transition: color .15s;
+  }
+  html.dark .expand-bar { border-color: #363636; }
+  .expand-bar:hover { color: #6C63FF; }
+
+  /* ─── Modal ─── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    z-index: 100; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border: 1px solid #E5E7EB; border-radius: 16px;
+    width: 680px; max-width: calc(100vw - 40px); max-height: 85vh;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #F3F4F6; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  html.dark .modal-header { border-color: #2a2a2a; }
+  .modal-title { font-size: 18px; font-weight: 700; flex: 1; }
+  .modal-close { padding: 6px; border: none; background: none; cursor: pointer; color: #9CA3AF; border-radius: 6px; }
+  .modal-close:hover { background: #F3F4F6; color: #374151; }
+  html.dark .modal-close:hover { background: #2a2a2a; }
+  .modal-body { overflow-y: auto; padding: 20px 24px; flex: 1; }
+  .modal-section { margin-bottom: 20px; }
+  .modal-section-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .modal-section-body { font-size: 13px; line-height: 1.8; color: #374151; white-space: pre-wrap; background: #F9FAFB; padding: 12px 14px; border-radius: 8px; border: 1px solid #E5E7EB; }
+  html.dark .modal-section-body { color: #D1D5DB; background: #2a2a2a; border-color: #363636; }
+  .modal-section-body.empty { color: #9CA3AF; font-style: italic; }
+
+  /* ─── Empty state ─── */
+  .empty-state { text-align: center; padding: 60px 20px; color: #9CA3AF; }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-text { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+  .empty-sub { font-size: 13px; }
+
+  /* ─── Scrollbar ─── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
+  html.dark ::-webkit-scrollbar-thumb { background: #363636; }
+
+  /* ─── Tooltip ─── */
+  .tooltip-wrap { position: relative; }
+  .tooltip {
+    display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: #1F2937; color: #F9FAFB; font-size: 11px; padding: 4px 8px; border-radius: 6px;
+    white-space: nowrap; pointer-events: none; z-index: 50;
+  }
+  .tooltip-wrap:hover .tooltip { display: block; }
+
+  /* ─── Filter bar ─── */
+  .filter-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filter-chip {
+    padding: 5px 12px; border-radius: 20px; border: 1px solid #E5E7EB;
+    font-size: 12px; font-weight: 500; cursor: pointer; background: #fff; color: #6B7280;
+    transition: all .15s;
+  }
+  html.dark .filter-chip { background: #2a2a2a; border-color: #363636; color: #9CA3AF; }
+  .filter-chip:hover { border-color: #6C63FF; color: #6C63FF; }
+  .filter-chip.active { background: #6C63FF; border-color: #6C63FF; color: #fff; }
+
+  /* responsive */
+  @media (max-width: 768px) {
+    .cards-grid { grid-template-columns: 1fr; }
+    .stats-bar { flex-wrap: wrap; }
+    .stat-box { flex: 1 1 45%; }
+    .sidebar { width: 68px; }
+    .sidebar .logo-text, .sidebar .nav-item span, .sidebar .user-name, .sidebar .user-role { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ─── Sidebar ─── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">行</div>
+      <span class="logo-text">行政周报</span>
+      <button class="sidebar-collapse-btn" onclick="toggleSidebar()" id="collapseBtn" title="收起">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+    </div>
+
+    <div class="sidebar-section-label">导航</div>
+    <nav>
+      <a class="nav-item active" onclick="setView('weekly')" href="#">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>周报看板</span>
+      </a>
+      <a class="nav-item" onclick="setView('person')" href="#">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>人员视图</span>
+      </a>
+      <a class="nav-item" onclick="setView('history')" href="#">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>历史周报</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">管</div>
+        <div>
+          <div class="user-name">耿博琳</div>
+          <div class="user-role">大行政</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ─── Main ─── -->
+  <div class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">2026.6.11 行政周报</div>
+      <div class="week-switcher">
+        <button class="week-arrow" onclick="prevWeek()" title="上一期">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="week-btn" onclick="switchWeek(0)">4.16</button>
+        <button class="week-btn" onclick="switchWeek(1)">5.28</button>
+        <button class="week-btn active" id="weekBtn2" onclick="switchWeek(2)">6.11</button>
+        <button class="week-arrow" onclick="nextWeek()" title="下一期">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" type="text" placeholder="搜索人员或内容…" id="searchInput" oninput="onSearch()" />
+        </div>
+        <button class="btn btn-ghost icon-btn tooltip-wrap" onclick="toggleDark()" title="切换主题">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content" id="mainContent">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ─── Detail Modal ─── -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="person-avatar" id="modalAvatar" style="width:44px;height:44px;border-radius:12px;font-size:18px;"></div>
+      <div>
+        <div class="modal-title" id="modalName"></div>
+        <div style="font-size:12px;color:#9CA3AF;" id="modalModule"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA — extracted from Excel 行政工作周报
+// ─────────────────────────────────────────────
+const WEEKS = [
+  { label: '2026.4.16', short: '4.16' },
+  { label: '2026.5.28', short: '5.28' },
+  { label: '2026.6.11', short: '6.11' },
+];
+
+const REPORT_DATA = [
+  // ─── week 0: 2026.4.16 ───
+  [
+    {
+      group: '大行政', name: '耿博琳', module: '职场管理（北京+异地）\n行政数字化 、文化运营', supportExec: '/',
+      weekly3: '一、2025双刊项目\n整体进度：议价调整沟通中，最迟明天反馈。整体落地节奏基本和去年持平或稍延后，五一假期前线上征集推出，五一后线下宣发推广。\n\n1、2025时光相册\n各部门素材精选与优化，各部门素材细筛与优化沟通。按相册大框架进行分版块素材整理。\n大事记：融资素材已完成；AI战略落地-智算云部分今天可全部补齐\n\n2、故事集\n招标进程跟进\n\n二、行政数字化行业分享\nPPT优化及演示准备\n\n三、全职场标准化考勤系统\n配合人力IT节奏，配合相应职场信息提供及落地',
+      daily: '其他跨部门沟通工作',
+      next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '高琳', module: '行政数字化后台相关', supportExec: '/',
+      weekly3: '一、趣味运动会：跃动2026——夯爆了\n时间：预计下周二发起报名，下下周二举办\n项目：跳绳、AI马拉松\n设计：今天主背景板能出来，明后天通知图能出来\n\n二、儿童节礼品\n方向1：小小探险家·户外安全套装\n方向2：定制夏凉被\n方向3：定制沙滩套装（书包、水枪、浴巾、浴帽、臂圈）\n\n三、家庭日\n陆续看场地\n\n四、行政服务台：本周创建工单数82个，其中人工工单数21，机器人拦截工单数60，100%',
+      daily: '日常行政后台事务处理', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '丁玉萍', module: '行政数字化后台相关', supportExec: '/',
+      weekly3: '一、费用相关\n月结凭证整理，火车费用提报中、北美信用卡还款提报、北京能源费、房租保证金借款，滴滴敏感订单定向推送\n\n二、用车、商旅、三项\n3月底员工三项额度录入；差旅问题处理；滴滴问题处理\n\n三、社团其他\n1、协议酒店：协议酒店问卷调研礼品发放、第一期北京武汉各2家谈价中\n2、健康系列活动：color run借款及报名、乒乓球对外交流赛、相册素材进度完成9个一级部门',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '张灵玉', module: '职场运营、文化运营', supportExec: '/',
+      weekly3: '一、职场运营\n1）北京职场：工位调整两版方案完善，等待确认调整；访客流程异常已修复\n2）上海职场：日常行政事务/下午茶等支持\n\n二、福利\n1）端午全员礼：四个方案已完成，等待智囊确认时间后开启投票\n2）入职包：智囊团已选定包形，lulu同款黑色胜出，设计师调整设计中\n3）五周年金钞：采购申请通过，供应链合同沟通中\n\n三、其他\n下午茶切换，暂无最新进展',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '傅中南', module: '行政：异地办公室管理\n总办支持', supportExec: '/',
+      weekly3: '异地职场\n庆阳：家具已完成交付，目前强电改造中，推进焕新仪式中，预计五一后\n珠海：装修中，预计424验收，427搬家，保洁服务对接中\n厦门：空调维修及清洗\n\n异地职场费用提报：广州、厦门、新加坡、马来、杭州、深圳、南京费用提报\n\n其他：行政部H2团建',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '程宇亮', module: '行政运营（武汉）', supportExec: '/',
+      weekly3: '流程相关\n1）投屏流程：与IT同事沟通公共区域投屏流程合并\n2）巡查流程：职场内部巡查已上线，开始测试\n3）工位预约：探讨出差工位预约可能性\n\n职场相关\n1）政企工位：集团明确租赁方式为1000元/个，按年租\n2）办公室：下周班子会，共享办公室分配\n\n黑马大赛\n1）路演答辩：完成黑马2天路演决赛现场落地\n2）后续宣发：勋章发布、圆满落幕长图整体宣发',
+      daily: '运动会活动现场协助、家庭日筹备启动', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '聂茜茜', module: '行政运营（武汉）', supportExec: '/',
+      weekly3: '一、活动相关\n1.黑马大赛路演答辩现场支持，高校奖金发放事宜跟进\n2.樱花节活动收尾，AI线上创意大赛奖品发放完毕\n3.云上智囊团碰头会（议题：露台改造方案+入职包方案）\n4.趣味运动会（明天下午16:30开始，物料搭建+奖品采购完成）',
+      daily: '行政服务台及员工日常问题答疑、社团活动支持', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '董诗昀', module: '行政运营（武汉）', supportExec: '/',
+      weekly3: '职场相关\n1、报修二维码试运行，已投放73处特殊点位二维码\n2、户外露台供应商现场侦查，已提供露台重点规划及建筑结构图\n3、咖咖贩卖机供应商对接，供应链重新寻找供应商\n4、本周公寓新增2名同学入住，二期公寓已开放约80间房源\n5、三家主体公司费用整理，费用提报\n6、会务支持：本周进行两场会务接待，满意度100%',
+      daily: '工区日常巡查维护，报修事宜跟踪整理', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '黄洁', module: '行政运营（深圳）', supportExec: '王羲桀（base深圳，非总办）',
+      weekly3: '1.职场运营相关\n深圳职场日常环境维护：环境巡检、每日下午茶准备，每月零食柜补充\n人力侧：协助入职1名&办理工牌1张\n财务侧：百望云开票系统每日登录&开票\n法务侧：合同章管理，盖章1则\nkoa计提报销9则\n\n2.政府项目申报&补贴\n完成高企发展年报填写\n\n3.羲桀总日常事务支持\n日常会议组织安排、面试&访客接待、报销工作、日常三餐等以及个人事务支持',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '高管支持', name: '王琳琳', module: '高管支持', supportExec: '田开颜\n王首虎\n崔丽',
+      weekly3: '高管支持\nRex：出差规划与安排，招待安排；供应商拜访安排；部门例会及重要代办进度跟进；重要会议安排与处理\n崔丽：物品采购；用餐安排；其他临时安排的事项处理\n王首虎：物品闪送邮寄，以及其他临时安排的事务\n\n支持部门\n1、无锡团建活动落地，共计100人参加（资产&参谋）\n2、部门事务支持工作、部门内部聚餐安排\n3、各部门例会支持，周报收集以及其他材料整理安排',
+      daily: '资产管理采购支持工作', next3: '', issues: '',
+    },
+  ],
+
+  // ─── week 1: 2026.5.28 ───
+  [
+    {
+      group: '大行政', name: '耿博琳', module: '职场管理（北京+异地）\n行政数字化 、文化运营', supportExec: '/',
+      weekly3: '一、2025双刊项目\n整体进度：故事集全员征集阶段已结束，相册设计优化过程中，持续优化设计及素材细节。\n\n1、2025时光相册\n完成第二版设计方案的沟通与确认。补充五周年、十周年、全员大合影等核心素材，同步优化整理素材文案。\n\n2、故事集\n完成面向全员的征集环节。整体参与度较低，本周转向完成了对管理层的定向约稿，确保内容质量与覆盖面。\n\n二、智能数据推送项目\n核心进展\n1、需求文档已完成定稿并与BI中心、技术委员会完成对接\n2、用车及差旅（机酒火）数据接口已调试通过，数据拉取无阻塞\n3、已产出可视化小原型，优化交互细节中\n4、推送方式：确定为协作订阅号，已完成新建订阅号名称、头像、流程申请\n\n三、政委工作方向辅助落地\n围绕实际场景落地，推进了两个场景相关工作机制的适配与初步落地',
+      daily: '其他跨部门沟通工作', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '高琳', module: '行政数字化后台相关', supportExec: '/',
+      weekly3: '一、儿童节礼品\n登记：1073个，超73个，补50个\n【北京】发放770，差53【武汉】发放230，差20个【其余地区】发放67\n\n二、甩肉大赛\n个人报名：344  团队报名：61组（已进行15天，下周二最终测量）\n今天下午发起本周押注活动\n目前单人减重率：10.1%    团队减重总数：22.6斤\n\n三、家庭日\n报名情况：220组家庭，740人（大人439小孩301）\n活动时间：6月6日 9:30-14:00\n赛事物料：奖牌、发带都已经制作了~就差文化衫\n\n四、行政服务台：本周创建工单数82个，其中人工工单数21，机器人拦截工单数61，100%',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '丁玉萍', module: '行政数字化后台相关', supportExec: '/',
+      weekly3: '一、费用相关\n月结凭证整理，火车费用提报中、北美信用卡还款提报、北京能源费、房租保证金借款，滴滴敏感订单定向推送\n\n二、用车、商旅、三项\n3月底员工三项额度录入；差旅问题处理；滴滴问题处理\n\n三、社团其他\n1、协议酒店：协议酒店问卷调研礼品发放、第一期北京武汉各2家谈价中\n2、健康系列活动：color run借款及报名、乒乓球对外交流赛、相册素材进度完成9个一级部门',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '张灵玉', module: '职场运营、文化运营', supportExec: '/',
+      weekly3: '一、职场运营\n1）北京职场：10层风控和翊姐办公室对调，已完成配置；8层平开门异常更换控制器；员工被小米投诉两则已做警告\n2）上海职场：日常行政事务/下午茶等支持\n\n二、福利\n1）端午全员礼：两个方案均在拍摄样品中，下周二家居品类装箱发往各地\n2）五周年金钞：大货生产中，仅更改年份（13周年更改为14周年），预计7月1日收货\n3）下午茶切换：招标方案问题答疑，北京武汉规则拉齐，下午茶费用逻辑：人数*50元/月',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '傅中南', module: '行政：异地办公室管理\n总办支持', supportExec: '/',
+      weekly3: '异地职场\n庆阳：新增追采，正在评估成本中\n兰州：选址方案已输出，待评估\n上海：星扬45层以上没资源，59层以上在谈整层客户\n\n总办\n公务车：西北车已提，武汉预计本周五提车，深圳预计下周提车，庆阳第二辆启动采购\n胸针：大货今明两天到\n文化衫：统计尺码后下大货',
+      daily: '异地职场费用提报', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '程宇亮', module: '行政运营（武汉）', supportExec: '/',
+      weekly3: '露台改造\n1）需求调整：按照30万整体预算，调整优先级落地需求\n2）露台答疑：供应商问题答疑，已对接集团工程部答疑完成\n3）现有进度：供应商调整最新方案，持续跟进中\n\n黑马大赛收尾\n1）intel赞助：统计整体花费金额约35万\n2）勋章制作：供应链寻供应商中，目前供应商达不到设计制作要求\n\n福利活动\n家庭日整体筹备：场地确定、方案整体策划沟通\n活动时间：2026年6月6日，10:00开场，报名110组家庭\n\n工位系统AI应用落地：已解决楼层工位图显示BUG修复',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '聂茜茜', module: '行政运营（武汉）', supportExec: '/',
+      weekly3: '一、2026家庭日筹备\n1.现场确认搭建及用餐细节、场地方对接\n2.方案流程沟通细化\n3.宣传海报文案梳理修改及表单设计\n4.报名数据及儿童信息整理统计\n\n二、公益行-黄石市儿童福利院\n本周五早上出发\n1.对接当地商店采购捐赠物资：18箱日用品 3箱笔记本\n2.横幅制作及慰问流程\n\n三、儿童节礼品发放\n截止目前23个未领\n\n四、视频ip栏目策划\n脚本梳理中，待进一步脑暴确认',
+      daily: '行政服务台答疑，协议酒店更新续签一家', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '董诗昀', module: '行政运营（武汉）', supportExec: '/',
+      weekly3: '职场相关\n1、武汉园区二期公寓摇号圆满结束：共计144人参与报名，有效报名136人，40人报名成功\n2、一楼职场28个工位租赁合同推进，武汉职场绿植材料整理\n3、庆阳职场工卡人脸权限：后续由武汉开物理工卡分配权限寄给员工\n4、本周邀约咖啡贩卖机供应商到现场实地勘察\n5、计划在一楼前台新增失物招领处，方案细化中\n\n其他\n本周重点关注员工对工区体感温度的反馈',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '胡丽婷', module: '行政运营（深圳）', supportExec: '王羲桀（base深圳，非总办）',
+      weekly3: '1.职场运营相关\n深圳职场日常环境维护\n职场管理：\n（1）续租事项已完成，续签一年，于2027年5月31日到期，租金单价下调为90/m²，租赁保证金退回75456元\n（2）职场装修：装修需求、品牌、尺寸已确认，目前待确认是否延迟一个月\n人力侧：协助入职4名&办理工牌4张\n财务侧：百望云开票系统每日登录&开票\n法务侧：合同章管理，盖章12则\nkoa计提报销16则\n\n2.政府项目申报&补贴\n高新技术企业认证：目前正在推进前期资料筹备，预计6月底进行申报\n技术转移项目：已公示进入拨款阶段，补贴金额25万，资料已备齐本月内完成提交\n\n3.羲桀总日常事务支持',
+      daily: '协助AIPC部门加班餐食报销工作、协助完成产品发货邮寄', next3: '', issues: '',
+    },
+    {
+      group: '高管支持', name: '王琳琳', module: '高管支持', supportExec: '田开颜\n王首虎\n崔丽',
+      weekly3: '高管支持\nRex：出差规划与安排，招待安排；供应商拜访安排；部门例会及重要代办进度跟进；资产管理部事务协助处理\n崔丽：物品采购；用餐安排；其他临时安排的事项处理\n王首虎：物品闪送邮寄，以及其他临时安排的事务\n\n支持部门\n1、部门季度会顺利落地\n2、部门事务支持工作、部门内部聚餐安排\n3、各部门例会支持，周报收集以及其他材料整理安排\n4、资产管理采购支持工作',
+      daily: '', next3: '', issues: '',
+    },
+  ],
+
+  // ─── week 2: 2026.6.11 ───
+  [
+    {
+      group: '大行政', name: '耿博琳', module: '职场管理（北京+异地）\n行政数字化 、文化运营', supportExec: '/',
+      weekly3: '一、2025双刊项目\n整体进度：故事集全员征集阶段已结束，相册设计优化过程中，持续优化设计及素材细节。\n\n1、2025时光相册\n完成第二版设计方案的沟通与确认。补充五周年、十周年、全员大合影等核心素材，同步优化整理素材文案。\n待确定：总裁室大合影是否用年初全员大会合影——单独拍摄\n\n2、故事集\n完成面向全员的征集环节。整体参与度较低，本周转向完成了对管理层的定向约稿，确保内容质量与覆盖面。\n\n二、智能数据推送项目\n核心进展\n1、需求文档已完成定稿并与BI中心、技术委员会完成对接\n2、用车及差旅（机酒火）数据接口已调试通过，数据拉取无阻塞\n3、已产出可视化小原型，优化交互细节中\n4、推送方式：已确定为协作订阅号，已完成新建订阅号名称、头像、流程申请',
+      daily: '其他跨部门沟通工作', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '高琳', module: '行政数字化后台相关', supportExec: '/',
+      weekly3: '一、儿童节礼品\n登记：补70套，收尾，申请预算\n\n二、甩肉大赛\n收尾总结、发奖牌\n报名343人，总减重1411.2KG，单人减重率：16.18%，团队减重总数：62.8斤\n\n三、家庭日\n收尾，活动回顾今天或者明天发出\n\n四、端午手工DIY活动\n\n五、整理北京公益内容\n\n六、行政服务台：本周创建工单数57个，其中人工工单数19，机器人拦截工单数38，100%',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '丁玉萍', module: '行政数字化后台相关', supportExec: '/',
+      weekly3: '一、费用结算\n1、月结凭证整理对账：机票费用完成对账提报中、顺丰IDC账单对账中、分贝通凭证问题跟进（部分员工人脸授权）、AI账单发送配合对账、社团场地费充值\n\n二、平台方面\n1、差旅平台问题处理、5月底员工三项额度录入、差旅问题处理、滴滴问题处理\n\n三、其他\n1、协议酒店：单体签约覆盖5城19家，已全部托管上线，等设计稿，输出年度协议酒店信息\n2、健康体检：预计6月30日开启，目前配合供应链招标流程，技术条款制定\n3、相册素材优化：6.9素材全部提交完成及整体图文刷新优化\n4、滴滴敏感订单手动定向推送，智能推送项目暂未启用，预计下月',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '张灵玉', module: '职场运营、文化运营', supportExec: '/',
+      weekly3: '一、职场运营\n1）北京职场：\n维修部分：6-11层茶水间吊顶维修，6-8层连廊电路维修，已完成。翊姐会议桌门禁粘贴。\n车位：4、5、6月均预留3个访客车位，6月底大摇预计6月24号\n2）上海职场：日常行政事务/下午茶等支持，职场相关费用提报付款\n\n二、福利\n1）端午全员礼\n北京武汉及异地已全部发放完毕，未主动登记默认夏凉被的异地员工本周也已陆续联系并发出\n2）五周年金钞\n年中大会暂未确定地点，外包装先邮寄至北京，等待后续确认后转交HR\n3）下午茶\n端午节粽子下午茶',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '傅中南', module: '行政：异地办公室管理\n总办支持', supportExec: '/',
+      weekly3: '异地职场\n庆阳：文化墙已确定方案，待供应商施工。前台墙体最新解决方案为在原有墙体基础上加厚加固，方案已确认，待施工\n兰州：租赁：待邹总审批预算外邮件，租赁合同商务条款沟通中，目前计划8月1日起租\n上海：整合最新资源情况，待政企反馈下周踏勘时间\n\n总办\n公务车：庆阳武汉公务车已上牌，兰州公务车车款已付，深圳预计下周上牌\n流程：规章制度及责任承担协议已定稿，参谋部修改流程中，测试无问题后节前上线\n运营：珠海园区停车位租赁，北京预留一个车位\n一级班子：本周凯博、韩博生日\n文化衫：衣架、防尘罩定制大货已到，文化衫大货预计下周到\nPR照：先行签署合作协议，时间待定',
+      daily: '异地职场费用提报', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '程宇亮', module: '行政运营（武汉）', supportExec: '/',
+      weekly3: '露台改造\n1）需求调整：确定集装箱、部分家具、舞台区域为高优先级，将真草坪改为砾石区暂时放弃\n2）现有进度：已进入筹备供应商招标，确定供应商应标材料（设计方案、技术方案、户外电气系统方案等）\n\n福利活动\n1）武汉家庭日：\n动员分工：组织召开动员分工会，门票派发、游戏规则与分工宣贯动员\n活动现场：现场整体搭建定点盯场，活动当天现场统筹执行落地\n到场人数：90组，报名数据：120组家庭（限制前100组）\n后续宣发：整体完成订阅号、公众号回顾宣发，整体费用：14万+\n2）集团运动会：活动现场支持\n\n星云训练营\n暂定7月10日办理新员工入职，7月12日开营仪式，人数初步为90人',
+      daily: '库存系统：完成PRD需求文档2.0版本，目前正在输出2.0产品原型\n空调延时：已正式向集团发出延时邮件申请', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '聂茜茜', module: '行政运营（武汉）', supportExec: '/',
+      weekly3: '一、活动相关\n1.家庭日活动的落地完成及收尾工作\na.前期分工宣贯、保险信息收集等；现场票券的总体发放工作\nb.场地方合同对方确认中，费用明细单已确认，对方开票中\nc.微信公众号宣发收尾\n\n2.Q2生日会——minions party 快乐加码\n方案策划基本完成，小黄人ip搭建主题\n礼品完成选品下单，覆盖季度寿星人数87%以上\n\n3.公益活动输出\n武汉、北京已完成资料输出\n\n4.端午手工活动\n艾草门挂*20+非遗端午竹编蒲扇*30，下周三举办，活动物资已采买',
+      daily: '月度费用整理；服务台答疑', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '董诗昀', module: '行政运营（武汉）', supportExec: '/',
+      weekly3: '职场相关\n1、武汉职场矿泉水定制已提PR流程、定制抽纸外盒及抽纸纸盒两种方案成本评估\n2、对电子流"名片申请"、"金山云工卡维护（武汉，深圳，上海）"进行线上流程配置申请\n3、一楼职场租赁合同集团已走完盖章流程，武汉职场续租合同由季付变更为月付，集团财务正在审批\n4、端午节特色下午茶北京武汉两地职场同步发放 山姆甜粽\n5、端午节礼品发放，目前还有46位同学仍未领取\n6、武汉职场2-5层工椅数量明细统计\n\n物业相关\n1、统计截止目前职场所有报事报修问题，计划明天协同大小物业开展Q2季度报修进度拉起会\n2、工区日常巡查',
+      daily: '', next3: '', issues: '',
+    },
+    {
+      group: '大行政', name: '胡丽婷', module: '行政运营（深圳）', supportExec: '王羲桀（base深圳，非总办）',
+      weekly3: '1.职场运营相关\n深圳职场日常环境维护：环境巡检、每日下午茶准备，每月零食柜补充\n职场管理：\n（1）职场装修：采购pr已提交，总预算10万，期望最晚交付时间7月底\n（2）续租租赁保证金差额75456已退回公司\n（3）端午礼盒款式一已全部发放完毕，款式二运输中预计下周一前能发放完\n人力侧：协助入职1名&办理工牌1张\n财务侧：百望云开票系统每日登录&开票\n法务侧：合同章管理，盖章1则\nkoa计提报销8则\n\n2.政府项目申报&补贴\n高新技术企业认证：目前完成申报前期附件资料，其余材料正在推进中\n技术转移项目：已公示进入拨款阶段，补贴金额25万，资料已备齐本月内完成提交\n\n3.羲桀总日常事务支持\n日常会议组织安排、访客接待、报销工作、日常三餐等以及个人事务支持',
+      daily: '企微申请以及完成企业认证，协助AIPC部门加班餐食报销工作、协助完成产品发货邮寄', next3: '', issues: '',
+    },
+    {
+      group: '高管支持', name: '王琳琳', module: '高管支持', supportExec: '田开颜\n李翊\n王首虎\n崔丽',
+      weekly3: '高管支持\nRex：出差规划与安排，招待安排；供应商拜访安排；部门例会及重要代办进度跟进；重要会议安排与处理；资产管理部事务协助处理\n李翊：日程安排、用餐安排、他访客接待\n崔丽：物品采购；用餐安排；其他临时安排的事项处理\n王首虎：物品闪送邮寄，以及其他临时安排的事务\n\n支持部门\n1、部门事务支持工作、部门内部聚餐安排\n2、各部门例会支持，周报收集以及其他材料整理安排，部门事务支持协助\n3、资产管理采购支持与学习',
+      daily: '', next3: '', issues: '',
+    },
+  ],
+];
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let currentWeek = 2;
+let searchQuery = '';
+let sidebarCollapsed = false;
+let expandedCards = {};
+const AVATAR_COLORS = ['#6C63FF','#10B981','#3B82F6','#F59E0B','#EF4444','#8B5CF6','#EC4899','#14B8A6','#F97316','#6366F1'];
+
+function avatarColor(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xFFFF;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+function initial(name) { return name ? name[0] : '?'; }
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+function render() {
+  const data = REPORT_DATA[currentWeek];
+  const q = searchQuery.toLowerCase();
+  const filtered = q ? data.filter(p =>
+    p.name.includes(q) || p.module.includes(q) ||
+    p.weekly3.toLowerCase().includes(q) || p.daily.toLowerCase().includes(q)
+  ) : data;
+
+  // Stats
+  const groups = [...new Set(data.map(p => p.group))];
+  const totalPeople = data.length;
+  const withSupport = data.filter(p => p.supportExec && p.supportExec !== '/').length;
+
+  let html = `
+    <div class="stats-bar">
+      <div class="stat-box">
+        <div class="stat-icon purple">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div class="stat-value">${totalPeople}</div>
+          <div class="stat-label">参与人员</div>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon green">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div>
+          <div class="stat-value">${groups.length}</div>
+          <div class="stat-label">行政模块</div>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon blue">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div class="stat-value">${withSupport}</div>
+          <div class="stat-label">高管支持</div>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon orange">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div>
+          <div class="stat-value">${filtered.length}</div>
+          <div class="stat-label">${q ? '搜索结果' : '当周完整汇报'}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (filtered.length === 0) {
+    html += `<div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-text">未找到匹配内容</div>
+      <div class="empty-sub">尝试其他关键词</div>
+    </div>`;
+  } else {
+    for (const group of groups) {
+      const members = filtered.filter(p => p.group === group);
+      if (!members.length) continue;
+      html += `
+        <div class="group-block">
+          <div class="group-header">
+            <div class="group-dot"></div>
+            <div class="group-name">${group}</div>
+            <div class="group-count">${members.length} 人</div>
+          </div>
+          <div class="cards-grid">
+            ${members.map(p => renderCard(p)).join('')}
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+function renderCard(p) {
+  const color = avatarColor(p.name);
+  const cardId = `${currentWeek}_${p.name}`;
+  const isExpanded = expandedCards[cardId];
+
+  const hasDailyOrMore = p.daily || p.next3 || p.issues;
+
+  return `
+    <div class="card" id="card_${cardId}">
+      <div class="card-header">
+        <div class="person-avatar" style="background:${color};">${initial(p.name)}</div>
+        <div class="person-info">
+          <div class="person-name">${p.name}</div>
+          <div class="person-module">${p.module.replace(/\n/g,'  ·  ')}</div>
+          ${p.supportExec && p.supportExec !== '/' ?
+            `<div class="support-exec-badge">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              ${p.supportExec.replace(/\n/g,' / ')}
+            </div>` : ''}
+        </div>
+        <button onclick="openModal('${p.name}', ${currentWeek})" style="flex-shrink:0;padding:6px;border:none;background:none;cursor:pointer;color:#9CA3AF;border-radius:6px;" title="查看详情">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="primary-section">
+          <div class="primary-label">
+            <div class="section-dot dot-blue"></div>
+            <span class="primary-label-text">本周重点 3 件事</span>
+          </div>
+          <div class="primary-content">${truncate(p.weekly3, isExpanded ? 99999 : 240)}</div>
+          ${p.weekly3.length > 240 && !isExpanded ? `<div style="margin-top:6px;font-size:12px;color:#6C63FF;cursor:pointer;" onclick="toggleExpand('${cardId}')">展开全部 ▾</div>` : ''}
+          ${p.weekly3.length > 240 && isExpanded ? `<div style="margin-top:6px;font-size:12px;color:#6C63FF;cursor:pointer;" onclick="toggleExpand('${cardId}')">收起 ▴</div>` : ''}
+        </div>
+
+        ${hasDailyOrMore && isExpanded ? `
+          ${p.daily ? renderSection('日常事务性工作', p.daily, 'dot-gray', cardId) : ''}
+          ${p.next3 ? renderSection('下周重点 3 件事', p.next3, 'dot-green', cardId) : ''}
+          ${p.issues ? renderSection('问题及跨部门协同', p.issues, 'dot-orange', cardId) : ''}
+        ` : ''}
+      </div>
+
+      ${hasDailyOrMore ? `
+        <div class="expand-bar" onclick="toggleExpand('${cardId}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transform:${isExpanded ? 'rotate(180deg)' : 'rotate(0)'};transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
+          ${isExpanded ? '收起其他字段' : '展开日常 / 下周 / 问题'}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function renderSection(label, content, dotClass, cardId) {
+  return `
+    <div class="card-section" style="padding:10px 16px 12px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div class="section-dot ${dotClass}"></div>
+        <span class="section-label">${label}</span>
+      </div>
+      <div class="section-content">${content}</div>
+    </div>
+  `;
+}
+
+function truncate(str, len) {
+  if (!str) return '暂无填写';
+  if (str.length <= len) return str;
+  return str.slice(0, len) + '…';
+}
+
+// ─── INTERACTIONS ───
+function toggleExpand(cardId) {
+  expandedCards[cardId] = !expandedCards[cardId];
+  render();
+}
+
+function switchWeek(idx) {
+  currentWeek = idx;
+  document.querySelectorAll('.week-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  document.getElementById('topbarTitle').textContent = `${WEEKS[idx].label} 行政周报`;
+  expandedCards = {};
+  render();
+}
+
+function prevWeek() { if (currentWeek > 0) switchWeek(currentWeek - 1); }
+function nextWeek() { if (currentWeek < WEEKS.length - 1) switchWeek(currentWeek + 1); }
+
+function onSearch() {
+  searchQuery = document.getElementById('searchInput').value;
+  render();
+}
+
+function toggleSidebar() {
+  sidebarCollapsed = !sidebarCollapsed;
+  const s = document.getElementById('sidebar');
+  s.classList.toggle('collapsed', sidebarCollapsed);
+  const btn = document.getElementById('collapseBtn');
+  btn.innerHTML = sidebarCollapsed
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>`
+    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>`;
+}
+
+function setView(v) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  // In prototype, all views show same data; just update title
+  const titles = { weekly: '周报看板', person: '人员视图', history: '历史周报' };
+  // keep rendering the weekly view for now
+}
+
+function toggleDark() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  const icon = document.getElementById('themeIcon');
+  icon.innerHTML = isDark
+    ? `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`
+    : `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+}
+
+// ─── MODAL ───
+function openModal(name, weekIdx) {
+  const p = REPORT_DATA[weekIdx].find(x => x.name === name);
+  if (!p) return;
+  const color = avatarColor(p.name);
+
+  document.getElementById('modalAvatar').style.background = color;
+  document.getElementById('modalAvatar').textContent = initial(p.name);
+  document.getElementById('modalName').textContent = `${p.name}   —   ${WEEKS[weekIdx].label}`;
+  document.getElementById('modalModule').textContent = p.module.replace(/\n/g, ' · ');
+
+  const renderMField = (label, content, dotClass, textColor) => {
+    const empty = !content || content === '/';
+    return `
+      <div class="modal-section">
+        <div class="modal-section-title" style="color:${textColor}">
+          <div class="section-dot ${dotClass}"></div>${label}
+        </div>
+        <div class="modal-section-body${empty ? ' empty' : ''}">${empty ? '本期暂无填写' : content}</div>
+      </div>
+    `;
+  };
+
+  let body = '';
+  if (p.supportExec && p.supportExec !== '/') {
+    body += `<div style="margin-bottom:16px;padding:10px 14px;background:#FEF3C7;border-radius:8px;font-size:13px;">
+      <span style="font-weight:600;color:#92400E;">支持高管：</span>
+      <span style="color:#78350F;">${p.supportExec.replace(/\n/g,' / ')}</span>
+    </div>`;
+  }
+  body += renderMField('本周重点 3 件事', p.weekly3, 'dot-blue', '#3B82F6');
+  body += renderMField('日常事务性工作', p.daily, 'dot-gray', '#6B7280');
+  body += renderMField('下周重点 3 件事', p.next3, 'dot-green', '#10B981');
+  body += renderMField('问题及跨部门协同', p.issues, 'dot-orange', '#F59E0B');
+
+  document.getElementById('modalBody').innerHTML = body;
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modalOverlay')) {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ─── INIT ───
+render();
+</script>
+</body>
+</html>

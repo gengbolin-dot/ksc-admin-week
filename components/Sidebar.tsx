@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ view, setView, currentUser }) 
               <IconCalendar className="w-3 h-3" />
             </button>
           </div>
-          {!collapsed && <span className="text-xl font-bold text-gray-900 dark:text-white">项目中心</span>}
+          {!collapsed && <span className="text-xl font-bold text-gray-900 dark:text-white">行政周报看板</span>}
         </div>
         <button 
           onClick={() => setCollapsed(!collapsed)} 

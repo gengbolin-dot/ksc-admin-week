@@ -73,7 +73,7 @@ interface AppProps {
 }
 
 const App: React.FC<AppProps> = ({ currentUser }) => {
-  const [view, setView] = useState<ViewType>('personal');
+  const [view, setView] = useState<ViewType>('weeklyReport');
   const [projects, setProjects] = useState<Project[]>([]);
   const [okrSets, setOkrSets] = useState<OkrSet[]>([]);
   const [currentOkrPeriodId, setCurrentOkrPeriodId] = useState<string | null>(null);
