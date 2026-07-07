@@ -319,7 +319,7 @@
     font-size: 13px;
     font-weight: 500;
     color: var(--text-secondary);
-    width: 110px;
+    width: 130px;
     flex-shrink: 0;
     text-align: right;
   }
@@ -399,7 +399,7 @@
     font-size: 13px;
     font-weight: 500;
     color: var(--text-primary);
-    width: 60px;
+    width: 70px;
     flex-shrink: 0;
   }
   .rank-bar-track {
@@ -719,7 +719,7 @@
   <div class="sidebar">
     <div class="sidebar-logo">
       <div class="sidebar-logo-icon">A</div>
-      <div class="sidebar-logo-text">AOP</div>
+      <div class="sidebar-logo-text">AOP</div><div style="font-size:10px;font-weight:500;color:var(--text-tertiary);letter-spacing:0">行政运营管理平台</div>
       <div class="sidebar-logo-badge">Beta</div>
     </div>
     <div class="sidebar-workspace">▼ 行政部</div>
@@ -735,6 +735,9 @@
       </div>
       <div class="sidebar-item">
         <div class="sidebar-icon">⭐</div> 重点专项
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">🎯</div> OKR <span style="font-size:10px;color:var(--text-tertiary);margin-left:2px">手动导入</span>
       </div>
     </div>
 
@@ -760,17 +763,22 @@
 
     <div class="sidebar-section">
       <div class="sidebar-label">业务模块</div>
-      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#3B5BDB;"></div> 职场运营</div>
-      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#10B981;"></div> 文化运营</div>
-      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#06B6D4;"></div> 数字化运营</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#3B5BDB;"></div> 职场运营(北京)</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#8B5CF6;"></div> 职场运营(武汉)</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#EC4899;"></div> 职场运营(异地)</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#F97316;"></div> 职场运营(深圳)</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#10B981;"></div> 文化运营(活动)</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#F59E0B;"></div> 文化运营(福利)</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#06B6D4;"></div> 数字化运营(行政服务台)</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#6366F1;"></div> 数字化运营(后台)</div>
     </div>
 
     <div class="sidebar-bottom">
       <div class="sidebar-user">
-        <div class="sidebar-avatar">高</div>
+        <div class="sidebar-avatar">耿</div>
         <div>
-          <div class="sidebar-username">高琳</div>
-          <div class="sidebar-userrole">主管</div>
+          <div class="sidebar-username">耿博琳</div>
+          <div class="sidebar-userrole">大行政负责人</div>
         </div>
       </div>
     </div>
@@ -800,29 +808,29 @@
       <!-- Stats Row -->
       <div class="stats-row">
         <div class="stat-card total">
-          <div class="stat-num">42</div>
+          <div class="stat-num">40</div>
           <div class="stat-label">总事项</div>
-          <div class="stat-trend neutral">较上周 +2</div>
+          <div class="stat-trend neutral">9 人团队</div>
         </div>
         <div class="stat-card progress">
-          <div class="stat-num">18</div>
+          <div class="stat-num">28</div>
           <div class="stat-label">进行中</div>
-          <div class="stat-trend up">↑ 3 较上周</div>
+          <div class="stat-trend up">主力推进</div>
         </div>
         <div class="stat-card done">
-          <div class="stat-num">20</div>
+          <div class="stat-num">9</div>
           <div class="stat-label">已完成</div>
-          <div class="stat-trend up">↑ 5 较上周</div>
+          <div class="stat-trend up">本周 +3</div>
         </div>
         <div class="stat-card overdue">
-          <div class="stat-num">3</div>
+          <div class="stat-num">0</div>
           <div class="stat-label">延期</div>
-          <div class="stat-trend down">↑ 1 较上周</div>
+          <div class="stat-trend neutral">无延期</div>
         </div>
         <div class="stat-card risk">
-          <div class="stat-num">4</div>
-          <div class="stat-label">高风险</div>
-          <div class="stat-trend down">↑ 2 较上周</div>
+          <div class="stat-num">3</div>
+          <div class="stat-label">需协调</div>
+          <div class="stat-trend down">跨模块</div>
         </div>
       </div>
 
@@ -836,33 +844,64 @@
           <div class="card">
             <div class="card-header">
               <div class="card-title">工作模块分布</div>
-              <div class="card-badge accent">7 个模块</div>
+              <div class="card-badge accent">8 个模块</div>
             </div>
             <div class="stacked-bar-container">
               <div class="stacked-bar-row">
-                <div class="stacked-bar-label">职场运营</div>
+                <div class="stacked-bar-label">职场运营(北京)</div>
                 <div class="stacked-bar-track">
-                  <div class="stacked-bar-segment" style="width:26%;background:#3B5BDB;"><span>11</span></div>
-                  <div class="stacked-bar-segment" style="width:12%;background:#8B5CF6;"><span>5</span></div>
-                  <div class="stacked-bar-segment" style="width:5%;background:#A5B4FC;"><span></span></div>
-                  <div class="stacked-bar-segment" style="width:3%;background:#EF4444;border-radius:0 6px 6px 0;"><span></span></div>
+                  <div class="stacked-bar-segment" style="width:10%;background:#3B5BDB;"><span>4</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#8B5CF6;"><span></span></div>
+                  <div class="stacked-bar-segment" style="width:2%;background:#A5B4FC;"><span></span></div>
                 </div>
               </div>
               <div class="stacked-bar-row">
-                <div class="stacked-bar-label">文化运营</div>
+                <div class="stacked-bar-label">职场运营(武汉)</div>
                 <div class="stacked-bar-track">
-                  <div class="stacked-bar-segment" style="width:16%;background:#10B981;"><span>7</span></div>
-                  <div class="stacked-bar-segment" style="width:7%;background:#34D399;"><span>3</span></div>
-                  <div class="stacked-bar-segment" style="width:5%;background:#6EE7B7;"><span></span></div>
-                  <div class="stacked-bar-segment" style="width:5%;background:#EF4444;border-radius:0 6px 6px 0;"><span>2</span></div>
+                  <div class="stacked-bar-segment" style="width:14%;background:#8B5CF6;"><span>6</span></div>
+                  <div class="stacked-bar-segment" style="width:7%;background:#A78BFA;"><span>3</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#C4B5FD;"><span>2</span></div>
+                </div>
+              </div>
+              <div class="stacked-bar-row">
+                <div class="stacked-bar-label">职场运营(异地)</div>
+                <div class="stacked-bar-track">
+                  <div class="stacked-bar-segment" style="width:12%;background:#EC4899;"><span>5</span></div>
+                  <div class="stacked-bar-segment" style="width:5%;background:#F472B6;"><span>2</span></div>
+                </div>
+              </div>
+              <div class="stacked-bar-row">
+                <div class="stacked-bar-label">职场运营(深圳)</div>
+                <div class="stacked-bar-track">
+                  <div class="stacked-bar-segment" style="width:8%;background:#F97316;"><span>3</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#FB923C;"><span>1</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#FDBA74;"><span>1</span></div>
+                  <div class="stacked-bar-segment" style="width:2%;background:#10B981;"><span></span></div>
+                </div>
+              </div>
+              <div class="stacked-bar-row">
+                <div class="stacked-bar-label">文化运营(活动)</div>
+                <div class="stacked-bar-track">
+                  <div class="stacked-bar-segment" style="width:6%;background:#10B981;"><span>2</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#34D399;"><span>1</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#6EE7B7;"><span></span></div>
+                </div>
+              </div>
+              <div class="stacked-bar-row">
+                <div class="stacked-bar-label">文化运营(福利)</div>
+                <div class="stacked-bar-track">
+                  <div class="stacked-bar-segment" style="width:8%;background:#F59E0B;"><span>3</span></div>
+                  <div class="stacked-bar-segment" style="width:5%;background:#FBBF24;"><span>2</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#FDE68A;"><span>1</span></div>
                 </div>
               </div>
               <div class="stacked-bar-row">
                 <div class="stacked-bar-label">数字化运营</div>
                 <div class="stacked-bar-track">
-                  <div class="stacked-bar-segment" style="width:12%;background:#06B6D4;"><span>5</span></div>
-                  <div class="stacked-bar-segment" style="width:7%;background:#22D3EE;"><span>3</span></div>
-                  <div class="stacked-bar-segment" style="width:7%;background:#67E8F9;"><span></span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#06B6D4;"><span>1</span></div>
+                  <div class="stacked-bar-segment" style="width:8%;background:#6366F1;"><span>3</span></div>
+                  <div class="stacked-bar-segment" style="width:6%;background:#818CF8;"><span>2</span></div>
+                  <div class="stacked-bar-segment" style="width:3%;background:#A5B4FC;"><span></span></div>
                 </div>
               </div>
             </div>
@@ -878,55 +917,79 @@
           <div class="card">
             <div class="card-header">
               <div class="card-title">负责人工作量排行</div>
-              <div class="card-badge accent">TOP 6</div>
+              <div class="card-badge accent">TOP 9</div>
             </div>
             <div class="rank-list">
               <div class="rank-item">
                 <div class="rank-pos top">1</div>
-                <div class="rank-avatar">张</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#3B5BDB,#6366F1);">张</div>
                 <div class="rank-name">张灵玉</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:90%;background:var(--accent);">9</div>
+                  <div class="rank-bar-fill" style="width:60%;background:var(--accent);">6</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos top">2</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);">陈</div>
-                <div class="rank-name">陈思</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA);">董</div>
+                <div class="rank-name">董诗昀</div>
                 <div class="rank-bar-track">
                   <div class="rank-bar-fill" style="width:70%;background:var(--accent);">7</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos top">3</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);">李</div>
-                <div class="rank-name">李明</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#EC4899,#F472B6);">傅</div>
+                <div class="rank-name">傅中南</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:60%;background:var(--accent);">6</div>
+                  <div class="rank-bar-fill" style="width:70%;background:var(--accent);">7</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos">4</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%);">高</div>
-                <div class="rank-name">高琳</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#F97316,#FB923C);">胡</div>
+                <div class="rank-name">胡丽婷</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:50%;background:var(--purple);">5</div>
+                  <div class="rank-bar-fill" style="width:60%;background:var(--purple);">6</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos">5</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#fa709a 0%,#fee140 100%);">赵</div>
-                <div class="rank-name">赵颖</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#10B981,#34D399);">聂</div>
+                <div class="rank-name">聂茜茜</div>
                 <div class="rank-bar-track">
                   <div class="rank-bar-fill" style="width:40%;background:var(--purple);">4</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos">6</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#a18cd1 0%,#fbc2eb 100%);">周</div>
-                <div class="rank-name">周洋</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#6366F1,#818CF8);">丁</div>
+                <div class="rank-name">丁玉萍</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:30%;background:var(--warning);">3</div>
+                  <div class="rank-bar-fill" style="width:60%;background:var(--warning);">6</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos">7</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#F59E0B,#FBBF24);">高</div>
+                <div class="rank-name">高琳</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:60%;background:var(--warning);">6</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos">8</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#8B5CF6,#C4B5FD);">程</div>
+                <div class="rank-name">程宇亮</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:50%;background:var(--warning);">5</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos">9</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);">耿</div>
+                <div class="rank-name">耿博琳</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:0%;background:var(--text-tertiary);min-width:30px;">0</div>
                 </div>
               </div>
             </div>
@@ -939,13 +1002,13 @@
             </div>
             <div class="donut-chart-section">
               <div class="donut-chart" style="background: conic-gradient(
-                var(--accent) 0deg 154.3deg,
-                var(--success) 154.3deg 325.7deg,
-                var(--warning) 325.7deg 351.4deg,
-                var(--danger) 351.4deg 360deg
+                var(--accent) 0deg 252deg,
+                var(--success) 252deg 333deg,
+                var(--text-tertiary) 333deg 355.5deg,
+                var(--purple) 355.5deg 360deg
               );">
                 <div class="donut-center">
-                  <div class="donut-center-num">42</div>
+                  <div class="donut-center-num">40</div>
                   <div class="donut-center-label">总事项</div>
                 </div>
               </div>
@@ -953,32 +1016,26 @@
                 <div class="donut-legend-item">
                   <div class="donut-legend-dot" style="background:var(--accent);"></div>
                   <div class="donut-legend-label">进行中</div>
-                  <div class="donut-legend-value">18</div>
-                  <div class="donut-legend-pct">42.9%</div>
+                  <div class="donut-legend-value">28</div>
+                  <div class="donut-legend-pct">70.0%</div>
                 </div>
                 <div class="donut-legend-item">
                   <div class="donut-legend-dot" style="background:var(--success);"></div>
                   <div class="donut-legend-label">已完成</div>
-                  <div class="donut-legend-value">20</div>
-                  <div class="donut-legend-pct">47.6%</div>
-                </div>
-                <div class="donut-legend-item">
-                  <div class="donut-legend-dot" style="background:var(--warning);"></div>
-                  <div class="donut-legend-label">待启动</div>
-                  <div class="donut-legend-value">3</div>
-                  <div class="donut-legend-pct">7.1%</div>
-                </div>
-                <div class="donut-legend-item">
-                  <div class="donut-legend-dot" style="background:var(--danger);"></div>
-                  <div class="donut-legend-label">延期</div>
-                  <div class="donut-legend-value">3</div>
-                  <div class="donut-legend-pct">7.1%</div>
+                  <div class="donut-legend-value">9</div>
+                  <div class="donut-legend-pct">22.5%</div>
                 </div>
                 <div class="donut-legend-item">
                   <div class="donut-legend-dot" style="background:var(--text-tertiary);"></div>
-                  <div class="donut-legend-label">待评审</div>
-                  <div class="donut-legend-value">0</div>
-                  <div class="donut-legend-pct">0%</div>
+                  <div class="donut-legend-label">未开始</div>
+                  <div class="donut-legend-value">2</div>
+                  <div class="donut-legend-pct">5.0%</div>
+                </div>
+                <div class="donut-legend-item">
+                  <div class="donut-legend-dot" style="background:var(--purple);"></div>
+                  <div class="donut-legend-label">评审中</div>
+                  <div class="donut-legend-value">1</div>
+                  <div class="donut-legend-pct">2.5%</div>
                 </div>
               </div>
             </div>
@@ -997,42 +1054,42 @@
             </div>
             <div class="update-list">
               <div class="update-item">
-                <div class="update-avatar">张</div>
+                <div class="update-avatar" style="background:#3B5BDB;">张</div>
                 <div class="update-content">
-                  <div class="update-name">北京办公室5层装修项目</div>
-                  <div class="update-action">张灵玉更新了进度：完成率 65%→78%，施工方已完成吊顶安装</div>
+                  <div class="update-name">北京职场维修(茶水间吊顶)</div>
+                  <div class="update-action">张灵玉更新：6-11层茶水间吊顶维修，6-8层连廊电路维修已完成</div>
                 </div>
                 <div class="update-time">10分钟前</div>
               </div>
               <div class="update-item">
-                <div class="update-avatar" style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);">陈</div>
+                <div class="update-avatar" style="background:#8B5CF6;">程</div>
                 <div class="update-content">
-                  <div class="update-name">家庭日活动策划与执行</div>
-                  <div class="update-action">陈思标记了里程碑：场地已确认，进入物料采购阶段</div>
+                  <div class="update-name">武汉家庭日</div>
+                  <div class="update-action">程宇亮标记完成：到场90组，报名120组，费用14万+</div>
                 </div>
                 <div class="update-time">1小时前</div>
               </div>
               <div class="update-item">
-                <div class="update-avatar" style="background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);">李</div>
+                <div class="update-avatar" style="background:#6366F1;">丁</div>
                 <div class="update-content">
-                  <div class="update-name">武汉职场空调设备维保</div>
-                  <div class="update-action">李明提交了异常说明：3号机组压缩机异响，已联系厂家</div>
+                  <div class="update-name">协议酒店签约</div>
+                  <div class="update-action">丁玉萍更新：单体签约覆盖5城19家，已全部托管上线</div>
                 </div>
                 <div class="update-time">2小时前</div>
               </div>
               <div class="update-item">
-                <div class="update-avatar" style="background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%);">高</div>
+                <div class="update-avatar" style="background:#F97316;">胡</div>
                 <div class="update-content">
-                  <div class="update-name">六一儿童节福利发放</div>
-                  <div class="update-action">高琳更新了完成率：100%，全部福利已签收</div>
+                  <div class="update-name">深圳续租保证金</div>
+                  <div class="update-action">胡丽婷标记完成：租赁保证金差额75456已退回公司</div>
                 </div>
                 <div class="update-time">3小时前</div>
               </div>
               <div class="update-item">
-                <div class="update-avatar" style="background:linear-gradient(135deg,#a18cd1 0%,#fbc2eb 100%);">周</div>
+                <div class="update-avatar" style="background:#10B981;">聂</div>
                 <div class="update-content">
-                  <div class="update-name">行政服务台系统升级2.0</div>
-                  <div class="update-action">周洋提交评审申请：前端V2原型已完成，等待产品评审</div>
+                  <div class="update-name">Q2生日会(minions party)</div>
+                  <div class="update-action">聂茜茜更新：方案策划基本完成，礼品选品下单，覆盖87%以上寿星</div>
                 </div>
                 <div class="update-time">昨天 18:30</div>
               </div>
@@ -1043,45 +1100,10 @@
           <div class="card">
             <div class="card-header">
               <div class="card-title">超期事项</div>
-              <div class="card-badge danger">3 项</div>
+              <div class="card-badge danger">0 项</div>
             </div>
-            <div class="overdue-list">
-              <div class="overdue-item">
-                <div class="overdue-indicator"></div>
-                <div class="overdue-info">
-                  <div class="overdue-name">异地职场网络扩容项目</div>
-                  <div class="overdue-meta">
-                    <span class="overdue-module-tag" style="background:#FDF2F8;color:#EC4899;">🏢 异地职场</span>
-                    <span class="overdue-deadline">截止 6月20日</span>
-                    <span class="overdue-owner">王芳</span>
-                  </div>
-                </div>
-                <div class="overdue-days">超期16天</div>
-              </div>
-              <div class="overdue-item">
-                <div class="overdue-indicator"></div>
-                <div class="overdue-info">
-                  <div class="overdue-name">端午节福利方案审批</div>
-                  <div class="overdue-meta">
-                    <span class="overdue-module-tag" style="background:#FFFBEB;color:#F59E0B;">🎁 员工福利</span>
-                    <span class="overdue-deadline">截止 6月25日</span>
-                    <span class="overdue-owner">赵颖</span>
-                  </div>
-                </div>
-                <div class="overdue-days">超期11天</div>
-              </div>
-              <div class="overdue-item">
-                <div class="overdue-indicator"></div>
-                <div class="overdue-info">
-                  <div class="overdue-name">服务台工单分类标准修订</div>
-                  <div class="overdue-meta">
-                    <span class="overdue-module-tag" style="background:#ECFEFF;color:#06B6D4;">💻 行政服务台</span>
-                    <span class="overdue-deadline">截止 6月28日</span>
-                    <span class="overdue-owner">周洋</span>
-                  </div>
-                </div>
-                <div class="overdue-days">超期8天</div>
-              </div>
+            <div style="text-align:center;padding:24px 0;color:var(--text-tertiary);font-size:13px">
+              ✅ 本周无超期事项
             </div>
           </div>
 
@@ -1095,34 +1117,33 @@
               <div class="coord-item">
                 <div class="coord-icon">⚡</div>
                 <div class="coord-info">
-                  <div class="coord-name">北京办公室5层装修项目</div>
-                  <div class="coord-detail">IT弱电施工需要数字化运营团队配合布线</div>
+                  <div class="coord-name">深圳职场装修</div>
+                  <div class="coord-detail">采购PR已提交，总预算10万，期望7月底交付，需集团审批支持</div>
                   <div class="coord-deps">
-                    <span class="coord-dep-tag">🏢 北京职场</span>
-                    <span class="coord-dep-tag">💻 数字化后台运营</span>
+                    <span class="coord-dep-tag">🏢 职场运营(深圳)</span>
+                    <span class="coord-dep-tag">📋 审批中心</span>
                   </div>
                 </div>
               </div>
               <div class="coord-item">
                 <div class="coord-icon">⚡</div>
                 <div class="coord-info">
-                  <div class="coord-name">家庭日活动场地布置</div>
-                  <div class="coord-detail">活动需要北京职场团队配合场地清理和动线规划</div>
+                  <div class="coord-name">兰州租赁</div>
+                  <div class="coord-detail">待邹总审批预算外邮件，租赁合同商务条款沟通中，8月1起租前需确定装修商</div>
                   <div class="coord-deps">
-                    <span class="coord-dep-tag">🎉 活动运营</span>
-                    <span class="coord-dep-tag">🏢 北京职场</span>
+                    <span class="coord-dep-tag">🏢 职场运营(异地)</span>
+                    <span class="coord-dep-tag">📋 审批中心</span>
                   </div>
                 </div>
               </div>
               <div class="coord-item">
                 <div class="coord-icon">⚡</div>
                 <div class="coord-info">
-                  <div class="coord-name">行政服务台系统升级2.0</div>
-                  <div class="coord-detail">数据迁移需要各职场配合提供历史工单数据</div>
+                  <div class="coord-name">武汉空调延时</div>
+                  <div class="coord-detail">已正式向集团发出延时邮件申请，待回复</div>
                   <div class="coord-deps">
-                    <span class="coord-dep-tag">💻 行政服务台</span>
-                    <span class="coord-dep-tag">🏢 北京职场</span>
-                    <span class="coord-dep-tag">🏢 武汉职场</span>
+                    <span class="coord-dep-tag">🏢 职场运营(武汉)</span>
+                    <span class="coord-dep-tag">🏢 集团</span>
                   </div>
                 </div>
               </div>
@@ -1141,7 +1162,7 @@
     <h4>Dashboard Notes</h4>
     <div class="anno-item">
       <div class="anno-num">1</div>
-      <div class="anno-text">顶部5个统计卡片：总事项42 / 进行中18 / 已完成20 / 延期3 / 高风险4</div>
+      <div class="anno-text">顶部5个统计卡片：总事项40 / 进行中28 / 已完成9 / 延期0 / 需协调3</div>
     </div>
     <div class="anno-item">
       <div class="anno-num">2</div>
@@ -1149,11 +1170,11 @@
     </div>
     <div class="anno-item">
       <div class="anno-num">3</div>
-      <div class="anno-text">模块分布使用 CSS flexbox 堆叠条形图，展示每个模块组内各状态占比</div>
+      <div class="anno-text">模块分布使用 CSS flexbox 堆叠条形图，按8个业务模块展示各状态占比</div>
     </div>
     <div class="anno-item">
       <div class="anno-num">4</div>
-      <div class="anno-text">负责人工作量排行：水平条形图，前3名使用主题蓝色，4-6名使用紫/黄递减色</div>
+      <div class="anno-text">负责人工作量排行：水平条形图，前3名使用主题蓝色，4-6名使用紫色递减，7-9名使用黄色</div>
     </div>
     <div class="anno-item">
       <div class="anno-num">5</div>

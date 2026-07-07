@@ -179,13 +179,14 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
       <div class="nav-group-label">概览</div>
       <div class="nav-item active"><span class="nav-icon">📊</span>行政总览</div>
       <div class="nav-item"><span class="nav-icon">📈</span>数据看板</div>
+      <div class="nav-item"><span class="nav-icon">🎯</span>OKR <span style="font-size:10px;color:var(--text-tertiary);margin-left:2px">手动导入</span></div>
     </div>
     <div class="nav-group">
       <div class="nav-group-label">职场运营</div>
-      <div class="nav-item"><span class="nav-icon">🏢</span>职场管理</div>
-      <div class="nav-item"><span class="nav-icon">🪑</span>工位管理</div>
-      <div class="nav-item"><span class="nav-icon">🔧</span>设施运维</div>
-      <div class="nav-item"><span class="nav-icon">🛡️</span>安全管理</div>
+      <div class="nav-item"><span class="nav-icon">🏢</span>职场管理(北京)</div>
+      <div class="nav-item"><span class="nav-icon">🏢</span>职场管理(武汉)</div>
+      <div class="nav-item"><span class="nav-icon">🏢</span>职场管理(异地)</div>
+      <div class="nav-item"><span class="nav-icon">🏢</span>职场管理(深圳)</div>
     </div>
     <div class="nav-group">
       <div class="nav-group-label">文化运营</div>
@@ -216,7 +217,7 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
         <span>🔍</span> 搜索事项… <span>⌘K</span>
       </div>
       <div style="font-size:14px;cursor:pointer;color:var(--text-tertiary)">🔔</div>
-      <div class="topbar-avatar">李</div>
+      <div class="topbar-avatar">耿</div>
     </div>
   </div>
 
@@ -231,18 +232,23 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
           <div class="module-pills">
             <div class="module-pill active" data-module="beijing" onclick="selectModule(this,'beijing')">
               <span class="pill-dot dot-blue"></span>
-              <span class="pill-name">北京职场</span>
-              <span class="pill-owner">张明</span>
+              <span class="pill-name">职场运营(北京)</span>
+              <span class="pill-owner">张灵玉</span>
             </div>
             <div class="module-pill" data-module="wuhan" onclick="selectModule(this,'wuhan')">
-              <span class="pill-dot dot-green"></span>
-              <span class="pill-name">武汉职场</span>
-              <span class="pill-owner">李婷</span>
+              <span class="pill-dot dot-purple"></span>
+              <span class="pill-name">职场运营(武汉)</span>
+              <span class="pill-owner">程宇亮/董诗昀</span>
             </div>
             <div class="module-pill" data-module="remote" onclick="selectModule(this,'remote')">
+              <span class="pill-dot dot-red"></span>
+              <span class="pill-name">职场运营(异地)</span>
+              <span class="pill-owner">傅中南</span>
+            </div>
+            <div class="module-pill" data-module="shenzhen" onclick="selectModule(this,'shenzhen')">
               <span class="pill-dot dot-orange"></span>
-              <span class="pill-name">异地职场</span>
-              <span class="pill-owner">王磊</span>
+              <span class="pill-name">职场运营(深圳)</span>
+              <span class="pill-owner">胡丽婷</span>
             </div>
           </div>
         </div>
@@ -250,14 +256,14 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
           <div class="module-group-header"><span class="group-emoji">🎉</span> 文化运营</div>
           <div class="module-pills">
             <div class="module-pill" data-module="activity" onclick="selectModule(this,'activity')">
-              <span class="pill-dot dot-purple"></span>
-              <span class="pill-name">活动运营</span>
-              <span class="pill-owner">赵颖</span>
+              <span class="pill-dot dot-green"></span>
+              <span class="pill-name">文化运营(活动)</span>
+              <span class="pill-owner">聂茜茜</span>
             </div>
             <div class="module-pill" data-module="benefit" onclick="selectModule(this,'benefit')">
-              <span class="pill-dot dot-red"></span>
-              <span class="pill-name">员工福利</span>
-              <span class="pill-owner">陈静</span>
+              <span class="pill-dot dot-orange"></span>
+              <span class="pill-name">文化运营(福利)</span>
+              <span class="pill-owner">高琳</span>
             </div>
           </div>
         </div>
@@ -266,13 +272,13 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
           <div class="module-pills">
             <div class="module-pill" data-module="servicedesk" onclick="selectModule(this,'servicedesk')">
               <span class="pill-dot dot-blue"></span>
-              <span class="pill-name">行政服务台</span>
-              <span class="pill-owner">刘洋</span>
+              <span class="pill-name">数字化运营(行政服务台)</span>
+              <span class="pill-owner">高琳</span>
             </div>
             <div class="module-pill" data-module="digital" onclick="selectModule(this,'digital')">
-              <span class="pill-dot dot-green"></span>
-              <span class="pill-name">数字化后台运营</span>
-              <span class="pill-owner">孙浩</span>
+              <span class="pill-dot dot-purple"></span>
+              <span class="pill-name">数字化运营(后台)</span>
+              <span class="pill-owner">丁玉萍</span>
             </div>
           </div>
         </div>
@@ -281,8 +287,8 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
       <!-- ── Content Header ── -->
       <div class="content-header">
         <div>
-          <div class="content-title" id="contentTitle">北京职场</div>
-          <div class="content-meta" id="contentMeta">共 10 项事项</div>
+          <div class="content-title" id="contentTitle">职场运营(北京)</div>
+          <div class="content-meta" id="contentMeta">共 5 项事项</div>
         </div>
         <div class="view-toggle">
           <button class="view-btn active" id="btnList" onclick="switchView('list')">
@@ -343,26 +349,25 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
           <div class="ann-label">视图切换</div>
           <div class="ann-content">列表视图以 Table 呈现完整字段；看板视图按状态分为四列，卡片显示摘要信息。切换时无刷新，使用 CSS 动画过渡。</div>
         </div>
-        <div class="ann-item"><div class="ann-divider"></div></div>
+        <div class="annotation-item"><div class="ann-divider"></div></div>
         <div class="annotation-item">
           <div class="ann-label">色彩映射</div>
-          <div class="ann-color-row"><span class="ann-color-dot" style="background:var(--accent)"></span><span class="ann-color-label">进行中 — accent</span></div>
-          <div class="ann-color-row"><span class="ann-color-dot" style="background:var(--purple)"></span><span class="ann-color-label">评审中 — purple</span></div>
-          <div class="ann-color-row"><span class="ann-color-dot" style="background:var(--success)"></span><span class="ann-color-label">已完成 — success</span></div>
-          <div class="ann-color-row"><span class="ann-color-dot" style="background:var(--text-tertiary)"></span><span class="ann-color-label">未开始 — tertiary</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#3B5BDB"></span><span class="ann-color-label">职场运营(北京) — #3B5BDB</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#8B5CF6"></span><span class="ann-color-label">职场运营(武汉) — #8B5CF6</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#EC4899"></span><span class="ann-color-label">职场运营(异地) — #EC4899</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#F97316"></span><span class="ann-color-label">职场运营(深圳) — #F97316</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#10B981"></span><span class="ann-color-label">文化运营(活动) — #10B981</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#F59E0B"></span><span class="ann-color-label">文化运营(福利) — #F59E0B</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#06B6D4"></span><span class="ann-color-label">数字化运营(行政服务台) — #06B6D4</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#6366F1"></span><span class="ann-color-label">数字化运营(后台) — #6366F1</span></div>
         </div>
-        <div class="annotation-item">
-          <div class="ann-label">优先级圆点</div>
-          <div class="ann-content">1 点 = 低，2 点 = 中，3 点 = 高（橙色），4 点 = 紧急（红色）。仅看板卡片显示。</div>
-        </div>
-        <div class="ann-item"><div class="ann-divider"></div></div>
         <div class="annotation-item">
           <div class="ann-label">当前模块统计</div>
           <div class="ann-stats">
-            <div class="ann-stat-card"><div class="ann-stat-value" id="statTotal">10</div><div class="ann-stat-label">总事项</div></div>
-            <div class="ann-stat-card"><div class="ann-stat-value" id="statDone">3</div><div class="ann-stat-label">已完成</div></div>
-            <div class="ann-stat-card"><div class="ann-stat-value" id="statWip">5</div><div class="ann-stat-label">进行中</div></div>
-            <div class="ann-stat-card"><div class="ann-stat-value" id="statAvg">68%</div><div class="ann-stat-label">平均完成率</div></div>
+            <div class="ann-stat-card"><div class="ann-stat-value" id="statTotal">5</div><div class="ann-stat-label">总事项</div></div>
+            <div class="ann-stat-card"><div class="ann-stat-value" id="statDone">1</div><div class="ann-stat-label">已完成</div></div>
+            <div class="ann-stat-card"><div class="ann-stat-value" id="statWip">3</div><div class="ann-stat-label">进行中</div></div>
+            <div class="ann-stat-card"><div class="ann-stat-value" id="statAvg">65%</div><div class="ann-stat-label">平均完成率</div></div>
           </div>
         </div>
         <div class="annotation-item">
@@ -382,57 +387,81 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
 </div>
 
 <script>
-// ── Sample Data ──
+// ── Real Data ──
 const DATA = {
   beijing: [
-    { name: 'Q3 办公区域改造', type: 'project', typeLabel: '专项项目', owner: '张明', ownerColor: '#3B5BDB', status: 'in-progress', statusLabel: '进行中', pct: 65, updated: '07-05', priority: 3 },
-    { name: '7月空调系统巡检', type: 'periodic', typeLabel: '周期事项', owner: '刘伟', ownerColor: '#10B981', status: 'in-progress', statusLabel: '进行中', pct: 40, updated: '07-04', priority: 2 },
-    { name: '新员工工位分配', type: 'daily', typeLabel: '日常事务', owner: '张明', ownerColor: '#3B5BDB', status: 'done', statusLabel: '已完成', pct: 100, updated: '07-03', priority: 2 },
-    { name: '消防通道清理', type: 'emergency', typeLabel: '紧急事项', owner: '王强', ownerColor: '#EF4444', status: 'review', statusLabel: '评审中', pct: 90, updated: '07-05', priority: 4 },
-    { name: '会议室预约系统升级', type: 'project', typeLabel: '专项项目', owner: '李娜', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 55, updated: '07-02', priority: 2 },
-    { name: '停车场月卡续办', type: 'periodic', typeLabel: '周期事项', owner: '刘伟', ownerColor: '#10B981', status: 'not-started', statusLabel: '未开始', pct: 0, updated: '06-28', priority: 1 },
-    { name: '前台接待流程优化', type: 'daily', typeLabel: '日常事务', owner: '陈雪', ownerColor: '#F59E0B', status: 'in-progress', statusLabel: '进行中', pct: 30, updated: '07-01', priority: 1 },
-    { name: '办公家具采购', type: 'project', typeLabel: '专项项目', owner: '张明', ownerColor: '#3B5BDB', status: 'review', statusLabel: '评审中', pct: 85, updated: '07-04', priority: 3 },
-    { name: '绿植养护合同续签', type: 'periodic', typeLabel: '周期事项', owner: '李娜', ownerColor: '#8B5CF6', status: 'done', statusLabel: '已完成', pct: 100, updated: '07-02', priority: 1 },
-    { name: '电梯年检安排', type: 'emergency', typeLabel: '紧急事项', owner: '王强', ownerColor: '#EF4444', status: 'not-started', statusLabel: '未开始', pct: 0, updated: '06-30', priority: 4 },
+    { name: '北京职场维修(6-11层茶水间吊顶)', type: 'project', typeLabel: '专项项目', owner: '张灵玉', ownerColor: '#3B5BDB', status: 'in-progress', statusLabel: '进行中', pct: 85, updated: '06-13', priority: 3 },
+    { name: '北京职场维修(6-8层连廊电路)', type: 'project', typeLabel: '专项项目', owner: '张灵玉', ownerColor: '#3B5BDB', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-12', priority: 2 },
+    { name: '北京职场车位管理', type: 'daily', typeLabel: '日常事务', owner: '张灵玉', ownerColor: '#3B5BDB', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 2 },
+    { name: '端午全员礼发放', type: 'project', typeLabel: '专项项目', owner: '张灵玉', ownerColor: '#3B5BDB', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-10', priority: 3 },
+    { name: '五周年金钞', type: 'periodic', typeLabel: '周期事项', owner: '张灵玉', ownerColor: '#3B5BDB', status: 'in-progress', statusLabel: '进行中', pct: 50, updated: '06-13', priority: 2 },
   ],
   wuhan: [
-    { name: '武汉职场搬迁准备', type: 'project', typeLabel: '专项项目', owner: '李婷', ownerColor: '#10B981', status: 'in-progress', statusLabel: '进行中', pct: 45, updated: '07-05', priority: 3 },
-    { name: '7月安保演练', type: 'periodic', typeLabel: '周期事项', owner: '周峰', ownerColor: '#3B5BDB', status: 'not-started', statusLabel: '未开始', pct: 0, updated: '07-01', priority: 2 },
-    { name: '饮水机消毒', type: 'daily', typeLabel: '日常事务', owner: '李婷', ownerColor: '#10B981', status: 'done', statusLabel: '已完成', pct: 100, updated: '07-03', priority: 1 },
-    { name: '网络线路改造', type: 'project', typeLabel: '专项项目', owner: '周峰', ownerColor: '#3B5BDB', status: 'review', statusLabel: '评审中', pct: 80, updated: '07-04', priority: 3 },
+    { name: '露台改造', type: 'project', typeLabel: '专项项目', owner: '程宇亮', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 35, updated: '06-13', priority: 3 },
+    { name: '武汉家庭日', type: 'project', typeLabel: '专项项目', owner: '程宇亮', ownerColor: '#8B5CF6', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-09', priority: 3 },
+    { name: '星云训练营', type: 'project', typeLabel: '专项项目', owner: '程宇亮', ownerColor: '#8B5CF6', status: 'not-started', statusLabel: '未开始', pct: 0, updated: '06-12', priority: 3 },
+    { name: '库存系统2.0', type: 'project', typeLabel: '专项项目', owner: '程宇亮', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 40, updated: '06-13', priority: 2 },
+    { name: '空调延时申请', type: 'daily', typeLabel: '日常事务', owner: '程宇亮', ownerColor: '#8B5CF6', status: 'review', statusLabel: '评审中', pct: 70, updated: '06-11', priority: 2 },
+    { name: '武汉职场定制物品', type: 'daily', typeLabel: '日常事务', owner: '董诗昀', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 50, updated: '06-13', priority: 2 },
+    { name: '名片/工卡流程线上化', type: 'project', typeLabel: '专项项目', owner: '董诗昀', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 45, updated: '06-12', priority: 2 },
+    { name: '一楼租赁合同续租', type: 'periodic', typeLabel: '周期事项', owner: '董诗昀', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 3 },
+    { name: '端午礼盒发放', type: 'project', typeLabel: '专项项目', owner: '董诗昀', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 80, updated: '06-13', priority: 2 },
+    { name: '工椅统计', type: 'daily', typeLabel: '日常事务', owner: '董诗昀', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 70, updated: '06-12', priority: 1 },
+    { name: 'Q2季度报修进度拉起', type: 'daily', typeLabel: '日常事务', owner: '董诗昀', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 30, updated: '06-13', priority: 2 },
   ],
   remote: [
-    { name: '上海联合办公续约', type: 'project', typeLabel: '专项项目', owner: '王磊', ownerColor: '#F59E0B', status: 'in-progress', statusLabel: '进行中', pct: 70, updated: '07-04', priority: 3 },
-    { name: '异地办公设备调配', type: 'daily', typeLabel: '日常事务', owner: '赵凯', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 50, updated: '07-03', priority: 2 },
+    { name: '庆阳文化墙', type: 'project', typeLabel: '专项项目', owner: '傅中南', ownerColor: '#EC4899', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 3 },
+    { name: '兰州租赁', type: 'project', typeLabel: '专项项目', owner: '傅中南', ownerColor: '#EC4899', status: 'in-progress', statusLabel: '进行中', pct: 30, updated: '06-12', priority: 3 },
+    { name: '上海整合', type: 'project', typeLabel: '专项项目', owner: '傅中南', ownerColor: '#EC4899', status: 'in-progress', statusLabel: '进行中', pct: 20, updated: '06-13', priority: 2 },
+    { name: '车辆采购(庆阳/武汉/兰州/深圳)', type: 'project', typeLabel: '专项项目', owner: '傅中南', ownerColor: '#EC4899', status: 'in-progress', statusLabel: '进行中', pct: 70, updated: '06-13', priority: 3 },
+    { name: '流程规章定稿', type: 'project', typeLabel: '专项项目', owner: '傅中南', ownerColor: '#EC4899', status: 'in-progress', statusLabel: '进行中', pct: 80, updated: '06-11', priority: 3 },
+    { name: '文化衫大货', type: 'project', typeLabel: '专项项目', owner: '傅中南', ownerColor: '#EC4899', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 2 },
+    { name: 'PR照签署', type: 'periodic', typeLabel: '周期事项', owner: '傅中南', ownerColor: '#EC4899', status: 'not-started', statusLabel: '未开始', pct: 0, updated: '06-10', priority: 2 },
+  ],
+  shenzhen: [
+    { name: '深圳职场装修', type: 'project', typeLabel: '专项项目', owner: '胡丽婷', ownerColor: '#F97316', status: 'in-progress', statusLabel: '进行中', pct: 25, updated: '06-13', priority: 3 },
+    { name: '深圳续租保证金退回', type: 'periodic', typeLabel: '周期事项', owner: '胡丽婷', ownerColor: '#F97316', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-11', priority: 2 },
+    { name: '端午礼盒发放', type: 'project', typeLabel: '专项项目', owner: '胡丽婷', ownerColor: '#F97316', status: 'in-progress', statusLabel: '进行中', pct: 70, updated: '06-13', priority: 2 },
+    { name: '高新技术企业认证', type: 'project', typeLabel: '专项项目', owner: '胡丽婷', ownerColor: '#F97316', status: 'in-progress', statusLabel: '进行中', pct: 40, updated: '06-12', priority: 3 },
+    { name: '技术转移项目补贴', type: 'project', typeLabel: '专项项目', owner: '胡丽婷', ownerColor: '#F97316', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 3 },
+    { name: '高管日常支持', type: 'daily', typeLabel: '日常事务', owner: '胡丽婷', ownerColor: '#F97316', status: 'in-progress', statusLabel: '进行中', pct: 80, updated: '06-13', priority: 1 },
   ],
   activity: [
-    { name: '年中团建策划', type: 'project', typeLabel: '专项项目', owner: '赵颖', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '07-05', priority: 3 },
-    { name: '生日会物资采购', type: 'daily', typeLabel: '日常事务', owner: '赵颖', ownerColor: '#8B5CF6', status: 'done', statusLabel: '已完成', pct: 100, updated: '07-02', priority: 1 },
-    { name: '部门联谊活动', type: 'project', typeLabel: '专项项目', owner: '孙琳', ownerColor: '#10B981', status: 'review', statusLabel: '评审中', pct: 85, updated: '07-04', priority: 2 },
+    { name: 'Q2生日会(minions party)', type: 'project', typeLabel: '专项项目', owner: '聂茜茜', ownerColor: '#10B981', status: 'in-progress', statusLabel: '进行中', pct: 55, updated: '06-13', priority: 2 },
+    { name: '公益活动输出', type: 'project', typeLabel: '专项项目', owner: '聂茜茜', ownerColor: '#10B981', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-12', priority: 2 },
+    { name: '端午手工活动(艾草门挂+非遗竹编)', type: 'daily', typeLabel: '日常事务', owner: '聂茜茜', ownerColor: '#10B981', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-07', priority: 2 },
+    { name: '月度费用整理/服务台答疑', type: 'daily', typeLabel: '日常事务', owner: '聂茜茜', ownerColor: '#10B981', status: 'in-progress', statusLabel: '进行中', pct: 50, updated: '06-13', priority: 1 },
   ],
   benefit: [
-    { name: 'Q3 福利品发放', type: 'periodic', typeLabel: '周期事项', owner: '陈静', ownerColor: '#EF4444', status: 'in-progress', statusLabel: '进行中', pct: 35, updated: '07-05', priority: 2 },
-    { name: '体检供应商对接', type: 'project', typeLabel: '专项项目', owner: '陈静', ownerColor: '#EF4444', status: 'not-started', statusLabel: '未开始', pct: 0, updated: '06-29', priority: 3 },
+    { name: '儿童节礼品', type: 'project', typeLabel: '专项项目', owner: '高琳', ownerColor: '#F59E0B', status: 'in-progress', statusLabel: '进行中', pct: 90, updated: '06-13', priority: 3 },
+    { name: '甩肉大赛', type: 'project', typeLabel: '专项项目', owner: '高琳', ownerColor: '#F59E0B', status: 'in-progress', statusLabel: '进行中', pct: 80, updated: '06-13', priority: 3 },
+    { name: '家庭日', type: 'project', typeLabel: '专项项目', owner: '高琳', ownerColor: '#F59E0B', status: 'in-progress', statusLabel: '进行中', pct: 70, updated: '06-13', priority: 3 },
+    { name: '端午手工DIY活动', type: 'daily', typeLabel: '日常事务', owner: '高琳', ownerColor: '#F59E0B', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-07', priority: 1 },
+    { name: '整理北京公益内容', type: 'daily', typeLabel: '日常事务', owner: '高琳', ownerColor: '#F59E0B', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-09', priority: 1 },
+    { name: '行政服务台', type: 'daily', typeLabel: '日常事务', owner: '高琳', ownerColor: '#F59E0B', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 2 },
   ],
   servicedesk: [
-    { name: '工单系统 V2 上线', type: 'project', typeLabel: '专项项目', owner: '刘洋', ownerColor: '#3B5BDB', status: 'in-progress', statusLabel: '进行中', pct: 75, updated: '07-05', priority: 3 },
-    { name: '知识库内容更新', type: 'daily', typeLabel: '日常事务', owner: '刘洋', ownerColor: '#3B5BDB', status: 'done', statusLabel: '已完成', pct: 100, updated: '07-01', priority: 1 },
+    { name: '行政服务台工单处理', type: 'daily', typeLabel: '日常事务', owner: '高琳', ownerColor: '#06B6D4', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 2 },
   ],
   digital: [
-    { name: '报表自动推送开发', type: 'project', typeLabel: '专项项目', owner: '孙浩', ownerColor: '#10B981', status: 'review', statusLabel: '评审中', pct: 90, updated: '07-04', priority: 2 },
-    { name: '审批流引擎优化', type: 'project', typeLabel: '专项项目', owner: '孙浩', ownerColor: '#10B981', status: 'in-progress', statusLabel: '进行中', pct: 45, updated: '07-03', priority: 2 },
+    { name: '费用结算(月结凭证对账)', type: 'periodic', typeLabel: '周期事项', owner: '丁玉萍', ownerColor: '#6366F1', status: 'in-progress', statusLabel: '进行中', pct: 50, updated: '06-13', priority: 3 },
+    { name: '差旅平台问题处理', type: 'daily', typeLabel: '日常事务', owner: '丁玉萍', ownerColor: '#6366F1', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 2 },
+    { name: '协议酒店签约上线', type: 'project', typeLabel: '专项项目', owner: '丁玉萍', ownerColor: '#6366F1', status: 'in-progress', statusLabel: '进行中', pct: 85, updated: '06-12', priority: 2 },
+    { name: '健康体检(630开启)', type: 'project', typeLabel: '专项项目', owner: '丁玉萍', ownerColor: '#6366F1', status: 'not-started', statusLabel: '未开始', pct: 0, updated: '06-10', priority: 3 },
+    { name: '相册素材优化', type: 'project', typeLabel: '专项项目', owner: '丁玉萍', ownerColor: '#6366F1', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-09', priority: 2 },
+    { name: '滴滴敏感订单推送', type: 'daily', typeLabel: '日常事务', owner: '丁玉萍', ownerColor: '#6366F1', status: 'in-progress', statusLabel: '进行中', pct: 50, updated: '06-13', priority: 1 },
   ]
 };
 
 const MODULE_LABELS = {
-  beijing: '北京职场',
-  wuhan: '武汉职场',
-  remote: '异地职场',
-  activity: '活动运营',
-  benefit: '员工福利',
-  servicedesk: '行政服务台',
-  digital: '数字化后台运营'
+  beijing: '职场运营(北京)',
+  wuhan: '职场运营(武汉)',
+  remote: '职场运营(异地)',
+  shenzhen: '职场运营(深圳)',
+  activity: '文化运营(活动)',
+  benefit: '文化运营(福利)',
+  servicedesk: '数字化运营(行政服务台)',
+  digital: '数字化运营(后台)'
 };
 
 let currentModule = 'beijing';

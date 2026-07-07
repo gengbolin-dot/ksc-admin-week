@@ -149,11 +149,12 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
 
 <!-- Sidebar -->
 <div class="sb">
-  <div class="sb-logo"><div class="sb-logo-i">A</div><div class="sb-logo-t">AOP</div></div>
+  <div class="sb-logo"><div class="sb-logo-i">A</div><div class="sb-logo-t">AOP</div><div style="font-size:10px;font-weight:500;color:var(--t3);letter-spacing:0">行政运营管理平台</div></div>
   <div class="sb-sec"><div class="sb-lbl">工作</div>
     <div class="sb-i act"><div class="sb-ic">🏠</div> 我的工作<div class="sb-bg">3</div></div>
     <div class="sb-i"><div class="sb-ic">📋</div> 行政总览</div>
     <div class="sb-i"><div class="sb-ic">⭐</div> 重点专项</div>
+    <div class="sb-i"><div class="sb-ic">🎯</div> OKR <span style="font-size:10px;color:var(--t3);margin-left:2px">手动导入</span></div>
   </div>
   <div class="sb-sec"><div class="sb-lbl">管理</div>
     <div class="sb-i"><div class="sb-ic">📊</div> 运营看板</div>
@@ -164,11 +165,16 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
     <div class="sb-i"><div class="sb-ic">📈</div> 数据驾驶舱</div>
   </div>
   <div class="sb-sec"><div class="sb-lbl">业务模块</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#3B5BDB"></div> 职场运营</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#10B981"></div> 文化运营</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#06B6D4"></div> 数字化运营</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#3B5BDB"></div> 职场运营(北京)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#8B5CF6"></div> 职场运营(武汉)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#EC4899"></div> 职场运营(异地)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#F97316"></div> 职场运营(深圳)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#10B981"></div> 文化运营(活动)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#F59E0B"></div> 文化运营(福利)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#06B6D4"></div> 数字化运营(行政服务台)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#6366F1"></div> 数字化运营(后台)</div>
   </div>
-  <div class="sb-bt"><div class="sb-u"><div class="sb-av">高</div><div><div class="sb-un">高琳</div><div class="sb-ur">主管</div></div></div></div>
+  <div class="sb-bt"><div class="sb-u"><div class="sb-av">高</div><div><div class="sb-un">高琳</div><div class="sb-ur">大行政负责人</div></div></div></div>
 </div>
 
 <!-- Main -->
@@ -178,7 +184,7 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
     <div style="font-size:22px;font-weight:700;margin-bottom:4px">早上好，高琳 👋</div>
     <div style="font-size:13px;color:var(--t2);margin-bottom:24px">本周有 3 个事项待更新</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
-      <div style="background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px"><div style="font-size:28px;font-weight:700;color:var(--ac)">12</div><div style="font-size:12px;color:var(--t3)">负责事项</div></div>
+      <div style="background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px"><div style="font-size:28px;font-weight:700;color:var(--ac)">6</div><div style="font-size:12px;color:var(--t3)">负责事项</div></div>
       <div style="background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px"><div style="font-size:28px;font-weight:700;color:var(--warn)">3</div><div style="font-size:12px;color:var(--t3)">待更新</div></div>
       <div style="background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px"><div style="font-size:28px;font-weight:700;color:var(--dan)">1</div><div style="font-size:12px;color:var(--t3)">今日截止</div></div>
       <div style="background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px"><div style="font-size:28px;font-weight:700;color:var(--suc)">0</div><div style="font-size:12px;color:var(--t3)">延期</div></div>
@@ -198,7 +204,7 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
   <div class="slide" id="projectSlide">
     <div class="slide-head">
       <div class="slide-close">✕</div>
-      <div class="slide-title">北京办公室5层装修项目</div>
+      <div class="slide-title">甩肉大赛</div>
       <span class="slide-type" style="background:#F3E8FF;color:#8B5CF6;">专项</span>
     </div>
     <div class="slide-body">
@@ -208,7 +214,7 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
         <div class="field-group-label">基本信息</div>
         <div class="field-row">
           <div class="field-key">所属模块</div>
-          <div class="field-val"><span class="mod-tag" style="background:#EBF0FF;color:#3B5BDB;"><span class="mod-dot" style="background:#3B5BDB"></span>北京职场</span></div>
+          <div class="field-val"><span class="mod-tag" style="background:#FFFBEB;color:#F59E0B;"><span class="mod-dot" style="background:#F59E0B"></span>文化运营(福利)</span></div>
         </div>
         <div class="field-row">
           <div class="field-key">负责人</div>
@@ -216,11 +222,11 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
         </div>
         <div class="field-row">
           <div class="field-key">协作人</div>
-          <div class="field-val" style="display:flex;gap:4px"><div class="avatar-sm" title="李明">李</div><div class="avatar-sm" title="王芳">王</div><div class="avatar-sm" title="张伟">张</div></div>
+          <div class="field-val" style="display:flex;gap:4px"><div class="avatar-sm" title="聂茜茜">聂</div><div class="avatar-sm" title="张灵玉">张</div></div>
         </div>
         <div class="field-row">
           <div class="field-key">优先级</div>
-          <div class="field-val"><div class="pri-dots"><div class="pri-d on d"></div><div class="pri-d on d"></div><div class="pri-d on d"></div><div class="pri-d on d"></div><div class="pri-d on d"></div></div></div>
+          <div class="field-val"><div class="pri-dots"><div class="pri-d on d"></div><div class="pri-d on d"></div><div class="pri-d on d"></div><div class="pri-d on d"></div><div class="pri-d"></div></div></div>
         </div>
         <div class="field-row">
           <div class="field-key">状态</div>
@@ -237,10 +243,10 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
         <div class="field-group-label">项目进度</div>
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
           <div class="prog-ring">
-            <svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="none" stroke="#F1F3F8" stroke-width="4"/><circle cx="24" cy="24" r="20" fill="none" stroke="#3B5BDB" stroke-width="4" stroke-dasharray="125.6" stroke-dashoffset="37.7" stroke-linecap="round"/></svg>
-            <div class="num">70%</div>
+            <svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="none" stroke="#F1F3F8" stroke-width="4"/><circle cx="24" cy="24" r="20" fill="none" stroke="#F59E0B" stroke-width="4" stroke-dasharray="125.6" stroke-dashoffset="25.1" stroke-linecap="round"/></svg>
+            <div class="num" style="color:var(--warn)">80%</div>
           </div>
-          <div><div style="font-size:13px;font-weight:600;color:var(--t1)">完成率 70%</div><div style="font-size:11px;color:var(--t3)">预计按期完成</div></div>
+          <div><div style="font-size:13px;font-weight:600;color:var(--t1)">完成率 80%</div><div style="font-size:11px;color:var(--t3)">收尾总结阶段</div></div>
         </div>
       </div>
 
@@ -249,57 +255,44 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
         <div class="field-group-label">里程碑</div>
         <div class="milestone">
           <div class="ms-dot done">✓</div>
-          <div class="ms-info"><div class="ms-name">需求确认与设计方案</div><div class="ms-date">5月15日 · 已完成</div></div>
+          <div class="ms-info"><div class="ms-name">活动策划与报名</div><div class="ms-date">4月 · 已完成</div></div>
         </div>
         <div class="milestone">
           <div class="ms-dot done">✓</div>
-          <div class="ms-info"><div class="ms-name">施工招标与合同签订</div><div class="ms-date">6月1日 · 已完成</div></div>
+          <div class="ms-info"><div class="ms-name">比赛执行阶段</div><div class="ms-date">5月 · 已完成</div></div>
         </div>
         <div class="milestone">
           <div class="ms-dot active">3</div>
-          <div class="ms-info"><div class="ms-name">施工进场与装修执行</div><div class="ms-date">6月10日-7月10日 · 进行中</div></div>
+          <div class="ms-info"><div class="ms-name">收尾总结、发奖牌</div><div class="ms-date">6月 · 进行中</div></div>
         </div>
         <div class="milestone">
           <div class="ms-dot">4</div>
-          <div class="ms-info"><div class="ms-name">验收与入驻</div><div class="ms-date">7月15日 · 待开始</div></div>
-        </div>
-      </div>
-
-      <!-- Risk -->
-      <div class="field-group">
-        <div class="field-group-label">风险</div>
-        <div class="risk-box">
-          <div class="label">⚠ 风险提示</div>
-          <div class="text">空调设备供应商交期延迟2周，可能影响7月验收节点。已启动备选供应商评估。</div>
+          <div class="ms-info"><div class="ms-name">活动复盘报告</div><div class="ms-date">7月 · 待开始</div></div>
         </div>
       </div>
 
       <!-- This week update -->
       <div class="field-group">
         <div class="field-group-label">本周更新</div>
-        <div class="editable" contenteditable="true">本周完成3层隔断墙施工，4层电路改造验收通过。空调设备到货延迟，已联系备选供应商。下周重点推进5层地面铺设和空调安装。</div>
+        <div class="editable" contenteditable="true">收尾总结、发奖牌。报名343人，总减重1411.2KG，目前单人减重率16.18%，团队减重总数62.8斤</div>
       </div>
 
       <!-- Next week plan -->
       <div class="field-group">
         <div class="field-group-label">下周计划</div>
-        <div class="editable" contenteditable="true">1. 完成5层地面铺设<br/>2. 推进空调设备安装<br/>3. 启动备选供应商评估<br/>4. 准备中期验收材料</div>
+        <div class="editable" contenteditable="true">1. 完成奖牌发放<br/>2. 撰写活动复盘报告<br/>3. 统计各团队最终成绩</div>
       </div>
 
       <!-- Comments -->
       <div class="field-group">
-        <div class="field-group-label">评论 (3)</div>
-        <div class="comment">
-          <div class="cmt-av">李</div>
-          <div class="cmt-body"><div class="cmt-head"><span class="cmt-name">李明</span><span class="cmt-time">2小时前</span></div><div class="cmt-text">空调备选供应商我这边有资源，下午同步给你。</div></div>
-        </div>
-        <div class="comment">
-          <div class="cmt-av">王</div>
-          <div class="cmt-body"><div class="cmt-head"><span class="cmt-name">王芳</span><span class="cmt-time">昨天</span></div><div class="cmt-text">@高琳 4层电路验收报告已经提交，请查收。</div></div>
-        </div>
+        <div class="field-group-label">评论 (2)</div>
         <div class="comment">
           <div class="cmt-av">张</div>
-          <div class="cmt-body"><div class="cmt-head"><span class="cmt-name">张伟</span><span class="cmt-time">3天前</span></div><div class="cmt-text">3层隔断墙材料清单已确认，明天可以进场。</div></div>
+          <div class="cmt-body"><div class="cmt-head"><span class="cmt-name">张灵玉</span><span class="cmt-time">1小时前</span></div><div class="cmt-text">奖牌已到北京，明天可以开始发放</div></div>
+        </div>
+        <div class="comment">
+          <div class="cmt-av">聂</div>
+          <div class="cmt-body"><div class="cmt-head"><span class="cmt-name">聂茜茜</span><span class="cmt-time">昨天</span></div><div class="cmt-text">@高琳 武汉赛区奖牌需要单独邮寄吗？</div></div>
         </div>
       </div>
 
@@ -307,8 +300,8 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
       <div class="field-group">
         <div class="field-group-label">附件 (2)</div>
         <div style="display:flex;flex-direction:column;gap:4px">
-          <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg2);border-radius:6px;font-size:12px;color:var(--t2)"><span>📎</span> 装修设计方案v3.pdf <span style="margin-left:auto;color:var(--t3)">2.4MB</span></div>
-          <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg2);border-radius:6px;font-size:12px;color:var(--t2)"><span>📎</span> 空调设备报价对比.xlsx <span style="margin-left:auto;color:var(--t3)">180KB</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg2);border-radius:6px;font-size:12px;color:var(--t2)"><span>📎</span> 甩肉大赛最终数据.xlsx <span style="margin-left:auto;color:var(--t3)">350KB</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg2);border-radius:6px;font-size:12px;color:var(--t2)"><span>📎</span> 奖牌设计稿.pdf <span style="margin-left:auto;color:var(--t3)">1.2MB</span></div>
         </div>
       </div>
     </div>
@@ -324,7 +317,7 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
   <div class="slide" id="opsSlide" style="display:none">
     <div class="slide-head">
       <div class="slide-close" onclick="showProject()">✕</div>
-      <div class="slide-title">行政服务台工单处理</div>
+      <div class="slide-title">行政服务台</div>
       <span class="slide-type" style="background:#ECFDF5;color:#059669;">日常运营</span>
     </div>
     <div class="slide-body">
@@ -334,11 +327,11 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
         <div class="field-group-label">基本信息</div>
         <div class="field-row">
           <div class="field-key">所属模块</div>
-          <div class="field-val"><span class="mod-tag" style="background:#ECFEFF;color:#06B6D4;"><span class="mod-dot" style="background:#06B6D4"></span>行政服务台</span></div>
+          <div class="field-val"><span class="mod-tag" style="background:#ECFEFF;color:#06B6D4;"><span class="mod-dot" style="background:#06B6D4"></span>数字化运营(行政服务台)</span></div>
         </div>
         <div class="field-row">
           <div class="field-key">负责人</div>
-          <div class="field-val" style="display:flex;align-items:center;gap:6px"><div class="avatar-sm">周</div>周洋</div>
+          <div class="field-val" style="display:flex;align-items:center;gap:6px"><div class="avatar-sm">高</div>高琳</div>
         </div>
         <div class="field-row">
           <div class="field-key">优先级</div>
@@ -358,40 +351,31 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
       <div class="field-group">
         <div class="field-group-label">本周数据</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="kpi-card"><div class="kpi-icon" style="background:var(--acl)">🎫</div><div><div class="kpi-num">47</div><div class="kpi-label">工单总数</div></div><div class="kpi-change kpi-up">↑12%</div></div>
-          <div class="kpi-card"><div class="kpi-icon" style="background:var(--sucL)">✅</div><div><div class="kpi-num">43</div><div class="kpi-label">已关闭</div></div><div class="kpi-change kpi-up">↑8%</div></div>
-          <div class="kpi-card"><div class="kpi-icon" style="background:var(--warnL)">⏱</div><div><div class="kpi-num">4.2h</div><div class="kpi-label">平均响应</div></div><div class="kpi-change kpi-down">↓15%</div></div>
-          <div class="kpi-card"><div class="kpi-icon" style="background:var(--danL)">⭐</div><div><div class="kpi-num">4.6</div><div class="kpi-label">满意度</div></div><div class="kpi-change kpi-up">↑0.2</div></div>
-        </div>
-      </div>
-
-      <!-- Abnormal -->
-      <div class="field-group">
-        <div class="field-group-label">异常说明</div>
-        <div class="risk-box" style="border-left-color:var(--warn);background:var(--warnL)">
-          <div class="label" style="color:var(--warn)">⚠ 异常提醒</div>
-          <div class="text">本周空调维修工单激增（12件，环比+200%），主要集中在北京5层。</div>
+          <div class="kpi-card"><div class="kpi-icon" style="background:var(--acl)">🎫</div><div><div class="kpi-num">57</div><div class="kpi-label">工单总数</div></div><div class="kpi-change kpi-up">↑100%</div></div>
+          <div class="kpi-card"><div class="kpi-icon" style="background:var(--sucL)">✅</div><div><div class="kpi-num">19</div><div class="kpi-label">人工工单</div></div><div class="kpi-change kpi-up">↑正常</div></div>
+          <div class="kpi-card"><div class="kpi-icon" style="background:var(--warnL)">⏱</div><div><div class="kpi-num">38</div><div class="kpi-label">机器人拦截</div></div><div class="kpi-change kpi-up">100%</div></div>
+          <div class="kpi-card"><div class="kpi-icon" style="background:var(--danL)">⭐</div><div><div class="kpi-num">100%</div><div class="kpi-label">拦截率</div></div><div class="kpi-change kpi-up">达标</div></div>
         </div>
       </div>
 
       <!-- Optimization -->
       <div class="field-group">
-        <div class="field-group-label">优化措施</div>
-        <div class="editable" contenteditable="true">1. 已联系维保供应商加急处理，预计2天内清完<br/>2. 调整5层临时办公区域安排<br/>3. 推进空调预防性维保计划落地</div>
+        <div class="field-group-label">本周更新</div>
+        <div class="editable" contenteditable="true">本周创建工单数57个，其中人工工单数19，机器人拦截工单数38，拦截率100%</div>
       </div>
 
       <!-- Next week focus -->
       <div class="field-group">
         <div class="field-group-label">下周重点</div>
-        <div class="editable" contenteditable="true">1. 跟进空调维修工单清零<br/>2. 上线工单自动分配功能<br/>3. 完成满意度调研报告</div>
+        <div class="editable" contenteditable="true">1. 持续优化机器人拦截规则<br/>2. 跟进人工工单处理时效</div>
       </div>
 
       <!-- Comments -->
       <div class="field-group">
         <div class="field-group-label">评论 (1)</div>
         <div class="comment">
-          <div class="cmt-av">高</div>
-          <div class="cmt-body"><div class="cmt-head"><span class="cmt-name">高琳</span><span class="cmt-time">1天前</span></div><div class="cmt-text">空调工单暴增和装修项目有关联吗？需要协调处理。</div></div>
+          <div class="cmt-av">丁</div>
+          <div class="cmt-body"><div class="cmt-head"><span class="cmt-name">丁玉萍</span><span class="cmt-time">2天前</span></div><div class="cmt-text">机器人拦截率100%表现很好，可以总结最佳实践推广</div></div>
         </div>
       </div>
     </div>

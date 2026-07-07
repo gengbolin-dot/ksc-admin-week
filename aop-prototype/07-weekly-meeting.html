@@ -22,6 +22,7 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
 .sb-i:hover{background:var(--bgH);color:var(--t1)}
 .sb-i.act{background:var(--acl);color:var(--ac);font-weight:600}
 .sb-ic{width:16px;text-align:center;font-size:13px;flex-shrink:0}
+.sb-bg{font-size:10px;font-weight:600;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;border-radius:8px;margin-left:auto;padding:0 4px;background:var(--warn);color:#fff}
 .sb-sub{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 30px;font-size:12.5px;color:var(--t3);border-radius:5px;cursor:pointer;transition:all var(--tr)}
 .sb-sub:hover{background:var(--bgH);color:var(--t2)}
 .sb-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
@@ -114,11 +115,12 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
 
 <!-- Sidebar -->
 <div class="sb">
-  <div class="sb-logo"><div class="sb-logo-i">A</div><div class="sb-logo-t">AOP</div></div>
+  <div class="sb-logo"><div class="sb-logo-i">A</div><div class="sb-logo-t">AOP</div><div style="font-size:10px;font-weight:500;color:var(--t3);letter-spacing:0">行政运营管理平台</div></div>
   <div class="sb-sec"><div class="sb-lbl">工作</div>
     <div class="sb-i"><div class="sb-ic">🏠</div> 我的工作</div>
     <div class="sb-i"><div class="sb-ic">📋</div> 行政总览</div>
     <div class="sb-i"><div class="sb-ic">⭐</div> 重点专项</div>
+    <div class="sb-i"><div class="sb-ic">🎯</div> OKR <span style="font-size:10px;color:var(--t3);margin-left:2px">手动导入</span></div>
   </div>
   <div class="sb-sec"><div class="sb-lbl">管理</div>
     <div class="sb-i"><div class="sb-ic">📊</div> 运营看板</div>
@@ -129,11 +131,16 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
     <div class="sb-i"><div class="sb-ic">📈</div> 数据驾驶舱</div>
   </div>
   <div class="sb-sec"><div class="sb-lbl">业务模块</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#3B5BDB"></div> 职场运营</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#10B981"></div> 文化运营</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#06B6D4"></div> 数字化运营</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#3B5BDB"></div> 职场运营(北京)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#8B5CF6"></div> 职场运营(武汉)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#EC4899"></div> 职场运营(异地)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#F97316"></div> 职场运营(深圳)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#10B981"></div> 文化运营(活动)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#F59E0B"></div> 文化运营(福利)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#06B6D4"></div> 数字化运营(行政服务台)</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#6366F1"></div> 数字化运营(后台)</div>
   </div>
-  <div class="sb-bt"><div class="sb-u"><div class="sb-av">高</div><div><div style="font-size:12px;font-weight:600">高琳</div><div style="font-size:10px;color:var(--t3)">主管</div></div></div></div>
+  <div class="sb-bt"><div class="sb-u"><div class="sb-av">耿</div><div><div style="font-size:12px;font-weight:600">耿博琳</div><div style="font-size:10px;color:var(--t3)">大行政负责人</div></div></div></div>
 </div>
 
 <!-- Main -->
@@ -148,44 +155,44 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
     </div>
     <div class="people-list">
       <div class="person act" onclick="selectPerson(this,0)">
-        <div class="person-av" style="background:linear-gradient(135deg,#667eea,#764ba2)">高</div>
-        <div class="person-info"><div class="person-name">高琳</div><div class="person-role">主管</div></div>
-        <div class="person-badges"><span class="person-badge badge-warn">2</span></div>
+        <div class="person-av" style="background:linear-gradient(135deg,#F59E0B,#FBBF24)">高</div>
+        <div class="person-info"><div class="person-name">高琳</div><div class="person-role">大行政负责人 · 福利/服务台</div></div>
+        <div class="person-badges"><span class="person-badge badge-warn">3</span></div>
       </div>
       <div class="person" onclick="selectPerson(this,1)">
-        <div class="person-av" style="background:linear-gradient(135deg,#f093fb,#f5576c)">耿</div>
-        <div class="person-info"><div class="person-name">耿博琳</div><div class="person-role">专员</div></div>
-        <div class="person-badges"><span class="person-badge badge-warn">1</span></div>
+        <div class="person-av" style="background:linear-gradient(135deg,#6366F1,#818CF8)">丁</div>
+        <div class="person-info"><div class="person-name">丁玉萍</div><div class="person-role">数字化后台</div></div>
+        <div class="person-badges"><span class="person-badge badge-warn">2</span></div>
       </div>
       <div class="person" onclick="selectPerson(this,2)">
-        <div class="person-av" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">张</div>
-        <div class="person-info"><div class="person-name">张灵玉</div><div class="person-role">专员</div></div>
-      </div>
-      <div class="person" onclick="selectPerson(this,3)">
-        <div class="person-av" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">李</div>
-        <div class="person-info"><div class="person-name">李明</div><div class="person-role">专员</div></div>
-      </div>
-      <div class="person" onclick="selectPerson(this,4)">
-        <div class="person-av" style="background:linear-gradient(135deg,#fa709a,#fee140)">王</div>
-        <div class="person-info"><div class="person-name">王芳</div><div class="person-role">专员</div></div>
-        <div class="person-badges"><span class="person-badge badge-dan">1</span></div>
-      </div>
-      <div class="person" onclick="selectPerson(this,5)">
-        <div class="person-av" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)">陈</div>
-        <div class="person-info"><div class="person-name">陈思</div><div class="person-role">专员</div></div>
-      </div>
-      <div class="person" onclick="selectPerson(this,6)">
-        <div class="person-av" style="background:linear-gradient(135deg,#fccb90,#d57eeb)">赵</div>
-        <div class="person-info"><div class="person-name">赵颖</div><div class="person-role">专员</div></div>
+        <div class="person-av" style="background:linear-gradient(135deg,#3B5BDB,#6366F1)">张</div>
+        <div class="person-info"><div class="person-name">张灵玉</div><div class="person-role">职场运营(北京)</div></div>
         <div class="person-badges"><span class="person-badge badge-warn">1</span></div>
       </div>
+      <div class="person" onclick="selectPerson(this,3)">
+        <div class="person-av" style="background:linear-gradient(135deg,#EC4899,#F472B6)">傅</div>
+        <div class="person-info"><div class="person-name">傅中南</div><div class="person-role">职场运营(异地)</div></div>
+        <div class="person-badges"><span class="person-badge badge-dan">1</span></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,4)">
+        <div class="person-av" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA)">程</div>
+        <div class="person-info"><div class="person-name">程宇亮</div><div class="person-role">职场运营(武汉)</div></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,5)">
+        <div class="person-av" style="background:linear-gradient(135deg,#10B981,#34D399)">聂</div>
+        <div class="person-info"><div class="person-name">聂茜茜</div><div class="person-role">文化运营(活动)</div></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,6)">
+        <div class="person-av" style="background:linear-gradient(135deg,#8B5CF6,#C4B5FD)">董</div>
+        <div class="person-info"><div class="person-name">董诗昀</div><div class="person-role">职场运营(武汉)</div></div>
+      </div>
       <div class="person" onclick="selectPerson(this,7)">
-        <div class="person-av" style="background:linear-gradient(135deg,#30cfd0,#330867)">周</div>
-        <div class="person-info"><div class="person-name">周洋</div><div class="person-role">专员</div></div>
+        <div class="person-av" style="background:linear-gradient(135deg,#F97316,#FB923C)">胡</div>
+        <div class="person-info"><div class="person-name">胡丽婷</div><div class="person-role">职场运营(深圳)</div></div>
       </div>
       <div class="person" onclick="selectPerson(this,8)">
-        <div class="person-av" style="background:linear-gradient(135deg,#f5af19,#f12711)">刘</div>
-        <div class="person-info"><div class="person-name">刘强</div><div class="person-role">专员</div></div>
+        <div class="person-av" style="background:linear-gradient(135deg,#06B6D4,#22D3EE)">王</div>
+        <div class="person-info"><div class="person-name">王羲桀</div><div class="person-role">support(深圳)</div></div>
       </div>
     </div>
   </div>
@@ -193,72 +200,98 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
   <!-- Items panel -->
   <div class="items">
     <div class="items-head">
-      <div class="items-head-av" style="background:linear-gradient(135deg,#667eea,#764ba2)">高</div>
-      <div><div class="items-head-name">高琳</div><div class="items-head-sub">本周汇报 · 4 个事项 · 2 个待更新</div></div>
+      <div class="items-head-av" style="background:linear-gradient(135deg,#F59E0B,#FBBF24)">高</div>
+      <div><div class="items-head-name">高琳</div><div class="items-head-sub">本周汇报 · 6 个事项 · 3 个待更新</div></div>
     </div>
 
     <!-- Item 1 -->
-    <div class="item-card">
+    <div class="item-card" style="border-left:3px solid var(--warn)">
       <div class="item-top">
-        <div class="item-name">北京办公室5层装修项目</div>
+        <div class="item-name">甩肉大赛</div>
         <span class="item-type type-p">专项</span>
       </div>
       <div class="item-tags">
-        <span class="mod-tag" style="background:#EBF0FF;color:#3B5BDB"><span class="mod-dot" style="background:#3B5BDB"></span>北京职场</span>
+        <span class="mod-tag" style="background:#FFFBEB;color:#F59E0B"><span class="mod-dot" style="background:#F59E0B"></span>文化运营(福利)</span>
         <span class="st-badge" style="background:var(--acl);color:var(--ac)"><span class="st-dot" style="background:var(--ac)"></span>进行中</span>
       </div>
       <div class="item-progress">
-        <div class="prog-ring"><svg width="32" height="32"><circle cx="16" cy="16" r="13" fill="none" stroke="#F1F3F8" stroke-width="3"/><circle cx="16" cy="16" r="13" fill="none" stroke="#3B5BDB" stroke-width="3" stroke-dasharray="81.6" stroke-dashoffset="24.5" stroke-linecap="round"/></svg><div class="pct">70</div></div>
-        <div style="font-size:12px;color:var(--t2)">施工执行阶段 · 3/4里程碑</div>
+        <div class="prog-ring"><svg width="32" height="32"><circle cx="16" cy="16" r="13" fill="none" stroke="#F1F3F8" stroke-width="3"/><circle cx="16" cy="16" r="13" fill="none" stroke="#F59E0B" stroke-width="3" stroke-dasharray="81.6" stroke-dashoffset="16.3" stroke-linecap="round"/></svg><div class="pct" style="color:#F59E0B">80</div></div>
+        <div style="font-size:12px;color:var(--t2)">收尾总结阶段 · 报名343人</div>
       </div>
-      <div class="item-update">本周完成3层隔断墙施工，4层电路改造验收通过。空调设备到货延迟，已联系备选供应商。</div>
-      <div class="item-risk">⚠️ 空调设备交期延迟2周，可能影响7月验收</div>
-      <div class="item-next">下周：完成5层地面铺设 + 推进空调安装 + 启动备选供应商评估</div>
+      <div class="item-update">收尾总结、发奖牌。报名343人，总减重1411.2KG，目前单人减重率16.18%，团队减重总数62.8斤</div>
+      <div class="item-next">下周：完成奖牌发放 + 撰写活动复盘报告 + 统计各团队最终成绩</div>
     </div>
 
     <!-- Item 2 -->
-    <div class="item-card">
+    <div class="item-card" style="border-left:3px solid var(--warn)">
       <div class="item-top">
-        <div class="item-name">门禁系统改造</div>
+        <div class="item-name">家庭日</div>
         <span class="item-type type-p">专项</span>
       </div>
       <div class="item-tags">
-        <span class="mod-tag" style="background:#EBF0FF;color:#3B5BDB"><span class="mod-dot" style="background:#3B5BDB"></span>北京职场</span>
-        <span class="st-badge" style="background:var(--purL);color:var(--pur)"><span class="st-dot" style="background:var(--pur)"></span>评审中</span>
-      </div>
-      <div class="item-progress">
-        <div class="prog-ring"><svg width="32" height="32"><circle cx="16" cy="16" r="13" fill="none" stroke="#F1F3F8" stroke-width="3"/><circle cx="16" cy="16" r="13" fill="none" stroke="#8B5CF6" stroke-width="3" stroke-dasharray="81.6" stroke-dashoffset="69.4" stroke-linecap="round"/></svg><div class="pct" style="color:var(--pur)">15</div></div>
-        <div style="font-size:12px;color:var(--t2)">需求评审阶段</div>
-      </div>
-      <div class="item-update">完成3家供应商方案对比，正在整理技术评审材料。</div>
-      <div class="item-next">下周：组织技术评审会议 + 确定供应商</div>
-    </div>
-
-    <!-- Item 3 - Daily Ops -->
-    <div class="item-card">
-      <div class="item-top">
-        <div class="item-name">北京职场日常保洁巡检</div>
-        <span class="item-type type-o">日常运营</span>
-      </div>
-      <div class="item-tags">
-        <span class="mod-tag" style="background:#EBF0FF;color:#3B5BDB"><span class="mod-dot" style="background:#3B5BDB"></span>北京职场</span>
+        <span class="mod-tag" style="background:#ECFDF5;color:#10B981"><span class="mod-dot" style="background:#10B981"></span>文化运营(活动)</span>
         <span class="st-badge" style="background:var(--acl);color:var(--ac)"><span class="st-dot" style="background:var(--ac)"></span>进行中</span>
       </div>
-      <div class="item-update">本周巡检合格率 98%，发现2处卫生间清洁问题已整改。</div>
-      <div class="item-next">下周重点：5层施工区域保洁专项检查</div>
+      <div class="item-progress">
+        <div class="prog-ring"><svg width="32" height="32"><circle cx="16" cy="16" r="13" fill="none" stroke="#F1F3F8" stroke-width="3"/><circle cx="16" cy="16" r="13" fill="none" stroke="#10B981" stroke-width="3" stroke-dasharray="81.6" stroke-dashoffset="24.5" stroke-linecap="round"/></svg><div class="pct" style="color:#10B981">70</div></div>
+        <div style="font-size:12px;color:var(--t2)">收尾阶段 · 活动回顾待发</div>
+      </div>
+      <div class="item-update">收尾，活动回顾今天或明天发出，视频昨天给了一个版本又在改</div>
+      <div class="item-next">下周：发出活动回顾 + 确认最终视频版本</div>
+    </div>
+
+    <!-- Item 3 -->
+    <div class="item-card" style="border-left:3px solid var(--warn)">
+      <div class="item-top">
+        <div class="item-name">儿童节礼品</div>
+        <span class="item-type type-p">专项</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#FFFBEB;color:#F59E0B"><span class="mod-dot" style="background:#F59E0B"></span>文化运营(福利)</span>
+        <span class="st-badge" style="background:var(--acl);color:var(--ac)"><span class="st-dot" style="background:var(--ac)"></span>进行中</span>
+      </div>
+      <div class="item-update">登记补70套，收尾，申请预算</div>
+      <div class="item-next">下周：完成剩余礼品补登和收尾 + 预算申请</div>
     </div>
 
     <!-- Item 4 - Daily Ops -->
-    <div class="item-card" style="border-left:3px solid var(--warn)">
+    <div class="item-card">
       <div class="item-top">
-        <div class="item-name">下午茶供应商月度结算</div>
+        <div class="item-name">行政服务台</div>
         <span class="item-type type-o">日常运营</span>
       </div>
       <div class="item-tags">
-        <span class="mod-tag" style="background:#FFFBEB;color:#F59E0B"><span class="mod-dot" style="background:#F59E0B"></span>员工福利</span>
+        <span class="mod-tag" style="background:#ECFEFF;color:#06B6D4"><span class="mod-dot" style="background:#06B6D4"></span>数字化运营(行政服务台)</span>
+        <span class="st-badge" style="background:var(--acl);color:var(--ac)"><span class="st-dot" style="background:var(--ac)"></span>进行中</span>
+      </div>
+      <div class="item-update">本周创建工单数57个，其中人工工单数19，机器人拦截工单数38，拦截率100%</div>
+      <div class="item-next">下周：持续优化机器人拦截规则 + 跟进人工工单处理时效</div>
+    </div>
+
+    <!-- Item 5 -->
+    <div class="item-card">
+      <div class="item-top">
+        <div class="item-name">端午手工DIY活动</div>
+        <span class="item-type type-o">日常运营</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#ECFDF5;color:#10B981"><span class="mod-dot" style="background:#10B981"></span>文化运营(活动)</span>
         <span class="st-badge" style="background:var(--sucL);color:var(--suc)"><span class="st-dot" style="background:var(--suc)"></span>已完成</span>
       </div>
-      <div class="item-update">6月下午茶费用已结算，总计¥28,500。本周更新：供应商账单核对完成。</div>
+      <div class="item-update">已完成</div>
+    </div>
+
+    <!-- Item 6 -->
+    <div class="item-card">
+      <div class="item-top">
+        <div class="item-name">整理北京公益内容</div>
+        <span class="item-type type-o">日常运营</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#ECFDF5;color:#10B981"><span class="mod-dot" style="background:#10B981"></span>文化运营(活动)</span>
+        <span class="st-badge" style="background:var(--sucL);color:var(--suc)"><span class="st-dot" style="background:var(--suc)"></span>已完成</span>
+      </div>
+      <div class="item-update">已完成</div>
     </div>
 
   </div>
@@ -268,28 +301,33 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
 <div class="ppt-overlay" id="pptMode">
   <div class="ppt-close" onclick="closePPT()">✕</div>
   <div class="ppt-head">
-    <div class="ppt-av" style="background:linear-gradient(135deg,#667eea,#764ba2)">高</div>
+    <div class="ppt-av" style="background:linear-gradient(135deg,#F59E0B,#FBBF24)">高</div>
     <div><div class="ppt-name">高琳</div><div class="ppt-sub">本周汇报 · 第 1/9 人</div></div>
   </div>
   <div class="ppt-items">
     <div class="ppt-card">
-      <div class="ppt-card-name">北京办公室5层装修项目</div>
+      <div class="ppt-card-name">甩肉大赛</div>
+      <div class="ppt-card-status" style="background:var(--acl);color:var(--ac)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ac)"></span> 进行中 · 80%</div>
+      <div class="ppt-card-update">收尾总结、发奖牌。报名343人，总减重1411.2KG，目前单人减重率16.18%，团队减重总数62.8斤</div>
+      <div class="ppt-card-next">下周：完成奖牌发放 + 撰写活动复盘报告 + 统计各团队最终成绩</div>
+    </div>
+    <div class="ppt-card">
+      <div class="ppt-card-name">家庭日</div>
       <div class="ppt-card-status" style="background:var(--acl);color:var(--ac)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ac)"></span> 进行中 · 70%</div>
-      <div class="ppt-card-update">完成3层隔断墙施工，4层电路改造验收通过。空调设备到货延迟，已联系备选供应商。</div>
-      <div class="ppt-card-risk">⚠️ 空调设备交期延迟2周，可能影响7月验收</div>
-      <div class="ppt-card-next">下周：5层地面铺设 + 空调安装 + 备选供应商评估</div>
+      <div class="ppt-card-update">收尾，活动回顾今天或明天发出，视频昨天给了一个版本又在改</div>
+      <div class="ppt-card-next">下周：发出活动回顾 + 确认最终视频版本</div>
     </div>
     <div class="ppt-card">
-      <div class="ppt-card-name">门禁系统改造</div>
-      <div class="ppt-card-status" style="background:var(--purL);color:var(--pur)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--pur)"></span> 评审中 · 15%</div>
-      <div class="ppt-card-update">完成3家供应商方案对比，整理技术评审材料。</div>
-      <div class="ppt-card-next">下周：技术评审会议 + 确定供应商</div>
-    </div>
-    <div class="ppt-card">
-      <div class="ppt-card-name">北京职场日常保洁巡检</div>
+      <div class="ppt-card-name">儿童节礼品</div>
       <div class="ppt-card-status" style="background:var(--acl);color:var(--ac)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ac)"></span> 进行中</div>
-      <div class="ppt-card-update">本周巡检合格率 98%，2处卫生间问题已整改。</div>
-      <div class="ppt-card-next">下周：5层施工区域专项检查</div>
+      <div class="ppt-card-update">登记补70套，收尾，申请预算</div>
+      <div class="ppt-card-next">下周：完成剩余礼品补登和收尾 + 预算申请</div>
+    </div>
+    <div class="ppt-card">
+      <div class="ppt-card-name">行政服务台</div>
+      <div class="ppt-card-status" style="background:var(--acl);color:var(--ac)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ac)"></span> 进行中</div>
+      <div class="ppt-card-update">本周创建工单数57个，其中人工工单数19，机器人拦截工单数38，拦截率100%</div>
+      <div class="ppt-card-next">下周：持续优化机器人拦截规则 + 跟进人工工单处理时效</div>
     </div>
   </div>
   <div class="ppt-nav">
@@ -304,11 +342,11 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
   <h4>📋 周会视图说明</h4>
   <div class="anno-i"><div class="anno-n">1</div><div class="anno-t">左侧按人列表，右侧聚合该人所有事项</div></div>
   <div class="anno-i"><div class="anno-n">2</div><div class="anno-t">事项按优先级排序（★★★★★在前）</div></div>
-  <div class="anno-i"><div class="anno-n">3</div><div class="anno-t">专项显示完成率环+里程碑+风险</div></div>
+  <div class="anno-i"><div class="anno-n">3</div><div class="anno-t">专项显示完成率环+更新+下周计划</div></div>
   <div class="anno-i"><div class="anno-n">4</div><div class="anno-t">日常运营显示更新摘要+下周重点</div></div>
   <div class="anno-i"><div class="anno-n">5</div><div class="anno-t">黄色badge=待更新数量，红色=延期</div></div>
-  <div class="anno-i"><div class="anno-n">6</div><div class="anno-n">📺</div><div class="anno-t">投屏模式：全屏大卡片，适合投屏</div></div>
-  <div class="anno-i"><div class="anno-n">7</div><div class="anno-n">📑</div><div class="anno-t">PPT模式：每人一页，翻页导航</div></div>
+  <div class="anno-i"><div class="anno-n">6</div><div class="anno-t">📺 投屏模式：全屏大卡片，适合投屏</div></div>
+  <div class="anno-i"><div class="anno-n">7</div><div class="anno-t">📑 PPT模式：每人一页，翻页导航</div></div>
   <div class="anno-i"><div class="anno-n">8</div><div class="anno-t">点击「PPT」按钮查看翻页模式</div></div>
 </div>
 
@@ -323,7 +361,6 @@ function closePPT(){document.getElementById('pptMode').classList.remove('show')}
 function showPresent(){
   document.body.style.background='#000';
   document.querySelector('.app').style.display='none';
-  // Simplified - would show full-screen presentation in real app
   setTimeout(()=>{document.body.style.background='';document.querySelector('.app').style.display='flex'},3000);
 }
 </script>
