@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AOP 周会视图</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF;--bg2:#F8F9FB;--bg3:#F1F3F8;--bgH:#EEF0F6;--bd:#E5E7EB;--bdl:#F1F3F8;--t1:#1A1D26;--t2:#6B7280;--t3:#9CA3AF;--ac:#3B5BDB;--acl:#EBF0FF;--suc:#10B981;--sucL:#ECFDF5;--warn:#F59E0B;--warnL:#FFFBEB;--dan:#EF4444;--danL:#FEF2F2;--pur:#8B5CF6;--purL:#F5F3FF;--r:10px;--rl:14px;--sh:0 1px 3px rgba(0,0,0,.06);--shL:0 10px 25px rgba(0,0,0,.06);--tr:150ms cubic-bezier(.4,0,.2,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:var(--t1);font-size:14px;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sb{width:220px;background:var(--bg);border-right:1px solid var(--bdl);display:flex;flex-direction:column;flex-shrink:0}
+.sb-logo{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdl)}
+.sb-logo-i{width:26px;height:26px;background:var(--ac);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px}
+.sb-logo-t{font-size:14px;font-weight:700}
+.sb-sec{padding:6px 10px;border-top:1px solid var(--bdl)}
+.sb-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:6px 8px 2px}
+.sb-i{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:450;color:var(--t2);transition:all var(--tr)}
+.sb-i:hover{background:var(--bgH);color:var(--t1)}
+.sb-i.act{background:var(--acl);color:var(--ac);font-weight:600}
+.sb-ic{width:16px;text-align:center;font-size:13px;flex-shrink:0}
+.sb-sub{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 30px;font-size:12.5px;color:var(--t3);border-radius:5px;cursor:pointer;transition:all var(--tr)}
+.sb-sub:hover{background:var(--bgH);color:var(--t2)}
+.sb-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.sb-bt{margin-top:auto;padding:10px;border-top:1px solid var(--bdl)}
+.sb-u{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer}
+.sb-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600}
+
+/* Main area - two panels */
+.main{flex:1;display:flex;overflow:hidden}
+
+/* Left panel - person list */
+.people{width:240px;background:var(--bg);border-right:1px solid var(--bdl);display:flex;flex-direction:column;overflow:hidden}
+.people-head{padding:14px 16px;border-bottom:1px solid var(--bdl);font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+.people-mode{margin-left:auto;display:flex;gap:4px}
+.mode-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr)}
+.mode-btn.act{background:var(--acl);border-color:var(--ac);color:var(--ac);font-weight:600}
+.people-list{flex:1;overflow-y:auto;padding:6px}
+.person{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:all var(--tr);margin-bottom:2px}
+.person:hover{background:var(--bgH)}
+.person.act{background:var(--acl)}
+.person-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;flex-shrink:0}
+.person-info{flex:1;min-width:0}
+.person-name{font-size:13px;font-weight:600;color:var(--t1)}
+.person.act .person-name{color:var(--ac)}
+.person-role{font-size:10px;color:var(--t3);font-weight:500}
+.person-badges{display:flex;gap:4px;margin-left:auto;flex-shrink:0}
+.person-badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px}
+.badge-warn{background:var(--warnL);color:var(--warn)}
+.badge-dan{background:var(--danL);color:var(--dan)}
+
+/* Right panel - person items */
+.items{flex:1;overflow-y:auto;background:var(--bg2);padding:20px 24px}
+.items-head{margin-bottom:16px;display:flex;align-items:center;gap:14px}
+.items-head-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:600}
+.items-head-name{font-size:20px;font-weight:700}
+.items-head-sub{font-size:12px;color:var(--t3)}
+
+/* Item card */
+.item-card{background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,.04);cursor:pointer;transition:all var(--tr)}
+.item-card:hover{box-shadow:var(--sh);border-color:var(--bd)}
+.item-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.item-name{font-size:14px;font-weight:700;color:var(--t1);flex:1}
+.item-type{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px}
+.type-p{background:#F3E8FF;color:#8B5CF6}
+.type-o{background:#ECFDF5;color:#059669}
+.item-tags{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.mod-tag{font-size:10px;font-weight:500;padding:1px 7px;border-radius:8px;display:inline-flex;align-items:center;gap:3px}
+.mod-dot{width:4px;height:4px;border-radius:50%}
+.st-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:3px}
+.st-dot{width:5px;height:5px;border-radius:50%}
+.item-progress{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.prog-ring{width:32px;height:32px;flex-shrink:0;position:relative}
+.prog-ring svg{transform:rotate(-90deg)}
+.prog-ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--ac)}
+.item-update{font-size:12.5px;color:var(--t2);line-height:1.6;margin-bottom:6px}
+.item-risk{font-size:11.5px;color:var(--dan);font-weight:500;display:flex;align-items:center;gap:4px;margin-bottom:4px}
+.item-next{font-size:12px;color:var(--t3);line-height:1.5}
+.item-expand{font-size:11px;color:var(--ac);cursor:pointer;font-weight:500;margin-top:4px}
+
+/* PPT Mode overlay */
+.ppt-overlay{position:fixed;inset:0;background:var(--bg);z-index:200;display:none;flex-direction:column;padding:40px 60px}
+.ppt-overlay.show{display:flex}
+.ppt-head{display:flex;align-items:center;gap:14px;margin-bottom:30px}
+.ppt-av{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:600}
+.ppt-name{font-size:28px;font-weight:700}
+.ppt-sub{font-size:14px;color:var(--t3)}
+.ppt-items{flex:1;overflow-y:auto}
+.ppt-card{background:var(--bg2);border:1px solid var(--bdl);border-radius:12px;padding:20px 24px;margin-bottom:14px}
+.ppt-card-name{font-size:20px;font-weight:700;margin-bottom:8px}
+.ppt-card-status{font-size:13px;font-weight:600;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;gap:5px;margin-bottom:10px}
+.ppt-card-update{font-size:16px;color:var(--t2);line-height:1.7;margin-bottom:8px}
+.ppt-card-risk{font-size:14px;color:var(--dan);font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.ppt-card-next{font-size:14px;color:var(--t3);line-height:1.6}
+.ppt-nav{padding:16px 0;display:flex;align-items:center;justify-content:center;gap:20px;font-size:15px;color:var(--t3)}
+.ppt-nav-btn{padding:8px 18px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr)}
+.ppt-nav-btn:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
+.ppt-close{position:absolute;top:20px;right:24px;font-size:20px;cursor:pointer;color:var(--t2);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background var(--tr)}
+.ppt-close:hover{background:var(--bgH)}
+
+/* Annotation */
+.anno{position:fixed;right:20px;top:20px;width:260px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rl);box-shadow:var(--shL);padding:16px;font-size:12px;z-index:100}
+.anno h4{font-size:11px;font-weight:700;color:var(--ac);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em}
+.anno-i{display:flex;gap:8px;margin-bottom:6px;line-height:1.5}
+.anno-n{width:16px;height:16px;background:var(--ac);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.anno-t{color:var(--t2)}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Sidebar -->
+<div class="sb">
+  <div class="sb-logo"><div class="sb-logo-i">A</div><div class="sb-logo-t">AOP</div></div>
+  <div class="sb-sec"><div class="sb-lbl">工作</div>
+    <div class="sb-i"><div class="sb-ic">🏠</div> 我的工作</div>
+    <div class="sb-i"><div class="sb-ic">📋</div> 行政总览</div>
+    <div class="sb-i"><div class="sb-ic">⭐</div> 重点专项</div>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">管理</div>
+    <div class="sb-i"><div class="sb-ic">📊</div> 运营看板</div>
+    <div class="sb-i act"><div class="sb-ic">👥</div> 周会视图</div>
+    <div class="sb-i"><div class="sb-ic">📝</div> 周报</div>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">分析</div>
+    <div class="sb-i"><div class="sb-ic">📈</div> 数据驾驶舱</div>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">业务模块</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#3B5BDB"></div> 职场运营</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#10B981"></div> 文化运营</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#06B6D4"></div> 数字化运营</div>
+  </div>
+  <div class="sb-bt"><div class="sb-u"><div class="sb-av">高</div><div><div style="font-size:12px;font-weight:600">高琳</div><div style="font-size:10px;color:var(--t3)">主管</div></div></div></div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- People list -->
+  <div class="people">
+    <div class="people-head">👥 周会汇报
+      <div class="people-mode">
+        <div class="mode-btn" onclick="showPPT()">📑 PPT</div>
+        <div class="mode-btn" onclick="showPresent()">📺 投屏</div>
+      </div>
+    </div>
+    <div class="people-list">
+      <div class="person act" onclick="selectPerson(this,0)">
+        <div class="person-av" style="background:linear-gradient(135deg,#667eea,#764ba2)">高</div>
+        <div class="person-info"><div class="person-name">高琳</div><div class="person-role">主管</div></div>
+        <div class="person-badges"><span class="person-badge badge-warn">2</span></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,1)">
+        <div class="person-av" style="background:linear-gradient(135deg,#f093fb,#f5576c)">耿</div>
+        <div class="person-info"><div class="person-name">耿博琳</div><div class="person-role">专员</div></div>
+        <div class="person-badges"><span class="person-badge badge-warn">1</span></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,2)">
+        <div class="person-av" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">张</div>
+        <div class="person-info"><div class="person-name">张灵玉</div><div class="person-role">专员</div></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,3)">
+        <div class="person-av" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">李</div>
+        <div class="person-info"><div class="person-name">李明</div><div class="person-role">专员</div></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,4)">
+        <div class="person-av" style="background:linear-gradient(135deg,#fa709a,#fee140)">王</div>
+        <div class="person-info"><div class="person-name">王芳</div><div class="person-role">专员</div></div>
+        <div class="person-badges"><span class="person-badge badge-dan">1</span></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,5)">
+        <div class="person-av" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)">陈</div>
+        <div class="person-info"><div class="person-name">陈思</div><div class="person-role">专员</div></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,6)">
+        <div class="person-av" style="background:linear-gradient(135deg,#fccb90,#d57eeb)">赵</div>
+        <div class="person-info"><div class="person-name">赵颖</div><div class="person-role">专员</div></div>
+        <div class="person-badges"><span class="person-badge badge-warn">1</span></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,7)">
+        <div class="person-av" style="background:linear-gradient(135deg,#30cfd0,#330867)">周</div>
+        <div class="person-info"><div class="person-name">周洋</div><div class="person-role">专员</div></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,8)">
+        <div class="person-av" style="background:linear-gradient(135deg,#f5af19,#f12711)">刘</div>
+        <div class="person-info"><div class="person-name">刘强</div><div class="person-role">专员</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Items panel -->
+  <div class="items">
+    <div class="items-head">
+      <div class="items-head-av" style="background:linear-gradient(135deg,#667eea,#764ba2)">高</div>
+      <div><div class="items-head-name">高琳</div><div class="items-head-sub">本周汇报 · 4 个事项 · 2 个待更新</div></div>
+    </div>
+
+    <!-- Item 1 -->
+    <div class="item-card">
+      <div class="item-top">
+        <div class="item-name">北京办公室5层装修项目</div>
+        <span class="item-type type-p">专项</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#EBF0FF;color:#3B5BDB"><span class="mod-dot" style="background:#3B5BDB"></span>北京职场</span>
+        <span class="st-badge" style="background:var(--acl);color:var(--ac)"><span class="st-dot" style="background:var(--ac)"></span>进行中</span>
+      </div>
+      <div class="item-progress">
+        <div class="prog-ring"><svg width="32" height="32"><circle cx="16" cy="16" r="13" fill="none" stroke="#F1F3F8" stroke-width="3"/><circle cx="16" cy="16" r="13" fill="none" stroke="#3B5BDB" stroke-width="3" stroke-dasharray="81.6" stroke-dashoffset="24.5" stroke-linecap="round"/></svg><div class="pct">70</div></div>
+        <div style="font-size:12px;color:var(--t2)">施工执行阶段 · 3/4里程碑</div>
+      </div>
+      <div class="item-update">本周完成3层隔断墙施工，4层电路改造验收通过。空调设备到货延迟，已联系备选供应商。</div>
+      <div class="item-risk">⚠️ 空调设备交期延迟2周，可能影响7月验收</div>
+      <div class="item-next">下周：完成5层地面铺设 + 推进空调安装 + 启动备选供应商评估</div>
+    </div>
+
+    <!-- Item 2 -->
+    <div class="item-card">
+      <div class="item-top">
+        <div class="item-name">门禁系统改造</div>
+        <span class="item-type type-p">专项</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#EBF0FF;color:#3B5BDB"><span class="mod-dot" style="background:#3B5BDB"></span>北京职场</span>
+        <span class="st-badge" style="background:var(--purL);color:var(--pur)"><span class="st-dot" style="background:var(--pur)"></span>评审中</span>
+      </div>
+      <div class="item-progress">
+        <div class="prog-ring"><svg width="32" height="32"><circle cx="16" cy="16" r="13" fill="none" stroke="#F1F3F8" stroke-width="3"/><circle cx="16" cy="16" r="13" fill="none" stroke="#8B5CF6" stroke-width="3" stroke-dasharray="81.6" stroke-dashoffset="69.4" stroke-linecap="round"/></svg><div class="pct" style="color:var(--pur)">15</div></div>
+        <div style="font-size:12px;color:var(--t2)">需求评审阶段</div>
+      </div>
+      <div class="item-update">完成3家供应商方案对比，正在整理技术评审材料。</div>
+      <div class="item-next">下周：组织技术评审会议 + 确定供应商</div>
+    </div>
+
+    <!-- Item 3 - Daily Ops -->
+    <div class="item-card">
+      <div class="item-top">
+        <div class="item-name">北京职场日常保洁巡检</div>
+        <span class="item-type type-o">日常运营</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#EBF0FF;color:#3B5BDB"><span class="mod-dot" style="background:#3B5BDB"></span>北京职场</span>
+        <span class="st-badge" style="background:var(--acl);color:var(--ac)"><span class="st-dot" style="background:var(--ac)"></span>进行中</span>
+      </div>
+      <div class="item-update">本周巡检合格率 98%，发现2处卫生间清洁问题已整改。</div>
+      <div class="item-next">下周重点：5层施工区域保洁专项检查</div>
+    </div>
+
+    <!-- Item 4 - Daily Ops -->
+    <div class="item-card" style="border-left:3px solid var(--warn)">
+      <div class="item-top">
+        <div class="item-name">下午茶供应商月度结算</div>
+        <span class="item-type type-o">日常运营</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#FFFBEB;color:#F59E0B"><span class="mod-dot" style="background:#F59E0B"></span>员工福利</span>
+        <span class="st-badge" style="background:var(--sucL);color:var(--suc)"><span class="st-dot" style="background:var(--suc)"></span>已完成</span>
+      </div>
+      <div class="item-update">6月下午茶费用已结算，总计¥28,500。本周更新：供应商账单核对完成。</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PPT Mode Overlay -->
+<div class="ppt-overlay" id="pptMode">
+  <div class="ppt-close" onclick="closePPT()">✕</div>
+  <div class="ppt-head">
+    <div class="ppt-av" style="background:linear-gradient(135deg,#667eea,#764ba2)">高</div>
+    <div><div class="ppt-name">高琳</div><div class="ppt-sub">本周汇报 · 第 1/9 人</div></div>
+  </div>
+  <div class="ppt-items">
+    <div class="ppt-card">
+      <div class="ppt-card-name">北京办公室5层装修项目</div>
+      <div class="ppt-card-status" style="background:var(--acl);color:var(--ac)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ac)"></span> 进行中 · 70%</div>
+      <div class="ppt-card-update">完成3层隔断墙施工，4层电路改造验收通过。空调设备到货延迟，已联系备选供应商。</div>
+      <div class="ppt-card-risk">⚠️ 空调设备交期延迟2周，可能影响7月验收</div>
+      <div class="ppt-card-next">下周：5层地面铺设 + 空调安装 + 备选供应商评估</div>
+    </div>
+    <div class="ppt-card">
+      <div class="ppt-card-name">门禁系统改造</div>
+      <div class="ppt-card-status" style="background:var(--purL);color:var(--pur)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--pur)"></span> 评审中 · 15%</div>
+      <div class="ppt-card-update">完成3家供应商方案对比，整理技术评审材料。</div>
+      <div class="ppt-card-next">下周：技术评审会议 + 确定供应商</div>
+    </div>
+    <div class="ppt-card">
+      <div class="ppt-card-name">北京职场日常保洁巡检</div>
+      <div class="ppt-card-status" style="background:var(--acl);color:var(--ac)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ac)"></span> 进行中</div>
+      <div class="ppt-card-update">本周巡检合格率 98%，2处卫生间问题已整改。</div>
+      <div class="ppt-card-next">下周：5层施工区域专项检查</div>
+    </div>
+  </div>
+  <div class="ppt-nav">
+    <button class="ppt-nav-btn">← 上一位</button>
+    <span style="font-weight:600">1 / 9</span>
+    <button class="ppt-nav-btn">下一位 →</button>
+  </div>
+</div>
+
+<!-- Annotation -->
+<div class="anno">
+  <h4>📋 周会视图说明</h4>
+  <div class="anno-i"><div class="anno-n">1</div><div class="anno-t">左侧按人列表，右侧聚合该人所有事项</div></div>
+  <div class="anno-i"><div class="anno-n">2</div><div class="anno-t">事项按优先级排序（★★★★★在前）</div></div>
+  <div class="anno-i"><div class="anno-n">3</div><div class="anno-t">专项显示完成率环+里程碑+风险</div></div>
+  <div class="anno-i"><div class="anno-n">4</div><div class="anno-t">日常运营显示更新摘要+下周重点</div></div>
+  <div class="anno-i"><div class="anno-n">5</div><div class="anno-t">黄色badge=待更新数量，红色=延期</div></div>
+  <div class="anno-i"><div class="anno-n">6</div><div class="anno-n">📺</div><div class="anno-t">投屏模式：全屏大卡片，适合投屏</div></div>
+  <div class="anno-i"><div class="anno-n">7</div><div class="anno-n">📑</div><div class="anno-t">PPT模式：每人一页，翻页导航</div></div>
+  <div class="anno-i"><div class="anno-n">8</div><div class="anno-t">点击「PPT」按钮查看翻页模式</div></div>
+</div>
+
+</div>
+<script>
+function selectPerson(el,idx){
+  document.querySelectorAll('.person').forEach(p=>p.classList.remove('act'));
+  el.classList.add('act');
+}
+function showPPT(){document.getElementById('pptMode').classList.add('show')}
+function closePPT(){document.getElementById('pptMode').classList.remove('show')}
+function showPresent(){
+  document.body.style.background='#000';
+  document.querySelector('.app').style.display='none';
+  // Simplified - would show full-screen presentation in real app
+  setTimeout(()=>{document.body.style.background='';document.querySelector('.app').style.display='flex'},3000);
+}
+</script>
+</body>
+</html>

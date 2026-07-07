@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AOP 我的工作 — 员工首页</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-secondary: #F8F9FB;
+    --bg-tertiary: #F1F3F8;
+    --bg-hover: #EEF0F6;
+    --border: #E5E7EB;
+    --border-light: #F1F3F8;
+    --text-primary: #1A1D26;
+    --text-secondary: #6B7280;
+    --text-tertiary: #9CA3AF;
+    --accent: #3B5BDB;
+    --accent-light: #EBF0FF;
+    --accent-hover: #354FD4;
+    --success: #10B981;
+    --success-light: #ECFDF5;
+    --warning: #F59E0B;
+    --warning-light: #FFFBEB;
+    --danger: #EF4444;
+    --danger-light: #FEF2F2;
+    --purple: #8B5CF6;
+    --purple-light: #F5F3FF;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.06);
+    --transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== LAYOUT ===== */
+  .app-shell {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Sidebar (same as 01) */
+  .sidebar {
+    width: 220px;
+    background: var(--bg);
+    border-right: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sidebar-logo {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .sidebar-logo-icon {
+    width: 26px; height: 26px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 12px;
+  }
+  .sidebar-logo-text { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+  .sidebar-logo-badge { font-size: 9px; font-weight: 600; background: var(--bg-tertiary); color: var(--text-tertiary); padding: 1px 5px; border-radius: 8px; margin-left: 3px; }
+  .sidebar-workspace {
+    padding: 10px 16px; display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text-secondary); font-weight: 600;
+  }
+  .sidebar-section { padding: 6px 10px; border-top: 1px solid var(--border-light); }
+  .sidebar-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); padding: 6px 8px 2px; }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 9px; padding: 6px 10px;
+    border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 450;
+    color: var(--text-secondary); transition: all var(--transition);
+  }
+  .sidebar-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .sidebar-item.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+  .sidebar-icon { width: 16px; text-align: center; font-size: 13px; flex-shrink: 0; }
+  .sidebar-badge {
+    font-size: 10px; font-weight: 600; min-width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; margin-left: auto; padding: 0 4px;
+  }
+  .sidebar-badge.warn { background: var(--warning); color: white; }
+  .sidebar-sub-item {
+    display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 30px;
+    font-size: 12.5px; color: var(--text-tertiary); border-radius: 5px;
+    cursor: pointer; transition: all var(--transition);
+  }
+  .sidebar-sub-item:hover { background: var(--bg-hover); color: var(--text-secondary); }
+  .sidebar-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .sidebar-bottom { margin-top: auto; padding: 10px; border-top: 1px solid var(--border-light); }
+  .sidebar-user {
+    display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+    border-radius: 7px; cursor: pointer;
+  }
+  .sidebar-user:hover { background: var(--bg-hover); }
+  .sidebar-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 11px; font-weight: 600;
+  }
+  .sidebar-username { font-size: 12px; font-weight: 600; }
+  .sidebar-userrole { font-size: 10px; color: var(--text-tertiary); }
+
+  /* Main area */
+  .main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-secondary);
+  }
+  .main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 36px;
+  }
+
+  /* ===== PAGE HEADER ===== */
+  .page-header {
+    margin-bottom: 24px;
+  }
+  .page-header .greeting {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .page-header .greeting-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  /* ===== STATS ROW ===== */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition);
+  }
+  .stat-card:hover { box-shadow: var(--shadow); }
+  .stat-card .stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .stat-card .stat-label {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+  .stat-card.accent .stat-num { color: var(--accent); }
+  .stat-card.warn .stat-num { color: var(--warning); }
+  .stat-card.danger .stat-num { color: var(--danger); }
+  .stat-card.success .stat-num { color: var(--success); }
+
+  /* ===== TABS ===== */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0;
+  }
+  .tab-item {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all var(--transition);
+    margin-bottom: -1px;
+  }
+  .tab-item:hover { color: var(--text-secondary); }
+  .tab-item.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+  .tab-count {
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--bg-tertiary);
+    color: var(--text-tertiary);
+    padding: 0 5px;
+    border-radius: 8px;
+    margin-left: 4px;
+    line-height: 16px;
+  }
+  .tab-item.active .tab-count { background: var(--accent-light); color: var(--accent); }
+
+  /* ===== SEARCH ===== */
+  .search-bar {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .search-bar input {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px 12px 8px 34px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    background: var(--bg);
+    transition: border-color var(--transition);
+    outline: none;
+  }
+  .search-bar input:focus { border-color: var(--accent); }
+  .search-bar input::placeholder { color: var(--text-tertiary); }
+  .search-icon {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    font-size: 14px; color: var(--text-tertiary);
+  }
+
+  /* ===== WORK ITEM CARDS ===== */
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .work-item-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: var(--shadow-sm);
+  }
+  .work-item-card:hover {
+    box-shadow: var(--shadow);
+    border-color: var(--border);
+    transform: translateY(-1px);
+  }
+  .work-item-card.not-updated {
+    border-left: 3px solid var(--warning);
+  }
+  .work-item-card.overdue {
+    border-left: 3px solid var(--danger);
+  }
+
+  .item-priority-dots {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .priority-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+  .priority-dot.filled { background: var(--accent); }
+  .priority-dot.filled.warn { background: var(--warning); }
+  .priority-dot.filled.danger { background: var(--danger); }
+
+  .item-info { flex: 1; min-width: 0; }
+  .item-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .item-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 3px;
+  }
+  .item-module-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 1px 8px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .item-type-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 4px;
+  }
+  .type-project { background: #F3E8FF; color: #8B5CF6; }
+  .type-ops { background: #ECFDF5; color: #059669; }
+
+  .item-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+  .item-status {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+  .status-progress { background: var(--accent-light); color: var(--accent); }
+  .status-done { background: var(--success-light); color: var(--success); }
+  .status-overdue { background: var(--danger-light); color: var(--danger); }
+  .status-review { background: var(--purple-light); color: var(--purple); }
+
+  .item-owner-avatar {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 9px; font-weight: 600;
+  }
+  .item-deadline {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-weight: 400;
+  }
+  .item-deadline.overdue { color: var(--danger); font-weight: 500; }
+  .item-update-flag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .flag-pending { background: var(--warning-light); color: var(--warning); }
+  .flag-done { background: var(--success-light); color: var(--success); }
+
+  /* ===== PRIORITY SECTION HEADERS ===== */
+  .priority-section {
+    margin-top: 20px;
+  }
+  .priority-section:first-child { margin-top: 0; }
+  .priority-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .priority-header-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-tertiary);
+  }
+  .priority-header-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border-light);
+  }
+
+  /* ===== ANNOTATION PANEL ===== */
+  .annotation-panel {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    width: 280px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 18px;
+    font-size: 12px;
+    z-index: 100;
+  }
+  .annotation-panel h4 {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .anno-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .anno-num {
+    width: 16px; height: 16px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .anno-text { color: var(--text-secondary); }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">A</div>
+      <div class="sidebar-logo-text">AOP</div>
+      <div class="sidebar-logo-badge">Beta</div>
+    </div>
+    <div class="sidebar-workspace">▼ 行政部</div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">工作</div>
+      <div class="sidebar-item active">
+        <div class="sidebar-icon">🏠</div> 我的工作
+        <div class="sidebar-badge warn">3</div>
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">📋</div> 行政总览
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">⭐</div> 重点专项
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">管理</div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">📊</div> 运营看板
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">👥</div> 周会视图
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">📝</div> 周报
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">分析</div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">📈</div> 数据驾驶舱
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">业务模块</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#3B5BDB;"></div> 职场运营</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#10B981;"></div> 文化运营</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#06B6D4;"></div> 数字化运营</div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">高</div>
+        <div>
+          <div class="sidebar-username">高琳</div>
+          <div class="sidebar-userrole">主管</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+    <div class="main-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="greeting">早上好，高琳 👋</div>
+        <div class="greeting-sub">本周有 3 个事项待更新，1 个事项今日截止</div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-card accent">
+          <div class="stat-num">12</div>
+          <div class="stat-label">负责事项总数</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-num">3</div>
+          <div class="stat-label">本周待更新</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-num">1</div>
+          <div class="stat-label">今日截止</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-num">0</div>
+          <div class="stat-label">延期事项</div>
+        </div>
+      </div>
+
+      <!-- Tab Bar -->
+      <div class="tab-bar">
+        <div class="tab-item active">全部 <span class="tab-count">12</span></div>
+        <div class="tab-item">待更新 <span class="tab-count">3</span></div>
+        <div class="tab-item">已更新 <span class="tab-count">9</span></div>
+        <div class="tab-item">延期 <span class="tab-count">0</span></div>
+      </div>
+
+      <!-- Search -->
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="搜索事项名称..." />
+      </div>
+
+      <!-- Priority Sections -->
+      <div class="priority-section">
+        <div class="priority-header">
+          <span class="priority-header-label">★★★★★ 本周重点</span>
+          <div class="priority-header-line"></div>
+        </div>
+        <div class="items-list">
+          <div class="work-item-card not-updated">
+            <div class="item-priority-dots">
+              <div class="priority-dot filled danger"></div>
+              <div class="priority-dot filled danger"></div>
+              <div class="priority-dot filled danger"></div>
+              <div class="priority-dot filled danger"></div>
+              <div class="priority-dot filled danger"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">北京办公室5层装修项目</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#EBF0FF;color:#3B5BDB;">🏢 北京职场</span>
+                <span class="item-type-badge type-project">专项</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-progress">进行中</span>
+              <div class="item-owner-avatar">高</div>
+              <span class="item-deadline">6月30日</span>
+              <span class="item-update-flag flag-pending">待更新</span>
+            </div>
+          </div>
+
+          <div class="work-item-card not-updated">
+            <div class="item-priority-dots">
+              <div class="priority-dot filled danger"></div>
+              <div class="priority-dot filled danger"></div>
+              <div class="priority-dot filled danger"></div>
+              <div class="priority-dot filled danger"></div>
+              <div class="priority-dot filled danger"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">家庭日活动策划与执行</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#ECFDF5;color:#10B981;">🎉 活动运营</span>
+                <span class="item-type-badge type-project">专项</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-progress">进行中</span>
+              <div class="item-owner-avatar">陈</div>
+              <span class="item-deadline">7月15日</span>
+              <span class="item-update-flag flag-pending">待更新</span>
+            </div>
+          </div>
+
+          <div class="work-item-card">
+            <div class="item-priority-dots">
+              <div class="priority-dot filled danger"></div>
+              <div class="priority-dot filled danger"></div>
+              <div class="priority-dot filled danger"></div>
+              <div class="priority-dot filled danger"></div>
+              <div class="priority-dot filled danger"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">行政服务台系统升级2.0</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#ECFEFF;color:#06B6D4;">💻 行政服务台</span>
+                <span class="item-type-badge type-project">专项</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-review">评审中</span>
+              <div class="item-owner-avatar">周</div>
+              <span class="item-deadline">8月1日</span>
+              <span class="item-update-flag flag-done">已更新</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="priority-section">
+        <div class="priority-header">
+          <span class="priority-header-label">★★★★ 重要</span>
+          <div class="priority-header-line"></div>
+        </div>
+        <div class="items-list">
+          <div class="work-item-card not-updated">
+            <div class="item-priority-dots">
+              <div class="priority-dot filled warn"></div>
+              <div class="priority-dot filled warn"></div>
+              <div class="priority-dot filled warn"></div>
+              <div class="priority-dot filled warn"></div>
+              <div class="priority-dot"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">六一儿童节福利发放</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#FFFBEB;color:#F59E0B;">🎁 员工福利</span>
+                <span class="item-type-badge type-project">专项</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-progress">进行中</span>
+              <div class="item-owner-avatar">赵</div>
+              <span class="item-deadline overdue">今日截止</span>
+              <span class="item-update-flag flag-pending">待更新</span>
+            </div>
+          </div>
+
+          <div class="work-item-card">
+            <div class="item-priority-dots">
+              <div class="priority-dot filled warn"></div>
+              <div class="priority-dot filled warn"></div>
+              <div class="priority-dot filled warn"></div>
+              <div class="priority-dot filled warn"></div>
+              <div class="priority-dot"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">武汉职场空调设备维保</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#F5F3FF;color:#8B5CF6;">🏢 武汉职场</span>
+                <span class="item-type-badge type-ops">日常运营</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-progress">进行中</span>
+              <div class="item-owner-avatar">李</div>
+              <span class="item-deadline">7月10日</span>
+              <span class="item-update-flag flag-done">已更新</span>
+            </div>
+          </div>
+
+          <div class="work-item-card">
+            <div class="item-priority-dots">
+              <div class="priority-dot filled warn"></div>
+              <div class="priority-dot filled warn"></div>
+              <div class="priority-dot filled warn"></div>
+              <div class="priority-dot filled warn"></div>
+              <div class="priority-dot"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">下午茶供应商月度结算</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#FFFBEB;color:#F59E0B;">🎁 员工福利</span>
+                <span class="item-type-badge type-ops">日常运营</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-done">已完成</span>
+              <div class="item-owner-avatar">赵</div>
+              <span class="item-deadline">6月30日</span>
+              <span class="item-update-flag flag-done">已更新</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="priority-section">
+        <div class="priority-header">
+          <span class="priority-header-label">★★★ 常规</span>
+          <div class="priority-header-line"></div>
+        </div>
+        <div class="items-list">
+          <div class="work-item-card">
+            <div class="item-priority-dots">
+              <div class="priority-dot filled"></div>
+              <div class="priority-dot filled"></div>
+              <div class="priority-dot filled"></div>
+              <div class="priority-dot"></div>
+              <div class="priority-dot"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">异地职场工单跟踪</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#FDF2F8;color:#EC4899;">🏢 异地职场</span>
+                <span class="item-type-badge type-ops">日常运营</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-progress">进行中</span>
+              <div class="item-owner-avatar">王</div>
+              <span class="item-deadline">持续</span>
+              <span class="item-update-flag flag-done">已更新</span>
+            </div>
+          </div>
+
+          <div class="work-item-card">
+            <div class="item-priority-dots">
+              <div class="priority-dot filled"></div>
+              <div class="priority-dot filled"></div>
+              <div class="priority-dot filled"></div>
+              <div class="priority-dot"></div>
+              <div class="priority-dot"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">会议室预订系统维护</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#ECFEFF;color:#06B6D4;">💻 行政服务台</span>
+                <span class="item-type-badge type-ops">日常运营</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-progress">进行中</span>
+              <div class="item-owner-avatar">周</div>
+              <span class="item-deadline">持续</span>
+              <span class="item-update-flag flag-done">已更新</span>
+            </div>
+          </div>
+
+          <div class="work-item-card">
+            <div class="item-priority-dots">
+              <div class="priority-dot filled"></div>
+              <div class="priority-dot filled"></div>
+              <div class="priority-dot filled"></div>
+              <div class="priority-dot"></div>
+              <div class="priority-dot"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">数字化后台数据周报</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#EEF2FF;color:#6366F1;">💻 数字化后台运营</span>
+                <span class="item-type-badge type-ops">日常运营</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-progress">进行中</span>
+              <div class="item-owner-avatar">刘</div>
+              <span class="item-deadline">每周</span>
+              <span class="item-update-flag flag-done">已更新</span>
+            </div>
+          </div>
+
+          <div class="work-item-card">
+            <div class="item-priority-dots">
+              <div class="priority-dot filled"></div>
+              <div class="priority-dot filled"></div>
+              <div class="priority-dot filled"></div>
+              <div class="priority-dot"></div>
+              <div class="priority-dot"></div>
+            </div>
+            <div class="item-info">
+              <div class="item-name">北京职场日常保洁巡检</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#EBF0FF;color:#3B5BDB;">🏢 北京职场</span>
+                <span class="item-type-badge type-ops">日常运营</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-progress">进行中</span>
+              <div class="item-owner-avatar">高</div>
+              <span class="item-deadline">每日</span>
+              <span class="item-update-flag flag-done">已更新</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ANNOTATION PANEL -->
+  <div class="annotation-panel">
+    <h4>📋 页面说明</h4>
+    <div class="anno-item">
+      <div class="anno-num">1</div>
+      <div class="anno-text">默认首页，员工登录后直接进入此页</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">2</div>
+      <div class="anno-text">顶部统计卡片：总事项 / 待更新 / 今日截止 / 延期</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">3</div>
+      <div class="anno-text">4 个 Tab 切换筛选：全部 / 待更新 / 已更新 / 延期</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">4</div>
+      <div class="anno-text">按优先级自动分组排序：★★★★★→★★★★→★★★</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">5</div>
+      <div class="anno-text">左侧橙色边线 = 本周未更新，红色边线 = 延期</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">6</div>
+      <div class="anno-text">点击卡片 → 右侧 Slide-over 展开事项详情</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">7</div>
+      <div class="anno-text">专项显示紫色标签，日常运营显示绿色标签</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">8</div>
+      <div class="anno-text">每张卡片显示：名称、模块、类型、状态、负责人、截止日期、更新状态</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

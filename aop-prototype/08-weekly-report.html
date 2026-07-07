@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AOP 周报</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF;--bg2:#F8F9FB;--bg3:#F1F3F8;--bgH:#EEF0F6;--bd:#E5E7EB;--bdl:#F1F3F8;--t1:#1A1D26;--t2:#6B7280;--t3:#9CA3AF;--ac:#3B5BDB;--acl:#EBF0FF;--suc:#10B981;--sucL:#ECFDF5;--warn:#F59E0B;--warnL:#FFFBEB;--dan:#EF4444;--danL:#FEF2F2;--pur:#8B5CF6;--purL:#F5F3FF;--r:10px;--rl:14px;--sh:0 1px 3px rgba(0,0,0,.06);--shL:0 10px 25px rgba(0,0,0,.06);--tr:150ms cubic-bezier(.4,0,.2,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:var(--t1);font-size:14px;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sb{width:220px;background:var(--bg);border-right:1px solid var(--bdl);display:flex;flex-direction:column;flex-shrink:0}
+.sb-logo{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdl)}
+.sb-logo-i{width:26px;height:26px;background:var(--ac);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px}
+.sb-logo-t{font-size:14px;font-weight:700}
+.sb-sec{padding:6px 10px;border-top:1px solid var(--bdl)}
+.sb-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:6px 8px 2px}
+.sb-i{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:450;color:var(--t2);transition:all var(--tr)}
+.sb-i:hover{background:var(--bgH);color:var(--t1)}
+.sb-i.act{background:var(--acl);color:var(--ac);font-weight:600}
+.sb-ic{width:16px;text-align:center;font-size:13px;flex-shrink:0}
+.sb-sub{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 30px;font-size:12.5px;color:var(--t3);border-radius:5px;cursor:pointer;transition:all var(--tr)}
+.sb-sub:hover{background:var(--bgH);color:var(--t2)}
+.sb-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.sb-bt{margin-top:auto;padding:10px;border-top:1px solid var(--bdl)}
+.sb-u{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer}
+.sb-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600}
+
+/* Main */
+.main{flex:1;overflow-y:auto;background:var(--bg2);padding:24px 36px}
+
+/* Top bar */
+.top-bar{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.week-nav{display:flex;align-items:center;gap:8px}
+.week-nav button{width:28px;height:28px;border-radius:7px;border:1px solid var(--bd);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--t2);transition:all var(--tr)}
+.week-nav button:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
+.week-label{font-size:15px;font-weight:600;color:var(--t1);min-width:180px}
+.gen-info{font-size:11px;color:var(--t3);margin-left:auto;display:flex;align-items:center;gap:6px}
+.gen-time{font-size:11px;color:var(--t3)}
+.btn-sm{padding:5px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr)}
+.btn-sm:hover{background:var(--acl);border-color:var(--ac);color:var(--ac)}
+.export-bar{display:flex;gap:4px;margin-left:16px}
+
+/* Report sections */
+.report-section{margin-bottom:22px}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bdl)}
+.section-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.section-title{font-size:15px;font-weight:700;color:var(--t1)}
+.section-count{font-size:11px;font-weight:600;padding:1px 7px;border-radius:8px;background:var(--bg3);color:var(--t3)}
+.edit-toggle{margin-left:auto;font-size:11px;font-weight:600;color:var(--ac);cursor:pointer;padding:3px 10px;border-radius:6px;border:1px solid var(--ac);background:transparent;transition:all var(--tr)}
+.edit-toggle:hover{background:var(--ac);color:#fff}
+
+/* Report item row */
+.report-item{display:flex;align-items:flex-start;gap:14px;padding:10px 0;border-bottom:1px solid var(--bdl)}
+.report-item:last-child{border-bottom:none}
+.ri-bullet{width:6px;height:6px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.ri-content{flex:1}
+.ri-name{font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:3px}
+.ri-meta{display:flex;gap:8px;margin-bottom:4px}
+.ri-mod-tag{font-size:10px;font-weight:500;padding:1px 7px;border-radius:8px;display:inline-flex;align-items:center;gap:3px}
+.ri-mod-dot{width:4px;height:4px;border-radius:50%}
+.ri-detail{font-size:12.5px;color:var(--t2);line-height:1.7}
+.ri-risk{font-size:11.5px;color:var(--dan);font-weight:500;margin-top:2px}
+.ri-next{font-size:12px;color:var(--t3);margin-top:2px;line-height:1.5}
+
+/* KPI row for daily ops */
+.kpi-row{display:flex;gap:10px;margin:6px 0}
+.kpi-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2)}
+.kpi-val{font-weight:700;color:var(--t1)}
+.kpi-change{font-size:10px;font-weight:600;padding:0 4px;border-radius:6px}
+.kpi-up{background:var(--sucL);color:var(--suc)}
+.kpi-down{background:var(--danL);color:var(--dan)}
+
+/* Anno panel */
+.anno{position:fixed;right:20px;top:20px;width:260px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rl);box-shadow:var(--shL);padding:16px;font-size:12px;z-index:100}
+.anno h4{font-size:11px;font-weight:700;color:var(--ac);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em}
+.anno-i{display:flex;gap:8px;margin-bottom:6px;line-height:1.5}
+.anno-n{width:16px;height:16px;background:var(--ac);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.anno-t{color:var(--t2)}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="sb">
+  <div class="sb-logo"><div class="sb-logo-i">A</div><div class="sb-logo-t">AOP</div></div>
+  <div class="sb-sec"><div class="sb-lbl">工作</div>
+    <div class="sb-i"><div class="sb-ic">🏠</div> 我的工作</div>
+    <div class="sb-i"><div class="sb-ic">📋</div> 行政总览</div>
+    <div class="sb-i"><div class="sb-ic">⭐</div> 重点专项</div>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">管理</div>
+    <div class="sb-i"><div class="sb-ic">📊</div> 运营看板</div>
+    <div class="sb-i"><div class="sb-ic">👥</div> 周会视图</div>
+    <div class="sb-i act"><div class="sb-ic">📝</div> 周报</div>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">分析</div>
+    <div class="sb-i"><div class="sb-ic">📈</div> 数据驾驶舱</div>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">业务模块</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#3B5BDB"></div> 职场运营</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#10B981"></div> 文化运营</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#06B6D4"></div> 数字化运营</div>
+  </div>
+  <div class="sb-bt"><div class="sb-u"><div class="sb-av">高</div><div><div style="font-size:12px;font-weight:600">高琳</div><div style="font-size:10px;color:var(--t3)">主管</div></div></div></div>
+</div>
+
+<div class="main">
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div style="font-size:20px;font-weight:700;margin-right:12px">📝 周报</div>
+    <div class="week-nav">
+      <button>←</button>
+      <span class="week-label">第27周 · 6月30日-7月4日</span>
+      <button>→</button>
+    </div>
+    <div class="gen-info">
+      <span class="gen-time">自动生成于 7月4日 18:00</span>
+      <button class="btn-sm">🔄 重新生成</button>
+    </div>
+    <div class="export-bar">
+      <button class="btn-sm">📄 PDF</button>
+      <button class="btn-sm">📝 Word</button>
+      <button class="btn-sm">📊 Excel</button>
+    </div>
+  </div>
+
+  <!-- Section 1: 本周重点完成 -->
+  <div class="report-section">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--sucL)">✅</div>
+      <div class="section-title">本周重点完成</div>
+      <span class="section-count">3</span>
+      <button class="edit-toggle">编辑</button>
+    </div>
+    <div class="report-item">
+      <div class="ri-bullet" style="background:var(--suc)"></div>
+      <div class="ri-content">
+        <div class="ri-name">下午茶供应商月度结算</div>
+        <div class="ri-meta">
+          <span class="ri-mod-tag" style="background:#FFFBEB;color:#F59E0B"><span class="ri-mod-dot" style="background:#F59E0B"></span>员工福利</span>
+        </div>
+        <div class="ri-detail">6月下午茶费用已结算完毕，总计¥28,500，与供应商账单核对无误。</div>
+      </div>
+    </div>
+    <div class="report-item">
+      <div class="ri-bullet" style="background:var(--suc)"></div>
+      <div class="ri-content">
+        <div class="ri-name">武汉职场6月消防演练</div>
+        <div class="ri-meta">
+          <span class="ri-mod-tag" style="background:#F5F3FF;color:#8B5CF6"><span class="ri-mod-dot" style="background:#8B5CF6"></span>武汉职场</span>
+        </div>
+        <div class="ri-detail">完成全员消防演练，参演率95%，演练报告已提交。</div>
+      </div>
+    </div>
+    <div class="report-item">
+      <div class="ri-bullet" style="background:var(--suc)"></div>
+      <div class="ri-content">
+        <div class="ri-name">异地职场6月巡检报告</div>
+        <div class="ri-meta">
+          <span class="ri-mod-tag" style="background:#FDF2F8;color:#EC4899"><span class="ri-mod-dot" style="background:#EC4899"></span>异地职场</span>
+        </div>
+        <div class="ri-detail">完成成都、深圳办公室6月巡检，发现问题4项，3项已整改，1项跟进中。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: 专项项目进展 -->
+  <div class="report-section">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--acl)">⭐</div>
+      <div class="section-title">专项项目进展</div>
+      <span class="section-count">4</span>
+      <button class="edit-toggle">编辑</button>
+    </div>
+    <div class="report-item">
+      <div class="ri-bullet" style="background:var(--ac)"></div>
+      <div class="ri-content">
+        <div class="ri-name">北京办公室5层装修项目</div>
+        <div class="ri-meta">
+          <span class="ri-mod-tag" style="background:#EBF0FF;color:#3B5BDB"><span class="ri-mod-dot" style="background:#3B5BDB"></span>北京职场</span>
+          <span style="font-size:11px;font-weight:600;color:var(--ac)">70%</span>
+        </div>
+        <div class="ri-detail">本周完成3层隔断墙施工，4层电路改造验收通过。空调设备到货延迟，已联系备选供应商。</div>
+        <div class="ri-risk">⚠️ 风险：空调设备交期延迟2周，可能影响7月验收节点</div>
+        <div class="ri-next">下周：完成5层地面铺设 + 推进空调安装 + 启动备选供应商评估</div>
+      </div>
+    </div>
+    <div class="report-item">
+      <div class="ri-bullet" style="background:var(--ac)"></div>
+      <div class="ri-content">
+        <div class="ri-name">家庭日活动策划与执行</div>
+        <div class="ri-meta">
+          <span class="ri-mod-tag" style="background:#ECFDF5;color:#10B981"><span class="ri-mod-dot" style="background:#10B981"></span>活动运营</span>
+          <span style="font-size:11px;font-weight:600;color:var(--ac)">40%</span>
+        </div>
+        <div class="ri-detail">场地已确认，活动方案初稿完成，正在收集各部门参与人数。</div>
+        <div class="ri-next">下周：确定活动流程 + 启动物资采购 + 发送全员通知</div>
+      </div>
+    </div>
+    <div class="report-item">
+      <div class="ri-bullet" style="background:var(--pur)"></div>
+      <div class="ri-content">
+        <div class="ri-name">行政服务台系统升级2.0</div>
+        <div class="ri-meta">
+          <span class="ri-mod-tag" style="background:#ECFEFF;color:#06B6D4"><span class="ri-mod-dot" style="background:#06B6D4"></span>行政服务台</span>
+          <span style="font-size:11px;font-weight:600;color:var(--pur)">25%</span>
+        </div>
+        <div class="ri-detail">需求文档完成评审，进入技术方案设计阶段。</div>
+        <div class="ri-next">下周：技术方案评审 + 原型设计启动</div>
+      </div>
+    </div>
+    <div class="report-item">
+      <div class="ri-bullet" style="background:var(--warn)"></div>
+      <div class="ri-content">
+        <div class="ri-name">六一儿童节福利发放</div>
+        <div class="ri-meta">
+          <span class="ri-mod-tag" style="background:#FFFBEB;color:#F59E0B"><span class="ri-mod-dot" style="background:#F59E0B"></span>员工福利</span>
+          <span style="font-size:11px;font-weight:600;color:var(--warn)">90%</span>
+        </div>
+        <div class="ri-detail">礼品已到货，北京职场发放完成，武汉/异地职场本周寄出。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: 日常运营数据 -->
+  <div class="report-section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#ECFDF5">🔄</div>
+      <div class="section-title">日常运营数据</div>
+      <span class="section-count">3</span>
+      <button class="edit-toggle">编辑</button>
+    </div>
+    <div class="report-item">
+      <div class="ri-bullet" style="background:var(--ac)"></div>
+      <div class="ri-content">
+        <div class="ri-name">行政服务台工单处理</div>
+        <div class="ri-meta">
+          <span class="ri-mod-tag" style="background:#ECFEFF;color:#06B6D4"><span class="ri-mod-dot" style="background:#06B6D4"></span>行政服务台</span>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-item"><span class="kpi-val">47</span> 工单 <span class="kpi-change kpi-up">↑12%</span></div>
+          <div class="kpi-item"><span class="kpi-val">43</span> 关闭 <span class="kpi-change kpi-up">↑8%</span></div>
+          <div class="kpi-item"><span class="kpi-val">4.2h</span> 响应 <span class="kpi-change kpi-down">↓15%</span></div>
+          <div class="kpi-item"><span class="kpi-val">4.6</span> 满意度 <span class="kpi-change kpi-up">↑0.2</span></div>
+        </div>
+        <div class="ri-detail">⚠️ 空调维修工单激增12件（环比+200%），主要集中在北京5层。</div>
+      </div>
+    </div>
+    <div class="report-item">
+      <div class="ri-bullet" style="background:var(--suc)"></div>
+      <div class="ri-content">
+        <div class="ri-name">北京职场日常保洁巡检</div>
+        <div class="ri-meta">
+          <span class="ri-mod-tag" style="background:#EBF0FF;color:#3B5BDB"><span class="ri-mod-dot" style="background:#3B5BDB"></span>北京职场</span>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-item"><span class="kpi-val">98%</span> 合格率</div>
+          <div class="kpi-item"><span class="kpi-val">2</span> 问题项（已整改）</div>
+        </div>
+      </div>
+    </div>
+    <div class="report-item">
+      <div class="ri-bullet" style="background:var(--ac)"></div>
+      <div class="ri-content">
+        <div class="ri-name">数字化后台运营数据</div>
+        <div class="ri-meta">
+          <span class="ri-mod-tag" style="background:#EEF2FF;color:#6366F1"><span class="ri-mod-dot" style="background:#6366F1"></span>数字化后台运营</span>
+        </div>
+        <div class="kpi-row">
+          <div class="kpi-item"><span class="kpi-val">1,280</span> 活跃用户 <span class="kpi-change kpi-up">↑5%</span></div>
+          <div class="kpi-item"><span class="kpi-val">89%</span> 日活率</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: 延期与风险 -->
+  <div class="report-section">
+    <div class="section-header">
+      <div class="section-icon" style="background:var(--danL)">⚠️</div>
+      <div class="section-title" style="color:var(--dan)">延期与风险</div>
+      <span class="section-count" style="background:var(--danL);color:var(--dan)">2</span>
+      <button class="edit-toggle">编辑</button>
+    </div>
+    <div class="report-item">
+      <div class="ri-bullet" style="background:var(--dan)"></div>
+      <div class="ri-content">
+        <div class="ri-name">5层装修 · 空调设备延迟</div>
+        <div class="ri-detail">原定6月20日到货，现延迟至7月5日。影响7月中旬验收节点。备选供应商已启动评估。</div>
+      </div>
+    </div>
+    <div class="report-item">
+      <div class="ri-bullet" style="background:var(--warn)"></div>
+      <div class="ri-content">
+        <div class="ri-name">供应商合同续签</div>
+        <div class="ri-detail">保洁供应商合同6月30日到期，续签审批流程延迟。已申请加急处理。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 5: 下周重点 -->
+  <div class="report-section">
+    <div class="section-header">
+      <div class="section-icon" style="background:#EEF2FF">🎯</div>
+      <div class="section-title">下周重点</div>
+      <button class="edit-toggle">编辑</button>
+    </div>
+    <div style="padding:10px 14px;background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);font-size:13px;color:var(--t2);line-height:1.8">
+      <div>1. <strong>装修项目</strong>：完成5层地面铺设 + 推进空调安装 + 启动备选供应商评估</div>
+      <div>2. <strong>家庭日活动</strong>：确定活动流程 + 启动物资采购 + 发送全员通知</div>
+      <div>3. <strong>系统升级2.0</strong>：技术方案评审 + 原型设计启动</div>
+      <div>4. <strong>儿童节福利</strong>：武汉/异地职场礼品寄出并确认签收</div>
+      <div>5. <strong>服务台</strong>：处理空调维修工单积压 + 推进预防性维保计划</div>
+      <div>6. <strong>供应商续签</strong>：跟进续签审批进度</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Annotation -->
+<div class="anno">
+  <h4>📋 周报说明</h4>
+  <div class="anno-i"><div class="anno-n">1</div><div class="anno-t">自动从 Work Item 汇总生成，无需员工填写</div></div>
+  <div class="anno-i"><div class="anno-n">2</div><div class="anno-t">5 个板块：完成/专项/运营/风险/下周</div></div>
+  <div class="anno-i"><div class="anno-n">3</div><div class="anno-t">每周四 18:00 自动生成</div></div>
+  <div class="anno-i"><div class="anno-n">4</div><div class="anno-t">支持重新生成（AI重写摘要）</div></div>
+  <div class="anno-i"><div class="anno-n">5</div><div class="anno-t">所有内容支持手动编辑修改</div></div>
+  <div class="anno-i"><div class="anno-n">6</div><div class="anno-t">可导出 PDF / Word / Excel 三种格式</div></div>
+  <div class="anno-i"><div class="anno-n">7</div><div class="anno-t">日常运营数据展示 KPI 指标和变化趋势</div></div>
+  <div class="anno-i"><div class="anno-n">8</div><div class="anno-t">风险板块红色高亮，突出需关注事项</div></div>
+</div>
+
+</div>
+</body>
+</html>
