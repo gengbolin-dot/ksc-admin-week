@@ -20,7 +20,7 @@ metadata:
 
 1. **Single Source of Truth** — 所有页面数据均来源于 Work Item，员工不填写周报，只更新事项
 2. **Minimal Input, Max Output** — 员工每周唯一动作：更新自己负责的事项
-3. **Push Over Pull** — 系统主动推送待更新事项（已移除独立更新中心，改为「我的工作」页内提醒）
+3. **Push Over Pull** — 「我的工作」页主动提醒待更新事项，无需员工自行寻找
 4. **Type-Driven Templates** — 专项和日常运营使用不同编辑/展示模板
 5. **Role-Based Views** — 不同角色看到不同视图，数据来源一致
 6. **Linear-Style Aesthetics** — 极简、现代、高信息密度、白色背景、蓝色主色
