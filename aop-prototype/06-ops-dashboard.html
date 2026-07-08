@@ -86,6 +86,7 @@
   }
   .sidebar-section { padding: 6px 10px; border-top: 1px solid var(--border-light); }
   .sidebar-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); padding: 6px 8px 2px; }
+  .sidebar-group { font-size: 10px; font-weight: 600; color: var(--text-tertiary); padding: 4px 10px 0; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 6px; }
   .sidebar-item {
     display: flex; align-items: center; gap: 9px; padding: 6px 10px;
     border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 450;
@@ -725,24 +726,24 @@
     <div class="sidebar-workspace">▼ 行政部</div>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">工作</div>
+      <div class="sidebar-label">个人</div>
       <div class="sidebar-item">
         <div class="sidebar-icon">🏠</div> 我的工作
         <div class="sidebar-badge warn">3</div>
       </div>
+      <a class="sidebar-item" href="./10-okr.html">
+        <div class="sidebar-icon">🎯</div> OKR <span style="font-size:10px;color:var(--text-tertiary);margin-left:2px">手动导入</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">管理</div>
       <div class="sidebar-item">
         <div class="sidebar-icon">📋</div> 行政总览
       </div>
       <div class="sidebar-item">
         <div class="sidebar-icon">⭐</div> 重点专项
       </div>
-      <div class="sidebar-item">
-        <div class="sidebar-icon">🎯</div> OKR <span style="font-size:10px;color:var(--text-tertiary);margin-left:2px">手动导入</span>
-      </div>
-    </div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-label">管理</div>
       <div class="sidebar-item active">
         <div class="sidebar-icon">📊</div> 运营看板
       </div>
@@ -763,14 +764,16 @@
 
     <div class="sidebar-section">
       <div class="sidebar-label">业务模块</div>
-      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#3B5BDB;"></div> 职场运营(北京)</div>
-      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#8B5CF6;"></div> 职场运营(武汉)</div>
-      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#EC4899;"></div> 职场运营(异地)</div>
-      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#F97316;"></div> 职场运营(深圳)</div>
-      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#10B981;"></div> 文化运营(活动)</div>
-      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#F59E0B;"></div> 文化运营(福利)</div>
-      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#06B6D4;"></div> 数字化运营(行政服务台)</div>
-      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#6366F1;"></div> 数字化运营(后台)</div>
+      <div class="sidebar-group">职场运营</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#3B5BDB;"></div> 北京职场</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#8B5CF6;"></div> 武汉职场</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#EC4899;"></div> 异地职场</div>
+      <div class="sidebar-group">文化运营</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#10B981;"></div> 活动运营</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#F59E0B;"></div> 员工福利</div>
+      <div class="sidebar-group">数字化运营</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#06B6D4;"></div> 行政服务台</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#6366F1;"></div> 数字化后台运营</div>
     </div>
 
     <div class="sidebar-bottom">
@@ -778,7 +781,7 @@
         <div class="sidebar-avatar">耿</div>
         <div>
           <div class="sidebar-username">耿博琳</div>
-          <div class="sidebar-userrole">大行政负责人</div>
+          <div class="sidebar-userrole">职场管理(北京+异地)、行政数字化、文化运营</div>
         </div>
       </div>
     </div>
@@ -810,7 +813,7 @@
         <div class="stat-card total">
           <div class="stat-num">40</div>
           <div class="stat-label">总事项</div>
-          <div class="stat-trend neutral">9 人团队</div>
+          <div class="stat-trend neutral">10 人团队</div>
         </div>
         <div class="stat-card progress">
           <div class="stat-num">28</div>
@@ -917,7 +920,7 @@
           <div class="card">
             <div class="card-header">
               <div class="card-title">负责人工作量排行</div>
-              <div class="card-badge accent">TOP 9</div>
+              <div class="card-badge accent">TOP 10</div>
             </div>
             <div class="rank-list">
               <div class="rank-item">
@@ -925,71 +928,79 @@
                 <div class="rank-avatar" style="background:linear-gradient(135deg,#3B5BDB,#6366F1);">张</div>
                 <div class="rank-name">张灵玉</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:60%;background:var(--accent);">6</div>
+                  <div class="rank-bar-fill" style="width:100%;background:var(--accent);">8</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos top">2</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA);">董</div>
-                <div class="rank-name">董诗昀</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#3B5BDB,#818CF8);">耿</div>
+                <div class="rank-name">耿博琳</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:70%;background:var(--accent);">7</div>
+                  <div class="rank-bar-fill" style="width:87.5%;background:var(--accent);">7</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos top">3</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#EC4899,#F472B6);">傅</div>
-                <div class="rank-name">傅中南</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#6366F1,#818CF8);">程</div>
+                <div class="rank-name">程宇亮</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:70%;background:var(--accent);">7</div>
+                  <div class="rank-bar-fill" style="width:75%;background:var(--accent);">6</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos">4</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#F97316,#FB923C);">胡</div>
-                <div class="rank-name">胡丽婷</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA);">傅</div>
+                <div class="rank-name">傅中南</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:60%;background:var(--purple);">6</div>
+                  <div class="rank-bar-fill" style="width:75%;background:var(--purple);">6</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos">5</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#10B981,#34D399);">聂</div>
-                <div class="rank-name">聂茜茜</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#8B5CF6,#C4B5FD);">高</div>
+                <div class="rank-name">高琳</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:40%;background:var(--purple);">4</div>
+                  <div class="rank-bar-fill" style="width:62.5%;background:var(--purple);">5</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos">6</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#6366F1,#818CF8);">丁</div>
-                <div class="rank-name">丁玉萍</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#A78BFA,#C4B5FD);">董</div>
+                <div class="rank-name">董诗昀</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:60%;background:var(--warning);">6</div>
+                  <div class="rank-bar-fill" style="width:62.5%;background:var(--purple);">5</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos">7</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#F59E0B,#FBBF24);">高</div>
-                <div class="rank-name">高琳</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#F59E0B,#FBBF24);">聂</div>
+                <div class="rank-name">聂茜茜</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:60%;background:var(--warning);">6</div>
+                  <div class="rank-bar-fill" style="width:50%;background:var(--warning);">4</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos">8</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#8B5CF6,#C4B5FD);">程</div>
-                <div class="rank-name">程宇亮</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#F59E0B,#FDE68A);">丁</div>
+                <div class="rank-name">丁玉萍</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:50%;background:var(--warning);">5</div>
+                  <div class="rank-bar-fill" style="width:50%;background:var(--warning);">4</div>
                 </div>
               </div>
               <div class="rank-item">
                 <div class="rank-pos">9</div>
-                <div class="rank-avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);">耿</div>
-                <div class="rank-name">耿博琳</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#FBBF24,#FDE68A);">胡</div>
+                <div class="rank-name">胡丽婷</div>
                 <div class="rank-bar-track">
-                  <div class="rank-bar-fill" style="width:0%;background:var(--text-tertiary);min-width:30px;">0</div>
+                  <div class="rank-bar-fill" style="width:37.5%;background:var(--warning);">3</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos">10</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#F59E0B,#FCD34D);">王</div>
+                <div class="rank-name">王琳琳</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:25%;background:var(--warning);">2</div>
                 </div>
               </div>
             </div>
@@ -1070,26 +1081,26 @@
                 <div class="update-time">1小时前</div>
               </div>
               <div class="update-item">
-                <div class="update-avatar" style="background:#6366F1;">丁</div>
+                <div class="update-avatar" style="background:#6366F1;">傅</div>
                 <div class="update-content">
-                  <div class="update-name">协议酒店签约</div>
-                  <div class="update-action">丁玉萍更新：单体签约覆盖5城19家，已全部托管上线</div>
+                  <div class="update-name">兰州办公室租赁</div>
+                  <div class="update-action">傅中南更新：租赁合同商务条款沟通中，8月1日起租前需确定装修方案</div>
                 </div>
                 <div class="update-time">2小时前</div>
+              </div>
+              <div class="update-item">
+                <div class="update-avatar" style="background:#F59E0B;">高</div>
+                <div class="update-content">
+                  <div class="update-name">行政服务台工单处理</div>
+                  <div class="update-action">高琳更新：本周处理工单32件，完结率95%，剩余2件跟进中</div>
+                </div>
+                <div class="update-time">3小时前</div>
               </div>
               <div class="update-item">
                 <div class="update-avatar" style="background:#F97316;">胡</div>
                 <div class="update-content">
                   <div class="update-name">深圳续租保证金</div>
                   <div class="update-action">胡丽婷标记完成：租赁保证金差额75456已退回公司</div>
-                </div>
-                <div class="update-time">3小时前</div>
-              </div>
-              <div class="update-item">
-                <div class="update-avatar" style="background:#10B981;">聂</div>
-                <div class="update-content">
-                  <div class="update-name">Q2生日会(minions party)</div>
-                  <div class="update-action">聂茜茜更新：方案策划基本完成，礼品选品下单，覆盖87%以上寿星</div>
                 </div>
                 <div class="update-time">昨天 18:30</div>
               </div>
@@ -1174,7 +1185,7 @@
     </div>
     <div class="anno-item">
       <div class="anno-num">4</div>
-      <div class="anno-text">负责人工作量排行：水平条形图，前3名使用主题蓝色，4-6名使用紫色递减，7-9名使用黄色</div>
+      <div class="anno-text">负责人工作量排行：水平条形图，前3名使用主题蓝色，4-6名使用紫色递减，7-10名使用黄色</div>
     </div>
     <div class="anno-item">
       <div class="anno-num">5</div>

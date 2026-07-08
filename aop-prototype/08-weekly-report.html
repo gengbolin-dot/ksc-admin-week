@@ -25,6 +25,7 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
 .sb-sub{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 30px;font-size:12.5px;color:var(--t3);border-radius:5px;cursor:pointer;transition:all var(--tr)}
 .sb-sub:hover{background:var(--bgH);color:var(--t2)}
 .sb-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.sb-grp{font-size:10px;font-weight:600;color:var(--t3);padding:4px 10px 0;text-transform:uppercase;letter-spacing:.05em;margin-top:6px}
 .sb-bt{margin-top:auto;padding:10px;border-top:1px solid var(--bdl)}
 .sb-u{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer}
 .sb-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600}
@@ -87,13 +88,13 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
 
 <div class="sb">
   <div class="sb-logo"><div class="sb-logo-i">A</div><div style="display:flex;flex-direction:column"><div style="display:flex;align-items:center;gap:6px"><div class="sb-logo-t">AOP</div><div class="sb-logo-badge">Beta</div></div><div style="font-size:9px;font-weight:500;color:var(--t3);letter-spacing:0.06em;white-space:nowrap;margin-top:1px">行政运营管理平台</div></div></div>
-  <div class="sb-sec"><div class="sb-lbl">工作</div>
+  <div class="sb-sec"><div class="sb-lbl">个人</div>
     <div class="sb-i"><div class="sb-ic">🏠</div> 我的工作</div>
-    <div class="sb-i"><div class="sb-ic">📋</div> 行政总览</div>
-    <div class="sb-i"><div class="sb-ic">⭐</div> 重点专项</div>
-    <div class="sb-i"><div class="sb-ic">🎯</div> OKR <span style="font-size:10px;color:var(--t3);margin-left:2px">手动导入</span></div>
+    <a class="sb-i" href="./10-okr.html"><div class="sb-ic">🎯</div> OKR <span style="font-size:10px;color:var(--t3);margin-left:2px">手动导入</span></a>
   </div>
   <div class="sb-sec"><div class="sb-lbl">管理</div>
+    <div class="sb-i"><div class="sb-ic">📋</div> 行政总览</div>
+    <div class="sb-i"><div class="sb-ic">⭐</div> 重点专项</div>
     <div class="sb-i"><div class="sb-ic">📊</div> 运营看板</div>
     <div class="sb-i"><div class="sb-ic">👥</div> 周会视图</div>
     <div class="sb-i act"><div class="sb-ic">📝</div> 周报</div>
@@ -102,16 +103,18 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
     <div class="sb-i"><div class="sb-ic">📈</div> 数据驾驶舱</div>
   </div>
   <div class="sb-sec"><div class="sb-lbl">业务模块</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#3B5BDB"></div> 职场运营(北京)</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#8B5CF6"></div> 职场运营(武汉)</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#EC4899"></div> 职场运营(异地)</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#F97316"></div> 职场运营(深圳)</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#10B981"></div> 文化运营(活动)</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#F59E0B"></div> 文化运营(福利)</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#06B6D4"></div> 数字化运营(行政服务台)</div>
-    <div class="sb-sub"><div class="sb-dot" style="background:#6366F1"></div> 数字化运营(后台)</div>
-  </div>
-  <div class="sb-bt"><div class="sb-u"><div class="sb-av">耿</div><div><div style="font-size:12px;font-weight:600">耿博琳</div><div style="font-size:10px;color:var(--t3)">大行政负责人</div></div></div></div>
+  <div class="sb-grp">职场运营</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#3B5BDB"></div> 北京职场</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#8B5CF6"></div> 武汉职场</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#EC4899"></div> 异地职场</div>
+  <div class="sb-grp">文化运营</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#10B981"></div> 活动运营</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#F59E0B"></div> 员工福利</div>
+  <div class="sb-grp">数字化运营</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#06B6D4"></div> 行政服务台</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#6366F1"></div> 数字化后台运营</div>
+</div>
+  <div class="sb-bt"><div class="sb-u"><div class="sb-av">耿</div><div><div style="font-size:12px;font-weight:600">耿博琳</div><div style="font-size:10px;color:var(--t3)">职场管理(北京+异地)、行政数字化、文化运营</div></div></div></div>
 </div>
 
 <div class="main">
@@ -121,17 +124,40 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
     <div style="font-size:20px;font-weight:700;margin-right:12px">📝 周报</div>
     <div class="week-nav">
       <button>←</button>
-      <span class="week-label">第24周 · 6月9日-6月13日</span>
+      <div style="display:flex;flex-direction:column">
+        <span class="week-label">第 7 次周会 · 6月23日 — 7月12日</span>
+        <span style="font-size:11px;color:var(--t3);margin-top:1px">跨 3 个更新周 · 汇报周期</span>
+      </div>
       <button>→</button>
     </div>
     <div class="gen-info">
-      <span class="gen-time">自动生成于 6月13日 18:00</span>
+      <span class="gen-time">自动生成于 7月12日 18:00</span>
       <button class="btn-sm">🔄 重新生成</button>
     </div>
     <div class="export-bar">
       <button class="btn-sm">📄 PDF</button>
       <button class="btn-sm">📝 Word</button>
       <button class="btn-sm">📊 Excel</button>
+    </div>
+  </div>
+
+  <!-- Period scope summary -->
+  <div style="margin-bottom:18px;padding:0;background:var(--acl);border:1px solid rgba(59,91,219,.10);border-radius:var(--r);overflow:hidden">
+    <div style="padding:12px 16px;display:flex;align-items:center;gap:14px;font-size:12px">
+      <div style="display:flex;align-items:center;gap:6px;font-weight:600;color:var(--ac)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        本次汇报覆盖周期
+      </div>
+      <span style="color:var(--t2)">覆盖 <strong style="color:var(--t1)">3 个更新周</strong>（W26 · W27 · W28），汇总全员期间内所有事项更新</span>
+    </div>
+    <div style="padding:6px 16px 12px;display:flex;align-items:center;gap:4px">
+      <div style="width:36px;height:6px;border-radius:3px;background:var(--ac)" title="W26 · 6月23-27日"></div>
+      <div style="width:36px;height:6px;border-radius:3px;background:var(--ac)" title="W27 · 6月30-7月4日"></div>
+      <div style="width:36px;height:6px;border-radius:3px;background:var(--warn)" title="W28 · 7月7-11日（本周）"></div>
+      <div style="width:36px;height:6px;border-radius:3px;background:var(--bdl)" title="W29"></div>
+      <div style="width:36px;height:6px;border-radius:3px;background:var(--bdl)" title="W30"></div>
+      <span style="font-size:9px;color:var(--t3);margin-left:6px">更新周进度</span>
+      <span style="margin-left:auto;font-size:11px;font-weight:600;color:var(--ac);cursor:pointer">编辑覆盖范围 →</span>
     </div>
   </div>
 
@@ -403,14 +429,15 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
 <!-- Annotation -->
 <div class="anno">
   <h4>📋 周报说明</h4>
-  <div class="anno-i"><div class="anno-n">1</div><div class="anno-t">自动从 Work Item 汇总生成，无需员工填写</div></div>
-  <div class="anno-i"><div class="anno-n">2</div><div class="anno-t">5 个板块：完成/专项/运营/协调/下周</div></div>
-  <div class="anno-i"><div class="anno-n">3</div><div class="anno-t">每周四 18:00 自动生成</div></div>
-  <div class="anno-i"><div class="anno-n">4</div><div class="anno-t">支持重新生成（AI重写摘要）</div></div>
-  <div class="anno-i"><div class="anno-n">5</div><div class="anno-t">所有内容支持手动编辑修改</div></div>
-  <div class="anno-i"><div class="anno-n">6</div><div class="anno-t">可导出 PDF / Word / Excel 三种格式</div></div>
-  <div class="anno-i"><div class="anno-n">7</div><div class="anno-t">日常运营数据展示 KPI 指标和变化趋势</div></div>
-  <div class="anno-i"><div class="anno-n">8</div><div class="anno-t">协调板块黄色高亮，突出需关注事项</div></div>
+  <div class="anno-i"><div class="anno-n">1</div><div class="anno-t"><strong>展示 AI 生成的摘要</strong> — 基于全员原始更新自动提炼，不是原始文字</div></div>
+  <div class="anno-i"><div class="anno-n">2</div><div class="anno-t"><strong>工作更新 ≠ 汇报输出</strong> — 两个独立维度，填报按周、汇报按开会节奏</div></div>
+  <div class="anno-i"><div class="anno-n">2</div><div class="anno-t">管理者发起周会时选择<strong>覆盖周期</strong>，系统自动聚合该区间内所有每周更新</div></div>
+  <div class="anno-i"><div class="anno-n">3</div><div class="anno-t">周期越长 → 汇报内容越丰富，不会有信息丢失</div></div>
+  <div class="anno-i"><div class="anno-n">4</div><div class="anno-t">彩色条段标注被覆盖的更新周，<span style="color:var(--warn)">黄色</span>=本周</div></div>
+  <div class="anno-i"><div class="anno-n">5</div><div class="anno-t">「编辑覆盖范围」可调整起止日期</div></div>
+  <div class="anno-i"><div class="anno-n">6</div><div class="anno-t">5 个板块：完成/专项/运营/协调/下周</div></div>
+  <div class="anno-i"><div class="anno-n">7</div><div class="anno-t">支持重新生成（AI重写摘要）+ 手动编辑</div></div>
+  <div class="anno-i"><div class="anno-n">8</div><div class="anno-t"><strong>年度存档</strong> — 历史汇报周期永久保留，按年份可回溯</div></div>
 </div>
 
 </div>
