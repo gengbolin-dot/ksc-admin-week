@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AOP 周会视图</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF;--bg2:#F8F9FB;--bg3:#F1F3F8;--bgH:#EEF0F6;--bd:#E5E7EB;--bdl:#F1F3F8;--t1:#1A1D26;--t2:#6B7280;--t3:#9CA3AF;--ac:#3B5BDB;--acl:#EBF0FF;--suc:#10B981;--sucL:#ECFDF5;--warn:#F59E0B;--warnL:#FFFBEB;--dan:#EF4444;--danL:#FEF2F2;--pur:#8B5CF6;--purL:#F5F3FF;--r:10px;--rl:14px;--sh:0 1px 3px rgba(0,0,0,.06);--shL:0 10px 25px rgba(0,0,0,.06);--tr:150ms cubic-bezier(.4,0,.2,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:var(--t1);font-size:14px;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sb{width:220px;background:var(--bg);border-right:1px solid var(--bdl);display:flex;flex-direction:column;flex-shrink:0}
+.sb-logo{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdl)}
+.sb-logo-i{width:26px;height:26px;background:var(--ac);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px}
+.sb-logo-t{font-size:14px;font-weight:700}
+.sb-sec{padding:6px 10px;border-top:1px solid var(--bdl)}
+.sb-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:6px 8px 2px}
+.sb-i{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:450;color:var(--t2);transition:all var(--tr)}
+.sb-i:hover{background:var(--bgH);color:var(--t1)}
+.sb-i.act{background:var(--acl);color:var(--ac);font-weight:600}
+.sb-ic{width:16px;text-align:center;font-size:13px;flex-shrink:0}
+.sb-bg{font-size:10px;font-weight:600;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;border-radius:8px;margin-left:auto;padding:0 4px;background:var(--warn);color:#fff}
+.sb-sub{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 30px;font-size:12.5px;color:var(--t3);border-radius:5px;cursor:pointer;transition:all var(--tr)}
+.sb-sub:hover{background:var(--bgH);color:var(--t2)}
+.sb-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.sb-grp{font-size:10px;font-weight:600;color:var(--t3);padding:4px 10px 0;text-transform:uppercase;letter-spacing:.05em;margin-top:6px}
+.sb-bt{margin-top:auto;padding:10px;border-top:1px solid var(--bdl)}
+.sb-u{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer}
+.sb-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600}
+
+/* Main area - two panels */
+.main{flex:1;display:flex;overflow:hidden}
+
+/* Left panel - person list */
+.people{width:280px;background:var(--bg);border-right:1px solid var(--bdl);display:flex;flex-direction:column;overflow:hidden}
+.people-head{padding:14px 16px;border-bottom:1px solid var(--bdl);font-size:14px;font-weight:700}
+.people-mode{margin-left:auto;display:flex;gap:4px}
+
+/* Period selector */
+.period-bar{padding:10px 14px;border-bottom:1px solid var(--bdl);background:var(--acl)}
+.period-label{font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.period-label svg{width:12px;height:12px}
+.period-range{font-size:13px;font-weight:600;color:var(--t1)}
+.period-weeks{font-size:11px;color:var(--t3);margin-top:2px}
+.period-nav{display:flex;align-items:center;gap:6px;margin-top:6px}
+.period-nav-btn{width:24px;height:24px;border-radius:5px;border:1px solid var(--bd);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--t2);transition:all var(--tr)}
+.period-nav-btn:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
+.period-new{margin-left:auto;padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--ac);background:var(--bg);color:var(--ac);transition:all var(--tr)}
+.period-new:hover{background:var(--ac);color:#fff}
+
+/* Week coverage dots */
+.week-dots{display:flex;gap:4px;margin-top:6px;align-items:center}
+.week-dot{width:20px;height:6px;border-radius:3px;background:var(--bdl);position:relative}
+.week-dot.covered{background:var(--ac)}
+.week-dot.current{background:var(--warn)}
+.week-dot-label{font-size:9px;color:var(--t3);margin-left:6px}
+
+.mode-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr)}
+.mode-btn.act{background:var(--acl);border-color:var(--ac);color:var(--ac);font-weight:600}
+.people-head-row{display:flex;align-items:center;gap:8px}
+.people-list{flex:1;overflow-y:auto;padding:6px}
+.person{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:all var(--tr);margin-bottom:2px}
+.person:hover{background:var(--bgH)}
+.person.act{background:var(--acl)}
+.person-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;flex-shrink:0}
+.person-info{flex:1;min-width:0}
+.person-name{font-size:13px;font-weight:600;color:var(--t1)}
+.person.act .person-name{color:var(--ac)}
+.person-role{font-size:10px;color:var(--t3);font-weight:500}
+.person-badges{display:flex;gap:4px;margin-left:auto;flex-shrink:0}
+.person-badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px}
+
+/* Submit progress board */
+.submit-board{padding:10px 14px;border-bottom:1px solid var(--bdl);background:var(--acl)}
+.submit-board-title{font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.submit-board-title svg{width:12px;height:12px}
+.submit-board-bar{height:6px;border-radius:3px;background:var(--bdl);margin-bottom:6px;overflow:hidden}
+.submit-board-fill{height:100%;border-radius:3px;background:var(--ac);transition:width var(--tr)}
+.submit-board-count{font-size:11px;font-weight:600;color:var(--t1);margin-bottom:6px}
+.submit-board-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
+.submit-person-status{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 6px;border-radius:5px}
+.submit-person-status.done{color:var(--suc);background:var(--sucL)}
+.submit-person-status.pending{color:#C2410C;background:#FFF7ED}
+.submit-person-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.submit-person-status.done .submit-person-dot{background:var(--suc)}
+.submit-person-status.pending .submit-person-dot{background:#C2410C}
+.remind-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--ac);background:var(--bg);color:var(--ac);transition:all var(--tr)}
+.remind-btn:hover{background:var(--ac);color:#fff}
+.badge-warn{background:var(--warnL);color:var(--warn)}
+.badge-dan{background:var(--danL);color:var(--dan)}
+
+/* Right panel - person items */
+.items{flex:1;overflow-y:auto;background:var(--bg2);padding:20px 24px}
+.items-head{margin-bottom:16px;display:flex;align-items:center;gap:14px}
+.items-head-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:600}
+.items-head-name{font-size:20px;font-weight:700}
+.items-head-sub{font-size:12px;color:var(--t3)}
+
+/* Item card */
+.item-card{background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,.04);cursor:pointer;transition:all var(--tr)}
+.item-card:hover{box-shadow:var(--sh);border-color:var(--bd)}
+.item-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.item-name{font-size:14px;font-weight:700;color:var(--t1);flex:1}
+.item-type{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px}
+.type-p{background:#F3E8FF;color:#8B5CF6}
+.type-o{background:#ECFDF5;color:#059669}
+.item-tags{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.mod-tag{font-size:10px;font-weight:500;padding:1px 7px;border-radius:8px;display:inline-flex;align-items:center;gap:3px}
+.mod-dot{width:4px;height:4px;border-radius:50%}
+.st-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:3px}
+.st-dot{width:5px;height:5px;border-radius:50%}
+.item-progress{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.prog-ring{width:32px;height:32px;flex-shrink:0;position:relative}
+.prog-ring svg{transform:rotate(-90deg)}
+.prog-ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--ac)}
+.item-update{font-size:12.5px;color:var(--t2);line-height:1.6;margin-bottom:6px}
+.item-risk{font-size:11.5px;color:var(--dan);font-weight:500;display:flex;align-items:center;gap:4px;margin-bottom:4px}
+.item-next{font-size:12px;color:var(--t3);line-height:1.5}
+.item-expand{font-size:11px;color:var(--ac);cursor:pointer;font-weight:500;margin-top:4px}
+
+/* PPT Mode overlay */
+.ppt-overlay{position:fixed;inset:0;background:var(--bg);z-index:200;display:none;flex-direction:column;padding:40px 60px}
+.ppt-overlay.show{display:flex}
+.ppt-head{display:flex;align-items:center;gap:14px;margin-bottom:30px}
+.ppt-av{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:600}
+.ppt-name{font-size:28px;font-weight:700}
+.ppt-sub{font-size:14px;color:var(--t3)}
+.ppt-items{flex:1;overflow-y:auto}
+.ppt-card{background:var(--bg2);border:1px solid var(--bdl);border-radius:12px;padding:20px 24px;margin-bottom:14px}
+.ppt-card-name{font-size:20px;font-weight:700;margin-bottom:8px}
+.ppt-card-status{font-size:13px;font-weight:600;padding:4px 12px;border-radius:12px;display:inline-flex;align-items:center;gap:5px;margin-bottom:10px}
+.ppt-card-update{font-size:16px;color:var(--t2);line-height:1.7;margin-bottom:8px}
+.ppt-card-risk{font-size:14px;color:var(--dan);font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.ppt-card-next{font-size:14px;color:var(--t3);line-height:1.6}
+.ppt-nav{padding:16px 0;display:flex;align-items:center;justify-content:center;gap:20px;font-size:15px;color:var(--t3)}
+.ppt-nav-btn{padding:8px 18px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr)}
+.ppt-nav-btn:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
+.ppt-close{position:absolute;top:20px;right:24px;font-size:20px;cursor:pointer;color:var(--t2);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background var(--tr)}
+.ppt-close:hover{background:var(--bgH)}
+
+/* Annotation */
+.anno{position:fixed;right:20px;top:20px;width:260px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rl);box-shadow:var(--shL);padding:16px;font-size:12px;z-index:100}
+.anno h4{font-size:11px;font-weight:700;color:var(--ac);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em}
+.anno-i{display:flex;gap:8px;margin-bottom:6px;line-height:1.5}
+.anno-n{width:16px;height:16px;background:var(--ac);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.anno-t{color:var(--t2)}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Sidebar -->
+<div class="sb">
+  <div class="sb-logo"><div class="sb-logo-i">A</div><div style="display:flex;flex-direction:column"><div style="display:flex;align-items:center;gap:6px"><div class="sb-logo-t">AOP</div><div class="sb-logo-badge">Beta</div></div><div style="font-size:9px;font-weight:500;color:var(--t3);letter-spacing:0.06em;white-space:nowrap;margin-top:1px">行政运营管理平台</div></div></div>
+  <div class="sb-sec"><div class="sb-lbl">个人</div>
+    <div class="sb-i"><div class="sb-ic">🏠</div> 我的工作</div>
+    <a class="sb-i" href="./10-okr.html"><div class="sb-ic">🎯</div> OKR <span style="font-size:10px;color:var(--t3);margin-left:2px">手动导入</span></a>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">管理</div>
+    <div class="sb-i"><div class="sb-ic">📋</div> 行政总览</div>
+    <div class="sb-i"><div class="sb-ic">⭐</div> 重点专项</div>
+    <div class="sb-i"><div class="sb-ic">📊</div> 运营看板</div>
+    <div class="sb-i act"><div class="sb-ic">👥</div> 周会视图</div>
+    <div class="sb-i"><div class="sb-ic">📝</div> 周报</div>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">分析</div>
+    <div class="sb-i"><div class="sb-ic">📈</div> 数据驾驶舱</div>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">业务模块</div>
+  <div class="sb-grp">职场运营</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#3B5BDB"></div> 北京职场</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#8B5CF6"></div> 武汉职场</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#EC4899"></div> 异地职场</div>
+  <div class="sb-grp">文化运营</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#10B981"></div> 活动运营</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#F59E0B"></div> 员工福利</div>
+  <div class="sb-grp">数字化运营</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#06B6D4"></div> 行政服务台</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#6366F1"></div> 数字化后台运营</div>
+</div>
+  <div class="sb-bt"><div class="sb-u"><div class="sb-av">耿</div><div><div style="font-size:12px;font-weight:600">耿博琳</div><div style="font-size:10px;color:var(--t3)">职场管理(北京+异地)、行政数字化、文化运营</div></div></div></div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- People list -->
+  <div class="people">
+    <div class="people-head">
+      <div class="people-head-row">
+        <span>👥 周会汇报</span>
+        <div class="people-mode">
+          <div class="mode-btn" onclick="showPPT()">📑 PPT</div>
+          <div class="mode-btn" onclick="showPresent()">📺 投屏</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Period selector: manager sets coverage range -->
+    <div class="period-bar">
+      <div class="period-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        本次汇报覆盖周期
+      </div>
+      <div class="period-range">6月23日 — 7月12日</div>
+      <div class="period-weeks">覆盖 W26 · W27 · W28 共 3 个更新周</div>
+      <div class="week-dots">
+        <div class="week-dot covered" title="W26 · 6月23-27日"></div>
+        <div class="week-dot covered" title="W27 · 6月30-7月4日"></div>
+        <div class="week-dot current" title="W28 · 7月7-11日（本周）"></div>
+        <div class="week-dot" title="W29 · 7月14-18日"></div>
+        <div class="week-dot" title="W30 · 7月21-25日"></div>
+        <span class="week-dot-label">更新周进度</span>
+      </div>
+      <div class="period-nav">
+        <button class="period-nav-btn">←</button>
+        <span style="font-size:11px;font-weight:600;color:var(--t2)">第 7 次</span>
+        <button class="period-nav-btn">→</button>
+        <button class="period-new">+ 发起下次周会</button>
+      </div>
+    </div>
+
+    <!-- Submit progress board -->
+    <div class="submit-board">
+      <div class="submit-board-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        提交进度
+      </div>
+      <div class="submit-board-bar"><div class="submit-board-fill" style="width:70%"></div></div>
+      <div class="submit-board-count">7 / 10 已提交</div>
+      <div class="submit-board-grid">
+        <div class="submit-person-status done"><div class="submit-person-dot"></div>耿博琳</div>
+        <div class="submit-person-status done"><div class="submit-person-dot"></div>高琳</div>
+        <div class="submit-person-status done"><div class="submit-person-dot"></div>丁玉萍</div>
+        <div class="submit-person-status done"><div class="submit-person-dot"></div>张灵玉</div>
+        <div class="submit-person-status done"><div class="submit-person-dot"></div>程宇亮</div>
+        <div class="submit-person-status done"><div class="submit-person-dot"></div>聂茜茜</div>
+        <div class="submit-person-status done"><div class="submit-person-dot"></div>傅中南</div>
+        <div class="submit-person-status pending"><div class="submit-person-dot"></div>董诗昀</div>
+        <div class="submit-person-status pending"><div class="submit-person-dot"></div>胡丽婷</div>
+        <div class="submit-person-status pending"><div class="submit-person-dot"></div>王琳琳</div>
+      </div>
+      <button class="remind-btn" onclick="sendRemind()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        催更未提交 →
+      </button>
+    </div>
+
+    <div class="people-list">
+      <div class="person act" onclick="selectPerson(this,0)">
+        <div class="person-av" style="background:linear-gradient(135deg,#667eea,#764ba2)">耿</div>
+        <div class="person-info"><div class="person-name">耿博琳</div><div class="person-role">职场管理(北京+异地)、行政数字化、文化运营</div></div>
+        <div class="person-badges"><span class="person-badge badge-warn">3</span></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,1)">
+        <div class="person-av" style="background:linear-gradient(135deg,#F59E0B,#FBBF24)">高</div>
+        <div class="person-info"><div class="person-name">高琳</div><div class="person-role">文化运营、行政服务台运营</div></div>
+        <div class="person-badges"><span class="person-badge badge-warn">3</span></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,2)">
+        <div class="person-av" style="background:linear-gradient(135deg,#6366F1,#818CF8)">丁</div>
+        <div class="person-info"><div class="person-name">丁玉萍</div><div class="person-role">数字化后台运营</div></div>
+        <div class="person-badges"><span class="person-badge badge-warn">2</span></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,3)">
+        <div class="person-av" style="background:linear-gradient(135deg,#3B5BDB,#6366F1)">张</div>
+        <div class="person-info"><div class="person-name">张灵玉</div><div class="person-role">北京职场、文化运营</div></div>
+        <div class="person-badges"><span class="person-badge badge-warn">1</span></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,4)">
+        <div class="person-av" style="background:linear-gradient(135deg,#EC4899,#F472B6)">傅</div>
+        <div class="person-info"><div class="person-name">傅中南</div><div class="person-role">异地办公室管理、总办支持</div></div>
+        <div class="person-badges"><span class="person-badge badge-dan">1</span></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,5)">
+        <div class="person-av" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA)">程</div>
+        <div class="person-info"><div class="person-name">程宇亮</div><div class="person-role">行政运营(武汉)</div></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,6)">
+        <div class="person-av" style="background:linear-gradient(135deg,#10B981,#34D399)">聂</div>
+        <div class="person-info"><div class="person-name">聂茜茜</div><div class="person-role">行政运营(武汉)</div></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,7)">
+        <div class="person-av" style="background:linear-gradient(135deg,#14B8A6,#5EEAD4)">董</div>
+        <div class="person-info"><div class="person-name">董诗昀</div><div class="person-role">行政运营(武汉)</div></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,8)">
+        <div class="person-av" style="background:linear-gradient(135deg,#F97316,#FB923C)">胡</div>
+        <div class="person-info"><div class="person-name">胡丽婷</div><div class="person-role">行政运营(深圳)</div></div>
+      </div>
+      <div class="person" onclick="selectPerson(this,9)">
+        <div class="person-av" style="background:linear-gradient(135deg,#06B6D4,#22D3EE)">王</div>
+        <div class="person-info"><div class="person-name">王琳琳</div><div class="person-role">高管支持</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Items panel -->
+  <div class="items">
+    <div class="items-head">
+      <div class="items-head-av" style="background:linear-gradient(135deg,#F59E0B,#FBBF24)">高</div>
+      <div><div class="items-head-name">高琳</div><div class="items-head-sub">本次汇报 · 6月23日–7月12日 · 6 个事项 · 3 个待更新</div></div>
+    </div>
+
+    <!-- Item 1 -->
+    <div class="item-card" style="border-left:3px solid var(--warn)">
+      <div class="item-top">
+        <div class="item-name">甩肉大赛</div>
+        <span class="item-type type-p">专项</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#FFFBEB;color:#F59E0B"><span class="mod-dot" style="background:#F59E0B"></span>文化运营(福利)</span>
+        <span class="st-badge" style="background:var(--acl);color:var(--ac)"><span class="st-dot" style="background:var(--ac)"></span>进行中</span>
+      </div>
+      <div class="item-progress">
+        <div class="prog-ring"><svg width="32" height="32"><circle cx="16" cy="16" r="13" fill="none" stroke="#F1F3F8" stroke-width="3"/><circle cx="16" cy="16" r="13" fill="none" stroke="#F59E0B" stroke-width="3" stroke-dasharray="81.6" stroke-dashoffset="16.3" stroke-linecap="round"/></svg><div class="pct" style="color:#F59E0B">80</div></div>
+        <div style="font-size:12px;color:var(--t2)">收尾总结阶段 · 报名343人</div>
+      </div>
+      <div class="item-update">收尾总结、发奖牌。报名343人，总减重1411.2KG，目前单人减重率16.18%，团队减重总数62.8斤</div>
+      <div class="item-next">下周：完成奖牌发放 + 撰写活动复盘报告 + 统计各团队最终成绩</div>
+    </div>
+
+    <!-- Item 2 -->
+    <div class="item-card" style="border-left:3px solid var(--warn)">
+      <div class="item-top">
+        <div class="item-name">家庭日</div>
+        <span class="item-type type-p">专项</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#ECFDF5;color:#10B981"><span class="mod-dot" style="background:#10B981"></span>文化运营(活动)</span>
+        <span class="st-badge" style="background:var(--acl);color:var(--ac)"><span class="st-dot" style="background:var(--ac)"></span>进行中</span>
+      </div>
+      <div class="item-progress">
+        <div class="prog-ring"><svg width="32" height="32"><circle cx="16" cy="16" r="13" fill="none" stroke="#F1F3F8" stroke-width="3"/><circle cx="16" cy="16" r="13" fill="none" stroke="#10B981" stroke-width="3" stroke-dasharray="81.6" stroke-dashoffset="24.5" stroke-linecap="round"/></svg><div class="pct" style="color:#10B981">70</div></div>
+        <div style="font-size:12px;color:var(--t2)">收尾阶段 · 活动回顾待发</div>
+      </div>
+      <div class="item-update">收尾，活动回顾今天或明天发出，视频昨天给了一个版本又在改</div>
+      <div class="item-next">下周：发出活动回顾 + 确认最终视频版本</div>
+    </div>
+
+    <!-- Item 3 -->
+    <div class="item-card" style="border-left:3px solid var(--warn)">
+      <div class="item-top">
+        <div class="item-name">儿童节礼品</div>
+        <span class="item-type type-p">专项</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#FFFBEB;color:#F59E0B"><span class="mod-dot" style="background:#F59E0B"></span>文化运营(福利)</span>
+        <span class="st-badge" style="background:var(--acl);color:var(--ac)"><span class="st-dot" style="background:var(--ac)"></span>进行中</span>
+      </div>
+      <div class="item-update">登记补70套，收尾，申请预算</div>
+      <div class="item-next">下周：完成剩余礼品补登和收尾 + 预算申请</div>
+    </div>
+
+    <!-- Item 4 - Daily Ops -->
+    <div class="item-card">
+      <div class="item-top">
+        <div class="item-name">行政服务台</div>
+        <span class="item-type type-o">日常运营</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#ECFEFF;color:#06B6D4"><span class="mod-dot" style="background:#06B6D4"></span>数字化运营(行政服务台)</span>
+        <span class="st-badge" style="background:var(--acl);color:var(--ac)"><span class="st-dot" style="background:var(--ac)"></span>进行中</span>
+      </div>
+      <div class="item-update">本周创建工单数57个，其中人工工单数19，机器人拦截工单数38，拦截率100%</div>
+      <div class="item-next">下周：持续优化机器人拦截规则 + 跟进人工工单处理时效</div>
+    </div>
+
+    <!-- Item 5 -->
+    <div class="item-card">
+      <div class="item-top">
+        <div class="item-name">端午手工DIY活动</div>
+        <span class="item-type type-o">日常运营</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#ECFDF5;color:#10B981"><span class="mod-dot" style="background:#10B981"></span>文化运营(活动)</span>
+        <span class="st-badge" style="background:var(--sucL);color:var(--suc)"><span class="st-dot" style="background:var(--suc)"></span>已完成</span>
+      </div>
+      <div class="item-update">已完成</div>
+    </div>
+
+    <!-- Item 6 -->
+    <div class="item-card">
+      <div class="item-top">
+        <div class="item-name">整理北京公益内容</div>
+        <span class="item-type type-o">日常运营</span>
+      </div>
+      <div class="item-tags">
+        <span class="mod-tag" style="background:#ECFDF5;color:#10B981"><span class="mod-dot" style="background:#10B981"></span>文化运营(活动)</span>
+        <span class="st-badge" style="background:var(--sucL);color:var(--suc)"><span class="st-dot" style="background:var(--suc)"></span>已完成</span>
+      </div>
+      <div class="item-update">已完成</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PPT Mode Overlay -->
+<div class="ppt-overlay" id="pptMode">
+  <div class="ppt-close" onclick="closePPT()">✕</div>
+  <div class="ppt-head">
+    <div class="ppt-av" style="background:linear-gradient(135deg,#F59E0B,#FBBF24)">高</div>
+    <div><div class="ppt-name">高琳</div><div class="ppt-sub">本次汇报 · 第 1/10 人 · W26–W28</div></div>
+  </div>
+  <div class="ppt-items">
+    <div class="ppt-card">
+      <div class="ppt-card-name">甩肉大赛</div>
+      <div class="ppt-card-status" style="background:var(--acl);color:var(--ac)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ac)"></span> 进行中 · 80%</div>
+      <div class="ppt-card-update">收尾总结、发奖牌。报名343人，总减重1411.2KG，目前单人减重率16.18%，团队减重总数62.8斤</div>
+      <div class="ppt-card-next">下周：完成奖牌发放 + 撰写活动复盘报告 + 统计各团队最终成绩</div>
+    </div>
+    <div class="ppt-card">
+      <div class="ppt-card-name">家庭日</div>
+      <div class="ppt-card-status" style="background:var(--acl);color:var(--ac)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ac)"></span> 进行中 · 70%</div>
+      <div class="ppt-card-update">收尾，活动回顾今天或明天发出，视频昨天给了一个版本又在改</div>
+      <div class="ppt-card-next">下周：发出活动回顾 + 确认最终视频版本</div>
+    </div>
+    <div class="ppt-card">
+      <div class="ppt-card-name">儿童节礼品</div>
+      <div class="ppt-card-status" style="background:var(--acl);color:var(--ac)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ac)"></span> 进行中</div>
+      <div class="ppt-card-update">登记补70套，收尾，申请预算</div>
+      <div class="ppt-card-next">下周：完成剩余礼品补登和收尾 + 预算申请</div>
+    </div>
+    <div class="ppt-card">
+      <div class="ppt-card-name">行政服务台</div>
+      <div class="ppt-card-status" style="background:var(--acl);color:var(--ac)"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ac)"></span> 进行中</div>
+      <div class="ppt-card-update">本周创建工单数57个，其中人工工单数19，机器人拦截工单数38，拦截率100%</div>
+      <div class="ppt-card-next">下周：持续优化机器人拦截规则 + 跟进人工工单处理时效</div>
+    </div>
+  </div>
+  <div class="ppt-nav">
+    <button class="ppt-nav-btn">← 上一位</button>
+    <span style="font-weight:600">1 / 10</span>
+    <button class="ppt-nav-btn">下一位 →</button>
+  </div>
+</div>
+
+<!-- Annotation -->
+<div class="anno">
+  <h4>📋 周会视图说明</h4>
+  <div class="anno-i"><div class="anno-n">1</div><div class="anno-t"><strong>展示原始更新文字</strong> — 来自「我的工作」每人写的真实内容，不是AI摘要</div></div>
+  <div class="anno-i"><div class="anno-n">2</div><div class="anno-t"><strong>更新频率 ≠ 汇报节奏</strong> — 两个独立维度</div></div>
+  <div class="anno-i"><div class="anno-n">2</div><div class="anno-t">管理者发起周会时选择<strong>覆盖周期</strong>，系统自动聚合区间内所有每周更新</div></div>
+  <div class="anno-i"><div class="anno-n">3</div><div class="anno-t">彩色条段 = 被覆盖的更新周，直观看到跨了几周</div></div>
+  <div class="anno-i"><div class="anno-n">4</div><div class="anno-t">「+ 发起下次周会」— 管理者选下次开会日，自动建新周期</div></div>
+  <div class="anno-i"><div class="anno-n">5</div><div class="anno-t">左侧按人列表，右侧聚合该人所有事项</div></div>
+  <div class="anno-i"><div class="anno-n">6</div><div class="anno-t">黄色badge=待更新，红色=延期</div></div>
+  <div class="anno-i"><div class="anno-n">7</div><div class="anno-t">📺 投屏 + 📑 PPT 两种演示模式</div></div>
+  <div class="anno-i"><div class="anno-n">8</div><div class="anno-t"><strong>年度存档</strong> — 历史周期永久保留，按年份回溯</div></div>
+</div>
+
+</div>
+<script>
+function selectPerson(el,idx){
+  document.querySelectorAll('.person').forEach(p=>p.classList.remove('act'));
+  el.classList.add('act');
+}
+function showPPT(){document.getElementById('pptMode').classList.add('show')}
+function closePPT(){document.getElementById('pptMode').classList.remove('show')}
+function showPresent(){
+  document.body.style.background='#000';
+  document.querySelector('.app').style.display='none';
+  setTimeout(()=>{document.body.style.background='';document.querySelector('.app').style.display='flex'},3000);
+}
+function sendRemind(){
+  var btn = document.querySelector('.remind-btn');
+  btn.textContent = '✓ 已发送催更提醒';
+  btn.style.background = 'var(--ac)';
+  btn.style.color = '#fff';
+  btn.disabled = true;
+  setTimeout(function(){
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> 催更未提交 →';
+    btn.style.background = 'var(--bg)';
+    btn.style.color = 'var(--ac)';
+    btn.disabled = false;
+  }, 2000);
+}
+</script>
+</body>
+</html>

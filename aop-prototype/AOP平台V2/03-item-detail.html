@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AOP 事项详情</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF;--bg2:#F8F9FB;--bg3:#F1F3F8;--bgH:#EEF0F6;--bd:#E5E7EB;--bdl:#F1F3F8;--t1:#1A1D26;--t2:#6B7280;--t3:#9CA3AF;--ac:#3B5BDB;--acl:#EBF0FF;--suc:#10B981;--sucL:#ECFDF5;--warn:#F59E0B;--warnL:#FFFBEB;--dan:#EF4444;--danL:#FEF2F2;--pur:#8B5CF6;--purL:#F5F3FF;--r:10px;--rl:14px;--sh:0 1px 3px rgba(0,0,0,.06);--shL:0 10px 25px rgba(0,0,0,.06);--tr:150ms cubic-bezier(.4,0,.2,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:var(--t1);font-size:14px;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sb{width:220px;background:var(--bg);border-right:1px solid var(--bdl);display:flex;flex-direction:column;flex-shrink:0}
+.sb-logo{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdl)}
+.sb-logo-i{width:26px;height:26px;background:var(--ac);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px}
+.sb-logo-t{font-size:14px;font-weight:700}
+.sb-sec{padding:6px 10px;border-top:1px solid var(--bdl)}
+.sb-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:6px 8px 2px}
+.sb-i{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:450;color:var(--t2);transition:all var(--tr)}
+.sb-i:hover{background:var(--bgH);color:var(--t1)}
+.sb-i.act{background:var(--acl);color:var(--ac);font-weight:600}
+.sb-ic{width:16px;text-align:center;font-size:13px;flex-shrink:0}
+.sb-bg{font-size:10px;font-weight:600;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;border-radius:8px;margin-left:auto;padding:0 4px;background:var(--warn);color:#fff}
+.sb-sub{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 30px;font-size:12.5px;color:var(--t3);border-radius:5px;cursor:pointer;transition:all var(--tr)}
+.sb-sub:hover{background:var(--bgH);color:var(--t2)}
+.sb-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.sb-grp{font-size:10px;font-weight:600;color:var(--t3);padding:4px 10px 0;text-transform:uppercase;letter-spacing:.05em;margin-top:6px}
+.sb-bt{margin-top:auto;padding:10px;border-top:1px solid var(--bdl)}
+.sb-u{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer}
+.sb-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600}
+.sb-un{font-size:12px;font-weight:600}
+.sb-ur{font-size:10px;color:var(--t3)}
+
+/* Main */
+.main{flex:1;display:flex;overflow:hidden;position:relative}
+.main-bg{flex:1;overflow-y:auto;padding:28px 36px;background:var(--bg2);filter:blur(2px);opacity:.4;pointer-events:none}
+
+/* Slide-over panel */
+.slide{position:absolute;right:0;top:0;bottom:0;width:520px;background:var(--bg);border-left:1px solid var(--bd);box-shadow:-4px 0 20px rgba(0,0,0,.06);display:flex;flex-direction:column;overflow:hidden;z-index:50;animation:slideIn .3s ease-out}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.slide-head{padding:14px 20px;border-bottom:1px solid var(--bdl);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.slide-close{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);transition:background var(--tr);font-size:18px}
+.slide-close:hover{background:var(--bgH)}
+.slide-title{font-size:15px;font-weight:700;flex:1}
+.slide-type{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px}
+.slide-body{flex:1;overflow-y:auto;padding:20px}
+.slide-foot{padding:12px 20px;border-top:1px solid var(--bdl);display:flex;gap:8px;flex-shrink:0;background:var(--bg)}
+
+/* Detail fields */
+.field-group{margin-bottom:20px}
+.field-group-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:8px}
+.field-row{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--bdl)}
+.field-row:last-child{border-bottom:none}
+.field-key{width:80px;font-size:12.5px;font-weight:500;color:var(--t3);flex-shrink:0;padding-top:1px}
+.field-val{flex:1;font-size:13px;color:var(--t1);font-weight:400}
+
+/* Status badge */
+.st-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;display:inline-flex;align-items:center;gap:4px}
+.st-dot{width:6px;height:6px;border-radius:50%}
+.st-progress{background:var(--acl);color:var(--ac)}
+.st-progress .st-dot{background:var(--ac)}
+.st-done{background:var(--sucL);color:var(--suc)}
+.st-done .st-dot{background:var(--suc)}
+.st-review{background:var(--purL);color:var(--pur)}
+.st-review .st-dot{background:var(--pur)}
+
+/* Priority dots */
+.pri-dots{display:flex;gap:2px}
+.pri-d{width:5px;height:5px;border-radius:50%;background:var(--bd)}
+.pri-d.on{background:var(--ac)}
+.pri-d.on.w{background:var(--warn)}
+.pri-d.on.d{background:var(--dan)}
+
+/* Module tag */
+.mod-tag{font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:4px}
+.mod-dot{width:5px;height:5px;border-radius:50%}
+
+/* Progress ring */
+.prog-ring{position:relative;width:48px;height:48px;flex-shrink:0}
+.prog-ring svg{transform:rotate(-90deg)}
+.prog-ring .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac)}
+
+/* Milestone */
+.milestone{display:flex;align-items:flex-start;gap:10px;padding:8px 0}
+.ms-line{width:2px;background:var(--bd);position:relative;margin-left:7px}
+.ms-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--bd);background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;z-index:1;position:relative}
+.ms-dot.done{border-color:var(--suc);background:var(--sucL);color:var(--suc)}
+.ms-dot.active{border-color:var(--ac);background:var(--acl);color:var(--ac)}
+.ms-info{flex:1}
+.ms-name{font-size:13px;font-weight:500;color:var(--t1)}
+.ms-date{font-size:11px;color:var(--t3);margin-top:1px}
+
+/* Risk callout */
+.risk-box{padding:10px 14px;border-radius:var(--r);border-left:3px solid var(--dan);background:var(--danL);margin:8px 0}
+.risk-box .label{font-size:11px;font-weight:700;color:var(--dan);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.risk-box .text{font-size:12.5px;color:var(--t2);line-height:1.5}
+
+/* Rich text editable */
+.editable{padding:10px 14px;border:1px solid var(--bd);border-radius:8px;min-height:60px;font-size:13px;line-height:1.7;color:var(--t1);cursor:text;transition:border-color var(--tr)}
+.editable:hover{border-color:var(--ac)}
+.editable:focus{border-color:var(--ac);outline:none;box-shadow:0 0 0 3px rgba(59,91,219,.1)}
+
+/* KPI card for daily ops */
+.kpi-card{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg2);border-radius:8px;border:1px solid var(--bdl)}
+.kpi-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.kpi-num{font-size:18px;font-weight:700;color:var(--t1);line-height:1.2}
+.kpi-label{font-size:11px;color:var(--t3);margin-top:1px}
+.kpi-change{font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px}
+.kpi-up{background:var(--sucL);color:var(--suc)}
+.kpi-down{background:var(--danL);color:var(--dan)}
+
+/* Comment */
+.comment{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdl)}
+.comment:last-child{border-bottom:none}
+.cmt-av{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:600;flex-shrink:0}
+.cmt-body{flex:1}
+.cmt-head{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+.cmt-name{font-size:12px;font-weight:600;color:var(--t1)}
+.cmt-time{font-size:10px;color:var(--t3)}
+.cmt-text{font-size:12.5px;color:var(--t2);line-height:1.5}
+
+/* Annotation panel */
+.anno{position:fixed;right:548px;top:20px;width:260px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rl);box-shadow:var(--shL);padding:16px;font-size:12px;z-index:100}
+.anno h4{font-size:11px;font-weight:700;color:var(--ac);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em}
+.anno-i{display:flex;gap:8px;margin-bottom:6px;line-height:1.5}
+.anno-n{width:16px;height:16px;background:var(--ac);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.anno-t{color:var(--t2)}
+
+/* Type toggle at top */
+.type-toggle{display:flex;gap:6px;margin-bottom:8px}
+.type-btn{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr)}
+.type-btn.act{background:var(--acl);border-color:var(--ac);color:var(--ac);font-weight:600}
+.type-btn:hover:not(.act){background:var(--bgH)}
+
+.btn{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all var(--tr)}
+.btn-pri{background:var(--ac);color:#fff}
+.btn-pri:hover{background:var(--ac)}
+.btn-sec{background:var(--bg2);color:var(--t2);border:1px solid var(--bd)}
+.btn-sec:hover{background:var(--bgH)}
+
+.avatar-sm{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Sidebar -->
+<div class="sb">
+  <div class="sb-logo"><div class="sb-logo-i">A</div><div style="display:flex;flex-direction:column"><div style="display:flex;align-items:center;gap:6px"><div class="sb-logo-t">AOP</div><div class="sb-logo-badge">Beta</div></div><div style="font-size:9px;font-weight:500;color:var(--t3);letter-spacing:0.06em;white-space:nowrap;margin-top:1px">行政运营管理平台</div></div></div>
+  <div class="sb-sec"><div class="sb-lbl">个人</div>
+    <div class="sb-i"><div class="sb-ic">🏠</div> 我的工作<div class="sb-bg">3</div></div>
+    <a class="sb-i" href="./10-okr.html"><div class="sb-ic">🎯</div> OKR <span style="font-size:10px;color:var(--t3);margin-left:2px">手动导入</span></a>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">管理</div>
+    <div class="sb-i act"><div class="sb-ic">📋</div> 行政总览</div>
+    <div class="sb-i"><div class="sb-ic">⭐</div> 重点专项</div>
+    <div class="sb-i"><div class="sb-ic">📊</div> 运营看板</div>
+    <div class="sb-i"><div class="sb-ic">👥</div> 周会视图</div>
+    <div class="sb-i"><div class="sb-ic">📝</div> 周报</div>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">分析</div>
+    <div class="sb-i"><div class="sb-ic">📈</div> 数据驾驶舱</div>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">业务模块</div>
+  <div class="sb-grp">职场运营</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#3B5BDB"></div> 北京职场</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#8B5CF6"></div> 武汉职场</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#EC4899"></div> 异地职场</div>
+  <div class="sb-grp">文化运营</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#10B981"></div> 活动运营</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#F59E0B"></div> 员工福利</div>
+  <div class="sb-grp">数字化运营</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#06B6D4"></div> 行政服务台</div>
+  <div class="sb-sub"><div class="sb-dot" style="background:#6366F1"></div> 数字化后台运营</div>
+</div>
+  <div class="sb-bt"><div class="sb-u"><div class="sb-av">耿</div><div><div class="sb-un">耿博琳</div><div class="sb-ur">职场管理(北京+异地)、行政数字化、文化运营</div></div></div></div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Background (blurred "我的工作" page) -->
+  <div class="main-bg">
+    <div style="font-size:22px;font-weight:700;margin-bottom:4px">早上好，耿博琳 👋</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:24px">本周有 3 个事项待更新</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+      <div style="background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px"><div style="font-size:28px;font-weight:700;color:var(--ac)">6</div><div style="font-size:12px;color:var(--t3)">负责事项</div></div>
+      <div style="background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px"><div style="font-size:28px;font-weight:700;color:var(--warn)">3</div><div style="font-size:12px;color:var(--t3)">待更新</div></div>
+      <div style="background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px"><div style="font-size:28px;font-weight:700;color:var(--dan)">1</div><div style="font-size:12px;color:var(--t3)">今日截止</div></div>
+      <div style="background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px"><div style="font-size:28px;font-weight:700;color:var(--suc)">0</div><div style="font-size:12px;color:var(--t3)">延期</div></div>
+    </div>
+  </div>
+
+  <!-- Type toggle -->
+  <div style="position:absolute;top:14px;left:14px;z-index:60">
+    <div style="font-size:12px;color:var(--t3);margin-bottom:4px;font-weight:600">切换事项类型查看：</div>
+    <div class="type-toggle">
+      <div class="type-btn act" onclick="showProject()">⭐ 专项项目</div>
+      <div class="type-btn" onclick="showOps()">🔄 日常运营</div>
+    </div>
+  </div>
+
+  <!-- SLIDE-OVER: 专项项目 -->
+  <div class="slide" id="projectSlide">
+    <div class="slide-head">
+      <div class="slide-close">✕</div>
+      <div class="slide-title">甩肉大赛</div>
+      <span class="slide-type" style="background:#F3E8FF;color:#8B5CF6;">专项</span>
+    </div>
+    <div class="slide-body">
+
+      <!-- Basic Info -->
+      <div class="field-group">
+        <div class="field-group-label">基本信息</div>
+        <div class="field-row">
+          <div class="field-key">所属模块</div>
+          <div class="field-val"><span class="mod-tag" style="background:#FFFBEB;color:#F59E0B;"><span class="mod-dot" style="background:#F59E0B"></span>文化运营(福利)</span></div>
+        </div>
+        <div class="field-row">
+          <div class="field-key">负责人</div>
+          <div class="field-val" style="display:flex;align-items:center;gap:6px"><div class="avatar-sm">高</div>高琳</div>
+        </div>
+        <div class="field-row">
+          <div class="field-key">协作人</div>
+          <div class="field-val" style="display:flex;gap:4px"><div class="avatar-sm" title="聂茜茜">聂</div><div class="avatar-sm" title="张灵玉">张</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-key">优先级</div>
+          <div class="field-val"><div class="pri-dots"><div class="pri-d on d"></div><div class="pri-d on d"></div><div class="pri-d on d"></div><div class="pri-d on d"></div><div class="pri-d"></div></div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-key">状态</div>
+          <div class="field-val"><span class="st-badge st-progress"><span class="st-dot"></span>进行中</span></div>
+        </div>
+        <div class="field-row">
+          <div class="field-key">截止时间</div>
+          <div class="field-val" style="font-weight:500">2026年6月30日</div>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="field-group">
+        <div class="field-group-label">项目进度</div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <div class="prog-ring">
+            <svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="none" stroke="#F1F3F8" stroke-width="4"/><circle cx="24" cy="24" r="20" fill="none" stroke="#F59E0B" stroke-width="4" stroke-dasharray="125.6" stroke-dashoffset="25.1" stroke-linecap="round"/></svg>
+            <div class="num" style="color:var(--warn)">80%</div>
+          </div>
+          <div><div style="font-size:13px;font-weight:600;color:var(--t1)">完成率 80%</div><div style="font-size:11px;color:var(--t3)">收尾总结阶段</div></div>
+        </div>
+      </div>
+
+      <!-- Milestones -->
+      <div class="field-group">
+        <div class="field-group-label">里程碑</div>
+        <div class="milestone">
+          <div class="ms-dot done">✓</div>
+          <div class="ms-info"><div class="ms-name">活动策划与报名</div><div class="ms-date">4月 · 已完成</div></div>
+        </div>
+        <div class="milestone">
+          <div class="ms-dot done">✓</div>
+          <div class="ms-info"><div class="ms-name">比赛执行阶段</div><div class="ms-date">5月 · 已完成</div></div>
+        </div>
+        <div class="milestone">
+          <div class="ms-dot active">3</div>
+          <div class="ms-info"><div class="ms-name">收尾总结、发奖牌</div><div class="ms-date">6月 · 进行中</div></div>
+        </div>
+        <div class="milestone">
+          <div class="ms-dot">4</div>
+          <div class="ms-info"><div class="ms-name">活动复盘报告</div><div class="ms-date">7月 · 待开始</div></div>
+        </div>
+      </div>
+
+      <!-- This week update -->
+      <div class="field-group">
+        <div class="field-group-label">本周更新</div>
+        <div class="editable" contenteditable="true">收尾总结、发奖牌。报名343人，总减重1411.2KG，目前单人减重率16.18%，团队减重总数62.8斤</div>
+      </div>
+
+      <!-- Next week plan -->
+      <div class="field-group">
+        <div class="field-group-label">下周计划</div>
+        <div class="editable" contenteditable="true">1. 完成奖牌发放<br/>2. 撰写活动复盘报告<br/>3. 统计各团队最终成绩</div>
+      </div>
+
+      <!-- Comments -->
+      <div class="field-group">
+        <div class="field-group-label">评论 (2)</div>
+        <div class="comment">
+          <div class="cmt-av">张</div>
+          <div class="cmt-body"><div class="cmt-head"><span class="cmt-name">张灵玉</span><span class="cmt-time">1小时前</span></div><div class="cmt-text">奖牌已到北京，明天可以开始发放</div></div>
+        </div>
+        <div class="comment">
+          <div class="cmt-av">聂</div>
+          <div class="cmt-body"><div class="cmt-head"><span class="cmt-name">聂茜茜</span><span class="cmt-time">昨天</span></div><div class="cmt-text">@高琳 武汉赛区奖牌需要单独邮寄吗？</div></div>
+        </div>
+      </div>
+
+      <!-- Attachments -->
+      <div class="field-group">
+        <div class="field-group-label">附件 (2)</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg2);border-radius:6px;font-size:12px;color:var(--t2)"><span>📎</span> 甩肉大赛最终数据.xlsx <span style="margin-left:auto;color:var(--t3)">350KB</span></div>
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--bg2);border-radius:6px;font-size:12px;color:var(--t2)"><span>📎</span> 奖牌设计稿.pdf <span style="margin-left:auto;color:var(--t3)">1.2MB</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky footer -->
+    <div class="slide-foot">
+      <button class="btn btn-sec">取消</button>
+      <button class="btn btn-pri">保存更新</button>
+    </div>
+  </div>
+
+  <!-- SLIDE-OVER: 日常运营 (hidden by default) -->
+  <div class="slide" id="opsSlide" style="display:none">
+    <div class="slide-head">
+      <div class="slide-close" onclick="showProject()">✕</div>
+      <div class="slide-title">行政服务台</div>
+      <span class="slide-type" style="background:#ECFDF5;color:#059669;">日常运营</span>
+    </div>
+    <div class="slide-body">
+
+      <!-- Basic Info -->
+      <div class="field-group">
+        <div class="field-group-label">基本信息</div>
+        <div class="field-row">
+          <div class="field-key">所属模块</div>
+          <div class="field-val"><span class="mod-tag" style="background:#ECFEFF;color:#06B6D4;"><span class="mod-dot" style="background:#06B6D4"></span>数字化运营(行政服务台)</span></div>
+        </div>
+        <div class="field-row">
+          <div class="field-key">负责人</div>
+          <div class="field-val" style="display:flex;align-items:center;gap:6px"><div class="avatar-sm">高</div>高琳</div>
+        </div>
+        <div class="field-row">
+          <div class="field-key">优先级</div>
+          <div class="field-val"><div class="pri-dots"><div class="pri-d on"></div><div class="pri-d on"></div><div class="pri-d on"></div><div class="pri-d"></div><div class="pri-d"></div></div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-key">状态</div>
+          <div class="field-val"><span class="st-badge st-progress"><span class="st-dot"></span>进行中</span></div>
+        </div>
+        <div class="field-row">
+          <div class="field-key">周期</div>
+          <div class="field-val">每周循环</div>
+        </div>
+      </div>
+
+      <!-- KPI Data -->
+      <div class="field-group">
+        <div class="field-group-label">本周数据</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="kpi-card"><div class="kpi-icon" style="background:var(--acl)">🎫</div><div><div class="kpi-num">57</div><div class="kpi-label">工单总数</div></div><div class="kpi-change kpi-up">↑100%</div></div>
+          <div class="kpi-card"><div class="kpi-icon" style="background:var(--sucL)">✅</div><div><div class="kpi-num">19</div><div class="kpi-label">人工工单</div></div><div class="kpi-change kpi-up">↑正常</div></div>
+          <div class="kpi-card"><div class="kpi-icon" style="background:var(--warnL)">⏱</div><div><div class="kpi-num">38</div><div class="kpi-label">机器人拦截</div></div><div class="kpi-change kpi-up">100%</div></div>
+          <div class="kpi-card"><div class="kpi-icon" style="background:var(--danL)">⭐</div><div><div class="kpi-num">100%</div><div class="kpi-label">拦截率</div></div><div class="kpi-change kpi-up">达标</div></div>
+        </div>
+      </div>
+
+      <!-- Optimization -->
+      <div class="field-group">
+        <div class="field-group-label">本周更新</div>
+        <div class="editable" contenteditable="true">本周创建工单数57个，其中人工工单数19，机器人拦截工单数38，拦截率100%</div>
+      </div>
+
+      <!-- Next week focus -->
+      <div class="field-group">
+        <div class="field-group-label">下周重点</div>
+        <div class="editable" contenteditable="true">1. 持续优化机器人拦截规则<br/>2. 跟进人工工单处理时效</div>
+      </div>
+
+      <!-- Comments -->
+      <div class="field-group">
+        <div class="field-group-label">评论 (1)</div>
+        <div class="comment">
+          <div class="cmt-av">丁</div>
+          <div class="cmt-body"><div class="cmt-head"><span class="cmt-name">丁玉萍</span><span class="cmt-time">2天前</span></div><div class="cmt-text">机器人拦截率100%表现很好，可以总结最佳实践推广</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-foot">
+      <button class="btn btn-sec">取消</button>
+      <button class="btn btn-pri">保存更新</button>
+    </div>
+  </div>
+
+  <!-- Annotation Panel -->
+  <div class="anno">
+    <h4>📋 事项详情说明</h4>
+    <div class="anno-i"><div class="anno-n">1</div><div class="anno-t">点击工作卡片 → 右侧 Slide-over 滑出</div></div>
+    <div class="anno-i"><div class="anno-n">2</div><div class="anno-t">专项项目显示：完成率环、里程碑列表、风险提示</div></div>
+    <div class="anno-i"><div class="anno-n">3</div><div class="anno-t">日常运营显示：KPI数据卡片、异常提醒、优化措施</div></div>
+    <div class="anno-i"><div class="anno-n">4</div><div class="anno-t">所有文本字段均可直接编辑（点击即编辑）</div></div>
+    <div class="anno-i"><div class="anno-n">5</div><div class="anno-t">底部保存按钮始终可见（sticky footer）</div></div>
+    <div class="anno-i"><div class="anno-n">6</div><div class="anno-t">顶部可切换查看两种类型模板</div></div>
+    <div class="anno-i"><div class="anno-n">7</div><div class="anno-t">评论支持 @提及，附件支持上传下载</div></div>
+    <div class="anno-i"><div class="anno-n">8</div><div class="anno-t">里程碑：✓已完成 → 🔵进行中 → ○待开始</div></div>
+  </div>
+</div>
+
+</div>
+<script>
+function showProject(){
+  document.getElementById('projectSlide').style.display='';
+  document.getElementById('opsSlide').style.display='none';
+  document.querySelectorAll('.type-btn')[0].classList.add('act');
+  document.querySelectorAll('.type-btn')[1].classList.remove('act');
+}
+function showOps(){
+  document.getElementById('projectSlide').style.display='none';
+  document.getElementById('opsSlide').style.display='';
+  document.querySelectorAll('.type-btn')[0].classList.remove('act');
+  document.querySelectorAll('.type-btn')[1].classList.add('act');
+}
+</script>
+</body>
+</html>

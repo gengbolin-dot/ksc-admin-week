@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>行政总览 - AOP 行政运营管理平台</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FFFFFF;--bg-secondary:#F8F9FB;--bg-tertiary:#F1F3F8;--bg-hover:#EEF0F6;
+  --border:#E5E7EB;--border-light:#F1F3F8;
+  --text-primary:#1A1D26;--text-secondary:#6B7280;--text-tertiary:#9CA3AF;
+  --accent:#3B5BDB;--accent-light:#EBF0FF;
+  --success:#10B981;--success-light:#ECFDF5;
+  --warning:#F59E0B;--warning-light:#FFFBEB;
+  --danger:#EF4444;--danger-light:#FEF2F2;
+  --purple:#8B5CF6;--purple-light:#F5F3FF;
+  --radius:10px;--radius-lg:14px;
+}
+html{font-size:14px}
+body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary);color:var(--text-primary);display:flex;min-height:100vh}
+/* ── Sidebar ── */
+.sidebar{width:220px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0}
+.sidebar-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-light)}
+.sidebar-logo .logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.sidebar-logo .logo-text{font-weight:700;font-size:15px;color:var(--text-primary)}
+.sidebar-logo .logo-sub{font-size:10px;color:var(--text-tertiary);margin-top:1px;letter-spacing:0.06em;white-space:nowrap}
+.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-group{margin-bottom:18px}
+.nav-group-label{font-size:10.5px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.6px;padding:4px 10px 6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s;font-size:13px;font-weight:500;color:var(--text-secondary);position:relative}
+.nav-item:hover{background:var(--bg-secondary);color:var(--text-primary)}
+.nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:600}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-icon{width:18px;text-align:center;font-size:14px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px}
+.nav-badge.warn{background:#F59E0B}
+.nav-sub-label{font-size:10px;font-weight:600;color:var(--text-tertiary);letter-spacing:.06em;padding:6px 12px 2px;text-transform:none}
+/* ── Main Area ── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:52px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0}
+.topbar-title{font-weight:600;font-size:15px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.topbar-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--accent)}
+.topbar-search{display:flex;align-items:center;background:var(--bg-secondary);border-radius:8px;padding:6px 12px;gap:6px;border:1px solid var(--border-light);font-size:12px;color:var(--text-tertiary);cursor:pointer;min-width:160px}
+.topbar-search span{color:var(--text-tertiary);font-size:11px;margin-left:auto}
+/* ── Content ── */
+.content-area{flex:1;display:flex;overflow:hidden}
+.content{flex:1;padding:24px;overflow-y:auto}
+/* ── Module Tab Bar ── */
+.module-tab-bar{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px}
+.module-group{margin-bottom:14px}
+.module-group:last-child{margin-bottom:0}
+.module-group-header{display:flex;align-items:center;gap:6px;margin-bottom:10px;font-size:13px;font-weight:600;color:var(--text-primary)}
+.module-group-header .group-emoji{font-size:15px}
+.module-pills{display:flex;flex-wrap:wrap;gap:8px}
+.module-pill{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .18s;font-size:12.5px;font-weight:500;color:var(--text-secondary);position:relative}
+.module-pill:hover{border-color:var(--accent);background:var(--bg-hover)}
+.module-pill.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:600}
+.pill-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pill-dot.dot-blue{background:var(--accent)}
+.pill-dot.dot-green{background:var(--success)}
+.pill-dot.dot-orange{background:var(--warning)}
+.pill-dot.dot-purple{background:var(--purple)}
+.pill-dot.dot-red{background:var(--danger)}
+.pill-owner{font-size:11px;color:var(--text-tertiary);font-weight:400}
+.module-pill.active .pill-owner{color:var(--accent);opacity:.7}
+/* ── Content Header ── */
+.content-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.content-title{font-size:16px;font-weight:600;color:var(--text-primary)}
+.content-meta{font-size:12px;color:var(--text-tertiary)}
+.view-toggle{display:flex;background:var(--bg-secondary);border-radius:8px;border:1px solid var(--border-light);overflow:hidden}
+.view-btn{padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--text-secondary);display:flex;align-items:center;gap:5px;border:none;background:none}
+.view-btn:hover{color:var(--text-primary)}
+.view-btn.active{background:var(--bg);color:var(--accent);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.view-btn svg{width:14px;height:14px}
+/* ── List View ── */
+.list-view{display:block}
+.list-table{width:100%;border-collapse:collapse;background:var(--bg);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border)}
+.list-table thead{background:var(--bg-secondary)}
+.list-table th{padding:11px 16px;text-align:left;font-size:11.5px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border-light)}
+.list-table td{padding:12px 16px;font-size:13px;color:var(--text-primary);border-bottom:1px solid var(--border-light);vertical-align:middle}
+.list-table tbody tr{transition:background .12s}
+.list-table tbody tr:hover{background:var(--bg-hover)}
+.list-table tbody tr:last-child td{border-bottom:none}
+.status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:6px;font-size:11.5px;font-weight:600}
+.status-badge.badge-in-progress{background:var(--accent-light);color:var(--accent)}
+.status-badge.badge-review{background:var(--purple-light);color:var(--purple)}
+.status-badge.badge-done{background:var(--success-light);color:var(--success)}
+.status-badge.badge-not-started{background:var(--bg-tertiary);color:var(--text-tertiary)}
+.status-badge .status-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.type-badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:500}
+.type-badge.type-daily{background:#EBF0FF;color:var(--accent)}
+.type-badge.type-periodic{background:#FFFBEB;color:var(--warning)}
+.type-badge.type-project{background:#F5F3FF;color:var(--purple)}
+.type-badge.type-emergency{background:#FEF2F2;color:var(--danger)}
+.progress-bar-wrap{display:flex;align-items:center;gap:8px}
+.progress-bar-track{width:64px;height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+.progress-bar-fill.fill-accent{background:var(--accent)}
+.progress-bar-fill.fill-success{background:var(--success)}
+.progress-bar-fill.fill-warning{background:var(--warning)}
+.progress-bar-fill.fill-purple{background:var(--purple)}
+.progress-pct{font-size:11.5px;font-weight:500;color:var(--text-secondary);min-width:32px}
+.owner-cell{display:flex;align-items:center;gap:8px}
+.owner-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0}
+.priority-dots{display:flex;gap:2px;align-items:center}
+.priority-dots .dot{width:5px;height:5px;border-radius:50%;background:var(--bg-tertiary)}
+.priority-dots .dot.filled{background:var(--warning)}
+.priority-dots .dot.filled.high{background:var(--danger)}
+/* ── Kanban View ── */
+.kanban-view{display:none}
+.kanban-board{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px}
+.kanban-col{min-width:260px;max-width:300px;flex:1;display:flex;flex-direction:column}
+.kanban-col-header{padding:10px 12px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.kanban-col-header .col-count{font-size:11px;font-weight:500;color:var(--text-tertiary);background:var(--bg-tertiary);padding:1px 7px;border-radius:10px}
+.kanban-col-header.header-not-started{color:var(--text-tertiary)}
+.kanban-col-header.header-in-progress{color:var(--accent)}
+.kanban-col-header.header-review{color:var(--purple)}
+.kanban-col-header.header-done{color:var(--success)}
+.kanban-col-body{background:var(--bg-secondary);border:1px solid var(--border-light);border-radius:var(--radius);padding:8px;flex:1;min-height:200px;display:flex;flex-direction:column;gap:8px}
+.kanban-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;cursor:grab;transition:box-shadow .15s,border-color .15s;position:relative}
+.kanban-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.06);border-color:var(--accent)}
+.kanban-card:active{cursor:grabbing}
+.kanban-card .drag-handle{position:absolute;top:8px;right:8px;color:var(--text-tertiary);opacity:0;transition:opacity .15s;font-size:12px;cursor:grab}
+.kanban-card:hover .drag-handle{opacity:.6}
+.card-name{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;line-height:1.35}
+.card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.card-owner{display:flex;align-items:center;gap:5px}
+.card-owner-avatar{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;flex-shrink:0}
+.card-owner-name{font-size:11px;color:var(--text-secondary)}
+.card-progress{display:flex;align-items:center;gap:6px;margin-top:6px}
+.card-progress-track{width:100%;height:4px;background:var(--bg-tertiary);border-radius:2px;overflow:hidden}
+.card-progress-fill{height:100%;border-radius:2px}
+.card-progress-pct{font-size:10.5px;font-weight:500;color:var(--text-tertiary);white-space:nowrap}
+.card-priority{display:flex;gap:2px;align-items:center}
+.card-priority .dot{width:5px;height:5px;border-radius:50%;background:var(--bg-tertiary)}
+.card-priority .dot.filled{background:var(--warning)}
+.card-priority .dot.filled.high{background:var(--danger)}
+/* ── Annotation Panel ── */
+.annotation-panel{width:280px;background:var(--bg);border-left:1px solid var(--border);flex-shrink:0;height:100vh;position:sticky;top:0;overflow-y:auto;display:flex;flex-direction:column}
+.annotation-header{padding:16px 18px 12px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between}
+.annotation-header h3{font-size:13px;font-weight:600}
+.annotation-toggle{font-size:18px;cursor:pointer;color:var(--text-tertiary);transition:color .15s;line-height:1}
+.annotation-toggle:hover{color:var(--text-primary)}
+.annotation-body{flex:1;padding:14px 18px;overflow-y:auto}
+.annotation-item{margin-bottom:18px}
+.annotation-item .ann-label{font-size:10.5px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.annotation-item .ann-content{font-size:12px;color:var(--text-secondary);line-height:1.6}
+.annotation-item .ann-callout{background:var(--accent-light);border-left:3px solid var(--accent);padding:8px 12px;border-radius:0 6px 6px 0;font-size:12px;color:var(--accent);line-height:1.5}
+.annotation-item .ann-divider{height:1px;background:var(--border-light);margin:10px 0}
+.ann-color-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.ann-color-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ann-color-label{font-size:11.5px;color:var(--text-secondary)}
+.ann-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ann-stat-card{background:var(--bg-secondary);border-radius:8px;padding:10px 12px;text-align:center}
+.ann-stat-value{font-size:18px;font-weight:700;color:var(--accent)}
+.ann-stat-label{font-size:10px;color:var(--text-tertiary);margin-top:2px}
+/* ── Utilities ── */
+.fade-enter{animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ═══════ Sidebar ═══════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">A</div>
+    <div>
+      <div style="display:flex;align-items:center;gap:6px"><div class="logo-text">AOP</div><div style="font-size:9px;font-weight:600;color:var(--text-tertiary);background:var(--bg-tertiary);padding:1px 6px;border-radius:4px">Beta</div></div>
+      <div class="logo-sub">行政运营管理平台</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">个人</div>
+      <a class="nav-item" href="./02-my-work.html"><span class="nav-icon">🏠</span>我的工作<span class="nav-badge warn">3</span></a>
+      <a class="nav-item" href="./10-okr.html"><span class="nav-icon">🎯</span>OKR <span style="font-size:10px;color:var(--text-tertiary);margin-left:2px">手动导入</span></a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">管理</div>
+      <div class="nav-item active"><span class="nav-icon">📋</span>行政总览</div>
+      <a class="nav-item" href="./05-key-projects.html"><span class="nav-icon">⭐</span>重点专项</a>
+      <a class="nav-item" href="./06-ops-dashboard.html"><span class="nav-icon">📊</span>运营看板</a>
+      <a class="nav-item" href="./07-weekly-meeting.html"><span class="nav-icon">👥</span>周会视图</a>
+      <a class="nav-item" href="./08-weekly-report.html"><span class="nav-icon">📝</span>周报</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">分析</div>
+      <a class="nav-item" href="./09-data-cockpit.html"><span class="nav-icon">📈</span>数据驾驶舱</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">业务模块</div>
+      <div class="nav-sub-label">职场运营</div>
+      <div class="nav-item"><span class="nav-icon">🏢</span>北京职场</div>
+      <div class="nav-item"><span class="nav-icon">🏢</span>武汉职场</div>
+      <div class="nav-item"><span class="nav-icon">🏢</span>异地职场</div>
+      <div class="nav-sub-label">文化运营</div>
+      <div class="nav-item"><span class="nav-icon">🎉</span>活动运营<span class="nav-badge">3</span></div>
+      <div class="nav-item"><span class="nav-icon">🎁</span>员工福利</div>
+      <div class="nav-sub-label">数字化运营</div>
+      <div class="nav-item"><span class="nav-icon">💻</span>行政服务台</div>
+      <div class="nav-item"><span class="nav-icon">⚙️</span>数字化后台运营</div>
+    </div>
+  </nav>
+</aside>
+
+<!-- ═══════ Main ═══════ -->
+<div class="main">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-title">行政总览</div>
+    <div class="topbar-right">
+      <div class="topbar-search">
+        <span>🔍</span> 搜索事项… <span>⌘K</span>
+      </div>
+      <div style="font-size:14px;cursor:pointer;color:var(--text-tertiary)">🔔</div>
+      <div class="topbar-avatar">耿</div>
+    </div>
+  </div>
+
+  <!-- Content Area -->
+  <div class="content-area">
+    <div class="content">
+
+      <!-- ── Module Tab Bar ── -->
+      <div class="module-tab-bar">
+        <div class="module-group">
+          <div class="module-group-header"><span class="group-emoji">🏢</span> 职场运营</div>
+          <div class="module-pills">
+            <div class="module-pill active" data-module="beijing" onclick="selectModule(this,'beijing')">
+              <span class="pill-dot dot-blue"></span>
+              <span class="pill-name">北京职场</span>
+              <span class="pill-owner">张灵玉</span>
+            </div>
+            <div class="module-pill" data-module="wuhan" onclick="selectModule(this,'wuhan')">
+              <span class="pill-dot dot-purple"></span>
+              <span class="pill-name">武汉职场</span>
+              <span class="pill-owner">程宇亮/董诗昀</span>
+            </div>
+            <div class="module-pill" data-module="remote" onclick="selectModule(this,'remote')">
+              <span class="pill-dot dot-red"></span>
+              <span class="pill-name">异地职场</span>
+              <span class="pill-owner">傅中南</span>
+            </div>
+            <div class="module-pill" data-module="shenzhen" onclick="selectModule(this,'shenzhen')">
+              <span class="pill-dot dot-orange"></span>
+              <span class="pill-name">深圳职场</span>
+              <span class="pill-owner">胡丽婷</span>
+            </div>
+          </div>
+        </div>
+        <div class="module-group">
+          <div class="module-group-header"><span class="group-emoji">🎉</span> 文化运营</div>
+          <div class="module-pills">
+            <div class="module-pill" data-module="activity" onclick="selectModule(this,'activity')">
+              <span class="pill-dot dot-green"></span>
+              <span class="pill-name">活动运营</span>
+              <span class="pill-owner">聂茜茜</span>
+            </div>
+            <div class="module-pill" data-module="benefit" onclick="selectModule(this,'benefit')">
+              <span class="pill-dot dot-orange"></span>
+              <span class="pill-name">员工福利</span>
+              <span class="pill-owner">高琳</span>
+            </div>
+          </div>
+        </div>
+        <div class="module-group">
+          <div class="module-group-header"><span class="group-emoji">💻</span> 数字化运营</div>
+          <div class="module-pills">
+            <div class="module-pill" data-module="servicedesk" onclick="selectModule(this,'servicedesk')">
+              <span class="pill-dot dot-blue"></span>
+              <span class="pill-name">行政服务台</span>
+              <span class="pill-owner">高琳</span>
+            </div>
+            <div class="module-pill" data-module="digital" onclick="selectModule(this,'digital')">
+              <span class="pill-dot dot-purple"></span>
+              <span class="pill-name">数字化后台运营</span>
+              <span class="pill-owner">丁玉萍</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Content Header ── -->
+      <div class="content-header">
+        <div>
+          <div class="content-title" id="contentTitle">北京职场</div>
+          <div class="content-meta" id="contentMeta">共 5 项事项</div>
+        </div>
+        <div class="view-toggle">
+          <button class="view-btn active" id="btnList" onclick="switchView('list')">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3h7M5 7h7M5 11h7"/><rect x="1" y="2" width="2" height="2" rx=".5" fill="currentColor"/><rect x="1" y="6" width="2" height="2" rx=".5" fill="currentColor"/><rect x="1" y="10" width="2" height="2" rx=".5" fill="currentColor"/></svg>
+            列表
+          </button>
+          <button class="view-btn" id="btnKanban" onclick="switchView('kanban')">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1" y="2" width="3.2" height="10" rx="1"/><rect x="5.4" y="2" width="3.2" height="7" rx="1"/><rect x="9.8" y="2" width="3.2" height="8.5" rx="1"/></svg>
+            看板
+          </button>
+        </div>
+      </div>
+
+      <!-- ── List View ── -->
+      <div class="list-view fade-enter" id="listView">
+        <table class="list-table">
+          <thead>
+            <tr>
+              <th>事项名称</th>
+              <th>类型</th>
+              <th>负责人</th>
+              <th>状态</th>
+              <th>完成率</th>
+              <th>最后更新</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Kanban View ── -->
+      <div class="kanban-view" id="kanbanView">
+        <div class="kanban-board" id="kanbanBoard">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Annotation Panel ── -->
+    <aside class="annotation-panel">
+      <div class="annotation-header">
+        <h3>设计标注</h3>
+        <span class="annotation-toggle" onclick="this.closest('.annotation-panel').classList.toggle('collapsed')">◀</span>
+      </div>
+      <div class="annotation-body">
+        <div class="annotation-item">
+          <div class="ann-label">页面说明</div>
+          <div class="ann-content">行政总览页是 AOP 平台的核心入口，按模块聚合呈现全部行政运营事项，支持列表/看板双视图切换。</div>
+        </div>
+        <div class="annotation-item">
+          <div class="ann-label">模块选择器</div>
+          <div class="ann-callout">Pill 组件按模块组分组，选中态使用 accent-light 底色 + accent 色边框。每组首个 pill 默认激活。点击切换数据区域内容。</div>
+        </div>
+        <div class="annotation-item">
+          <div class="ann-label">视图切换</div>
+          <div class="ann-content">列表视图以 Table 呈现完整字段；看板视图按状态分为四列，卡片显示摘要信息。切换时无刷新，使用 CSS 动画过渡。</div>
+        </div>
+        <div class="annotation-item"><div class="ann-divider"></div></div>
+        <div class="annotation-item">
+          <div class="ann-label">色彩映射</div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#3B5BDB"></span><span class="ann-color-label">北京职场 — #3B5BDB</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#8B5CF6"></span><span class="ann-color-label">武汉职场 — #8B5CF6</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#EC4899"></span><span class="ann-color-label">异地职场 — #EC4899</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#F97316"></span><span class="ann-color-label">深圳职场 — #F97316</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#10B981"></span><span class="ann-color-label">活动运营 — #10B981</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#F59E0B"></span><span class="ann-color-label">员工福利 — #F59E0B</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#06B6D4"></span><span class="ann-color-label">行政服务台 — #06B6D4</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:#6366F1"></span><span class="ann-color-label">数字化后台运营 — #6366F1</span></div>
+        </div>
+        <div class="annotation-item">
+          <div class="ann-label">当前模块统计</div>
+          <div class="ann-stats">
+            <div class="ann-stat-card"><div class="ann-stat-value" id="statTotal">5</div><div class="ann-stat-label">总事项</div></div>
+            <div class="ann-stat-card"><div class="ann-stat-value" id="statDone">1</div><div class="ann-stat-label">已完成</div></div>
+            <div class="ann-stat-card"><div class="ann-stat-value" id="statWip">3</div><div class="ann-stat-label">进行中</div></div>
+            <div class="ann-stat-card"><div class="ann-stat-value" id="statAvg">65%</div><div class="ann-stat-label">平均完成率</div></div>
+          </div>
+        </div>
+        <div class="annotation-item">
+          <div class="ann-label">类型标签色</div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:var(--accent)"></span><span class="ann-color-label">日常事务 — accent-light</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:var(--warning)"></span><span class="ann-color-label">周期事项 — warning</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:var(--purple)"></span><span class="ann-color-label">专项项目 — purple</span></div>
+          <div class="ann-color-row"><span class="ann-color-dot" style="background:var(--danger)"></span><span class="ann-color-label">紧急事项 — danger</span></div>
+        </div>
+        <div class="annotation-item">
+          <div class="ann-label">交互说明</div>
+          <div class="ann-content">看板卡片支持拖拽排序（drag handle 在右上角 hover 显现），列表行点击可进入事项详情。模块切换时数据平滑过渡。</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+// ── Real Data ──
+const DATA = {
+  beijing: [
+    { name: '北京职场维修(6-11层茶水间吊顶)', type: 'project', typeLabel: '专项项目', owner: '张灵玉', ownerColor: '#3B5BDB', status: 'in-progress', statusLabel: '进行中', pct: 85, updated: '06-13', priority: 3 },
+    { name: '北京职场维修(6-8层连廊电路)', type: 'project', typeLabel: '专项项目', owner: '张灵玉', ownerColor: '#3B5BDB', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-12', priority: 2 },
+    { name: '北京职场车位管理', type: 'daily', typeLabel: '日常事务', owner: '张灵玉', ownerColor: '#3B5BDB', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 2 },
+    { name: '端午全员礼发放', type: 'project', typeLabel: '专项项目', owner: '张灵玉', ownerColor: '#3B5BDB', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-10', priority: 3 },
+    { name: '五周年金钞', type: 'periodic', typeLabel: '周期事项', owner: '张灵玉', ownerColor: '#3B5BDB', status: 'in-progress', statusLabel: '进行中', pct: 50, updated: '06-13', priority: 2 },
+  ],
+  wuhan: [
+    { name: '露台改造', type: 'project', typeLabel: '专项项目', owner: '程宇亮', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 35, updated: '06-13', priority: 3 },
+    { name: '武汉家庭日', type: 'project', typeLabel: '专项项目', owner: '程宇亮', ownerColor: '#8B5CF6', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-09', priority: 3 },
+    { name: '星云训练营', type: 'project', typeLabel: '专项项目', owner: '程宇亮', ownerColor: '#8B5CF6', status: 'not-started', statusLabel: '未开始', pct: 0, updated: '06-12', priority: 3 },
+    { name: '库存系统2.0', type: 'project', typeLabel: '专项项目', owner: '程宇亮', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 40, updated: '06-13', priority: 2 },
+    { name: '空调延时申请', type: 'daily', typeLabel: '日常事务', owner: '程宇亮', ownerColor: '#8B5CF6', status: 'review', statusLabel: '评审中', pct: 70, updated: '06-11', priority: 2 },
+    { name: '武汉职场定制物品', type: 'daily', typeLabel: '日常事务', owner: '董诗昀', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 50, updated: '06-13', priority: 2 },
+    { name: '名片/工卡流程线上化', type: 'project', typeLabel: '专项项目', owner: '董诗昀', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 45, updated: '06-12', priority: 2 },
+    { name: '一楼租赁合同续租', type: 'periodic', typeLabel: '周期事项', owner: '董诗昀', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 3 },
+    { name: '端午礼盒发放', type: 'project', typeLabel: '专项项目', owner: '董诗昀', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 80, updated: '06-13', priority: 2 },
+    { name: '工椅统计', type: 'daily', typeLabel: '日常事务', owner: '董诗昀', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 70, updated: '06-12', priority: 1 },
+    { name: 'Q2季度报修进度拉起', type: 'daily', typeLabel: '日常事务', owner: '董诗昀', ownerColor: '#8B5CF6', status: 'in-progress', statusLabel: '进行中', pct: 30, updated: '06-13', priority: 2 },
+  ],
+  remote: [
+    { name: '庆阳文化墙', type: 'project', typeLabel: '专项项目', owner: '傅中南', ownerColor: '#EC4899', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 3 },
+    { name: '兰州租赁', type: 'project', typeLabel: '专项项目', owner: '傅中南', ownerColor: '#EC4899', status: 'in-progress', statusLabel: '进行中', pct: 30, updated: '06-12', priority: 3 },
+    { name: '上海整合', type: 'project', typeLabel: '专项项目', owner: '傅中南', ownerColor: '#EC4899', status: 'in-progress', statusLabel: '进行中', pct: 20, updated: '06-13', priority: 2 },
+    { name: '车辆采购(庆阳/武汉/兰州/深圳)', type: 'project', typeLabel: '专项项目', owner: '傅中南', ownerColor: '#EC4899', status: 'in-progress', statusLabel: '进行中', pct: 70, updated: '06-13', priority: 3 },
+    { name: '流程规章定稿', type: 'project', typeLabel: '专项项目', owner: '傅中南', ownerColor: '#EC4899', status: 'in-progress', statusLabel: '进行中', pct: 80, updated: '06-11', priority: 3 },
+    { name: '文化衫大货', type: 'project', typeLabel: '专项项目', owner: '傅中南', ownerColor: '#EC4899', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 2 },
+    { name: 'PR照签署', type: 'periodic', typeLabel: '周期事项', owner: '傅中南', ownerColor: '#EC4899', status: 'not-started', statusLabel: '未开始', pct: 0, updated: '06-10', priority: 2 },
+  ],
+  shenzhen: [
+    { name: '深圳职场装修', type: 'project', typeLabel: '专项项目', owner: '胡丽婷', ownerColor: '#F97316', status: 'in-progress', statusLabel: '进行中', pct: 25, updated: '06-13', priority: 3 },
+    { name: '深圳续租保证金退回', type: 'periodic', typeLabel: '周期事项', owner: '胡丽婷', ownerColor: '#F97316', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-11', priority: 2 },
+    { name: '端午礼盒发放', type: 'project', typeLabel: '专项项目', owner: '胡丽婷', ownerColor: '#F97316', status: 'in-progress', statusLabel: '进行中', pct: 70, updated: '06-13', priority: 2 },
+    { name: '高新技术企业认证', type: 'project', typeLabel: '专项项目', owner: '胡丽婷', ownerColor: '#F97316', status: 'in-progress', statusLabel: '进行中', pct: 40, updated: '06-12', priority: 3 },
+    { name: '技术转移项目补贴', type: 'project', typeLabel: '专项项目', owner: '胡丽婷', ownerColor: '#F97316', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 3 },
+    { name: '高管日常支持', type: 'daily', typeLabel: '日常事务', owner: '胡丽婷', ownerColor: '#F97316', status: 'in-progress', statusLabel: '进行中', pct: 80, updated: '06-13', priority: 1 },
+  ],
+  activity: [
+    { name: 'Q2生日会(minions party)', type: 'project', typeLabel: '专项项目', owner: '聂茜茜', ownerColor: '#10B981', status: 'in-progress', statusLabel: '进行中', pct: 55, updated: '06-13', priority: 2 },
+    { name: '公益活动输出', type: 'project', typeLabel: '专项项目', owner: '聂茜茜', ownerColor: '#10B981', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-12', priority: 2 },
+    { name: '端午手工活动(艾草门挂+非遗竹编)', type: 'daily', typeLabel: '日常事务', owner: '聂茜茜', ownerColor: '#10B981', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-07', priority: 2 },
+    { name: '月度费用整理/服务台答疑', type: 'daily', typeLabel: '日常事务', owner: '聂茜茜', ownerColor: '#10B981', status: 'in-progress', statusLabel: '进行中', pct: 50, updated: '06-13', priority: 1 },
+  ],
+  benefit: [
+    { name: '儿童节礼品', type: 'project', typeLabel: '专项项目', owner: '高琳', ownerColor: '#F59E0B', status: 'in-progress', statusLabel: '进行中', pct: 90, updated: '06-13', priority: 3 },
+    { name: '甩肉大赛', type: 'project', typeLabel: '专项项目', owner: '高琳', ownerColor: '#F59E0B', status: 'in-progress', statusLabel: '进行中', pct: 80, updated: '06-13', priority: 3 },
+    { name: '家庭日', type: 'project', typeLabel: '专项项目', owner: '高琳', ownerColor: '#F59E0B', status: 'in-progress', statusLabel: '进行中', pct: 70, updated: '06-13', priority: 3 },
+    { name: '端午手工DIY活动', type: 'daily', typeLabel: '日常事务', owner: '高琳', ownerColor: '#F59E0B', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-07', priority: 1 },
+    { name: '整理北京公益内容', type: 'daily', typeLabel: '日常事务', owner: '高琳', ownerColor: '#F59E0B', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-09', priority: 1 },
+    { name: '行政服务台', type: 'daily', typeLabel: '日常事务', owner: '高琳', ownerColor: '#F59E0B', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 2 },
+  ],
+  servicedesk: [
+    { name: '行政服务台工单处理', type: 'daily', typeLabel: '日常事务', owner: '高琳', ownerColor: '#06B6D4', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 2 },
+  ],
+  digital: [
+    { name: '费用结算(月结凭证对账)', type: 'periodic', typeLabel: '周期事项', owner: '丁玉萍', ownerColor: '#6366F1', status: 'in-progress', statusLabel: '进行中', pct: 50, updated: '06-13', priority: 3 },
+    { name: '差旅平台问题处理', type: 'daily', typeLabel: '日常事务', owner: '丁玉萍', ownerColor: '#6366F1', status: 'in-progress', statusLabel: '进行中', pct: 60, updated: '06-13', priority: 2 },
+    { name: '协议酒店签约上线', type: 'project', typeLabel: '专项项目', owner: '丁玉萍', ownerColor: '#6366F1', status: 'in-progress', statusLabel: '进行中', pct: 85, updated: '06-12', priority: 2 },
+    { name: '健康体检(630开启)', type: 'project', typeLabel: '专项项目', owner: '丁玉萍', ownerColor: '#6366F1', status: 'not-started', statusLabel: '未开始', pct: 0, updated: '06-10', priority: 3 },
+    { name: '相册素材优化', type: 'project', typeLabel: '专项项目', owner: '丁玉萍', ownerColor: '#6366F1', status: 'done', statusLabel: '已完成', pct: 100, updated: '06-09', priority: 2 },
+    { name: '滴滴敏感订单推送', type: 'daily', typeLabel: '日常事务', owner: '丁玉萍', ownerColor: '#6366F1', status: 'in-progress', statusLabel: '进行中', pct: 50, updated: '06-13', priority: 1 },
+  ]
+};
+
+const MODULE_LABELS = {
+  beijing: '北京职场',
+  wuhan: '武汉职场',
+  remote: '异地职场',
+  shenzhen: '深圳职场',
+  activity: '活动运营',
+  benefit: '员工福利',
+  servicedesk: '行政服务台',
+  digital: '数字化后台运营'
+};
+
+let currentModule = 'beijing';
+let currentView = 'list';
+
+function selectModule(el, mod) {
+  document.querySelectorAll('.module-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  currentModule = mod;
+  render();
+}
+
+function switchView(view) {
+  currentView = view;
+  document.getElementById('btnList').classList.toggle('active', view === 'list');
+  document.getElementById('btnKanban').classList.toggle('active', view === 'kanban');
+  document.getElementById('listView').style.display = view === 'list' ? 'block' : 'none';
+  document.getElementById('kanbanView').style.display = view === 'kanban' ? 'block' : 'none';
+  render();
+}
+
+function progressColor(pct) {
+  if (pct >= 100) return 'fill-success';
+  if (pct >= 60) return 'fill-accent';
+  if (pct >= 30) return 'fill-warning';
+  return 'fill-purple';
+}
+
+function statusClass(status) {
+  const m = { 'in-progress': 'badge-in-progress', 'review': 'badge-review', 'done': 'badge-done', 'not-started': 'badge-not-started' };
+  return m[status] || '';
+}
+
+function typeClass(type) {
+  const m = { daily: 'type-daily', periodic: 'type-periodic', project: 'type-project', emergency: 'type-emergency' };
+  return m[type] || '';
+}
+
+function priorityDots(level, isHigh) {
+  let html = '<span class="priority-dots">';
+  for (let i = 1; i <= 4; i++) {
+    const filled = i <= level;
+    const cls = filled ? (isHigh && level >= 4 ? 'filled high' : 'filled') : '';
+    html += `<span class="dot ${cls}"></span>`;
+  }
+  html += '</span>';
+  return html;
+}
+
+function renderList(items) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = items.map(it => `
+    <tr>
+      <td style="font-weight:500">${it.name}</td>
+      <td><span class="type-badge ${typeClass(it.type)}">${it.typeLabel}</span></td>
+      <td>
+        <div class="owner-cell">
+          <span class="owner-avatar" style="background:${it.ownerColor}">${it.owner[0]}</span>
+          ${it.owner}
+        </div>
+      </td>
+      <td><span class="status-badge ${statusClass(it.status)}"><span class="status-dot"></span>${it.statusLabel}</span></td>
+      <td>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-track"><div class="progress-bar-fill ${progressColor(it.pct)}" style="width:${it.pct}%"></div></div>
+          <span class="progress-pct">${it.pct}%</span>
+        </div>
+      </td>
+      <td style="color:var(--text-tertiary);font-size:12px">${it.updated}</td>
+    </tr>
+  `).join('');
+}
+
+function renderKanban(items) {
+  const cols = { 'not-started': [], 'in-progress': [], 'review': [], 'done': [] };
+  items.forEach(it => { if (cols[it.status]) cols[it.status].push(it); });
+
+  const colMeta = [
+    { key: 'not-started', label: '未开始', cls: 'header-not-started' },
+    { key: 'in-progress', label: '进行中', cls: 'header-in-progress' },
+    { key: 'review', label: '评审中', cls: 'header-review' },
+    { key: 'done', label: '已完成', cls: 'header-done' },
+  ];
+
+  const board = document.getElementById('kanbanBoard');
+  board.innerHTML = colMeta.map(c => {
+    const cards = cols[c.key];
+    return `
+      <div class="kanban-col">
+        <div class="kanban-col-header ${c.cls}">${c.label}<span class="col-count">${cards.length}</span></div>
+        <div class="kanban-col-body">
+          ${cards.map(it => `
+            <div class="kanban-card">
+              <span class="drag-handle">⠿</span>
+              <div class="card-name">${it.name}</div>
+              <div class="card-meta">
+                <span class="type-badge ${typeClass(it.type)}" style="font-size:10px;padding:1px 6px">${it.typeLabel}</span>
+                <div class="card-owner">
+                  <span class="card-owner-avatar" style="background:${it.ownerColor}">${it.owner[0]}</span>
+                  <span class="card-owner-name">${it.owner}</span>
+                </div>
+                ${priorityDots(it.priority, it.priority >= 4)}
+              </div>
+              <div class="card-progress">
+                <div class="card-progress-track"><div class="card-progress-fill ${it.pct >= 100 ? 'fill-success' : it.pct >= 60 ? 'fill-accent' : it.pct >= 30 ? 'fill-warning' : 'fill-purple'}" style="width:${it.pct}%;background:${it.pct >= 100 ? 'var(--success)' : it.pct >= 60 ? 'var(--accent)' : it.pct >= 30 ? 'var(--warning)' : 'var(--purple)'}"></div></div>
+                <span class="card-progress-pct">${it.pct}%</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateStats(items) {
+  const total = items.length;
+  const done = items.filter(i => i.status === 'done').length;
+  const wip = items.filter(i => i.status === 'in-progress').length;
+  const avg = total ? Math.round(items.reduce((s, i) => s + i.pct, 0) / total) : 0;
+  document.getElementById('contentTitle').textContent = MODULE_LABELS[currentModule];
+  document.getElementById('contentMeta').textContent = `共 ${total} 项事项`;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statWip').textContent = wip;
+  document.getElementById('statAvg').textContent = avg + '%';
+}
+
+function render() {
+  const items = DATA[currentModule] || [];
+  updateStats(items);
+  if (currentView === 'list') renderList(items);
+  else renderKanban(items);
+}
+
+// Initial render
+render();
+</script>
+</body>
+</html>

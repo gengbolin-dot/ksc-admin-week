@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AOP 我的工作 — 员工首页</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-secondary: #F8F9FB;
+    --bg-tertiary: #F1F3F8;
+    --bg-hover: #EEF0F6;
+    --border: #E5E7EB;
+    --border-light: #F1F3F8;
+    --text-primary: #1A1D26;
+    --text-secondary: #6B7280;
+    --text-tertiary: #9CA3AF;
+    --accent: #3B5BDB;
+    --accent-light: #EBF0FF;
+    --accent-hover: #354FD4;
+    --success: #10B981;
+    --success-light: #ECFDF5;
+    --warning: #F59E0B;
+    --warning-light: #FFFBEB;
+    --danger: #EF4444;
+    --danger-light: #FEF2F2;
+    --purple: #8B5CF6;
+    --purple-light: #F5F3FF;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.06);
+    --transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== LAYOUT ===== */
+  .app-shell {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Sidebar (same as 01) */
+  .sidebar {
+    width: 220px;
+    background: var(--bg);
+    border-right: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sidebar-logo {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .sidebar-logo-icon {
+    width: 26px; height: 26px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 12px;
+  }
+  .sidebar-logo-text { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+  .sidebar-logo-badge { font-size: 9px; font-weight: 600; background: var(--bg-tertiary); color: var(--text-tertiary); padding: 1px 5px; border-radius: 8px; margin-left: 3px; }
+  .sidebar-workspace {
+    padding: 10px 16px; display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text-secondary); font-weight: 600;
+  }
+  .sidebar-section { padding: 6px 10px; border-top: 1px solid var(--border-light); }
+  .sidebar-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); padding: 6px 8px 2px; }
+  .sidebar-group { font-size: 10px; font-weight: 600; color: var(--text-tertiary); padding: 4px 10px 0; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 6px; }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 9px; padding: 6px 10px;
+    border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 450;
+    color: var(--text-secondary); transition: all var(--transition);
+    text-decoration: none;
+  }
+  .sidebar-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .sidebar-item.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+  .sidebar-icon { width: 16px; text-align: center; font-size: 13px; flex-shrink: 0; }
+  .sidebar-badge {
+    font-size: 10px; font-weight: 600; min-width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; margin-left: auto; padding: 0 4px;
+  }
+  .sidebar-badge.warn { background: var(--warning); color: white; }
+  .sidebar-sub-item {
+    display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 30px;
+    font-size: 12.5px; color: var(--text-tertiary); border-radius: 5px;
+    cursor: pointer; transition: all var(--transition); text-decoration: none;
+  }
+  .sidebar-sub-item:hover { background: var(--bg-hover); color: var(--text-secondary); }
+  .sidebar-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .sidebar-bottom { margin-top: auto; padding: 10px; border-top: 1px solid var(--border-light); }
+  .sidebar-user {
+    display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+    border-radius: 7px; cursor: pointer;
+  }
+  .sidebar-user:hover { background: var(--bg-hover); }
+  .sidebar-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 11px; font-weight: 600;
+  }
+  .sidebar-username { font-size: 12px; font-weight: 600; }
+  .sidebar-userrole { font-size: 10px; color: var(--text-tertiary); }
+
+  /* Main area */
+  .main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-secondary);
+  }
+  .main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 36px;
+  }
+
+  /* ===== PAGE HEADER ===== */
+  .page-header {
+    margin-bottom: 20px;
+  }
+  .page-header .greeting {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .page-header .greeting-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  /* ===== WEEK NAVIGATOR → COVERAGE PERIOD SELECTOR ===== */
+  .week-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 12px 18px;
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  .week-nav-btn {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+    transition: all var(--transition);
+    font-size: 16px;
+  }
+  .week-nav-btn:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .week-nav-btn:disabled {
+    opacity: .35;
+    cursor: default;
+    background: var(--bg);
+    color: var(--text-tertiary);
+    border-color: var(--border-light);
+  }
+  .week-nav-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 260px;
+  }
+  .week-nav-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .week-nav-sub {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-tertiary);
+    margin-top: 1px;
+  }
+  .week-nav-current {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-left: 10px;
+  }
+  .week-nav-current::before {
+    content: "";
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  /* Quick period chips */
+  .period-chips {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .period-chip {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-secondary);
+    transition: all var(--transition);
+    white-space: nowrap;
+  }
+  .period-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-light);
+  }
+  .period-chip.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .period-chip span {
+    font-weight: 400;
+    color: var(--text-tertiary);
+    margin-left: 2px;
+  }
+  .period-chip.active span { color: rgba(255,255,255,.7); }
+  .week-nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .week-nav-year {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    padding: 4px 10px;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+  .week-nav-year:hover { color: var(--accent); background: var(--accent-light); }
+  .week-nav-year.active { color: var(--accent); background: var(--accent-light); }
+  .btn-view-report {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 8px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--accent); background: var(--accent-light);
+    color: var(--accent); transition: all var(--transition);
+    text-decoration: none;
+  }
+  .btn-view-report:hover { background: var(--accent); color: #fff; }
+  .btn-view-report svg { width: 13px; height: 13px; }
+
+  /* ===== STATS ROW ===== */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition);
+  }
+  .stat-card:hover { box-shadow: var(--shadow); }
+  .stat-card .stat-num {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .stat-card .stat-label {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+  .stat-card.accent .stat-num { color: var(--accent); }
+  .stat-card.warn .stat-num { color: var(--warning); }
+  .stat-card.danger .stat-num { color: var(--danger); }
+  .stat-card.success .stat-num { color: var(--success); }
+
+  /* ===== TABS ===== */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0;
+  }
+  .tab-item {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all var(--transition);
+    margin-bottom: -1px;
+  }
+  .tab-item:hover { color: var(--text-secondary); }
+  .tab-item.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+  .tab-count {
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--bg-tertiary);
+    color: var(--text-tertiary);
+    padding: 0 5px;
+    border-radius: 8px;
+    margin-left: 4px;
+    line-height: 16px;
+  }
+  .tab-item.active .tab-count { background: var(--accent-light); color: var(--accent); }
+
+  /* ===== SEARCH ===== */
+  .search-bar {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .search-bar input {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px 12px 8px 34px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    background: var(--bg);
+    transition: border-color var(--transition);
+    outline: none;
+  }
+  .search-bar input:focus { border-color: var(--accent); }
+  .search-bar input::placeholder { color: var(--text-tertiary); }
+  .search-icon {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    font-size: 14px; color: var(--text-tertiary);
+  }
+
+  /* ===== TYPE SECTIONS (重点专项 / 日常运营) ===== */
+  .type-section {
+    margin-top: 24px;
+  }
+  .type-section:first-child { margin-top: 0; }
+  .type-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .type-header-icon {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .type-header-icon.project { background: var(--purple-light); }
+  .type-header-icon.ops { background: var(--success-light); }
+  .type-header-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .type-header-count {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .type-header-count.project { background: var(--purple-light); color: var(--purple); }
+  .type-header-count.ops { background: var(--success-light); color: var(--success); }
+  .type-header-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border-light);
+  }
+
+  /* ===== WORK ITEM CARDS ===== */
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .work-item-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: inherit;
+  }
+  .work-item-card:hover {
+    box-shadow: var(--shadow);
+    border-color: var(--border);
+    transform: translateY(-1px);
+  }
+  .work-item-card.not-updated {
+    border-left: 3px solid var(--warning);
+  }
+  .work-item-card.overdue {
+    border-left: 3px solid var(--danger);
+  }
+
+  .item-priority-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .priority-high { background: var(--danger-light); color: var(--danger); }
+  .priority-medium { background: var(--warning-light); color: var(--warning); }
+  .priority-low { background: var(--bg-tertiary); color: var(--text-tertiary); }
+
+  .item-info { flex: 1; min-width: 0; }
+  .item-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .item-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 3px;
+  }
+  .item-module-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 1px 8px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .item-type-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 4px;
+  }
+  .type-project { background: #F3E8FF; color: #8B5CF6; }
+  .type-ops { background: #ECFDF5; color: #059669; }
+
+  .item-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+  .item-status {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+  .status-progress { background: var(--accent-light); color: var(--accent); }
+  .status-done { background: var(--success-light); color: var(--success); }
+  .status-overdue { background: var(--danger-light); color: var(--danger); }
+  .status-review { background: var(--purple-light); color: var(--purple); }
+
+  .item-owner-avatar {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 9px; font-weight: 600;
+  }
+  .item-deadline {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-weight: 400;
+  }
+  .item-deadline.overdue { color: var(--danger); font-weight: 500; }
+  .item-update-flag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .flag-pending { background: var(--warning-light); color: var(--warning); }
+  .flag-done { background: var(--success-light); color: var(--success); }
+
+  /* ===== SUBMIT STATUS ON CARDS ===== */
+  .item-submit-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 8px;
+    margin-left: 4px;
+  }
+  .submit-done { background: #ECFDF5; color: #059669; }
+  .submit-pending { background: #FFF7ED; color: #C2410C; }
+
+  /* ===== SUBMIT ACTION BAR ===== */
+  .submit-bar {
+    margin-top: 28px;
+    padding: 18px 22px;
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  .submit-bar-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .submit-bar-progress {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+  .submit-bar-progress strong { color: var(--text-primary); }
+  .submit-unsubmitted {
+    font-size: 11px;
+    color: var(--warning);
+    font-weight: 500;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .submit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all var(--transition);
+  }
+  .submit-btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .submit-btn-primary:hover { filter: brightness(1.08); }
+  .submit-btn-primary:disabled {
+    opacity: .4;
+    cursor: default;
+    filter: none;
+  }
+  .submit-btn-done {
+    background: var(--success-light);
+    color: var(--success);
+    cursor: default;
+  }
+  .submit-hint {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  /* ===== HISTORICAL WEEK INDICATOR ===== */
+  .historical-hint {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: var(--bg-tertiary);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    font-size: 12px;
+    color: var(--text-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .historical-hint svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* ===== VIEW REPORT LINK ===== */
+  .view-report-section {
+    margin-top: 24px;
+    padding: 14px 18px;
+    background: linear-gradient(180deg, var(--accent-light) 0%, transparent 100%);
+    border: 1px solid rgba(59, 91, 219, 0.12);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .view-report-section .vr-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .view-report-section .vr-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    color: white; flex-shrink: 0;
+  }
+  .view-report-section .vr-icon svg { width: 18px; height: 18px; }
+  .view-report-section .vr-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .view-report-section .vr-sub {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+  }
+
+  /* ===== ANNOTATION PANEL ===== */
+  .annotation-panel {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    width: 280px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 18px;
+    font-size: 12px;
+    z-index: 100;
+  }
+  .annotation-panel h4 {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .anno-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .anno-num {
+    width: 16px; height: 16px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .anno-text { color: var(--text-secondary); }
+  .anno-text strong { color: var(--text-primary); }
+
+  /* ===== CALENDAR POPOVER ===== */
+  .cal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.15);
+    z-index: 300;
+    display: none;
+  }
+  .cal-overlay.open { display: block; }
+  .cal-popover {
+    position: absolute;
+    width: 340px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: 301;
+    display: none;
+    overflow: hidden;
+  }
+  .cal-popover.open { display: block; }
+  .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .cal-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .cal-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .cal-nav-btn {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-secondary);
+    transition: all var(--transition);
+    font-size: 13px;
+  }
+  .cal-nav-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .cal-month-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 100px;
+    text-align: center;
+  }
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 8px 12px 4px;
+    gap: 0;
+  }
+  .cal-weekday {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 4px 12px 12px;
+    gap: 2px;
+  }
+  .cal-day {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition);
+    margin: 0 auto;
+    position: relative;
+  }
+  .cal-day:hover { background: var(--accent-light); }
+  .cal-day.other-month { color: var(--text-tertiary); opacity: .4; }
+  .cal-day.today { font-weight: 700; color: var(--accent); }
+  .cal-day.today::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    width: 4px; height: 2px;
+    border-radius: 1px;
+    background: var(--accent);
+  }
+  .cal-day.start-selected {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 8px 4px 4px 8px;
+  }
+  .cal-day.end-selected {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 4px 8px 8px 4px;
+  }
+  .cal-day.in-range {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 600;
+    border-radius: 4px;
+  }
+  .cal-day.start-end {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 8px;
+  }
+  .cal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-secondary);
+  }
+  .cal-range-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .cal-range-weeks {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    margin-top: 1px;
+  }
+  .cal-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .cal-btn {
+    padding: 6px 16px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    border: none;
+  }
+  .cal-btn-cancel {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+  .cal-btn-cancel:hover { background: var(--bg-hover); }
+  .cal-btn-apply {
+    background: var(--accent);
+    color: #fff;
+  }
+  .cal-btn-apply:hover { filter: brightness(1.08); }
+  .cal-btn-apply:disabled { opacity: .4; cursor: default; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">A</div>
+      <div style="display:flex;flex-direction:column"><div style="display:flex;align-items:center;gap:6px"><div class="sidebar-logo-text">AOP</div><div class="sidebar-logo-badge">Beta</div></div><div style="font-size:9px;font-weight:500;color:var(--text-tertiary);letter-spacing:0.06em;white-space:nowrap;margin-top:1px">行政运营管理平台</div></div>
+    </div>
+    <div class="sidebar-workspace">▼ 行政部</div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">个人</div>
+      <div class="sidebar-item active">
+        <div class="sidebar-icon">🏠</div> 我的工作
+        <div class="sidebar-badge warn">3</div>
+      </div>
+      <a class="sidebar-item" href="./10-okr.html">
+        <div class="sidebar-icon">🎯</div> OKR <span style="font-size:10px;color:var(--text-tertiary);margin-left:2px">手动导入</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">管理</div>
+      <a class="sidebar-item" href="./04-admin-overview.html">
+        <div class="sidebar-icon">📋</div> 行政总览
+      </a>
+      <a class="sidebar-item" href="./05-key-projects.html">
+        <div class="sidebar-icon">⭐</div> 重点专项
+      </a>
+      <a class="sidebar-item" href="./06-ops-dashboard.html">
+        <div class="sidebar-icon">📊</div> 运营看板
+      </a>
+      <a class="sidebar-item" href="./07-weekly-meeting.html">
+        <div class="sidebar-icon">👥</div> 周会视图
+      </a>
+      <a class="sidebar-item" href="./08-weekly-report.html">
+        <div class="sidebar-icon">📝</div> 周报
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">分析</div>
+      <a class="sidebar-item" href="./09-data-cockpit.html">
+        <div class="sidebar-icon">📈</div> 数据驾驶舱
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">业务模块</div>
+      <div class="sidebar-group">职场运营</div>
+      <a class="sidebar-sub-item" href="#"><div class="sidebar-dot" style="background:#3B5BDB;"></div> 北京职场</a>
+      <a class="sidebar-sub-item" href="#"><div class="sidebar-dot" style="background:#8B5CF6;"></div> 武汉职场</a>
+      <a class="sidebar-sub-item" href="#"><div class="sidebar-dot" style="background:#EC4899;"></div> 异地职场</a>
+      <div class="sidebar-group">文化运营</div>
+      <a class="sidebar-sub-item" href="#"><div class="sidebar-dot" style="background:#10B981;"></div> 活动运营</a>
+      <a class="sidebar-sub-item" href="#"><div class="sidebar-dot" style="background:#F59E0B;"></div> 员工福利</a>
+      <div class="sidebar-group">数字化运营</div>
+      <a class="sidebar-sub-item" href="#"><div class="sidebar-dot" style="background:#06B6D4;"></div> 行政服务台</a>
+      <a class="sidebar-sub-item" href="#"><div class="sidebar-dot" style="background:#6366F1;"></div> 数字化后台运营</a>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">耿</div>
+        <div>
+          <div class="sidebar-username">耿博琳</div>
+          <div class="sidebar-userrole">职场管理(北京+异地)、行政数字化、文化运营</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+    <div class="main-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="greeting">早上好，耿博琳 👋</div>
+        <div class="greeting-sub">本周有 3 个事项待更新，1 个事项今日截止</div>
+      </div>
+
+      <!-- Coverage Period Selector -->
+      <div class="week-nav">
+        <button class="week-nav-btn" disabled>←</button>
+        <div class="week-nav-body">
+          <div class="week-nav-label">
+            7月7日 — 7月11日
+            <span class="week-nav-current">当前周</span>
+          </div>
+          <div class="week-nav-sub">W28 · 选择你要更新的覆盖周期</div>
+          <div class="period-chips">
+            <div class="period-chip active">本周 <span>7/7-7/11</span></div>
+            <div class="period-chip">上周 <span>6/30-7/4</span></div>
+            <div class="period-chip">近两周 <span>6/30-7/11</span></div>
+            <div class="period-chip">本月 <span>7/1-7/31</span></div>
+            <div class="period-chip">自选区间</div>
+          </div>
+        </div>
+        <button class="week-nav-btn" disabled>→</button>
+        <div class="week-nav-right">
+          <span class="week-nav-year active">2026</span>
+          <span class="week-nav-year">2025</span>
+          <a class="btn-view-report" href="./08-weekly-report.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            查看本周报
+          </a>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-card accent">
+          <div class="stat-num">6</div>
+          <div class="stat-label">负责事项总数</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-num">3</div>
+          <div class="stat-label">本周待更新</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-num">1</div>
+          <div class="stat-label">今日截止</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-num">0</div>
+          <div class="stat-label">延期事项</div>
+        </div>
+      </div>
+
+      <!-- Tab Bar -->
+      <div class="tab-bar">
+        <div class="tab-item active">全部 <span class="tab-count">6</span></div>
+        <div class="tab-item">待更新 <span class="tab-count">3</span></div>
+        <div class="tab-item">已更新 <span class="tab-count">3</span></div>
+        <div class="tab-item">延期 <span class="tab-count">0</span></div>
+      </div>
+
+      <!-- Search -->
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="搜索事项名称..." />
+      </div>
+
+      <!-- ⭐ 重点专项 Section -->
+      <div class="type-section">
+        <div class="type-header">
+          <div class="type-header-icon project">⭐</div>
+          <span class="type-header-label">重点专项</span>
+          <span class="type-header-count project">4</span>
+          <div class="type-header-line"></div>
+        </div>
+        <div class="items-list">
+
+          <div class="work-item-card not-updated" href="./03-item-detail.html" onclick="window.location='./03-item-detail.html'">
+            <div class="item-priority-badge priority-high">高</div>
+            <div class="item-info">
+              <div class="item-name">甩肉大赛</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#FFFBEB;color:#F59E0B;">🎉 文化运营(福利)</span>
+                <span class="item-type-badge type-project">专项</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-progress">进行中</span>
+              <div class="item-owner-avatar">高</div>
+              <span class="item-deadline">6月30日</span>
+              <span class="item-update-flag flag-pending">待更新</span>
+              <span class="item-submit-badge submit-pending">待提交</span>
+            </div>
+          </div>
+
+          <div class="work-item-card not-updated" href="./03-item-detail.html" onclick="window.location='./03-item-detail.html'">
+            <div class="item-priority-badge priority-high">高</div>
+            <div class="item-info">
+              <div class="item-name">家庭日</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#ECFDF5;color:#10B981;">🎉 文化运营(活动)</span>
+                <span class="item-type-badge type-project">专项</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-progress">进行中</span>
+              <div class="item-owner-avatar">高</div>
+              <span class="item-deadline">7月15日</span>
+              <span class="item-update-flag flag-pending">待更新</span>
+              <span class="item-submit-badge submit-pending">待提交</span>
+            </div>
+          </div>
+
+          <div class="work-item-card" href="./03-item-detail.html" onclick="window.location='./03-item-detail.html'">
+            <div class="item-priority-badge priority-high">高</div>
+            <div class="item-info">
+              <div class="item-name">健康体检</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#ECFEFF;color:#06B6D4;">💻 数字化运营(后台)</span>
+                <span class="item-type-badge type-project">专项</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-review">评审中</span>
+              <div class="item-owner-avatar">丁</div>
+              <span class="item-deadline">6月30日</span>
+              <span class="item-update-flag flag-done">已更新</span>
+              <span class="item-submit-badge submit-done">✓已提交</span>
+            </div>
+          </div>
+
+          <div class="work-item-card not-updated" href="./03-item-detail.html" onclick="window.location='./03-item-detail.html'">
+            <div class="item-priority-badge priority-medium">中</div>
+            <div class="item-info">
+              <div class="item-name">儿童节礼品</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#FFFBEB;color:#F59E0B;">🎁 文化运营(福利)</span>
+                <span class="item-type-badge type-project">专项</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-progress">进行中</span>
+              <div class="item-owner-avatar">高</div>
+              <span class="item-deadline overdue">今日截止</span>
+              <span class="item-update-flag flag-pending">待更新</span>
+              <span class="item-submit-badge submit-pending">待提交</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 🔄 日常运营 Section -->
+      <div class="type-section">
+        <div class="type-header">
+          <div class="type-header-icon ops">🔄</div>
+          <span class="type-header-label">日常运营</span>
+          <span class="type-header-count ops">2</span>
+          <div class="type-header-line"></div>
+        </div>
+        <div class="items-list">
+
+          <div class="work-item-card" href="./03-item-detail.html" onclick="window.location='./03-item-detail.html'">
+            <div class="item-priority-badge priority-medium">中</div>
+            <div class="item-info">
+              <div class="item-name">行政服务台</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#ECFEFF;color:#06B6D4;">💻 数字化运营(行政服务台)</span>
+                <span class="item-type-badge type-ops">日常运营</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-progress">进行中</span>
+              <div class="item-owner-avatar">高</div>
+              <span class="item-deadline">每周</span>
+              <span class="item-update-flag flag-done">已更新</span>
+              <span class="item-submit-badge submit-done">✓已提交</span>
+            </div>
+          </div>
+
+          <div class="work-item-card" href="./03-item-detail.html" onclick="window.location='./03-item-detail.html'">
+            <div class="item-priority-badge priority-medium">中</div>
+            <div class="item-info">
+              <div class="item-name">整理北京公益内容</div>
+              <div class="item-meta">
+                <span class="item-module-tag" style="background:#ECFDF5;color:#10B981;">🎉 文化运营(活动)</span>
+                <span class="item-type-badge type-ops">日常运营</span>
+              </div>
+            </div>
+            <div class="item-right">
+              <span class="item-status status-done">已完成</span>
+              <div class="item-owner-avatar">高</div>
+              <span class="item-deadline">6月13日</span>
+              <span class="item-update-flag flag-done">已更新</span>
+              <span class="item-submit-badge submit-done">✓已提交</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Historical hint when navigating to past weeks -->
+      <!-- (This is shown when ← is clicked to go to a previous week) -->
+
+      <!-- Submit Action Bar -->
+      <div class="submit-bar">
+        <div class="submit-bar-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16" style="color:var(--accent);flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          本周更新提交
+        </div>
+        <div class="submit-bar-progress">
+          已更新 <strong>5</strong>/6 事项 · 已提交 <strong>4</strong>/6 事项
+        </div>
+        <div class="submit-unsubmitted">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          待提交：甩肉大赛、家庭日
+        </div>
+        <button class="submit-btn submit-btn-primary" id="submitBtn" onclick="handleSubmit()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          提交本周更新
+        </button>
+        <div class="submit-hint">
+          💡 提交后管理者可在周会前看到你的更新；未提交的事项会在开会前收到提醒
+        </div>
+      </div>
+
+      <!-- View Report Section -->
+      <div class="view-report-section">
+        <div class="vr-left">
+          <div class="vr-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="vr-title">本周报已自动生成</div>
+            <div class="vr-sub">2026年7月6日 — 7月12日 · 基于全员本周更新自动汇总</div>
+          </div>
+        </div>
+        <a class="btn-view-report" href="./08-weekly-report.html">
+          查看本周报 →
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ANNOTATION PANEL -->
+  <div class="annotation-panel">
+    <h4>📋 页面说明</h4>
+    <div class="anno-item">
+      <div class="anno-num">1</div>
+      <div class="anno-text">默认首页，员工登录后直接进入此页</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">2</div>
+      <div class="anno-text"><strong>覆盖周期选择器</strong> — 不是"你必须在哪周填"，而是"你这笔更新覆盖了哪个时间段"</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">3</div>
+      <div class="anno-text">快捷选项：本周 / 上周 / 近两周 / 本月 / 自选区间</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">4</div>
+      <div class="anno-text">默认选中「本周」— 习惯每周更新的同学无感知</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">5</div>
+      <div class="anno-text"><strong>自选区间 = 日历自由拖选</strong>，不强制对齐周边界。7月2号到14号？没问题</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">6</div>
+      <div class="anno-text">选完后系统自动计算覆盖了哪些更新周（W27·W28·W29），后台聚合用</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">7</div>
+      <div class="anno-text">「待更新」= 在你选的覆盖周期内还没有更新记录的事项</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">8</div>
+      <div class="anno-text">周报/周会自动聚合同区间所有人的更新，不丢信息</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Calendar popover overlay -->
+<div class="cal-overlay" id="calOverlay" onclick="closeCalendar()"></div>
+
+<!-- Calendar popover -->
+<div class="cal-popover" id="calPopover">
+  <div class="cal-header">
+    <div class="cal-title">选择覆盖区间</div>
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="calPrev()">←</button>
+      <span class="cal-month-label" id="calMonthLabel">2026年7月</span>
+      <button class="cal-nav-btn" onclick="calNext()">→</button>
+    </div>
+  </div>
+  <div class="cal-weekdays">
+    <span class="cal-weekday">一</span><span class="cal-weekday">二</span>
+    <span class="cal-weekday">三</span><span class="cal-weekday">四</span>
+    <span class="cal-weekday">五</span><span class="cal-weekday">六</span>
+    <span class="cal-weekday">日</span>
+  </div>
+  <div class="cal-days" id="calDays"></div>
+  <div class="cal-footer">
+    <div>
+      <div class="cal-range-label" id="calRangeLabel">选择起始日期</div>
+      <div class="cal-range-weeks" id="calRangeWeeks"></div>
+    </div>
+    <div class="cal-actions">
+      <button class="cal-btn cal-btn-cancel" onclick="closeCalendar()">取消</button>
+      <button class="cal-btn cal-btn-apply" id="calApplyBtn" disabled onclick="applyRange()">确认</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---- Period chip interaction ---- */
+document.querySelectorAll('.period-chip').forEach(function(chip) {
+  chip.addEventListener('click', function() {
+    if (chip.textContent.trim().startsWith('自选区间')) {
+      openCalendar(chip);
+      return;
+    }
+    document.querySelectorAll('.period-chip').forEach(function(c) { c.classList.remove('active'); });
+    chip.classList.add('active');
+  });
+});
+
+/* ---- Submit button interaction ---- */
+function handleSubmit() {
+  var btn = document.getElementById('submitBtn');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> 已提交 ✓';
+  btn.className = 'submit-btn submit-btn-done';
+  btn.disabled = true;
+  // Update all pending badges to done
+  document.querySelectorAll('.item-submit-badge.submit-pending').forEach(function(badge) {
+    badge.className = 'item-submit-badge submit-done';
+    badge.textContent = '✓已提交';
+  });
+  // Update submit bar progress
+  var bar = document.querySelector('.submit-bar');
+  if (bar) {
+    bar.querySelector('.submit-bar-progress').innerHTML = '已更新 <strong>5</strong>/6 事项 · 已提交 <strong>6</strong>/6 事项';
+    bar.querySelector('.submit-unsubmitted').style.display = 'none';
+  }
+}
+
+/* ---- Year switch ---- */
+document.querySelectorAll('.week-nav-year').forEach(function(el) {
+  el.addEventListener('click', function() {
+    document.querySelectorAll('.week-nav-year').forEach(function(e) { e.classList.remove('active'); });
+    el.classList.add('active');
+  });
+});
+
+/* ---- Calendar state ---- */
+var calYear = 2026;
+var calMonth = 7;
+var calStart = null;
+var calEnd = null;
+var calStep = 'start';
+var triggerChip = null;
+
+function openCalendar(chip) {
+  triggerChip = chip;
+  calStart = null;
+  calEnd = null;
+  calStep = 'start';
+  calYear = 2026;
+  calMonth = 7;
+  renderCalendar();
+  var rect = chip.getBoundingClientRect();
+  var pop = document.getElementById('calPopover');
+  pop.style.top = (rect.bottom + 8) + 'px';
+  pop.style.left = Math.max(8, rect.left - 20) + 'px';
+  document.getElementById('calOverlay').classList.add('open');
+  pop.classList.add('open');
+}
+
+function closeCalendar() {
+  document.getElementById('calOverlay').classList.remove('open');
+  document.getElementById('calPopover').classList.remove('open');
+}
+
+function renderCalendar() {
+  document.getElementById('calMonthLabel').textContent = calYear + '年' + calMonth + '月';
+  var firstDay = new Date(calYear, calMonth - 1, 1);
+  var lastDay = new Date(calYear, calMonth, 0);
+  var startDow = (firstDay.getDay() + 6) % 7;
+  var daysInMonth = lastDay.getDate();
+  var prevLast = new Date(calYear, calMonth - 1, 0).getDate();
+  var html = '';
+  for (var p = startDow - 1; p >= 0; p--) {
+    html += '<div class="cal-day other-month">' + (prevLast - p) + '</div>';
+  }
+  var today = new Date();
+  for (var d = 1; d <= daysInMonth; d++) {
+    var isToday = calYear === today.getFullYear() && calMonth === (today.getMonth() + 1) && d === today.getDate();
+    var cls = 'cal-day';
+    if (isToday) cls += ' today';
+    if (calStart && calEnd) {
+      var thisDate = new Date(calYear, calMonth - 1, d);
+      var s = calStart.getTime(); var e = calEnd.getTime(); var t = thisDate.getTime();
+      if (t === s && t === e) cls += ' start-end';
+      else if (t === s) cls += ' start-selected';
+      else if (t === e) cls += ' end-selected';
+      else if (t > s && t < e) cls += ' in-range';
+    } else if (calStart && calYear === calStart.getFullYear() && calMonth === (calStart.getMonth() + 1) && d === calStart.getDate()) {
+      cls += ' start-selected';
+    }
+    html += '<div class="' + cls + '" onclick="pickDay(' + d + ')">' + d + '</div>';
+  }
+  var totalCells = startDow + daysInMonth;
+  var remaining = (7 - totalCells % 7) % 7;
+  for (var n = 1; n <= remaining; n++) {
+    html += '<div class="cal-day other-month">' + n + '</div>';
+  }
+  document.getElementById('calDays').innerHTML = html;
+  // Footer labels
+  var rangeLabel = document.getElementById('calRangeLabel');
+  var rangeWeeks = document.getElementById('calRangeWeeks');
+  var applyBtn = document.getElementById('calApplyBtn');
+  if (!calStart) {
+    rangeLabel.textContent = '选择起始日期';
+    rangeWeeks.textContent = '';
+    applyBtn.disabled = true;
+  } else if (!calEnd) {
+    rangeLabel.textContent = (calStart.getMonth()+1) + '月' + calStart.getDate() + '日 — ?';
+    rangeWeeks.textContent = '再点击选择截止日期';
+    applyBtn.disabled = true;
+  } else {
+    var sF = (calStart.getMonth()+1) + '月' + calStart.getDate() + '日';
+    var eF = (calEnd.getMonth()+1) + '月' + calEnd.getDate() + '日';
+    rangeLabel.textContent = sF + ' — ' + eF;
+    var diffDays = Math.round((calEnd - calStart) / 86400000) + 1;
+    var wks = [];
+    var it = new Date(calStart);
+    while (it <= calEnd) {
+      var jan1 = new Date(it.getFullYear(), 0, 1);
+      var wk = Math.ceil(((it - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+      var wkS = 'W' + wk;
+      if (wks.indexOf(wkS) === -1) wks.push(wkS);
+      it.setDate(it.getDate() + 7);
+    }
+    rangeWeeks.textContent = '共 ' + diffDays + ' 天 · 覆盖 ' + wks.join(' · ');
+    applyBtn.disabled = false;
+  }
+}
+
+function pickDay(d) {
+  var picked = new Date(calYear, calMonth - 1, d);
+  if (calStep === 'start') {
+    calStart = picked; calEnd = null; calStep = 'end';
+  } else {
+    if (picked < calStart) { calEnd = calStart; calStart = picked; }
+    else { calEnd = picked; }
+    calStep = 'start';
+  }
+  renderCalendar();
+}
+
+function calPrev() { calMonth--; if (calMonth < 1) { calMonth = 12; calYear--; } renderCalendar(); }
+function calNext() { calMonth++; if (calMonth > 12) { calMonth = 1; calYear++; } renderCalendar(); }
+
+function applyRange() {
+  if (!calStart || !calEnd) return;
+  var sS = (calStart.getMonth()+1) + '/' + calStart.getDate();
+  var eS = (calEnd.getMonth()+1) + '/' + calEnd.getDate();
+  var navLabel = document.querySelector('.week-nav-label');
+  if (navLabel) {
+    var sF = (calStart.getMonth()+1) + '月' + calStart.getDate() + '日';
+    var eF = (calEnd.getMonth()+1) + '月' + calEnd.getDate() + '日';
+    navLabel.textContent = sF + ' — ' + eF;
+  }
+  document.querySelectorAll('.period-chip').forEach(function(c) { c.classList.remove('active'); });
+  if (triggerChip) {
+    triggerChip.classList.add('active');
+    triggerChip.innerHTML = '自选区间 <span>' + sS + '-' + eS + '</span>';
+  }
+  closeCalendar();
+}
+</script>
+
+</body>
+</html>

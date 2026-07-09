@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AOP 运营看板 — 管理层首页</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFFFF;
+    --bg-secondary: #F8F9FB;
+    --bg-tertiary: #F1F3F8;
+    --bg-hover: #EEF0F6;
+    --border: #E5E7EB;
+    --border-light: #F1F3F8;
+    --text-primary: #1A1D26;
+    --text-secondary: #6B7280;
+    --text-tertiary: #9CA3AF;
+    --accent: #3B5BDB;
+    --accent-light: #EBF0FF;
+    --accent-hover: #354FD4;
+    --success: #10B981;
+    --success-light: #ECFDF5;
+    --warning: #F59E0B;
+    --warning-light: #FFFBEB;
+    --danger: #EF4444;
+    --danger-light: #FEF2F2;
+    --purple: #8B5CF6;
+    --purple-light: #F5F3FF;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 18px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.06);
+    --transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== LAYOUT ===== */
+  .app-shell {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 220px;
+    background: var(--bg);
+    border-right: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sidebar-logo {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .sidebar-logo-icon {
+    width: 26px; height: 26px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 700; font-size: 12px;
+  }
+  .sidebar-logo-text { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+  .sidebar-logo-badge { font-size: 9px; font-weight: 600; background: var(--bg-tertiary); color: var(--text-tertiary); padding: 1px 5px; border-radius: 8px; margin-left: 3px; }
+  .sidebar-workspace {
+    padding: 10px 16px; display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text-secondary); font-weight: 600;
+  }
+  .sidebar-section { padding: 6px 10px; border-top: 1px solid var(--border-light); }
+  .sidebar-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-tertiary); padding: 6px 8px 2px; }
+  .sidebar-group { font-size: 10px; font-weight: 600; color: var(--text-tertiary); padding: 4px 10px 0; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 6px; }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 9px; padding: 6px 10px;
+    border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 450;
+    color: var(--text-secondary); transition: all var(--transition);
+  }
+  .sidebar-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .sidebar-item.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+  .sidebar-icon { width: 16px; text-align: center; font-size: 13px; flex-shrink: 0; }
+  .sidebar-badge {
+    font-size: 10px; font-weight: 600; min-width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; margin-left: auto; padding: 0 4px;
+  }
+  .sidebar-badge.warn { background: var(--warning); color: white; }
+  .sidebar-sub-item {
+    display: flex; align-items: center; gap: 6px; padding: 4px 10px 4px 30px;
+    font-size: 12.5px; color: var(--text-tertiary); border-radius: 5px;
+    cursor: pointer; transition: all var(--transition);
+  }
+  .sidebar-sub-item:hover { background: var(--bg-hover); color: var(--text-secondary); }
+  .sidebar-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .sidebar-bottom { margin-top: auto; padding: 10px; border-top: 1px solid var(--border-light); }
+  .sidebar-user {
+    display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+    border-radius: 7px; cursor: pointer;
+  }
+  .sidebar-user:hover { background: var(--bg-hover); }
+  .sidebar-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 11px; font-weight: 600;
+  }
+  .sidebar-username { font-size: 12px; font-weight: 600; }
+  .sidebar-userrole { font-size: 10px; color: var(--text-tertiary); }
+
+  /* ===== MAIN AREA ===== */
+  .main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-secondary);
+  }
+  .main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 36px;
+  }
+
+  /* ===== PAGE HEADER ===== */
+  .page-header {
+    margin-bottom: 28px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .page-header .title {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .page-header .subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-secondary);
+  }
+  .btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .period-select {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-secondary);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%239CA3AF' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  /* ===== STATS ROW ===== */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .stat-card.total::before { background: var(--accent); }
+  .stat-card.progress::before { background: var(--accent); }
+  .stat-card.done::before { background: var(--success); }
+  .stat-card.overdue::before { background: var(--danger); }
+  .stat-card.risk::before { background: var(--warning); }
+  .stat-card .stat-num {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .stat-card.total .stat-num { color: var(--accent); }
+  .stat-card.progress .stat-num { color: var(--accent); }
+  .stat-card.done .stat-num { color: var(--success); }
+  .stat-card.overdue .stat-num { color: var(--danger); }
+  .stat-card.risk .stat-num { color: var(--warning); }
+  .stat-card .stat-label {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .stat-card .stat-trend {
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .stat-trend.up { color: var(--success); }
+  .stat-trend.down { color: var(--danger); }
+  .stat-trend.neutral { color: var(--text-tertiary); }
+
+  /* ===== DASHBOARD GRID ===== */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 16px;
+  }
+  .dashboard-left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .dashboard-right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    padding: 24px 28px;
+    box-shadow: var(--shadow-sm);
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+  .card-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 12px;
+  }
+  .card-badge.accent { background: var(--accent-light); color: var(--accent); }
+  .card-badge.danger { background: var(--danger-light); color: var(--danger); }
+  .card-badge.warning { background: var(--warning-light); color: var(--warning); }
+
+  /* ===== STACKED BAR CHART ===== */
+  .stacked-bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .stacked-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .stacked-bar-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    width: 130px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .stacked-bar-track {
+    flex: 1;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--bg-tertiary);
+    display: flex;
+    overflow: hidden;
+  }
+  .stacked-bar-segment {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+    transition: width 0.6s ease;
+    min-width: 0;
+    position: relative;
+  }
+  .stacked-bar-segment span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 4px;
+  }
+  .bar-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .bar-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+  .bar-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+  }
+
+  /* ===== HORIZONTAL BAR RANKING ===== */
+  .rank-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .rank-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .rank-pos {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-tertiary);
+    width: 18px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .rank-pos.top { color: var(--accent); }
+  .rank-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 10px; font-weight: 600; flex-shrink: 0;
+  }
+  .rank-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    width: 70px;
+    flex-shrink: 0;
+  }
+  .rank-bar-track {
+    flex: 1;
+    height: 20px;
+    background: var(--bg-tertiary);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  .rank-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.6s ease;
+    display: flex;
+    align-items: center;
+    padding-right: 8px;
+    justify-content: flex-end;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    min-width: 24px;
+  }
+
+  /* ===== DONUT CHART ===== */
+  .donut-chart-section {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  .donut-chart {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .donut-chart::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: var(--bg);
+  }
+  .donut-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1;
+  }
+  .donut-center-num {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
+  }
+  .donut-center-label {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+  .donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+  .donut-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .donut-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .donut-legend-label {
+    color: var(--text-secondary);
+    font-weight: 450;
+    flex: 1;
+  }
+  .donut-legend-value {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .donut-legend-pct {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    width: 36px;
+    text-align: right;
+  }
+
+  /* ===== UPDATE LIST ===== */
+  .update-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .update-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .update-item:last-child { border-bottom: none; }
+  .update-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 10px; font-weight: 600; flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .update-content { flex: 1; min-width: 0; }
+  .update-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .update-action {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .update-time {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 400;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ===== OVERDUE LIST ===== */
+  .overdue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .overdue-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .overdue-item:last-child { border-bottom: none; }
+  .overdue-indicator {
+    width: 6px;
+    height: 24px;
+    border-radius: 3px;
+    background: var(--danger);
+    flex-shrink: 0;
+  }
+  .overdue-info { flex: 1; min-width: 0; }
+  .overdue-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .overdue-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+  }
+  .overdue-module-tag {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 1px 6px;
+    border-radius: 8px;
+  }
+  .overdue-deadline {
+    font-size: 11px;
+    color: var(--danger);
+    font-weight: 500;
+  }
+  .overdue-owner {
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+  .overdue-days {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--danger);
+    background: var(--danger-light);
+    padding: 2px 8px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  /* ===== COORDINATION LIST ===== */
+  .coord-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .coord-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .coord-item:last-child { border-bottom: none; }
+  .coord-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .coord-info { flex: 1; min-width: 0; }
+  .coord-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .coord-detail {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .coord-deps {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .coord-dep-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 6px;
+    background: var(--bg-tertiary);
+    color: var(--text-tertiary);
+  }
+
+  /* ===== ANNOTATION PANEL ===== */
+  .annotation-panel {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    width: 280px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 18px;
+    font-size: 12px;
+    z-index: 100;
+  }
+  .annotation-panel h4 {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .anno-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .anno-num {
+    width: 16px; height: 16px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .anno-text { color: var(--text-secondary); }
+
+  /* ===== EMPTY STATE MINI ===== */
+  .empty-mini {
+    text-align: center;
+    padding: 20px 0;
+    color: var(--text-tertiary);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">A</div>
+      <div style="display:flex;flex-direction:column"><div style="display:flex;align-items:center;gap:6px"><div class="sidebar-logo-text">AOP</div><div class="sidebar-logo-badge">Beta</div></div><div style="font-size:9px;font-weight:500;color:var(--text-tertiary);letter-spacing:0.06em;white-space:nowrap;margin-top:1px">行政运营管理平台</div></div>
+      
+    </div>
+    <div class="sidebar-workspace">▼ 行政部</div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">个人</div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">🏠</div> 我的工作
+        <div class="sidebar-badge warn">3</div>
+      </div>
+      <a class="sidebar-item" href="./10-okr.html">
+        <div class="sidebar-icon">🎯</div> OKR <span style="font-size:10px;color:var(--text-tertiary);margin-left:2px">手动导入</span>
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">管理</div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">📋</div> 行政总览
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">⭐</div> 重点专项
+      </div>
+      <div class="sidebar-item active">
+        <div class="sidebar-icon">📊</div> 运营看板
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">👥</div> 周会视图
+      </div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">📝</div> 周报
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">分析</div>
+      <div class="sidebar-item">
+        <div class="sidebar-icon">📈</div> 数据驾驶舱
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">业务模块</div>
+      <div class="sidebar-group">职场运营</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#3B5BDB;"></div> 北京职场</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#8B5CF6;"></div> 武汉职场</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#EC4899;"></div> 异地职场</div>
+      <div class="sidebar-group">文化运营</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#10B981;"></div> 活动运营</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#F59E0B;"></div> 员工福利</div>
+      <div class="sidebar-group">数字化运营</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#06B6D4;"></div> 行政服务台</div>
+      <div class="sidebar-sub-item"><div class="sidebar-dot" style="background:#6366F1;"></div> 数字化后台运营</div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">耿</div>
+        <div>
+          <div class="sidebar-username">耿博琳</div>
+          <div class="sidebar-userrole">职场管理(北京+异地)、行政数字化、文化运营</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+    <div class="main-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div>
+          <div class="title">运营看板</div>
+          <div class="subtitle">全局事项运营态势一览</div>
+        </div>
+        <div class="header-actions">
+          <select class="period-select">
+            <option>本周</option>
+            <option>本月</option>
+            <option>本季度</option>
+          </select>
+          <button class="btn">⬇ 导出</button>
+          <button class="btn-primary btn">🔄 刷新数据</button>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-card total">
+          <div class="stat-num">40</div>
+          <div class="stat-label">总事项</div>
+          <div class="stat-trend neutral">10 人团队</div>
+        </div>
+        <div class="stat-card progress">
+          <div class="stat-num">28</div>
+          <div class="stat-label">进行中</div>
+          <div class="stat-trend up">主力推进</div>
+        </div>
+        <div class="stat-card done">
+          <div class="stat-num">9</div>
+          <div class="stat-label">已完成</div>
+          <div class="stat-trend up">本周 +3</div>
+        </div>
+        <div class="stat-card overdue">
+          <div class="stat-num">0</div>
+          <div class="stat-label">延期</div>
+          <div class="stat-trend neutral">无延期</div>
+        </div>
+        <div class="stat-card risk">
+          <div class="stat-num">3</div>
+          <div class="stat-label">需协调</div>
+          <div class="stat-trend down">跨模块</div>
+        </div>
+      </div>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid">
+
+        <!-- LEFT COLUMN -->
+        <div class="dashboard-left">
+
+          <!-- Module Distribution -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">工作模块分布</div>
+              <div class="card-badge accent">8 个模块</div>
+            </div>
+            <div class="stacked-bar-container">
+              <div class="stacked-bar-row">
+                <div class="stacked-bar-label">职场运营(北京)</div>
+                <div class="stacked-bar-track">
+                  <div class="stacked-bar-segment" style="width:10%;background:#3B5BDB;"><span>4</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#8B5CF6;"><span></span></div>
+                  <div class="stacked-bar-segment" style="width:2%;background:#A5B4FC;"><span></span></div>
+                </div>
+              </div>
+              <div class="stacked-bar-row">
+                <div class="stacked-bar-label">职场运营(武汉)</div>
+                <div class="stacked-bar-track">
+                  <div class="stacked-bar-segment" style="width:14%;background:#8B5CF6;"><span>6</span></div>
+                  <div class="stacked-bar-segment" style="width:7%;background:#A78BFA;"><span>3</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#C4B5FD;"><span>2</span></div>
+                </div>
+              </div>
+              <div class="stacked-bar-row">
+                <div class="stacked-bar-label">职场运营(异地)</div>
+                <div class="stacked-bar-track">
+                  <div class="stacked-bar-segment" style="width:12%;background:#EC4899;"><span>5</span></div>
+                  <div class="stacked-bar-segment" style="width:5%;background:#F472B6;"><span>2</span></div>
+                </div>
+              </div>
+              <div class="stacked-bar-row">
+                <div class="stacked-bar-label">职场运营(深圳)</div>
+                <div class="stacked-bar-track">
+                  <div class="stacked-bar-segment" style="width:8%;background:#F97316;"><span>3</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#FB923C;"><span>1</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#FDBA74;"><span>1</span></div>
+                  <div class="stacked-bar-segment" style="width:2%;background:#10B981;"><span></span></div>
+                </div>
+              </div>
+              <div class="stacked-bar-row">
+                <div class="stacked-bar-label">文化运营(活动)</div>
+                <div class="stacked-bar-track">
+                  <div class="stacked-bar-segment" style="width:6%;background:#10B981;"><span>2</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#34D399;"><span>1</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#6EE7B7;"><span></span></div>
+                </div>
+              </div>
+              <div class="stacked-bar-row">
+                <div class="stacked-bar-label">文化运营(福利)</div>
+                <div class="stacked-bar-track">
+                  <div class="stacked-bar-segment" style="width:8%;background:#F59E0B;"><span>3</span></div>
+                  <div class="stacked-bar-segment" style="width:5%;background:#FBBF24;"><span>2</span></div>
+                  <div class="stacked-bar-segment" style="width:4%;background:#FDE68A;"><span>1</span></div>
+                </div>
+              </div>
+              <div class="stacked-bar-row">
+                <div class="stacked-bar-label">数字化运营</div>
+                <div class="stacked-bar-track">
+                  <div class="stacked-bar-segment" style="width:4%;background:#06B6D4;"><span>1</span></div>
+                  <div class="stacked-bar-segment" style="width:8%;background:#6366F1;"><span>3</span></div>
+                  <div class="stacked-bar-segment" style="width:6%;background:#818CF8;"><span>2</span></div>
+                  <div class="stacked-bar-segment" style="width:3%;background:#A5B4FC;"><span></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="bar-legend">
+              <div class="bar-legend-item"><div class="bar-legend-dot" style="background:var(--accent);"></div> 进行中</div>
+              <div class="bar-legend-item"><div class="bar-legend-dot" style="background:var(--success);"></div> 已完成</div>
+              <div class="bar-legend-item"><div class="bar-legend-dot" style="background:#A5B4FC;"></div> 待启动</div>
+              <div class="bar-legend-item"><div class="bar-legend-dot" style="background:var(--danger);"></div> 延期</div>
+            </div>
+          </div>
+
+          <!-- Owner Workload Ranking -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">负责人工作量排行</div>
+              <div class="card-badge accent">TOP 10</div>
+            </div>
+            <div class="rank-list">
+              <div class="rank-item">
+                <div class="rank-pos top">1</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#3B5BDB,#6366F1);">张</div>
+                <div class="rank-name">张灵玉</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:100%;background:var(--accent);">8</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos top">2</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#3B5BDB,#818CF8);">耿</div>
+                <div class="rank-name">耿博琳</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:87.5%;background:var(--accent);">7</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos top">3</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#6366F1,#818CF8);">程</div>
+                <div class="rank-name">程宇亮</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:75%;background:var(--accent);">6</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos">4</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA);">傅</div>
+                <div class="rank-name">傅中南</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:75%;background:var(--purple);">6</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos">5</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#8B5CF6,#C4B5FD);">高</div>
+                <div class="rank-name">高琳</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:62.5%;background:var(--purple);">5</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos">6</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#A78BFA,#C4B5FD);">董</div>
+                <div class="rank-name">董诗昀</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:62.5%;background:var(--purple);">5</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos">7</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#F59E0B,#FBBF24);">聂</div>
+                <div class="rank-name">聂茜茜</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:50%;background:var(--warning);">4</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos">8</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#F59E0B,#FDE68A);">丁</div>
+                <div class="rank-name">丁玉萍</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:50%;background:var(--warning);">4</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos">9</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#FBBF24,#FDE68A);">胡</div>
+                <div class="rank-name">胡丽婷</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:37.5%;background:var(--warning);">3</div>
+                </div>
+              </div>
+              <div class="rank-item">
+                <div class="rank-pos">10</div>
+                <div class="rank-avatar" style="background:linear-gradient(135deg,#F59E0B,#FCD34D);">王</div>
+                <div class="rank-name">王琳琳</div>
+                <div class="rank-bar-track">
+                  <div class="rank-bar-fill" style="width:25%;background:var(--warning);">2</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Distribution Donut -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">事项状态分布</div>
+            </div>
+            <div class="donut-chart-section">
+              <div class="donut-chart" style="background: conic-gradient(
+                var(--accent) 0deg 252deg,
+                var(--success) 252deg 333deg,
+                var(--text-tertiary) 333deg 355.5deg,
+                var(--purple) 355.5deg 360deg
+              );">
+                <div class="donut-center">
+                  <div class="donut-center-num">40</div>
+                  <div class="donut-center-label">总事项</div>
+                </div>
+              </div>
+              <div class="donut-legend">
+                <div class="donut-legend-item">
+                  <div class="donut-legend-dot" style="background:var(--accent);"></div>
+                  <div class="donut-legend-label">进行中</div>
+                  <div class="donut-legend-value">28</div>
+                  <div class="donut-legend-pct">70.0%</div>
+                </div>
+                <div class="donut-legend-item">
+                  <div class="donut-legend-dot" style="background:var(--success);"></div>
+                  <div class="donut-legend-label">已完成</div>
+                  <div class="donut-legend-value">9</div>
+                  <div class="donut-legend-pct">22.5%</div>
+                </div>
+                <div class="donut-legend-item">
+                  <div class="donut-legend-dot" style="background:var(--text-tertiary);"></div>
+                  <div class="donut-legend-label">未开始</div>
+                  <div class="donut-legend-value">2</div>
+                  <div class="donut-legend-pct">5.0%</div>
+                </div>
+                <div class="donut-legend-item">
+                  <div class="donut-legend-dot" style="background:var(--purple);"></div>
+                  <div class="donut-legend-label">评审中</div>
+                  <div class="donut-legend-value">1</div>
+                  <div class="donut-legend-pct">2.5%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="dashboard-right">
+
+          <!-- Recent Updates -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">最近更新</div>
+              <div class="card-badge accent">5 条</div>
+            </div>
+            <div class="update-list">
+              <div class="update-item">
+                <div class="update-avatar" style="background:#3B5BDB;">张</div>
+                <div class="update-content">
+                  <div class="update-name">北京职场维修(茶水间吊顶)</div>
+                  <div class="update-action">张灵玉更新：6-11层茶水间吊顶维修，6-8层连廊电路维修已完成</div>
+                </div>
+                <div class="update-time">10分钟前</div>
+              </div>
+              <div class="update-item">
+                <div class="update-avatar" style="background:#8B5CF6;">程</div>
+                <div class="update-content">
+                  <div class="update-name">武汉家庭日</div>
+                  <div class="update-action">程宇亮标记完成：到场90组，报名120组，费用14万+</div>
+                </div>
+                <div class="update-time">1小时前</div>
+              </div>
+              <div class="update-item">
+                <div class="update-avatar" style="background:#6366F1;">傅</div>
+                <div class="update-content">
+                  <div class="update-name">兰州办公室租赁</div>
+                  <div class="update-action">傅中南更新：租赁合同商务条款沟通中，8月1日起租前需确定装修方案</div>
+                </div>
+                <div class="update-time">2小时前</div>
+              </div>
+              <div class="update-item">
+                <div class="update-avatar" style="background:#F59E0B;">高</div>
+                <div class="update-content">
+                  <div class="update-name">行政服务台工单处理</div>
+                  <div class="update-action">高琳更新：本周处理工单32件，完结率95%，剩余2件跟进中</div>
+                </div>
+                <div class="update-time">3小时前</div>
+              </div>
+              <div class="update-item">
+                <div class="update-avatar" style="background:#F97316;">胡</div>
+                <div class="update-content">
+                  <div class="update-name">深圳续租保证金</div>
+                  <div class="update-action">胡丽婷标记完成：租赁保证金差额75456已退回公司</div>
+                </div>
+                <div class="update-time">昨天 18:30</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Overdue Items -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">超期事项</div>
+              <div class="card-badge danger">0 项</div>
+            </div>
+            <div style="text-align:center;padding:24px 0;color:var(--text-tertiary);font-size:13px">
+              ✅ 本周无超期事项
+            </div>
+          </div>
+
+          <!-- Needs Coordination -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">需要协调</div>
+              <div class="card-badge warning">3 项</div>
+            </div>
+            <div class="coord-list">
+              <div class="coord-item">
+                <div class="coord-icon">⚡</div>
+                <div class="coord-info">
+                  <div class="coord-name">深圳职场装修</div>
+                  <div class="coord-detail">采购PR已提交，总预算10万，期望7月底交付，需集团审批支持</div>
+                  <div class="coord-deps">
+                    <span class="coord-dep-tag">🏢 职场运营(深圳)</span>
+                    <span class="coord-dep-tag">📋 审批中心</span>
+                  </div>
+                </div>
+              </div>
+              <div class="coord-item">
+                <div class="coord-icon">⚡</div>
+                <div class="coord-info">
+                  <div class="coord-name">兰州租赁</div>
+                  <div class="coord-detail">待邹总审批预算外邮件，租赁合同商务条款沟通中，8月1起租前需确定装修商</div>
+                  <div class="coord-deps">
+                    <span class="coord-dep-tag">🏢 职场运营(异地)</span>
+                    <span class="coord-dep-tag">📋 审批中心</span>
+                  </div>
+                </div>
+              </div>
+              <div class="coord-item">
+                <div class="coord-icon">⚡</div>
+                <div class="coord-info">
+                  <div class="coord-name">武汉空调延时</div>
+                  <div class="coord-detail">已正式向集团发出延时邮件申请，待回复</div>
+                  <div class="coord-deps">
+                    <span class="coord-dep-tag">🏢 职场运营(武汉)</span>
+                    <span class="coord-dep-tag">🏢 集团</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ANNOTATION PANEL -->
+  <div class="annotation-panel">
+    <h4>Dashboard Notes</h4>
+    <div class="anno-item">
+      <div class="anno-num">1</div>
+      <div class="anno-text">顶部5个统计卡片：总事项40 / 进行中28 / 已完成9 / 延期0 / 需协调3</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">2</div>
+      <div class="anno-text">每个卡片顶部有对应颜色的3px色条标识，数字使用对应主题色</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">3</div>
+      <div class="anno-text">模块分布使用 CSS flexbox 堆叠条形图，按8个业务模块展示各状态占比</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">4</div>
+      <div class="anno-text">负责人工作量排行：水平条形图，前3名使用主题蓝色，4-6名使用紫色递减，7-10名使用黄色</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">5</div>
+      <div class="anno-text">状态分布使用 conic-gradient 实现的 CSS 环形图，中心显示总事项数</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">6</div>
+      <div class="anno-text">右侧三个列表卡片：最近更新 / 超期事项(红色标识) / 需要协调(跨模块依赖)</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">7</div>
+      <div class="anno-text">所有图表均为纯CSS实现，无任何第三方图表库依赖</div>
+    </div>
+    <div class="anno-item">
+      <div class="anno-num">8</div>
+      <div class="anno-text">数据均来源于 Work Item 的自动聚合，管理者无需手动填写</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
