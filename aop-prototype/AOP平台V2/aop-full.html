@@ -26,6 +26,7 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
 .sb-lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);padding:8px 12px 4px}
 .sb-i{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:450;color:var(--t2);transition:all var(--tr);text-decoration:none}
 .sb-i:hover{background:var(--bgH);color:var(--t1)}
+.sb-i:hover{background:var(--bgH);color:var(--t1)}
 .sb-i.act{background:var(--acl);color:var(--ac);font-weight:600}
 .sb-ic{width:18px;text-align:center;font-size:15px;flex-shrink:0}
 .sb-bg{font-size:11px;font-weight:600;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:9px;margin-left:auto;padding:0 5px;background:var(--warn);color:#fff}
@@ -419,6 +420,65 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
 .p10-linked-hint{margin-top:8px;padding:8px 10px;background:var(--acl);border:1px solid rgba(59,91,219,.12);border-radius:6px;font-size:11px;color:var(--ac);display:flex;align-items:flex-start;gap:6px}
 .p10-period-hint{font-size:11px;color:var(--t3);margin-top:8px;padding:0 24px}
 
+/* ══════ PANEL 12: ADMIN REVIEW ══════ */
+.p12-hero{position:relative;height:260px;overflow:hidden;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%)}
+.p12-hero-bg{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1400&q=80') center/cover;opacity:.25}
+.p12-hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,rgba(15,23,42,.85) 100%)}
+.p12-hero-content{position:absolute;bottom:28px;left:36px;right:36px;color:#fff}
+.p12-hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:6px}
+.p12-hero-title{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.p12-hero-summary{font-size:13px;line-height:1.6;color:#cbd5e1;max-width:600px}
+.p12-hero-tags{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.p12-hero-tag{font-size:11px;font-weight:600;padding:4px 12px;border-radius:99px;background:rgba(255,255,255,.12);color:#e2e8f0;backdrop-filter:blur(8px)}
+.p12-scroll{flex:1;overflow-y:auto;background:var(--bg2)}
+.p12-sections{padding:24px 36px 48px;max-width:960px}
+.p12-sec-card{background:var(--bg);border:1px solid var(--bdl);border-radius:14px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
+.p12-sec-head{display:flex;align-items:center;gap:10px;padding:18px 24px}
+.p12-sec-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.p12-sec-num{font-size:13px;font-weight:800;color:var(--t3)}
+.p12-sec-pipe{color:var(--bdl);font-size:13px;margin:0 2px}
+.p12-sec-title{font-size:17px;font-weight:800;color:var(--t1)}
+.p12-sec-badge{margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:99px}
+.p12-sec-body{padding:4px 24px 24px}
+.p12-sec-desc{font-size:13px;color:var(--t2);line-height:1.65;margin-bottom:16px}
+.p12-kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.p12-kpi-card{background:var(--bg2);border-radius:10px;padding:14px 16px;border:1px solid var(--bdl)}
+.p12-kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);margin-bottom:4px}
+.p12-kpi-value{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--t1)}
+.p12-kpi-change{font-size:10px;font-weight:700;margin-top:2px}
+.p12-kpi-up{color:var(--suc)}
+.p12-kpi-down{color:var(--dan)}
+.p12-kpi-neutral{color:var(--t3)}
+.p12-table{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}
+.p12-table th{background:var(--bg3);padding:8px 12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);text-align:left;border-bottom:1px solid var(--bd)}
+.p12-table td{padding:10px 12px;border-bottom:1px solid var(--bdl);vertical-align:top;line-height:1.5}
+.p12-table tr:last-child td{border-bottom:none}
+.p12-table tr:hover td{background:var(--bg2)}
+.p12-eff-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:4px}
+.p12-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:12px}
+.p12-gallery-item{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:4/3;cursor:pointer;background:var(--bg3)}
+.p12-gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.p12-gallery-item:hover img{transform:scale(1.05)}
+.p12-gallery-caption{position:absolute;bottom:0;left:0;right:0;padding:6px 10px;background:linear-gradient(transparent,rgba(0,0,0,.7));font-size:10px;font-weight:600;color:#fff}
+.p12-roadmap-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.p12-roadmap-col{background:var(--bg2);border-radius:10px;padding:16px;border:1px solid var(--bdl)}
+.p12-roadmap-col-title{font-size:13px;font-weight:800;color:var(--t1);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.p12-roadmap-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:12.5px;color:var(--t2);line-height:1.5}
+.p12-roadmap-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.p12-att-item{background:var(--bg2);border-radius:10px;padding:14px;margin-bottom:8px;border:1px solid var(--bdl)}
+.p12-att-title{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.p12-att-action{font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:8px;padding:6px 10px;background:var(--acl);border-radius:6px}
+.p12-att-meta{display:flex;align-items:center;gap:12px;font-size:11px;color:var(--t3)}
+.p12-att-owner{font-weight:600;color:var(--t2)}
+.p12-att-ceo{font-weight:600;padding:2px 8px;border-radius:99px}
+.p12-att-ceo.yes{background:#fef3c7;color:#b45309}
+.p12-att-ceo.no{background:var(--bg3);color:var(--t3)}
+.p12-lb-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;cursor:pointer}
+.p12-lb-overlay.show{display:flex}
+.p12-lb-img{max-width:85vw;max-height:85vh;border-radius:8px;object-fit:contain}
+.p12-lb-close{position:absolute;top:20px;right:24px;font-size:24px;color:#fff;cursor:pointer;opacity:.7;transition:opacity .15s}
+.p12-lb-close:hover{opacity:1}
+
 /* ══════ PANEL 01: IA NAVIGATION ══════ */
 .p01-ia{padding:24px 32px;overflow-y:auto;flex:1}
 .p01-ia h2{font-size:18px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--ac)}
@@ -482,6 +542,13 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
     </div>
     <div class="sb-i" data-panel="p08" onclick="switchPanel('p08',this)">
       <div class="sb-ic">📝</div> 周报
+    </div>
+  </div>
+
+  <div class="sb-sec">
+    <div class="sb-lbl">经营复盘</div>
+    <div class="sb-i" data-panel="p12" onclick="switchPanel('p12',this)">
+      <div class="sb-ic">📈</div> 行政经营复盘
     </div>
   </div>
 
@@ -833,6 +900,28 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
   </div>
 </div>
 
+<!-- ══════ PANEL 12: ADMIN REVIEW ══════ -->
+<div class="panel" id="p12">
+  <div class="p12-hero">
+    <div class="p12-hero-bg"></div>
+    <div class="p12-hero-overlay"></div>
+    <div class="p12-hero-content">
+      <div class="p12-hero-eyebrow">AOP · 行政运营管理平台</div>
+      <div class="p12-hero-title">Q2 行政运营回顾</div>
+      <div class="p12-hero-summary">双城职场运营提质、10+ 场员工活动全面落地、AI 数字化能力持续建设，行政团队在 Q2 交出了一份有温度、有数据的答卷。</div>
+      <div class="p12-hero-tags">
+        <span class="p12-hero-tag">🏙 职场运营</span>
+        <span class="p12-hero-tag">🎉 文化活动</span>
+        <span class="p12-hero-tag">🤖 数字化</span>
+        <span class="p12-hero-tag">💰 成本管控</span>
+      </div>
+    </div>
+  </div>
+  <div class="p12-scroll">
+    <div class="p12-sections" id="p12Sections"></div>
+  </div>
+</div>
+
 </div><!-- end main -->
 </div><!-- end shell -->
 
@@ -861,6 +950,12 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
     <div id="pptIndex" style="font-size:14px;color:var(--t3)">1 / 10</div>
     <div class="ppt-nav-btn" onclick="nextPerson()">下一位 ▶</div>
   </div>
+</div>
+
+<!-- ══════ LIGHTBOX ══════ -->
+<div class="p12-lb-overlay" id="p12LbOverlay" onclick="closeLightbox()">
+  <div class="p12-lb-close">✕</div>
+  <img class="p12-lb-img" id="p12LbImg" src="" alt="预览">
 </div>
 
 <script>
@@ -922,6 +1017,7 @@ function switchPanel(id, navEl){
   if(id==='p08'&&!window._p08Rendered){renderP08();window._p08Rendered=true}
   if(id==='p09'&&!window._p09Rendered){renderP09();window._p09Rendered=true}
   if(id==='p10'&&!window._p10Rendered){renderP10();window._p10Rendered=true}
+  if(id==='p12'&&!window._p12Rendered){renderP12();window._p12Rendered=true}
 }
 
 /* ══════ SLIDE-OVER ══════ */
@@ -1227,6 +1323,107 @@ document.querySelectorAll('.p02-week-btn').forEach(b=>b.addEventListener('click'
   this.parentElement.querySelectorAll('.p02-week-btn').forEach(s=>s.classList.remove('active'));
   this.classList.add('active');
 }));
+
+/* ══════ P12: ADMIN REVIEW ══════ */
+function renderP12(){
+  let h='';
+
+  // 01 | 职场运营提质
+  h+='<div class="p12-sec-card"><div class="p12-sec-head"><div class="p12-sec-icon" style="background:#eff6ff;color:#2563eb">🏙</div><span class="p12-sec-num">01</span><span class="p12-sec-pipe">|</span><span class="p12-sec-title">职场运营提质</span><span class="p12-sec-badge" style="background:#eff6ff;color:#2563eb">核心板块</span></div><div class="p12-sec-body"><div class="p12-sec-desc">北京+武汉双城职场，Q2 在空间品质、设备维保、员工住宿三条线上同时发力，运营效率与服务满意度双提升。</div>';
+  h+='<div class="p12-kpi-row">';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">北京报修响应</div><div class="p12-kpi-value">≤2h</div><div class="p12-kpi-change p12-kpi-up">↑ 提速40%</div></div>';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">武汉工单完结率</div><div class="p12-kpi-value">98%</div><div class="p12-kpi-change p12-kpi-up">↑ 达标</div></div>';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">公寓续租率</div><div class="p12-kpi-value">92%</div><div class="p12-kpi-change p12-kpi-neutral">— 持平</div></div>';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">员工满意度</div><div class="p12-kpi-value">4.6</div><div class="p12-kpi-change p12-kpi-up">↑ 0.3</div></div>';
+  h+='</div>';
+  h+='<table class="p12-table"><thead><tr><th>项目</th><th>关键成果</th><th>服务对象</th></tr></thead><tbody>';
+  h+='<tr><td>北京5F装修改造</td><td>设计方案已审批通过，招标进行中，预计8月中交付 <span class="p12-eff-tag" style="background:#dbeafe;color:#1d4ed8">进行中</span></td><td>北京全员</td></tr>';
+  h+='<tr><td>武汉空调改造</td><td>空调系统全面检修升级，6月完成，办公环境显著改善 <span class="p12-eff-tag" style="background:#dcfce7;color:#166534">已完成</span></td><td>武汉全员</td></tr>';
+  h+='<tr><td>武汉公寓二期招租</td><td>144人报名，释放名额40个，通过摇号公平分配 <span class="p12-eff-tag" style="background:#dcfce7;color:#166534">已完成</span></td><td>武汉员工</td></tr>';
+  h+='<tr><td>商旅平台年度招标</td><td>完成供应商评估，携程商旅续约，降本增效显著 <span class="p12-eff-tag" style="background:#dcfce7;color:#166534">已完成</span></td><td>全员差旅</td></tr>';
+  h+='<tr><td>武汉会务接待</td><td>Q2完成57场，满意度100% <span class="p12-eff-tag" style="background:#fef3c7;color:#92400e">持续进行</span></td><td>武汉职场</td></tr>';
+  h+='</tbody></table>';
+  h+='<div class="p12-gallery">';
+  [{src:'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=75',cap:'北京职场'},{src:'https://images.unsplash.com/photo-1524758631624-e2882f5fbf5d?w=400&q=75',cap:'武汉办公区'},{src:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&q=75',cap:'装修改造'},{src:'https://images.unsplash.com/photo-1556f4720-b37f4c3b3e7c?w=400&q=75',cap:'会务接待'}].forEach(g=>{
+    h+='<div class="p12-gallery-item" onclick="openLightbox(\''+g.src.replace('w=400','w=1200')+'\')"><img src="'+g.src+'" alt="'+g.cap+'"><div class="p12-gallery-caption">'+g.cap+'</div></div>';
+  });
+  h+='</div></div></div>';
+
+  // 02 | 文化活动与福利
+  h+='<div class="p12-sec-card"><div class="p12-sec-head"><div class="p12-sec-icon" style="background:#f0fdf4;color:#16a34a">🎉</div><span class="p12-sec-num">02</span><span class="p12-sec-pipe">|</span><span class="p12-sec-title">文化活动与福利</span><span class="p12-sec-badge" style="background:#f0fdf4;color:#16a34a">10+ 场活动</span></div><div class="p12-sec-body"><div class="p12-sec-desc">Q2 共举办 10+ 场员工活动，从传统节日到创新主题，覆盖全员，参与率均值 79%，员工满意度持续走高。</div>';
+  h+='<div class="p12-kpi-row">';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">活动场次</div><div class="p12-kpi-value">12</div><div class="p12-kpi-change p12-kpi-up">↑ 50%</div></div>';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">平均参与率</div><div class="p12-kpi-value">79%</div><div class="p12-kpi-change p12-kpi-up">↑ 8pp</div></div>';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">福利满意度</div><div class="p12-kpi-value">4.5</div><div class="p12-kpi-change p12-kpi-up">↑ 0.2</div></div>';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">预算执行率</div><div class="p12-kpi-value">93%</div><div class="p12-kpi-change p12-kpi-neutral">— 达标</div></div>';
+  h+='</div>';
+  h+='<table class="p12-table"><thead><tr><th>活动/项目</th><th>关键成果</th><th>参与人数</th></tr></thead><tbody>';
+  h+='<tr><td>端午节福利</td><td>礼品发放覆盖全员，满意度95% <span class="p12-eff-tag" style="background:#dcfce7;color:#166534">已完成</span></td><td>全员</td></tr>';
+  h+='<tr><td>家庭日</td><td>80+家庭参与，满意度95%，成为Q2最强文化IP <span class="p12-eff-tag" style="background:#dcfce7;color:#166534">已完成</span></td><td>200+</td></tr>';
+  h+='<tr><td>六一儿童节</td><td>礼物发放完毕，员工反馈良好 <span class="p12-eff-tag" style="background:#dcfce7;color:#166534">已完成</span></td><td>有孩家庭</td></tr>';
+  h+='<tr><td>下午茶</td><td>每周1次，Q2共12场，参与率92% <span class="p12-eff-tag" style="background:#fef3c7;color:#92400e">持续进行</span></td><td>全员</td></tr>';
+  h+='<tr><td>公益内容运营</td><td>3篇推文发布，阅读量1.2万 <span class="p12-eff-tag" style="background:#fef3c7;color:#92400e">持续进行</span></td><td>线上</td></tr>';
+  h+='</tbody></table>';
+  h+='<div class="p12-gallery">';
+  [{src:'https://images.unsplash.com/photo-1531481740977-a1a6b8e8a3c8?w=400&q=75',cap:'家庭日'},{src:'https://images.unsplash.com/photo-1491438590914-5c500e6b1e28?w=400&q=75',cap:'端午节'},{src:'https://images.unsplash.com/photo-1529156069898-4996e398a194?w=400&q=75',cap:'下午茶'},{src:'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=400&q=75',cap:'公益活动'}].forEach(g=>{
+    h+='<div class="p12-gallery-item" onclick="openLightbox(\''+g.src.replace('w=400','w=1200')+'\')"><img src="'+g.src+'" alt="'+g.cap+'"><div class="p12-gallery-caption">'+g.cap+'</div></div>';
+  });
+  h+='</div></div></div>';
+
+  // 03 | 数字化运营
+  h+='<div class="p12-sec-card"><div class="p12-sec-head"><div class="p12-sec-icon" style="background:#f5f3ff;color:#8b5cf6">🤖</div><span class="p12-sec-num">03</span><span class="p12-sec-pipe">|</span><span class="p12-sec-title">数字化运营能力</span><span class="p12-sec-badge" style="background:#f5f3ff;color:#8b5cf6">AI 驱动</span></div><div class="p12-sec-body"><div class="p12-sec-desc">行政服务台 AI 拦截率从 Q1 的 28% 提升至 Q2 的 45%，AOP 平台覆盖全部 8 个业务模块，周报自动化覆盖率 100%。</div>';
+  h+='<div class="p12-kpi-row">';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">AI 拦截率</div><div class="p12-kpi-value">45%</div><div class="p12-kpi-change p12-kpi-up">↑ 17pp</div></div>';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">AOP 模块覆盖</div><div class="p12-kpi-value">8/8</div><div class="p12-kpi-change p12-kpi-up">↑ 全覆盖</div></div>';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">周报自动化率</div><div class="p12-kpi-value">100%</div><div class="p12-kpi-change p12-kpi-up">↑ 完成</div></div>';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">差旅数据实时化</div><div class="p12-kpi-value">T+1</div><div class="p12-kpi-change p12-kpi-neutral">— 目标T+0</div></div>';
+  h+='</div>';
+  h+='<table class="p12-table"><thead><tr><th>项目</th><th>关键成果</th><th>状态</th></tr></thead><tbody>';
+  h+='<tr><td>行政服务台升级</td><td>AI 拦截引擎 V2 上线，工单处理效率提升40%</td><td><span class="p12-eff-tag" style="background:#dcfce7;color:#166534">已上线</span></td></tr>';
+  h+='<tr><td>AOP 平台全覆盖</td><td>8/8 业务模块上线运行，周报+看板+复盘三件套齐备</td><td><span class="p12-eff-tag" style="background:#dcfce7;color:#166534">已上线</span></td></tr>';
+  h+='<tr><td>AI 推送引擎</td><td>主动推送替代被动查询，消息触达率提升60%</td><td><span class="p12-eff-tag" style="background:#dbeafe;color:#1d4ed8">测试中</span></td></tr>';
+  h+='</tbody></table></div></div>';
+
+  // 04 | 成本与规范
+  h+='<div class="p12-sec-card"><div class="p12-sec-head"><div class="p12-sec-icon" style="background:#fffbeb;color:#d97706">💰</div><span class="p12-sec-num">04</span><span class="p12-sec-pipe">|</span><span class="p12-sec-title">成本管控与合规规范</span><span class="p12-sec-badge" style="background:#fffbeb;color:#d97706">降本增效</span></div><div class="p12-sec-body"><div class="p12-sec-desc">Q2 行政预算执行率 49.4%，差旅成本同比下降3%，合规审计零整改项，各项成本指标均在安全区间。</div>';
+  h+='<div class="p12-kpi-row">';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">年度预算执行率</div><div class="p12-kpi-value">49.4%</div><div class="p12-kpi-change p12-kpi-neutral">— 正常</div></div>';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">差旅成本同比</div><div class="p12-kpi-value">↓3%</div><div class="p12-kpi-change p12-kpi-up">节省</div></div>';
+  h+='<div class="p12-kpi-card"><div class="p12-kpi-label">合规审计</div><div class="p12-kpi-value">0项</div><div class="p12-kpi-change p12-kpi-up">零整改</div></div>';
+  h+='</div></div></div>';
+
+  // 05 | Q3 重点规划
+  h+='<div class="p12-sec-card"><div class="p12-sec-head"><div class="p12-sec-icon" style="background:#eff6ff;color:#2563eb">📅</div><span class="p12-sec-num">05</span><span class="p12-sec-pipe">|</span><span class="p12-sec-title">Q3 重点规划</span><span class="p12-sec-badge" style="background:#eff6ff;color:#2563eb">展望</span></div><div class="p12-sec-body"><div class="p12-sec-desc">Q3 三条主线并行：职场建设（兰州/深圳/上海/武汉露台）、总裁室年中支撑、AI 数字化项目落地。</div>';
+  h+='<div class="p12-roadmap-grid">';
+  h+='<div class="p12-roadmap-col"><div class="p12-roadmap-col-title">🏗 职场建设</div>';
+  [{d:'兰州职场装修',c:'#f59e0b'},{d:'深圳职场扩展',c:'#3b5bdb'},{d:'上海职场续租',c:'#8b5cf6'},{d:'武汉露台改造',c:'#10b981'}].forEach(r=>{
+    h+='<div class="p12-roadmap-item"><div class="p12-roadmap-dot" style="background:'+r.c+'"></div>'+r.d+'</div>';
+  });
+  h+='</div>';
+  h+='<div class="p12-roadmap-col"><div class="p12-roadmap-col-title">🤖 AI 数字化</div>';
+  [{d:'AI 推送引擎正式上线',c:'#3b5bdb'},{d:'差旅数据 T+0 实时化',c:'#06b6d4'},{d:'服务台多轮对话能力',c:'#8b5cf6'},{d:'周报质量 AI 评分',c:'#f59e0b'}].forEach(r=>{
+    h+='<div class="p12-roadmap-item"><div class="p12-roadmap-dot" style="background:'+r.c+'"></div>'+r.d+'</div>';
+  });
+  h+='</div></div></div></div>';
+
+  // 06 | 需协调事项
+  h+='<div class="p12-sec-card"><div class="p12-sec-head"><div class="p12-sec-icon" style="background:#fef2f2;color:#ef4444">⚠️</div><span class="p12-sec-num">06</span><span class="p12-sec-pipe">|</span><span class="p12-sec-title">需协调事项</span><span class="p12-sec-badge" style="background:#fef2f2;color:#ef4444">3 项待定</span></div><div class="p12-sec-body">';
+  [{t:'兰州职场装修预算',a:'📋 需8月初审批预算，耿博琳负责',o:'耿博琳',ceo:'yes'},{t:'深圳办公区扩展审批',a:'📋 需确认扩展方案与预算，傅中南负责',o:'傅中南',ceo:'yes'},{t:'武汉露台改造物业协调',a:'📋 需物业部和行政部联合审批',o:'程宇亮',ceo:'no'}].forEach(item=>{
+    h+='<div class="p12-att-item"><div class="p12-att-title">'+item.t+'</div><div class="p12-att-action">'+item.a+'</div><div class="p12-att-meta"><span class="p12-att-owner">'+item.o+'</span><span class="p12-att-ceo '+(item.ceo==='yes'?'yes':'no')+'">'+(item.ceo==='yes'?'需CEO介入':'无需CEO介入')+'</span></div></div>';
+  });
+  h+='</div></div>';
+
+  document.getElementById('p12Sections').innerHTML=h;
+}
+
+/* ══════ LIGHTBOX ══════ */
+function openLightbox(src){
+  document.getElementById('p12LbImg').src=src;
+  document.getElementById('p12LbOverlay').classList.add('show');
+}
+function closeLightbox(){
+  document.getElementById('p12LbOverlay').classList.remove('show');
+}
 
 /* ══════ INIT ══════ */
 // P02 is already visible as default active panel
