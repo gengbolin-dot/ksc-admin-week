@@ -23,14 +23,14 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
 .sb-logo-badge{font-size:10px;background:var(--bg3);color:var(--t3);border-radius:8px;padding:1px 7px;font-weight:600}
 .sb-ws{padding:11px 18px;font-size:13px;color:var(--t2);cursor:pointer;border-bottom:1px solid var(--bdl);display:flex;align-items:center;gap:6px}
 .sb-sec{padding:8px 12px;border-top:1px solid var(--bdl)}
-.sb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:7px 10px 3px}
+.sb-lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:7px 10px 3px}
 .sb-i{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:450;color:var(--t2);transition:all var(--tr);text-decoration:none}
 .sb-i:hover{background:var(--bgH);color:var(--t1)}
 .sb-i.act{background:var(--acl);color:var(--ac);font-weight:600}
 .sb-ic{width:18px;text-align:center;font-size:14px;flex-shrink:0}
 .sb-bg{font-size:11px;font-weight:600;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:9px;margin-left:auto;padding:0 5px;background:var(--warn);color:#fff}
 .sb-bg.warn{background:var(--warn)}
-.sb-grp{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:7px 10px 3px;margin-top:6px}
+.sb-grp{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);padding:7px 10px 3px;margin-top:6px}
 .sb-sub{display:flex;align-items:center;gap:6px;padding:5px 12px 5px 34px;font-size:13.5px;color:var(--t3);border-radius:6px;cursor:pointer;transition:all var(--tr);text-decoration:none}
 .sb-sub:hover{background:var(--bgH);color:var(--t2)}
 .sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
@@ -633,7 +633,7 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
     <div class="p02-section">
       <div class="p02-section-title">🏢 专项项目</div>
       <div class="p02-card" onclick="openSlide()">
-        <div class="p02-card-head"><div class="p02-card-name">瘦肉粥比赛</div><span class="st-badge" style="background:var(--purL);color:var(--pur)"><span class="st-dot" style="background:var(--pur)"></span>专项项目</span></div>
+        <div class="p02-card-head"><div class="p02-card-name">福利关怀</div><span class="st-badge" style="background:var(--purL);color:var(--pur)"><span class="st-dot" style="background:var(--pur)"></span>专项项目</span></div>
         <div class="p02-card-meta"><span class="mod-tag" style="background:var(--acl);color:var(--ac)"><span class="mod-dot" style="background:var(--ac)"></span>职场运营(北京)</span> · 耿博琳 · P2 · 🔵进行中 · 80%</div>
         <div class="p02-card-update">本周完成决赛环节策划方案，已确定6月28日决赛日期和场地</div>
       </div>
@@ -868,7 +868,7 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
 <script>
 /* ══════ DATA ══════ */
 const ITEMS = [
-  {id:1,name:'瘦肉粥比赛',type:'project',module:'职场运营(北京)',modColor:'#3B5BDB',modBg:'#EBF0FF',owner:'耿博琳',ownerColor:'#667eea',status:'in-progress',statusLabel:'进行中',pct:80,updated:'07-06',priority:2,risk:'决赛场地档期可能冲突',deadline:'07-28',
+  {id:1,name:'福利关怀',type:'project',module:'职场运营(北京)',modColor:'#3B5BDB',modBg:'#EBF0FF',owner:'耿博琳',ownerColor:'#667eea',status:'in-progress',statusLabel:'进行中',pct:80,updated:'07-06',priority:2,risk:'决赛场地档期可能冲突',deadline:'07-28',
    weekUpdate:'本周完成决赛环节策划方案，已确定7月28日决赛日期和场地',nextWeek:'1. 确认决赛评委名单\n2. 完成物料采购\n3. 场地布置方案定稿',
    milestones:[{name:'初赛完成',status:'done'},{name:'决赛策划',status:'active'},{name:'决赛执行',status:'pending'},{name:'总结复盘',status:'pending'}]},
   {id:2,name:'家庭日',type:'project',module:'文化运营(活动)',modColor:'#10B981',modBg:'#ECFDF5',owner:'聂茜茜',ownerColor:'#f093fb',status:'in-progress',statusLabel:'进行中',pct:70,updated:'07-07',priority:1,deadline:'08-15',
@@ -1145,7 +1145,7 @@ function renderP08(){
   // Section 5: Next week focus
   h+='<div class="p08-section" style="padding:0 24px 20px"><div class="p08-sec-header"><div class="p08-sec-icon" style="background:var(--acl)">🎯</div><div class="p08-sec-title">下周重点</div><div class="p08-sec-count">10</div></div></div>';
   h+='<div class="p08-next-list">';
-  ['确认瘦肉粥决赛评委名单','完成家庭日物料采购','5楼装修招标完成','签署酒店协议','持续优化服务台拦截规则','策划下期公益主题','跟进体检项目供应商对接','武汉空调改造方案评审','深圳装修采购清单审批','LZ续租预算审批'].forEach((t,i)=>{
+  ['确认福利关怀决赛评委名单','完成家庭日物料采购','5楼装修招标完成','签署酒店协议','持续优化服务台拦截规则','策划下期公益主题','跟进体检项目供应商对接','武汉空调改造方案评审','深圳装修采购清单审批','LZ续租预算审批'].forEach((t,i)=>{
     h+='<div class="p08-next-item"><div class="p08-next-num">'+(i+1)+'</div><div>'+t+'</div></div>';
   });
   h+='</div>';

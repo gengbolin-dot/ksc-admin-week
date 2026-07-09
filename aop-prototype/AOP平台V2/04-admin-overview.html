@@ -23,20 +23,20 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
 /* ── Sidebar ── */
 .sidebar{width:240px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0}
 .sidebar-logo{padding:16px 18px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-light)}
-.sidebar-logo .logo-icon{width:28px;height:28px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
-.sidebar-logo .logo-text{font-weight:700;font-size:16px;color:var(--text-primary)}
-.sidebar-logo .logo-sub{font-size:10px;color:var(--text-tertiary);margin-top:1px;letter-spacing:0.06em;white-space:nowrap}
-.sidebar-nav{flex:1;padding:12px 12px;overflow-y:auto}
+.sidebar-logo .logo-icon{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
+.sidebar-logo .logo-text{font-weight:700;font-size:17px;color:var(--text-primary)}
+.sidebar-logo .logo-sub{font-size:11px;color:var(--text-tertiary);margin-top:1px;letter-spacing:0.06em;white-space:nowrap}
+.sidebar-nav{flex:1;padding:14px 12px;overflow-y:auto}
 .nav-group{margin-bottom:18px}
-.nav-group-label{font-size:11px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.6px;padding:4px 12px 6px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s;font-size:14px;font-weight:500;color:var(--text-secondary);position:relative;text-decoration:none}
+.nav-group-label{font-size:14px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.6px;padding:4px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s;font-size:14px;font-weight:500;color:var(--text-secondary);position:relative;text-decoration:none}
 .nav-item:hover{background:var(--bg-secondary);color:var(--text-primary)}
 .nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:600}
 .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent);border-radius:0 3px 3px 0}
-.nav-icon{width:18px;text-align:center;font-size:14px;flex-shrink:0}
+.nav-icon{width:18px;text-align:center;font-size:15px;flex-shrink:0}
 .nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:11px;font-weight:600;padding:1px 6px;border-radius:10px}
 .nav-badge.warn{background:#F59E0B}
-.nav-sub-label{font-size:11px;font-weight:700;color:var(--text-tertiary);letter-spacing:.06em;padding:6px 12px 2px;text-transform:none}
+.nav-sub-label{font-size:13px;font-weight:700;color:var(--text-tertiary);letter-spacing:.06em;padding:6px 12px 2px;text-transform:none}
 /* ── Main Area ── */
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
 .topbar{height:52px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0}
@@ -172,7 +172,7 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
   <div class="sidebar-logo">
     <div class="logo-icon">A</div>
     <div>
-      <div style="display:flex;align-items:center;gap:6px"><div class="logo-text">AOP</div><div style="font-size:9px;font-weight:600;color:var(--text-tertiary);background:var(--bg-tertiary);padding:1px 6px;border-radius:4px">Beta</div></div>
+      <div style="display:flex;align-items:center;gap:6px"><div class="logo-text">AOP</div><div style="font-size:10px;font-weight:600;color:var(--text-tertiary);background:var(--bg-tertiary);padding:1px 6px;border-radius:4px">Beta</div></div>
       <div class="logo-sub">行政运营管理平台</div>
     </div>
   </div>
@@ -180,7 +180,7 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
     <div class="nav-group">
       <div class="nav-group-label">个人</div>
       <a class="nav-item" href="./02-my-work.html"><span class="nav-icon">🏠</span>我的工作<span class="nav-badge warn">3</span></a>
-      <a class="nav-item" href="./10-okr.html"><span class="nav-icon">🎯</span>OKR <span style="font-size:10px;color:var(--text-tertiary);margin-left:2px">手动导入</span></a>
+      <a class="nav-item" href="./10-okr.html"><span class="nav-icon">🎯</span>OKR <span style="font-size:11px;color:var(--text-tertiary);margin-left:2px">手动导入</span></a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label">管理</div>
