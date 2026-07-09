@@ -200,7 +200,7 @@
     box-shadow: var(--shadow-lg);
   }
   .nav-sidebar {
-    width: 260px;
+    width: 280px;
     background: var(--bg);
     border-right: 1px solid var(--border-light);
     display: flex;
@@ -214,6 +214,7 @@
     align-items: center;
     gap: 10px;
     border-bottom: 1px solid var(--border-light);
+    flex-shrink:0;
   }
   .nav-logo-icon {
     width: 30px;
@@ -252,6 +253,7 @@
     cursor: pointer;
     border-radius: 0;
     transition: background var(--transition);
+    flex-shrink:0;
   }
   .nav-workspace:hover { background: var(--bg-hover); }
   .nav-workspace-name {
@@ -343,7 +345,7 @@
     display: flex;
     align-items: center;
     gap: 7px;
-    padding: 6px 14px 6px 28px;
+    padding: 6px 14px 6px 24px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
@@ -925,6 +927,8 @@
           <span class="nav-workspace-arrow">切换</span>
         </div>
 
+        <div class="sb-scroll" style="flex:1;overflow-y:auto;overflow-x:hidden">
+
         <div class="nav-modules">
           <div class="nav-module-label">个人</div>
           <div class="nav-item active">
@@ -988,6 +992,8 @@
           <div class="nav-sub-label">数字化运营</div>
           <div class="nav-sub-item"><div class="nav-sub-dot" style="background:#06B6D4;"></div> 行政服务台</div>
           <div class="nav-sub-item"><div class="nav-sub-dot" style="background:#6366F1;"></div> 数字化后台运营</div>
+        </div>
+
         </div>
 
         <!-- User -->

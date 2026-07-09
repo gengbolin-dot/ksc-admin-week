@@ -57,7 +57,7 @@
 
   /* Sidebar (same as 01) */
   .sidebar {
-    width: 260px;
+    width: 280px;
     background: var(--bg);
     border-right: 1px solid var(--border-light);
     display: flex;
@@ -71,6 +71,7 @@
     align-items: center;
     gap: 10px;
     border-bottom: 1px solid var(--border-light);
+    flex-shrink:0;
   }
   .sidebar-logo-icon {
     width: 28px; height: 28px;
@@ -84,6 +85,7 @@
   .sidebar-workspace {
     padding: 10px 16px; display: flex; align-items: center; gap: 6px;
     font-size: 13px; color: var(--text-secondary); font-weight: 600;
+    flex-shrink:0;
   }
   .sidebar-section { padding: 8px 10px; border-top: 1px solid var(--border-light); }
   .sidebar-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-tertiary); padding: 8px 8px 2px; }
@@ -104,13 +106,13 @@
   }
   .sidebar-badge.warn { background: var(--warning); color: white; }
   .sidebar-sub-item {
-    display: flex; align-items: center; gap: 7px; padding: 6px 14px 6px 28px;
+    display: flex; align-items: center; gap: 7px; padding: 6px 14px 6px 24px;
     font-size: 14px; color: var(--text-tertiary); border-radius: 5px;
     cursor: pointer; transition: all var(--transition); text-decoration: none;
   }
   .sidebar-sub-item:hover { background: var(--bg-hover); color: var(--text-secondary); }
   .sidebar-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-  .sidebar-bottom { margin-top: auto; padding: 12px; border-top: 1px solid var(--border-light); }
+  .sidebar-bottom { margin-top: auto; padding: 12px; border-top: 1px solid var(--border-light); flex-shrink:0; }
   .sidebar-user {
     display: flex; align-items: center; gap: 8px; padding: 6px 8px;
     border-radius: 7px; cursor: pointer;
@@ -883,6 +885,9 @@
     </div>
     <div class="sidebar-workspace">▼ 行政部</div>
 
+    <div class="sb-scroll" style="flex:1;overflow-y:auto;overflow-x:hidden">
+
+  <div class="sidebar-scroll">
     <div class="sidebar-section">
       <div class="sidebar-label">个人</div>
       <div class="sidebar-item active">
@@ -939,6 +944,9 @@
       <a class="sidebar-sub-item" href="#"><div class="sidebar-dot" style="background:#6366F1;"></div> 数字化后台运营</a>
     </div>
 
+    </div>
+
+  </div>
     <div class="sidebar-bottom">
       <div class="sidebar-user">
         <div class="sidebar-avatar">耿</div>
