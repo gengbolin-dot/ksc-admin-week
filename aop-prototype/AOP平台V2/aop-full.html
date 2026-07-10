@@ -709,7 +709,102 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
 .p01-table tr:hover td{background:var(--bg2)}
 .p01-route{background:var(--bg2);border-radius:6px;padding:8px 12px;font-size:12px;font-family:'Inter',monospace;color:var(--t2);margin-bottom:4px}
 .p01-route .path{color:var(--ac);font-weight:600}
-</style>
+
+/* ══════ PANEL 11: TEAM STRUCTURE ══════ */
+.p11-layout{display:flex;flex:1;overflow:hidden}
+.p11-sidebar{width:280px;background:var(--bg);border-right:1px solid var(--bdl);display:flex;flex-direction:column;overflow:hidden}
+.p11-sidebar-head{padding:16px;border-bottom:1px solid var(--bdl)}
+.p11-sidebar-title{font-size:14px;font-weight:700;margin-bottom:12px}
+.p11-search{width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--bd);font-size:13px;outline:none;background:var(--bg2)}
+.p11-search:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(59,91,219,.1)}
+.p11-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 16px;border-bottom:1px solid var(--bdl)}
+.p11-stat{text-align:center}
+.p11-stat-num{font-size:20px;font-weight:700;color:var(--ac)}
+.p11-stat-label{font-size:10px;color:var(--t3);margin-top:2px}
+.p11-dept-list{flex:1;overflow-y:auto;padding:8px}
+.p11-dept{padding:10px 12px;border-radius:8px;cursor:pointer;transition:all var(--tr);margin-bottom:4px;display:flex;align-items:center;gap:10px}
+.p11-dept:hover{background:var(--bgH)}
+.p11-dept.active{background:var(--acl);color:var(--ac)}
+.p11-dept-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.p11-dept-name{font-size:13px;font-weight:600;flex:1}
+.p11-dept-count{font-size:11px;color:var(--t3);background:var(--bg3);padding:2px 8px;border-radius:99px}
+.p11-content{flex:1;overflow-y:auto;background:var(--bg2);padding:20px 24px}
+.p11-org-chart{background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:20px;margin-bottom:20px}
+.p11-org-title{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.p11-org-tree{display:flex;flex-direction:column;align-items:center;gap:12px}
+.p11-org-root{background:var(--acl);border:2px solid var(--ac);border-radius:12px;padding:12px 20px;text-align:center;min-width:160px}
+.p11-org-root-name{font-size:14px;font-weight:700;color:var(--ac)}
+.p11-org-root-title{font-size:11px;color:var(--t3);margin-top:2px}
+.p11-org-branches{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.p11-org-branch{display:flex;flex-direction:column;align-items:center;gap:8px}
+.p11-org-branch-head{background:var(--bg2);border:1px solid var(--bdl);border-radius:10px;padding:10px 16px;text-align:center;min-width:120px}
+.p11-org-branch-name{font-size:13px;font-weight:600}
+.p11-org-branch-title{font-size:10px;color:var(--t3);margin-top:2px}
+.p11-org-members{display:flex;flex-direction:column;gap:4px}
+.p11-org-member{background:var(--bg);border:1px solid var(--bdl);border-radius:8px;padding:8px 12px;font-size:12px;text-align:center;min-width:100px}
+.p11-team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.p11-card{background:var(--bg);border:1px solid var(--bdl);border-radius:12px;padding:16px;cursor:pointer;transition:all var(--tr)}
+.p11-card:hover{box-shadow:var(--sh);border-color:var(--bd)}
+.p11-card-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.p11-card-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;flex-shrink:0}
+.p11-card-info{flex:1;min-width:0}
+.p11-card-name{font-size:15px;font-weight:700;color:var(--t1)}
+.p11-card-title{font-size:12px;color:var(--t3);margin-top:2px}
+.p11-card-location{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px;margin-top:2px}
+.p11-card-role{font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:12px;padding:8px;background:var(--bg2);border-radius:8px}
+.p11-card-modules{display:flex;flex-wrap:wrap;gap:4px}
+.p11-card-module{font-size:10px;font-weight:500;padding:2px 8px;border-radius:99px;background:var(--acl);color:var(--ac)}
+.p11-card-contact{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--bdl)}
+.p11-card-contact-item{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px}
+
+/* ══════ PANEL 13: ANNUAL BUDGET ══════ */
+.p13-top-bar{display:flex;align-items:center;gap:12px;padding:16px 24px;background:var(--bg);border-bottom:1px solid var(--bdl)}
+.p13-year-sel{position:relative;display:inline-block}
+.p13-year-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--r);font-size:14px;font-weight:700;color:var(--t1);cursor:pointer;transition:all var(--tr)}
+.p13-year-btn:hover{border-color:var(--ac)}
+.p13-year-dd{position:absolute;top:calc(100% + 6px);left:0;width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--shL);z-index:20;display:none;overflow:hidden}
+.p13-year-dd.open{display:block}
+.p13-year-dd-item{display:block;width:100%;text-align:left;padding:8px 14px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--t2);transition:background var(--tr)}
+.p13-year-dd-item:hover{background:var(--bgH)}
+.p13-year-dd-item.current{font-weight:700;color:var(--t1)}
+.p13-import-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--ac);background:var(--bg);color:var(--ac);transition:all var(--tr)}
+.p13-import-btn:hover{background:var(--ac);color:#fff}
+.p13-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 24px;background:var(--bg);border-bottom:1px solid var(--bdl)}
+.p13-stat{background:var(--bg2);border-radius:10px;padding:14px;text-align:center}
+.p13-stat-label{font-size:11px;color:var(--t3);margin-bottom:6px}
+.p13-stat-num{font-size:22px;font-weight:700;color:var(--t1);letter-spacing:-.02em}
+.p13-stat-unit{font-size:12px;font-weight:500;color:var(--t3)}
+.p13-categories{padding:16px 24px}
+.p13-category{background:var(--bg);border:1px solid var(--bdl);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.p13-cat-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background var(--tr)}
+.p13-cat-header:hover{background:var(--bg2)}
+.p13-cat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.p13-cat-info{flex:1}
+.p13-cat-name{font-size:14px;font-weight:700;color:var(--t1)}
+.p13-cat-budget{font-size:11px;color:var(--t3);margin-top:2px}
+.p13-cat-progress{width:120px}
+.p13-prog-bar{height:8px;border-radius:4px;background:var(--bg3);overflow:hidden;margin-bottom:4px}
+.p13-prog-fill{height:100%;border-radius:4px;transition:width .5s}
+.p13-prog-text{font-size:11px;font-weight:600;text-align:right}
+.p13-cat-items{padding:0 16px 16px;display:none}
+.p13-cat-items.open{display:block}
+.p13-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bdl)}
+.p13-item:last-child{border-bottom:none}
+.p13-item-name{flex:1;font-size:13px;color:var(--t2)}
+.p13-item-budget{font-size:13px;font-weight:600;color:var(--t1);min-width:80px;text-align:right}
+.p13-item-spent{font-size:12px;color:var(--t3);min-width:60px;text-align:right}
+.p13-item-pct{font-size:11px;font-weight:600;min-width:50px;text-align:right}
+.p13-chart{padding:16px 24px;background:var(--bg);margin:0 24px;border-radius:12px;border:1px solid var(--bdl)}
+.p13-chart-title{font-size:14px;font-weight:700;margin-bottom:16px}
+.p13-bars{display:flex;align-items:flex-end;gap:8px;height:120px}
+.p13-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.p13-bar{width:100%;border-radius:4px 4px 0 0;background:var(--ac);min-height:4px;transition:height .5s}
+.p13-bar-label{font-size:10px;color:var(--t3)}
+.p13-empty{text-align:center;padding:60px 24px;color:var(--t3)}
+.p13-empty-icon{font-size:48px;margin-bottom:16px;opacity:.3}
+.p13-empty-text{font-size:14px;margin-bottom:8px}
+.p13-empty-hint{font-size:12px;color:var(--t3)}
+
 </head>
 <body>
 <div class="shell">
@@ -1736,6 +1831,42 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
   </div><!-- /p12-scroll -->
 </div>
 
+<!-- ══════ PANEL 11: TEAM STRUCTURE ══════ -->
+<div class="panel" id="p11">
+  <div class="topbar"><div class="topbar-title">团队人员架构</div></div>
+  <div class="p11-layout">
+    <div class="p11-sidebar">
+      <div class="p11-sidebar-head">
+        <div class="p11-sidebar-title">部门筛选</div>
+        <input type="text" class="p11-search" placeholder="搜索成员..." oninput="filterTeam(this.value)">
+      </div>
+      <div class="p11-stats" id="p11Stats"></div>
+      <div class="p11-dept-list" id="p11DeptList"></div>
+    </div>
+    <div class="p11-content" id="p11Content"></div>
+  </div>
+</div>
+
+<!-- ══════ PANEL 13: ANNUAL BUDGET ══════ -->
+<div class="panel" id="p13">
+  <div class="p13-top-bar">
+    <div style="font-size:16px;font-weight:700">年度预算</div>
+    <div class="p13-year-sel">
+      <div class="p13-year-btn" onclick="toggleBudgetYear()">2026 年 ▾</div>
+      <div class="p13-year-dd" id="p13YearDd">
+        <div class="p13-year-dd-item current" onclick="selectBudgetYear(2026)">2026 年</div>
+        <div class="p13-year-dd-item" onclick="selectBudgetYear(2025)">2025 年</div>
+      </div>
+    </div>
+    <div style="flex:1"></div>
+    <label class="p13-import-btn">
+      📥 导入 Excel
+      <input type="file" accept=".xlsx,.xls,.csv" onchange="importBudget(this)" style="display:none">
+    </label>
+  </div>
+  <div class="content-scroll" id="p13Content"></div>
+</div>
+
 </div><!-- end main -->
 </div><!-- end shell -->
 
@@ -1816,6 +1947,71 @@ const OKRS = [
   {num:'O3',obj:'建设数字化行政运营体系',krs:[{id:'O3-KR1',desc:'AOP 平台覆盖全部行政业务模块（8/8 上线）'},{id:'O3-KR2',desc:'周报覆盖率 100%'},{id:'O3-KR3',desc:'差旅数据 T+1 实时化'}],linked:'🔗 关联专项：AOP 平台、周报自动化、数据驾驶舱、AI推送引擎'},
 ];
 
+/* ══════ TEAM DATA ══════ */
+const TEAM = [
+  {id:'t01',name:'耿博琳',avatar:'耿',color:'#667eea',title:'行政总监',dept:'行政部',role:'职场管理(北京+异地)、行政数字化、文化运营',modules:['职场运营(北京)','职场运营(异地)','数字化运营'],email:'gengbolin@company.com',location:'北京',joinDate:'2020-03',reports:['t02','t03','t04','t05']},
+  {id:'t02',name:'高琳',avatar:'高',color:'#764ba2',title:'文化运营经理',dept:'文化运营',role:'文化运营、行政服务台运营',modules:['文化运营(活动)','文化运营(福利)','数字化运营(行政服务台)'],email:'gaolin@company.com',location:'北京',joinDate:'2021-06',reports:[]},
+  {id:'t03',name:'聂茜茜',avatar:'聂',color:'#f093fb',title:'活动策划主管',dept:'文化运营',role:'文化运营、活动策划',modules:['文化运营(活动)'],email:'nieqianqian@company.com',location:'北京',joinDate:'2022-01',reports:[]},
+  {id:'t04',name:'张灵玉',avatar:'张',color:'#4facfe',title:'北京职场主管',dept:'职场运营',role:'北京职场、文化运营',modules:['职场运营(北京)','文化运营(活动)'],email:'zhanglingyu@company.com',location:'北京',joinDate:'2021-03',reports:[]},
+  {id:'t05',name:'傅中南',avatar:'傅',color:'#a18cd1',title:'异地职场主管',dept:'职场运营',role:'异地职场管理',modules:['职场运营(异地)'],email:'fuzhongnan@company.com',location:'异地',joinDate:'2022-06',reports:['t06']},
+  {id:'t06',name:'胡丽婷',avatar:'胡',color:'#a6c0fe',title:'深圳职场专员',dept:'职场运营',role:'深圳职场',modules:['职场运营(异地)'],email:'huliting@company.com',location:'深圳',joinDate:'2023-03',reports:[]},
+  {id:'t07',name:'程宇亮',avatar:'程',color:'#43e97b',title:'武汉职场主管',dept:'职场运营',role:'武汉职场管理',modules:['职场运营(武汉)'],email:'chengyuliang@company.com',location:'武汉',joinDate:'2021-09',reports:['t08']},
+  {id:'t08',name:'董诗昀',avatar:'董',color:'#fa709a',title:'武汉职场专员',dept:'职场运营',role:'武汉职场',modules:['职场运营(武汉)'],email:'dongshiyun@company.com',location:'武汉',joinDate:'2022-12',reports:[]},
+  {id:'t09',name:'丁玉萍',avatar:'丁',color:'#fbc2eb',title:'数字化运营主管',dept:'数字化运营',role:'行政数字化、后台运营',modules:['数字化运营(后台)'],email:'dingyuping@company.com',location:'北京',joinDate:'2021-06',reports:[]},
+  {id:'t10',name:'王刚',avatar:'王',color:'#ffecd2',title:'行政负责人',dept:'行政部',role:'行政负责人',modules:['职场运营(北京)','文化运营','数字化运营'],email:'wanggang@company.com',location:'北京',joinDate:'2019-01',reports:['t01']},
+];
+
+const DEPARTMENTS = [
+  {id:'dept-workplace',name:'职场运营',icon:'🏢',color:'#3B5BDB',lead:'t01',members:['t01','t04','t05','t06','t07','t08']},
+  {id:'dept-culture',name:'文化运营',icon:'🎉',color:'#10B981',lead:'t02',members:['t02','t03']},
+  {id:'dept-digital',name:'数字化运营',icon:'💻',color:'#06B6D4',lead:'t09',members:['t09']},
+];
+
+const BUDGETS = {
+  2026: {
+    year: 2026,
+    total: 8500000,
+    spent: 4200000,
+    remaining: 4300000,
+    categories: [
+      {id:'b-workplace',name:'职场运营',icon:'🏢',color:'#3B5BDB',budget:4000000,spent:1800000,items:[
+        {name:'北京职场',budget:2000000,spent:900000},
+        {name:'武汉职场',budget:1500000,spent:700000},
+        {name:'异地职场',budget:500000,spent:200000}
+      ]},
+      {id:'b-culture',name:'文化运营',icon:'🎉',color:'#10B981',budget:2000000,spent:1200000,items:[
+        {name:'活动运营',budget:1500000,spent:900000},
+        {name:'员工福利',budget:500000,spent:300000}
+      ]},
+      {id:'b-digital',name:'数字化运营',icon:'💻',color:'#06B6D4',budget:2500000,spent:1200000,items:[
+        {name:'行政服务台',budget:1500000,spent:700000},
+        {name:'数字化后台',budget:1000000,spent:500000}
+      ]}
+    ]
+  },
+  2025: {
+    year: 2025,
+    total: 7800000,
+    spent: 7800000,
+    remaining: 0,
+    categories: [
+      {id:'b-workplace',name:'职场运营',icon:'🏢',color:'#3B5BDB',budget:3600000,spent:3600000,items:[
+        {name:'北京职场',budget:1800000,spent:1800000},
+        {name:'武汉职场',budget:1300000,spent:1300000},
+        {name:'异地职场',budget:500000,spent:500000}
+      ]},
+      {id:'b-culture',name:'文化运营',icon:'🎉',color:'#10B981',budget:1800000,spent:1800000,items:[
+        {name:'活动运营',budget:1300000,spent:1300000},
+        {name:'员工福利',budget:500000,spent:500000}
+      ]},
+      {id:'b-digital',name:'数字化运营',icon:'💻',color:'#06B6D4',budget:2400000,spent:2400000,items:[
+        {name:'行政服务台',budget:1400000,spent:1400000},
+        {name:'数字化后台',budget:1000000,spent:1000000}
+      ]}
+    ]
+  }
+};
+
 /* ══════ PANEL SWITCH ══════ */
 function switchPanel(id, navEl){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -1831,7 +2027,9 @@ function switchPanel(id, navEl){
   if(id==='p08'&&!window._p08Rendered){renderP08();window._p08Rendered=true}
   if(id==='p09'&&!window._p09Rendered){renderP09();window._p09Rendered=true}
   if(id==='p10'&&!window._p10Rendered){renderP10();window._p10Rendered=true}
+  if(id==='p11'&&!window._p11Rendered){renderP11();window._p11Rendered=true}
   if(id==='p12'&&!window._p12Rendered){renderP12();window._p12Rendered=true}
+  if(id==='p13'&&!window._p13Rendered){renderP13();window._p13Rendered=true}
 }
 
 /* ══════ SLIDE-OVER ══════ */
@@ -2312,6 +2510,265 @@ function closeLightbox(){
   document.getElementById('p12LbOverlay').classList.remove('show');
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox()});
+
+/* ══════ P11: TEAM STRUCTURE ══════ */
+let _p11Dept = 'all';
+let _p11Search = '';
+
+function renderP11(){
+  // Stats
+  const stats = document.getElementById('p11Stats');
+  stats.innerHTML = `
+    <div class="p11-stat"><div class="p11-stat-num">${TEAM.length}</div><div class="p11-stat-label">总人数</div></div>
+    <div class="p11-stat"><div class="p11-stat-num">${DEPARTMENTS.length}</div><div class="p11-stat-label">部门</div></div>
+    <div class="p11-stat"><div class="p11-stat-num">${TEAM.filter(t=>t.joinDate>='2026').length}</div><div class="p11-stat-label">今年入职</div></div>
+  `;
+
+  // Department list
+  renderP11Depts();
+
+  // Team content
+  renderP11Content();
+}
+
+function renderP11Depts(){
+  const el = document.getElementById('p11DeptList');
+  let h = `<div class="p11-dept ${_p11Dept==='all'?'active':''}" onclick="filterDept('all')">
+    <div class="p11-dept-icon" style="background:var(--acl);color:var(--ac)">👥</div>
+    <div class="p11-dept-name">全部成员</div>
+    <div class="p11-dept-count">${TEAM.length}</div>
+  </div>`;
+
+  DEPARTMENTS.forEach(d => {
+    h += `<div class="p11-dept ${_p11Dept===d.id?'active':''}" onclick="filterDept('${d.id}')">
+      <div class="p11-dept-icon" style="background:${d.color}18;color:${d.color}">${d.icon}</div>
+      <div class="p11-dept-name">${d.name}</div>
+      <div class="p11-dept-count">${d.members.length}</div>
+    </div>`;
+  });
+
+  el.innerHTML = h;
+}
+
+function renderP11Content(){
+  const el = document.getElementById('p11Content');
+  let filtered = TEAM;
+
+  if(_p11Dept !== 'all'){
+    const dept = DEPARTMENTS.find(d => d.id === _p11Dept);
+    if(dept) filtered = TEAM.filter(t => dept.members.includes(t.id));
+  }
+
+  if(_p11Search){
+    const term = _p11Search.toLowerCase();
+    filtered = filtered.filter(t =>
+      t.name.toLowerCase().includes(term) ||
+      t.title.toLowerCase().includes(term) ||
+      t.role.toLowerCase().includes(term)
+    );
+  }
+
+  // Org chart
+  let h = `<div class="p11-org-chart">
+    <div class="p11-org-title">📊 组织架构</div>
+    <div class="p11-org-tree">
+      <div class="p11-org-root">
+        <div class="p11-org-root-name">${TEAM.find(t=>t.id==='t10')?.name || '行政负责人'}</div>
+        <div class="p11-org-root-title">行政负责人</div>
+      </div>
+      <div class="p11-org-branches">`;
+
+  DEPARTMENTS.forEach(d => {
+    const lead = TEAM.find(t => t.id === d.lead);
+    const members = TEAM.filter(t => d.members.includes(t.id) && t.id !== d.lead);
+
+    h += `<div class="p11-org-branch">
+      <div class="p11-org-branch-head" style="border-color:${d.color}">
+        <div class="p11-org-branch-name">${lead?.name || '—'}</div>
+        <div class="p11-org-branch-title">${d.name}负责人</div>
+      </div>
+      <div class="p11-org-members">`;
+
+    members.forEach(m => {
+      h += `<div class="p11-org-member">${m.name}</div>`;
+    });
+
+    h += `</div></div>`;
+  });
+
+  h += `</div></div></div>`;
+
+  // Team grid
+  h += `<div class="p11-team-grid">`;
+
+  filtered.forEach(t => {
+    const dept = DEPARTMENTS.find(d => d.members.includes(t.id));
+    h += `<div class="p11-card" onclick="showTeamDetail('${t.id}')">
+      <div class="p11-card-head">
+        <div class="p11-card-avatar" style="background:${t.color}">${t.avatar}</div>
+        <div class="p11-card-info">
+          <div class="p11-card-name">${t.name}</div>
+          <div class="p11-card-title">${t.title}</div>
+          <div class="p11-card-location">📍 ${t.location} · 入职 ${t.joinDate}</div>
+        </div>
+      </div>
+      <div class="p11-card-role">${t.role}</div>
+      <div class="p11-card-modules">
+        ${t.modules.map(m => `<span class="p11-card-module">${m}</span>`).join('')}
+      </div>
+      <div class="p11-card-contact">
+        <span class="p11-card-contact-item">📧 ${t.email}</span>
+        ${dept ? `<span class="p11-card-contact-item" style="color:${dept.color}">${dept.icon} ${dept.name}</span>` : ''}
+      </div>
+    </div>`;
+  });
+
+  h += `</div>`;
+  el.innerHTML = h;
+}
+
+function filterDept(deptId){
+  _p11Dept = deptId;
+  renderP11Depts();
+  renderP11Content();
+}
+
+function filterTeam(term){
+  _p11Search = term;
+  renderP11Content();
+}
+
+function showTeamDetail(id){
+  const t = TEAM.find(m => m.id === id);
+  if(!t) return;
+  // Could open a slide-over panel with more details
+  alert(`${t.name}\n${t.title}\n${t.role}\n${t.email}`);
+}
+
+/* ══════ P13: ANNUAL BUDGET ══════ */
+let _p13Year = 2026;
+
+function renderP13(){
+  const el = document.getElementById('p13Content');
+  const budget = BUDGETS[_p13Year];
+
+  if(!budget){
+    el.innerHTML = `<div class="p13-empty">
+      <div class="p13-empty-icon">📊</div>
+      <div class="p13-empty-text">暂无 ${_p13Year} 年预算数据</div>
+      <div class="p13-empty-hint">点击"导入 Excel"按钮导入年度预算表格</div>
+    </div>`;
+    return;
+  }
+
+  const pct = Math.round(budget.spent / budget.total * 100);
+
+  let h = `<div class="p13-stats">
+    <div class="p13-stat">
+      <div class="p13-stat-label">总预算</div>
+      <div class="p13-stat-num">¥${(budget.total/10000).toFixed(0)}<span class="p13-stat-unit">万</span></div>
+    </div>
+    <div class="p13-stat">
+      <div class="p13-stat-label">已支出</div>
+      <div class="p13-stat-num">¥${(budget.spent/10000).toFixed(0)}<span class="p13-stat-unit">万</span></div>
+    </div>
+    <div class="p13-stat">
+      <div class="p13-stat-label">执行率</div>
+      <div class="p13-stat-num" style="color:var(--ac)">${pct}<span class="p13-stat-unit">%</span></div>
+    </div>
+    <div class="p13-stat">
+      <div class="p13-stat-label">剩余</div>
+      <div class="p13-stat-num">¥${(budget.remaining/10000).toFixed(0)}<span class="p13-stat-unit">万</span></div>
+    </div>
+  </div>`;
+
+  h += `<div class="p13-categories">`;
+
+  budget.categories.forEach(cat => {
+    const catPct = Math.round(cat.spent / cat.budget * 100);
+    const barColor = catPct > 80 ? 'var(--dan)' : catPct > 60 ? 'var(--warn)' : 'var(--suc)';
+
+    h += `<div class="p13-category">
+      <div class="p13-cat-header" onclick="toggleBudgetCat('${cat.id}')">
+        <div class="p13-cat-icon" style="background:${cat.color}18;color:${cat.color}">${cat.icon}</div>
+        <div class="p13-cat-info">
+          <div class="p13-cat-name">${cat.name}</div>
+          <div class="p13-cat-budget">预算: ¥${(cat.budget/10000).toFixed(0)}万 · 已用: ¥${(cat.spent/10000).toFixed(0)}万</div>
+        </div>
+        <div class="p13-cat-progress">
+          <div class="p13-prog-bar"><div class="p13-prog-fill" style="width:${catPct}%;background:${barColor}"></div></div>
+          <div class="p13-prog-text" style="color:${barColor}">${catPct}%</div>
+        </div>
+      </div>
+      <div class="p13-cat-items" id="budget-cat-${cat.id}">`;
+
+    cat.items.forEach(item => {
+      const itemPct = Math.round(item.spent / item.budget * 100);
+      h += `<div class="p13-item">
+        <div class="p13-item-name">${item.name}</div>
+        <div class="p13-item-budget">¥${(item.budget/10000).toFixed(0)}万</div>
+        <div class="p13-item-spent">¥${(item.spent/10000).toFixed(0)}万</div>
+        <div class="p13-item-pct" style="color:${itemPct>80?'var(--dan)':itemPct>60?'var(--warn)':'var(--suc)'}">${itemPct}%</div>
+      </div>`;
+    });
+
+    h += `</div></div>`;
+  });
+
+  h += `</div>`;
+
+  // Monthly chart (placeholder)
+  h += `<div class="p13-chart">
+    <div class="p13-chart-title">📈 月度预算使用趋势</div>
+    <div class="p13-bars">
+      ${['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'].map((m,i) => {
+        const height = Math.round(Math.random() * 80 + 20);
+        return `<div class="p13-bar-col"><div class="p13-bar" style="height:${height}%"></div><div class="p13-bar-label">${m}</div></div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  el.innerHTML = h;
+}
+
+function toggleBudgetYear(){
+  document.getElementById('p13YearDd').classList.toggle('open');
+}
+
+function selectBudgetYear(year){
+  _p13Year = year;
+  document.getElementById('p13YearDd').classList.remove('open');
+  document.querySelector('.p13-year-btn').textContent = year + ' 年 ▾';
+  document.querySelectorAll('.p13-year-dd-item').forEach(el => {
+    el.classList.toggle('current', el.textContent.includes(year));
+  });
+  renderP13();
+}
+
+function toggleBudgetCat(catId){
+  const el = document.getElementById('budget-cat-' + catId);
+  if(el) el.classList.toggle('open');
+}
+
+function importBudget(input){
+  const file = input.files[0];
+  if(!file) return;
+
+  // Placeholder for Excel import
+  // In production, use SheetJS (xlsx) library to parse Excel
+  alert('Excel 导入功能已就绪！\n\n文件: ' + file.name + '\n大小: ' + (file.size/1024).toFixed(1) + ' KB\n\n提示：请稍后提供具体的预算表格格式，我将完善解析逻辑。');
+
+  // Reset input
+  input.value = '';
+}
+
+// Close budget year dropdown when clicking outside
+document.addEventListener('click', e => {
+  const sel = document.querySelector('.p13-year-sel');
+  if(sel && !sel.contains(e.target)){
+    document.getElementById('p13YearDd').classList.remove('open');
+  }
+});
 
 /* ══════ INIT ══════ */
 // P02 is already visible as default active panel
