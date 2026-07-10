@@ -845,6 +845,40 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
 .p13-detail-summary-card{background:var(--bg);border:1px solid var(--bdl);border-radius:10px;padding:12px 16px;text-align:center;flex:1;min-width:120px}
 .p13-detail-summary-label{font-size:11px;color:var(--t3);margin-bottom:4px;white-space:nowrap}
 .p13-detail-summary-value{font-size:18px;font-weight:700;color:var(--t1);white-space:nowrap}
+
+/* ══════ PANEL 14: AI PERFORMANCE ══════ */
+.p14-header{padding:20px 24px;background:var(--bg);border-bottom:1px solid var(--bdl)}
+.p14-header-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.p14-title{font-size:18px;font-weight:700;color:var(--t1)}
+.p14-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--acl);color:var(--ac)}
+.p14-meta{display:flex;gap:16px;font-size:12px;color:var(--t3)}
+.p14-meta-item{display:flex;align-items:center;gap:4px}
+.p14-content{padding:24px;overflow-y:auto}
+.p14-goal-card{background:var(--bg);border:1px solid var(--bdl);border-radius:14px;margin-bottom:20px;overflow:hidden;transition:box-shadow var(--tr)}
+.p14-goal-card:hover{box-shadow:var(--sh)}
+.p14-goal-header{display:flex;align-items:flex-start;gap:16px;padding:20px;border-bottom:1px solid var(--bdl)}
+.p14-goal-num{width:40px;height:40px;border-radius:10px;background:var(--acl);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0}
+.p14-goal-info{flex:1}
+.p14-goal-name{font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.p14-goal-type{display:flex;gap:6px;margin-bottom:10px}
+.p14-type-tag{font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px}
+.p14-type-active{background:var(--acl);color:var(--ac)}
+.p14-type-inactive{background:var(--bg2);color:var(--t3)}
+.p14-goal-desc{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:12px}
+.p14-goal-standard{display:flex;align-items:flex-start;gap:8px;padding:10px 14px;background:var(--bg2);border-radius:8px;font-size:12px;color:var(--t2)}
+.p14-goal-standard-icon{color:var(--ac);flex-shrink:0;margin-top:1px}
+.p14-milestones{padding:16px 20px}
+.p14-milestone-title{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.p14-milestone-list{display:flex;flex-direction:column;gap:12px}
+.p14-milestone{display:flex;gap:12px;padding:12px;background:var(--bg2);border-radius:10px;border-left:3px solid var(--ac)}
+.p14-ms-label{font-size:11px;font-weight:700;color:var(--ac);min-width:30px;flex-shrink:0}
+.p14-ms-content{flex:1}
+.p14-ms-desc{font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:6px}
+.p14-ms-meta{display:flex;gap:12px;font-size:11px;color:var(--t3)}
+.p14-ms-meta-item{display:flex;align-items:center;gap:4px}
+.p14-empty{text-align:center;padding:60px 24px;color:var(--t3)}
+.p14-empty-icon{font-size:48px;margin-bottom:16px;opacity:.3}
+.p14-empty-text{font-size:14px;margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -895,6 +929,9 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
     </div>
     <div class="sb-i" data-panel="p13" onclick="switchPanel('p13',this)">
       <div class="sb-ic">💰</div> 年度预算 <span style="font-size:11px;color:var(--t3);margin-left:2px">导入</span>
+    </div>
+    <div class="sb-i" data-panel="p14" onclick="switchPanel('p14',this)">
+      <div class="sb-ic">🤖</div> AI 绩效
     </div>
   </div>
 
@@ -1912,6 +1949,12 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
   <div class="content-scroll" id="p13Content"></div>
 </div>
 
+<!-- ══════ PANEL 14: AI PERFORMANCE ══════ -->
+<div class="panel" id="p14">
+  <div class="topbar"><div class="topbar-title">AI 绩效</div></div>
+  <div class="content-scroll" id="p14Content"></div>
+</div>
+
 </div><!-- end main -->
 </div><!-- end shell -->
 
@@ -2169,6 +2212,54 @@ const BUDGET_DETAIL = [
 
 let _p13View = 'summary';
 
+/* ══════ AI PERFORMANCE DATA ══════ */
+const AI_PERFORMANCE = {
+  department: '市场和行政部-行政部',
+  period: '26年H2',
+  updateTime: '26年6月25日',
+  goals: [
+    {
+      id: 1,
+      name: '智能工位管理系统',
+      type: '增效降本型',
+      types: ['增效降本型', '业务增长型', '复用价值型'],
+      description: '解决职场工作资源灵活调度问题，从而做到员工可感知，可预订，资源管理灵活调度，职场成本数据报告',
+      standard: '提高资源利用率，达成智能化职场工位管理',
+      milestones: [
+        {label: 'M1', desc: '完成需求PRD定稿，系统框架搭建，已输出初版产品原型，功能包含出差工位预定、各楼层、部门工位显示、空闲工位显示、数据报告分析、用户角色管理、规则设置；实现会议室、人员协作数据拉取对接系统', owner: '程宇亮', time: '7-8月'},
+        {label: 'M2', desc: '完成楼层座位显示界面优化，部门工位显示UI优化，出差工位预定功能测试，预定工位规则设定，武汉整体、部门工位使用数据分析。完成各部门武汉工位管理人的确定，订阅号推送上线出差工位预定功能及部门工位使用数据分析，并推送至部门负责人的场景覆盖，持续完善数据报告分析，人均成本报告、爽约与违规统计、空置成本分析', owner: '程宇亮', time: '9-10月'},
+        {label: 'M3', desc: '持续优化UI界面，扩充功能会议室使用数据行政看板，工位扩租预测模型，半年度/年度分析报告', owner: '程宇亮', time: '11-12月'}
+      ]
+    },
+    {
+      id: 2,
+      name: '库存管理系统',
+      type: '增效降本型',
+      types: ['增效降本型', '业务增长型', '复用价值型'],
+      description: '解决行政库存管理问题，实现出入库及时更新，及时查询',
+      standard: '达成行政物资管理，建立数据台账，内部提效',
+      milestones: [
+        {label: 'M1', desc: '完成PRD需求文档2.0版本，输出2.0产品原型', owner: '程宇亮', time: '7-8月'},
+        {label: 'M2', desc: '完成2.0产品原型，产品分类、库存预警、数据分析等功能性搭建。完成功能测试且上线使用', owner: '程宇亮', time: '9-10月'},
+        {label: 'M3', desc: '整体界面优化与功能优化迭代', owner: '程宇亮', time: '11-12月'}
+      ]
+    },
+    {
+      id: 3,
+      name: '行政数字化（差旅及用车）数据分析及定向推送系统',
+      type: '增效降本型',
+      types: ['增效降本型', '业务增长型', '复用价值型'],
+      description: '将分散于BI系统深处的用车数据，同时补齐差旅（机酒火）费用数据盲区，通过AI能力主动推送至管理者终端，实现行政差旅数据分析及主动推送功能',
+      standard: '实现"变被动查看为主动获取、变数字为洞察"，更好的用数据辅助业务决策，协助管理提效',
+      milestones: [
+        {label: 'M1', desc: '完成需求定稿、跨部门对接及数据接口调通；产出首版产品原型，完成协作订阅号渠道申请；AI摘要生成逻辑，实现数据拉取→AI摘要→协作推送全链路联调', owner: '耿博琳', time: '7-8月'},
+        {label: 'M2', desc: '上线测试到正式运营的总裁室及一级部门负责人的全场景化覆盖推送。覆盖包含【敏感订单】等特定场景的标准化数据出口推送', owner: '耿博琳', time: '9-10月'},
+        {label: 'M3', desc: '除月度报告覆盖半年度/年度报告场景', owner: '耿博琳', time: '11-12月'}
+      ]
+    }
+  ]
+};
+
 /* ══════ PANEL SWITCH ══════ */
 function switchPanel(id, navEl){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -2187,6 +2278,7 @@ function switchPanel(id, navEl){
   if(id==='p11'&&!window._p11Rendered){renderP11();window._p11Rendered=true}
   if(id==='p12'&&!window._p12Rendered){renderP12();window._p12Rendered=true}
   if(id==='p13'&&!window._p13Rendered){renderP13();window._p13Rendered=true}
+  if(id==='p14'&&!window._p14Rendered){renderP14();window._p14Rendered=true}
 }
 
 /* ══════ SLIDE-OVER ══════ */
@@ -3066,6 +3158,82 @@ function renderP13Detail(){
 
   h += `</tbody></table></div>`; // end body
   h += `</div>`; // end detail view
+  el.innerHTML = h;
+}
+
+/* ══════ P14: AI PERFORMANCE ══════ */
+function renderP14(){
+  const el = document.getElementById('p14Content');
+  const data = AI_PERFORMANCE;
+
+  if(!data || !data.goals || data.goals.length === 0){
+    el.innerHTML = `<div class="p14-empty">
+      <div class="p14-empty-icon">🤖</div>
+      <div class="p14-empty-text">暂无 AI 绩效数据</div>
+    </div>`;
+    return;
+  }
+
+  let h = '';
+
+  // Header
+  h += `<div class="p14-header">
+    <div class="p14-header-top">
+      <div class="p14-title">AI 绩效目标</div>
+      <div class="p14-badge">${data.period}</div>
+    </div>
+    <div class="p14-meta">
+      <div class="p14-meta-item">🏢 ${data.department}</div>
+      <div class="p14-meta-item">📅 ${data.updateTime}</div>
+      <div class="p14-meta-item">🎯 ${data.goals.length} 个目标</div>
+    </div>
+  </div>`;
+
+  // Goals
+  h += `<div class="p14-content">`;
+
+  data.goals.forEach(goal => {
+    h += `<div class="p14-goal-card">
+      <div class="p14-goal-header">
+        <div class="p14-goal-num">${goal.id}</div>
+        <div class="p14-goal-info">
+          <div class="p14-goal-name">${goal.name}</div>
+          <div class="p14-goal-type">`;
+
+    goal.types.forEach(type => {
+      const isActive = type === goal.type;
+      h += `<span class="p14-type-tag ${isActive ? 'p14-type-active' : 'p14-type-inactive'}">${isActive ? '√' : '□'} ${type}</span>`;
+    });
+
+    h += `</div>
+          <div class="p14-goal-desc">${goal.description}</div>
+          <div class="p14-goal-standard">
+            <span class="p14-goal-standard-icon">🎯</span>
+            <span><strong>衡量标准：</strong>${goal.standard}</span>
+          </div>
+        </div>
+      </div>
+      <div class="p14-milestones">
+        <div class="p14-milestone-title">📋 里程碑拆解</div>
+        <div class="p14-milestone-list">`;
+
+    goal.milestones.forEach(ms => {
+      h += `<div class="p14-milestone">
+        <div class="p14-ms-label">${ms.label}</div>
+        <div class="p14-ms-content">
+          <div class="p14-ms-desc">${ms.desc}</div>
+          <div class="p14-ms-meta">
+            <span class="p14-ms-meta-item">👤 ${ms.owner}</span>
+            <span class="p14-ms-meta-item">📅 ${ms.time}</span>
+          </div>
+        </div>
+      </div>`;
+    });
+
+    h += `</div></div></div>`;
+  });
+
+  h += `</div>`;
   el.innerHTML = h;
 }
 
