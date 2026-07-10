@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#FFF;--bg2:#F8F9FB;--bg3:#F1F3F8;--bgH:#EEF0F6;--bd:#E5E7EB;--bdl:#F1F3F8;--t1:#1A1D26;--t2:#6B7280;--t3:#9CA3AF;--ac:#3B5BDB;--acl:#EBF0FF;--ach:#354FD4;--suc:#10B981;--sucL:#ECFDF5;--warn:#F59E0B;--warnL:#FFFBEB;--dan:#EF4444;--danL:#FEF2F2;--pur:#8B5CF6;--purL:#F5F3FF;--r:10px;--rl:14px;--rxl:18px;--sh:0 1px 3px rgba(0,0,0,.06);--shL:0 10px 25px rgba(0,0,0,.06);--tr:150ms cubic-bezier(.4,0,.2,1)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -3103,12 +3104,169 @@ function importBudget(input){
   const file = input.files[0];
   if(!file) return;
 
-  // Placeholder for Excel import
-  // In production, use SheetJS (xlsx) library to parse Excel
-  alert('Excel 导入功能已就绪！\n\n文件: ' + file.name + '\n大小: ' + (file.size/1024).toFixed(1) + ' KB\n\n提示：请稍后提供具体的预算表格格式，我将完善解析逻辑。');
+  const fileName = file.name;
+  const fileSize = (file.size/1024).toFixed(1);
 
-  // Reset input
-  input.value = '';
+  // Extract year from filename (e.g., "行政部2027年预算.csv" -> 2027)
+  const yearMatch = fileName.match(/(\d{4})/);
+  const year = yearMatch ? parseInt(yearMatch[1]) : new Date().getFullYear();
+
+  // Read file
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const content = e.target.result;
+      let rows;
+
+      // Parse based on file type
+      if(fileName.endsWith('.csv')) {
+        // Parse CSV
+        rows = parseCSV(content);
+      } else {
+        // Parse Excel using SheetJS
+        const workbook = XLSX.read(content, {type: 'binary'});
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
+      }
+
+      // Parse budget data
+      const budgetData = parseBudgetData(rows, year);
+
+      if(budgetData && budgetData.categories.length > 0) {
+        // Store in BUDGETS
+        BUDGETS[year] = budgetData;
+
+        // Update year selector
+        updateYearSelector(year);
+
+        // Switch to imported year
+        _p13Year = year;
+        document.querySelector('.p13-year-btn').textContent = year + ' 年 ▾';
+
+        // Re-render
+        renderP13();
+
+        // Show success message
+        alert('✅ 导入成功！\n\n文件: ' + fileName + '\n大小: ' + fileSize + ' KB\n年份: ' + year + '年\n分类: ' + budgetData.categories.length + '个\n总预算: ¥' + (budgetData.total/10000).toFixed(2) + '万');
+      } else {
+        alert('⚠️ 导入失败\n\n无法解析预算数据，请检查文件格式。\n\n支持格式：\n- CSV 文件\n- Excel 文件 (.xlsx, .xls)');
+      }
+    } catch(err) {
+      console.error('Import error:', err);
+      alert('❌ 导入错误\n\n' + err.message);
+    }
+
+    // Reset input
+    input.value = '';
+  };
+
+  if(fileName.endsWith('.csv')) {
+    reader.readAsText(file, 'UTF-8');
+  } else {
+    reader.readAsBinaryString(file);
+  }
+}
+
+// Parse CSV content
+function parseCSV(content){
+  const lines = content.split('\n');
+  const rows = [];
+  for(let i = 0; i < lines.length; i++){
+    const line = lines[i].trim();
+    if(!line) continue;
+    rows.push(line.split(','));
+  }
+  return rows;
+}
+
+// Parse budget data from rows
+function parseBudgetData(rows, year){
+  const categories = {};
+  let currentCat = '';
+  let currentSubcat = '';
+
+  // Start from row 6 (skip headers)
+  for(let i = 6; i < rows.length; i++){
+    const row = rows[i];
+    if(!row || row.length < 5) continue;
+
+    // Update category if present
+    if(row[0] && row[0].trim()) currentCat = row[0].trim();
+    if(row[1] && row[1].trim()) currentSubcat = row[1].trim();
+
+    const office = row[2] ? row[2].trim() : '';
+    const item = row[3] ? row[3].trim() : '';
+    const totalStr = row[4] ? row[4].trim().replace(/[,\s"]/g, '') : '0';
+    const total = parseFloat(totalStr) || 0;
+
+    if(total <= 0) continue;
+
+    // Map category
+    let catName;
+    if(currentCat === '职场') catName = '职场运营';
+    else if(currentCat === '福利') catName = '文化运营';
+    else if(currentCat === '办公' || currentCat === '星云专项') catName = '办公及邮寄';
+    else if(currentCat === '平台') catName = '数字化运营';
+    else catName = currentCat;
+
+    if(!categories[catName]) {
+      categories[catName] = {items: [], total: 0};
+    }
+
+    categories[catName].items.push({office, item, budget: total, spent: 0});
+    categories[catName].total += total;
+  }
+
+  // Convert to array format
+  const catArray = [];
+  const icons = {'职场运营':'🏢', '文化运营':'🎉', '数字化运营':'💻', '办公及邮寄':'📦'};
+  const colors = {'职场运营':'#3B5BDB', '文化运营':'#10B981', '数字化运营':'#06B6D4', '办公及邮寄':'#F59E0B'};
+
+  let grandTotal = 0;
+  Object.entries(categories).forEach(([name, data]) => {
+    grandTotal += data.total;
+    catArray.push({
+      id: 'b-' + name.replace(/[^a-zA-Z]/g, ''),
+      name: name,
+      icon: icons[name] || '📊',
+      color: colors[name] || '#6366F1',
+      budget: data.total,
+      spent: 0,
+      items: data.items
+    });
+  });
+
+  return {
+    year: year,
+    total: grandTotal,
+    spent: 0,
+    remaining: grandTotal,
+    categories: catArray
+  };
+}
+
+// Update year selector dropdown
+function updateYearSelector(newYear){
+  const dd = document.getElementById('p13YearDd');
+  const existing = dd.querySelector(`[data-year="${newYear}"]`);
+
+  if(!existing) {
+    // Add new year option
+    const newItem = document.createElement('div');
+    newItem.className = 'p13-year-dd-item';
+    newItem.setAttribute('data-year', newYear);
+    newItem.textContent = newYear + ' 年';
+    newItem.onclick = function(){ selectBudgetYear(newYear); };
+
+    // Insert before the first item (keep descending order)
+    const firstItem = dd.firstChild;
+    dd.insertBefore(newItem, firstItem);
+  }
+
+  // Update current class
+  dd.querySelectorAll('.p13-year-dd-item').forEach(el => {
+    el.classList.toggle('current', el.textContent.includes(newYear));
+  });
 }
 
 // Close budget year dropdown when clicking outside
