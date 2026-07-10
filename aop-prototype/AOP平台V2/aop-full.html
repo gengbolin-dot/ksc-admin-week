@@ -812,18 +812,21 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
 .p13-view-btn.active{background:var(--bg);color:var(--ac);box-shadow:var(--sh)}
 
 /* Budget detail table */
-.p13-detail-table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
-.p13-detail-table th{background:var(--bg3);padding:8px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);text-align:left;border-bottom:2px solid var(--bd);position:sticky;top:0;z-index:10}
-.p13-detail-table td{padding:8px 10px;border-bottom:1px solid var(--bdl);color:var(--t2)}
+.p13-detail-wrap{overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;margin:0 -24px;padding:0 24px}
+.p13-detail-table{width:100%;min-width:1800px;border-collapse:separate;border-spacing:0;font-size:12px;white-space:nowrap}
+.p13-detail-table th{background:var(--bg3);padding:10px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);text-align:left;border-bottom:2px solid var(--bd);position:sticky;top:0;z-index:10;white-space:nowrap}
+.p13-detail-table td{padding:10px 12px;border-bottom:1px solid var(--bdl);color:var(--t2);white-space:nowrap}
 .p13-detail-table tr:hover td{background:var(--bg2)}
 .p13-detail-table .cat-row{background:var(--acl);font-weight:700;color:var(--ac)}
-.p13-detail-table .cat-row td{border-bottom:2px solid var(--ac)}
+.p13-detail-table .cat-row td{border-bottom:2px solid var(--ac);font-size:13px}
 .p13-detail-table .subcat-row{background:var(--bg2);font-weight:600;color:var(--t1)}
-.p13-detail-table .amount{text-align:right;font-variant-numeric:tabular-nums}
+.p13-detail-table .amount{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .p13-detail-table .amount-bold{font-weight:700;color:var(--t1)}
-.p13-detail-table .q-header{background:var(--bg);font-weight:700;color:var(--ac);text-align:center;border-left:2px solid var(--bd)}
-.p13-detail-table .month-col{min-width:80px;text-align:right}
+.p13-detail-table .q-header{background:var(--bg);font-weight:700;color:var(--ac);text-align:center;border-left:2px solid var(--bd);white-space:nowrap}
+.p13-detail-table .month-col{min-width:90px;text-align:right;white-space:nowrap}
 .p13-detail-table .total-col{font-weight:700;color:var(--t1);background:var(--bg2)}
+.p13-detail-table .office-col{position:sticky;left:0;background:var(--bg);z-index:5;min-width:100px;border-right:1px solid var(--bdl)}
+.p13-detail-table .item-col{min-width:160px;white-space:nowrap}
 
 /* Detail filter */
 .p13-detail-filter{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
@@ -2956,12 +2959,11 @@ function renderP13Detail(){
   </div>`;
 
   // Detail table
-  h += `<div style="overflow-x:auto"><table class="p13-detail-table">
+  h += `<div class="p13-detail-wrap"><table class="p13-detail-table">
     <thead>
       <tr>
-        <th>分类</th>
-        <th>办公室</th>
-        <th>费用项</th>
+        <th class="office-col">办公室</th>
+        <th class="item-col">费用项</th>
         <th class="amount">全年合计</th>
         <th class="q-header">Q1</th>
         <th class="amount month-col">1月</th>
@@ -2994,36 +2996,49 @@ function renderP13Detail(){
 
   Object.entries(grouped).forEach(([cat, items]) => {
     // Category header row
-    let catTotal = 0;
-    items.forEach(i => catTotal += i.total);
+    let catTotal = 0, catQ1 = 0, catQ2 = 0, catQ3 = 0, catQ4 = 0;
+    items.forEach(i => {
+      catTotal += i.total;
+      catQ1 += i.q1;
+      catQ2 += i.q2;
+      catQ3 += i.q3;
+      catQ4 += i.q4;
+    });
 
     h += `<tr class="cat-row">
-      <td colspan="3">${catNames[cat] || cat}</td>
+      <td class="office-col">${catNames[cat] || cat}</td>
+      <td class="item-col">小计</td>
       <td class="amount amount-bold">¥${(catTotal/10000).toFixed(2)}万</td>
-      <td colspan="16"></td>
+      <td class="amount" style="color:var(--ac)">¥${(catQ1/10000).toFixed(2)}万</td>
+      <td colspan="3"></td>
+      <td class="amount" style="color:var(--ac)">¥${(catQ2/10000).toFixed(2)}万</td>
+      <td colspan="3"></td>
+      <td class="amount" style="color:var(--ac)">¥${(catQ3/10000).toFixed(2)}万</td>
+      <td colspan="3"></td>
+      <td class="amount" style="color:var(--ac)">¥${(catQ4/10000).toFixed(2)}万</td>
+      <td colspan="3"></td>
     </tr>`;
 
     // Items
     items.forEach(item => {
-      const fmt = (v) => v > 0 ? (v/10000).toFixed(2) : '-';
+      const fmt = (v) => v > 0 ? '¥' + (v/10000).toFixed(2) + '万' : '-';
       h += `<tr>
-        <td></td>
-        <td>${item.office}</td>
-        <td>${item.item}</td>
-        <td class="amount amount-bold">¥${fmt(item.total)}万</td>
-        <td class="amount" style="color:var(--ac)">¥${fmt(item.q1)}万</td>
+        <td class="office-col">${item.office}</td>
+        <td class="item-col">${item.item}</td>
+        <td class="amount amount-bold">${fmt(item.total)}</td>
+        <td class="amount" style="color:var(--ac)">${fmt(item.q1)}</td>
         <td class="amount">${fmt(item.jan)}</td>
         <td class="amount">${fmt(item.feb)}</td>
         <td class="amount">${fmt(item.mar)}</td>
-        <td class="amount" style="color:var(--ac)">¥${fmt(item.q2)}万</td>
+        <td class="amount" style="color:var(--ac)">${fmt(item.q2)}</td>
         <td class="amount">${fmt(item.apr)}</td>
         <td class="amount">${fmt(item.may)}</td>
         <td class="amount">${fmt(item.jun)}</td>
-        <td class="amount" style="color:var(--ac)">¥${fmt(item.q3)}万</td>
+        <td class="amount" style="color:var(--ac)">${fmt(item.q3)}</td>
         <td class="amount">${fmt(item.jul)}</td>
         <td class="amount">${fmt(item.aug)}</td>
         <td class="amount">${fmt(item.sep)}</td>
-        <td class="amount" style="color:var(--ac)">¥${fmt(item.q4)}万</td>
+        <td class="amount" style="color:var(--ac)">${fmt(item.q4)}</td>
         <td class="amount">${fmt(item.oct)}</td>
         <td class="amount">${fmt(item.nov)}</td>
         <td class="amount">${fmt(item.dec)}</td>
