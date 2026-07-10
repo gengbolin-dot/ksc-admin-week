@@ -804,7 +804,39 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
 .p13-empty-icon{font-size:48px;margin-bottom:16px;opacity:.3}
 .p13-empty-text{font-size:14px;margin-bottom:8px}
 .p13-empty-hint{font-size:12px;color:var(--t3)}
-</style>
+
+/* Budget view toggle */
+.p13-view-toggle{display:flex;gap:2px;background:var(--bg2);border-radius:8px;padding:2px}
+.p13-view-btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all var(--tr);color:var(--t3)}
+.p13-view-btn:hover{color:var(--t2)}
+.p13-view-btn.active{background:var(--bg);color:var(--ac);box-shadow:var(--sh)}
+
+/* Budget detail table */
+.p13-detail-table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
+.p13-detail-table th{background:var(--bg3);padding:8px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);text-align:left;border-bottom:2px solid var(--bd);position:sticky;top:0;z-index:10}
+.p13-detail-table td{padding:8px 10px;border-bottom:1px solid var(--bdl);color:var(--t2)}
+.p13-detail-table tr:hover td{background:var(--bg2)}
+.p13-detail-table .cat-row{background:var(--acl);font-weight:700;color:var(--ac)}
+.p13-detail-table .cat-row td{border-bottom:2px solid var(--ac)}
+.p13-detail-table .subcat-row{background:var(--bg2);font-weight:600;color:var(--t1)}
+.p13-detail-table .amount{text-align:right;font-variant-numeric:tabular-nums}
+.p13-detail-table .amount-bold{font-weight:700;color:var(--t1)}
+.p13-detail-table .q-header{background:var(--bg);font-weight:700;color:var(--ac);text-align:center;border-left:2px solid var(--bd)}
+.p13-detail-table .month-col{min-width:80px;text-align:right}
+.p13-detail-table .total-col{font-weight:700;color:var(--t1);background:var(--bg2)}
+
+/* Detail filter */
+.p13-detail-filter{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.p13-filter-btn{padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr)}
+.p13-filter-btn:hover{background:var(--bg2)}
+.p13-filter-btn.active{background:var(--acl);border-color:var(--ac);color:var(--ac)}
+
+/* Detail summary cards */
+.p13-detail-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.p13-detail-summary-card{background:var(--bg);border:1px solid var(--bdl);border-radius:10px;padding:12px;text-align:center}
+.p13-detail-summary-label{font-size:10px;color:var(--t3);margin-bottom:4px}
+.p13-detail-summary-value{font-size:18px;font-weight:700;color:var(--t1)}
+
 </head>
 <body>
 <div class="shell">
@@ -1858,6 +1890,10 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
         <div class="p13-year-dd-item" onclick="selectBudgetYear(2025)">2025 年</div>
       </div>
     </div>
+    <div class="p13-view-toggle">
+      <div class="p13-view-btn active" onclick="switchBudgetView('summary')">📊 概览</div>
+      <div class="p13-view-btn" onclick="switchBudgetView('detail')">📋 详细数据</div>
+    </div>
     <div style="flex:1"></div>
     <label class="p13-import-btn">
       📥 导入 Excel
@@ -2027,6 +2063,102 @@ const BUDGETS = {
     ]
   }
 };
+
+/* ══════ BUDGET DETAIL DATA (from CSV) ══════ */
+const BUDGET_DETAIL = [
+  {cat:'职场',subcat:'北京',office:'北京办公室',item:'房租',total:24358705.86,q1:6089676.46,jan:2029892.15,feb:2029892.15,mar:2029892.15,q2:6089676.46,apr:2029892.15,may:2029892.15,jun:2029892.15,q3:6089676.46,jul:2029892.15,aug:2029892.15,sep:2029892.15,q4:6089676.46,oct:2029892.15,nov:2029892.15,dec:2029892.15},
+  {cat:'职场',subcat:'北京',office:'北京办公室',item:'大物业费',total:6353918.94,q1:1588479.74,jan:529493.25,feb:529493.25,mar:529493.25,q2:1588479.74,apr:529493.25,may:529493.25,jun:529493.25,q3:1588479.74,jul:529493.25,aug:529493.25,sep:529493.25,q4:1588479.74,oct:529493.25,nov:529493.25,dec:529493.25},
+  {cat:'职场',subcat:'北京',office:'北京办公室',item:'小物业费',total:2703149.50,q1:675787.35,jan:225262.45,feb:225262.46,mar:225262.46,q2:675787.37,apr:225262.46,may:225262.46,jun:225262.46,q3:675787.37,jul:225262.46,aug:225262.46,sep:225262.46,q4:675787.37,oct:225262.46,nov:225262.46,dec:225262.46},
+  {cat:'职场',subcat:'北京',office:'北京办公室',item:'能源费',total:1835669.66,q1:439366.65,jan:150661.39,feb:140312.40,mar:148392.86,q2:441338.81,apr:137086.33,may:135214.53,jun:169037.95,q3:513983.25,jul:173878.94,aug:183817.87,sep:156286.44,q4:440980.95,oct:136344.27,nov:148734.10,dec:155902.58},
+  {cat:'职场',subcat:'北京',office:'北京办公室',item:'集团综合服务费',total:7059909.94,q1:1764977.48,jan:588325.83,feb:588325.83,mar:588325.83,q2:1764977.49,apr:588325.83,may:588325.83,jun:588325.83,q3:1764977.48,jul:588325.83,aug:588325.83,sep:588325.83,q4:1764977.48,oct:588325.83,nov:588325.83,dec:588325.83},
+  {cat:'职场',subcat:'北京',office:'北京办公室',item:'公司级承担车位',total:72000,q1:18000,jan:6000,feb:6000,mar:6000,q2:18000,apr:6000,may:6000,jun:6000,q3:18000,jul:6000,aug:6000,sep:6000,q4:18000,oct:6000,nov:6000,dec:6000},
+  {cat:'职场',subcat:'北京',office:'北京办公室',item:'连廊租赁费用',total:240000,q1:60000,jan:20000,feb:20000,mar:20000,q2:60000,apr:20000,may:20000,jun:20000,q3:60000,jul:20000,aug:20000,sep:20000,q4:60000,oct:20000,nov:20000,dec:20000},
+  {cat:'职场',subcat:'北京',office:'北京办公室',item:'空调费用（周六日特批）',total:36000,q1:0,jan:0,feb:0,mar:0,q2:8000,apr:0,may:0,jun:8000,q3:28000,jul:10000,aug:10000,sep:8000,q4:0,oct:0,nov:0,dec:0},
+  {cat:'职场',subcat:'北京',office:'北京办公室',item:'其他行政费用',total:180000,q1:45000,jan:15000,feb:15000,mar:15000,q2:45000,apr:15000,may:15000,jun:15000,q3:45000,jul:15000,aug:15000,sep:15000,q4:45000,oct:15000,nov:15000,dec:15000},
+  {cat:'职场',subcat:'北京',office:'北京办公室',item:'维修费（分摊）',total:100000,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'武汉园区2-5层房租',total:6092236.80,q1:1523059.20,jan:507686.40,feb:507686.40,mar:507686.40,q2:1523059.20,apr:507686.40,may:507686.40,jun:507686.40,q3:1523059.20,jul:507686.40,aug:507686.40,sep:507686.40,q4:1523059.20,oct:507686.40,nov:507686.40,dec:507686.40},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'武汉园区6-7层新租',total:1469242.80,q1:0,jan:0,feb:0,mar:0,q2:489747.60,apr:163249.20,may:163249.20,jun:163249.20,q3:489747.60,jul:163249.20,aug:163249.20,sep:163249.20,q4:489747.60,oct:163249.20,nov:163249.20,dec:163249.20},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'武汉园区2-5层大物业费',total:2843043.84,q1:710760.96,jan:236920.32,feb:236920.32,mar:236920.32,q2:710760.96,apr:236920.32,may:236920.32,jun:236920.32,q3:710760.96,jul:236920.32,aug:236920.32,sep:236920.32,q4:710760.96,oct:236920.32,nov:236920.32,dec:236920.32},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'武汉园区6-7层大物业费',total:685646.64,q1:0,jan:0,feb:0,mar:0,q2:228548.88,apr:76182.96,may:76182.96,jun:76182.96,q3:228548.88,jul:76182.96,aug:76182.96,sep:76182.96,q4:228548.88,oct:76182.96,nov:76182.96,dec:76182.96},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'武汉园区2-5层小物业费',total:1688818.92,q1:422204.73,jan:140734.91,feb:140734.91,mar:140734.91,q2:422204.73,apr:140734.91,may:140734.91,jun:140734.91,q3:422204.73,jul:140734.91,aug:140734.91,sep:140734.91,q4:422204.73,oct:140734.91,nov:140734.91,dec:140734.91},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'武汉园区6-7层小物业费',total:84089.34,q1:0,jan:0,feb:0,mar:0,q2:28029.78,apr:9343.26,may:9343.26,jun:9343.26,q3:28029.78,jul:9343.26,aug:9343.26,sep:9343.26,q4:28029.78,oct:9343.26,nov:9343.26,dec:9343.26},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'武汉园区2-5层能源费',total:600000,q1:150000,jan:50000,feb:50000,mar:50000,q2:150000,apr:50000,may:50000,jun:50000,q3:150000,jul:50000,aug:50000,sep:50000,q4:150000,oct:50000,nov:50000,dec:50000},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'武汉园区6-7层能源费',total:135000,q1:45000,jan:15000,feb:15000,mar:15000,q2:45000,apr:15000,may:15000,jun:15000,q3:45000,jul:15000,aug:15000,sep:15000,q4:45000,oct:15000,nov:15000,dec:15000},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'武汉园区2-5层绿植',total:81600,q1:20400,jan:6800,feb:6800,mar:6800,q2:20400,apr:6800,may:6800,jun:6800,q3:20400,jul:6800,aug:6800,sep:6800,q4:20400,oct:6800,nov:6800,dec:6800},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'武汉园区6-7层绿植',total:22500,q1:0,jan:0,feb:0,mar:0,q2:7500,apr:2500,may:2500,jun:2500,q3:7500,jul:2500,aug:2500,sep:2500,q4:7500,oct:2500,nov:2500,dec:2500},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'武汉园区6-7层新租一次性投入',total:75000,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'班车运营',total:171000,q1:36000,jan:12000,feb:12000,mar:12000,q2:45000,apr:15000,may:15000,jun:15000,q3:45000,jul:15000,aug:15000,sep:15000,q4:45000,oct:15000,nov:15000,dec:15000},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'其他行政费用',total:50000,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'维修费',total:20000,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'工区氛围软装',total:100000,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'露台功能性改造',total:300000,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'职场',subcat:'武汉',office:'武汉办公室',item:'千人报告厅场地租赁费',total:150000,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'职场',subcat:'上海',office:'上海办公室',item:'房租',total:1212347.52,q1:303086.88,jan:101028.96,feb:101028.96,mar:101028.96,q2:303086.88,apr:101028.96,may:101028.96,jun:101028.96,q3:303086.88,jul:101028.96,aug:101028.96,sep:101028.96,q4:303086.88,oct:101028.96,nov:101028.96,dec:101028.96},
+  {cat:'职场',subcat:'上海',office:'上海办公室',item:'物业管理费',total:141036,q1:35259,jan:11753,feb:11753,mar:11753,q2:35259,apr:11753,may:11753,jun:11753,q3:35259,jul:11753,aug:11753,sep:11753,q4:35259,oct:11753,nov:11753,dec:11753},
+  {cat:'职场',subcat:'上海',office:'上海办公室',item:'能源费',total:58200,q1:10400,jan:3500,feb:3700,mar:3200,q2:13300,apr:3800,may:3700,jun:5800,q3:21500,jul:7000,aug:8000,sep:6500,q4:13000,oct:5800,nov:3700,dec:3500},
+  {cat:'职场',subcat:'上海',office:'上海办公室',item:'绿植',total:4800,q1:1200,jan:400,feb:400,mar:400,q2:1200,apr:400,may:400,jun:400,q3:1200,jul:400,aug:400,sep:400,q4:1200,oct:400,nov:400,dec:400},
+  {cat:'职场',subcat:'上海',office:'上海办公室',item:'保洁费',total:21600,q1:5400,jan:1800,feb:1800,mar:1800,q2:5400,apr:1800,may:1800,jun:1800,q3:5400,jul:1800,aug:1800,sep:1800,q4:5400,oct:1800,nov:1800,dec:1800},
+  {cat:'职场',subcat:'上海',office:'上海办公室',item:'日常耗材',total:18000,q1:4500,jan:1500,feb:1500,mar:1500,q2:4500,apr:1500,may:1500,jun:1500,q3:4500,jul:1500,aug:1500,sep:1500,q4:4500,oct:1500,nov:1500,dec:1500},
+  {cat:'职场',subcat:'深圳',office:'深圳办公室',item:'房租',total:682000,q1:157200,jan:52400,feb:52400,mar:52400,q2:164800,apr:52400,may:52400,jun:60000,q3:180000,jul:60000,aug:60000,sep:60000,q4:180000,oct:60000,nov:60000,dec:60000},
+  {cat:'职场',subcat:'深圳',office:'深圳办公室',item:'物业管理费',total:94323,q1:23583,jan:7860,feb:7861,mar:7862,q2:23580,apr:7860,may:7860,jun:7860,q3:23580,jul:7860,aug:7860,sep:7860,q4:23580,oct:7860,nov:7860,dec:7860},
+  {cat:'职场',subcat:'深圳',office:'深圳办公室',item:'能源费',total:138000,q1:34500,jan:11500,feb:11500,mar:11500,q2:34500,apr:11500,may:11500,jun:11500,q3:34500,jul:11500,aug:11500,sep:11500,q4:34500,oct:11500,nov:11500,dec:11500},
+  {cat:'职场',subcat:'深圳',office:'深圳办公室',item:'绿植',total:7200,q1:1800,jan:600,feb:600,mar:600,q2:1800,apr:600,may:600,jun:600,q3:1800,jul:600,aug:600,sep:600,q4:1800,oct:600,nov:600,dec:600},
+  {cat:'职场',subcat:'深圳',office:'深圳办公室',item:'日常耗材',total:18000,q1:4500,jan:1500,feb:1500,mar:1500,q2:4500,apr:1500,may:1500,jun:1500,q3:4500,jul:1500,aug:1500,sep:1500,q4:4500,oct:1500,nov:1500,dec:1500},
+  {cat:'职场',subcat:'深圳',office:'深圳办公室',item:'保洁费',total:12000,q1:3000,jan:1000,feb:1000,mar:1000,q2:3000,apr:1000,may:1000,jun:1000,q3:3000,jul:1000,aug:1000,sep:1000,q4:3000,oct:1000,nov:1000,dec:1000},
+  {cat:'职场',subcat:'深圳',office:'深圳办公室',item:'邮寄费',total:18000,q1:4500,jan:1500,feb:1500,mar:1500,q2:4500,apr:1500,may:1500,jun:1500,q3:4500,jul:1500,aug:1500,sep:1500,q4:4500,oct:1500,nov:1500,dec:1500},
+  {cat:'职场',subcat:'厦门',office:'厦门办公室',item:'房租',total:501000,q1:125250,jan:41750,feb:41750,mar:41750,q2:125250,apr:41750,may:41750,jun:41750,q3:125250,jul:41750,aug:41750,sep:41750,q4:125250,oct:41750,nov:41750,dec:41750},
+  {cat:'职场',subcat:'厦门',office:'厦门办公室',item:'物业管理费',total:50100,q1:12525,jan:4175,feb:4175,mar:4175,q2:12525,apr:4175,may:4175,jun:4175,q3:12525,jul:4175,aug:4175,sep:4175,q4:12525,oct:4175,nov:4175,dec:4175},
+  {cat:'职场',subcat:'厦门',office:'厦门办公室',item:'能源费',total:36000,q1:9000,jan:3000,feb:3000,mar:3000,q2:9000,apr:3000,may:3000,jun:3000,q3:9000,jul:3000,aug:3000,sep:3000,q4:9000,oct:3000,nov:3000,dec:3000},
+  {cat:'职场',subcat:'厦门',office:'厦门办公室',item:'保洁费',total:7200,q1:1800,jan:600,feb:600,mar:600,q2:1800,apr:600,may:600,jun:600,q3:1800,jul:600,aug:600,sep:600,q4:1800,oct:600,nov:600,dec:600},
+  {cat:'职场',subcat:'厦门',office:'厦门办公室',item:'日常耗材',total:12000,q1:3000,jan:1000,feb:1000,mar:1000,q2:3000,apr:1000,may:1000,jun:1000,q3:3000,jul:1000,aug:1000,sep:1000,q4:3000,oct:1000,nov:1000,dec:1000},
+  {cat:'职场',subcat:'杭州',office:'杭州办公室',item:'房租',total:114576,q1:28644,jan:9548,feb:9548,mar:9548,q2:28644,apr:9548,may:9548,jun:9548,q3:28644,jul:9548,aug:9548,sep:9548,q4:28644,oct:9548,nov:9548,dec:9548},
+  {cat:'职场',subcat:'杭州',office:'杭州办公室',item:'物业管理费',total:15456,q1:3864,jan:1288,feb:1288,mar:1288,q2:3864,apr:1288,may:1288,jun:1288,q3:3864,jul:1288,aug:1288,sep:1288,q4:3864,oct:1288,nov:1288,dec:1288},
+  {cat:'职场',subcat:'杭州',office:'杭州办公室',item:'能源费',total:12000,q1:3000,jan:1000,feb:1000,mar:1000,q2:3000,apr:1000,may:1000,jun:1000,q3:3000,jul:1000,aug:1000,sep:1000,q4:3000,oct:1000,nov:1000,dec:1000},
+  {cat:'职场',subcat:'杭州',office:'杭州办公室',item:'绿植',total:3600,q1:900,jan:300,feb:300,mar:300,q2:900,apr:300,may:300,jun:300,q3:900,jul:300,aug:300,sep:300,q4:900,oct:300,nov:300,dec:300},
+  {cat:'职场',subcat:'杭州',office:'杭州办公室',item:'日常耗材',total:6000,q1:1500,jan:500,feb:500,mar:500,q2:1500,apr:500,may:500,jun:500,q3:1500,jul:500,aug:500,sep:500,q4:1500,oct:500,nov:500,dec:500},
+  {cat:'职场',subcat:'杭州',office:'杭州办公室',item:'保洁费',total:12000,q1:3000,jan:1000,feb:1000,mar:1000,q2:3000,apr:1000,may:1000,jun:1000,q3:3000,jul:1000,aug:1000,sep:1000,q4:3000,oct:1000,nov:1000,dec:1000},
+  {cat:'职场',subcat:'广州',office:'广州办公室',item:'房租',total:72000,q1:18000,jan:6000,feb:6000,mar:6000,q2:18000,apr:6000,may:6000,jun:6000,q3:18000,jul:6000,aug:6000,sep:6000,q4:18000,oct:6000,nov:6000,dec:6000},
+  {cat:'职场',subcat:'南京',office:'南京小米工位',item:'房租',total:36000,q1:9000,jan:3000,feb:3000,mar:3000,q2:9000,apr:3000,may:3000,jun:3000,q3:9000,jul:3000,aug:3000,sep:3000,q4:9000,oct:3000,nov:3000,dec:3000},
+  {cat:'职场',subcat:'珠海',office:'珠海横琴',item:'房租',total:299432.40,q1:74858.10,jan:24952.70,feb:24952.70,mar:24952.70,q2:74858.10,apr:24952.70,may:24952.70,jun:24952.70,q3:74858.10,jul:24952.70,aug:24952.70,sep:24952.70,q4:74858.10,oct:24952.70,nov:24952.70,dec:24952.70},
+  {cat:'职场',subcat:'珠海',office:'珠海横琴',item:'物业',total:20830.08,q1:5207.52,jan:1735.84,feb:1735.84,mar:1735.84,q2:5207.52,apr:1735.84,may:1735.84,jun:1735.84,q3:5207.52,jul:1735.84,aug:1735.84,sep:1735.84,q4:5207.52,oct:1735.84,nov:1735.84,dec:1735.84},
+  {cat:'职场',subcat:'珠海',office:'珠海横琴',item:'能源',total:12000,q1:3000,jan:1000,feb:1000,mar:1000,q2:3000,apr:1000,may:1000,jun:1000,q3:3000,jul:1000,aug:1000,sep:1000,q4:3000,oct:1000,nov:1000,dec:1000},
+  {cat:'职场',subcat:'珠海',office:'珠海横琴',item:'保洁',total:15622.56,q1:3905.64,jan:1301.88,feb:1301.88,mar:1301.88,q2:3905.64,apr:1301.88,may:1301.88,jun:1301.88,q3:3905.64,jul:1301.88,aug:1301.88,sep:1301.88,q4:3905.64,oct:1301.88,nov:1301.88,dec:1301.88},
+  {cat:'职场',subcat:'珠海',office:'珠海横琴',item:'绿植',total:6000,q1:1500,jan:500,feb:500,mar:500,q2:1500,apr:500,may:500,jun:500,q3:1500,jul:500,aug:500,sep:500,q4:1500,oct:500,nov:500,dec:500},
+  {cat:'职场',subcat:'珠海',office:'珠海横琴',item:'日常耗材',total:6000,q1:1500,jan:500,feb:500,mar:500,q2:1500,apr:500,may:500,jun:500,q3:1500,jul:500,aug:500,sep:500,q4:1500,oct:500,nov:500,dec:500},
+  {cat:'职场',subcat:'北美',office:'硅谷',item:'房租',total:300000,q1:75000,jan:25000,feb:25000,mar:25000,q2:75000,apr:25000,may:25000,jun:25000,q3:75000,jul:25000,aug:25000,sep:25000,q4:75000,oct:25000,nov:25000,dec:25000},
+  {cat:'职场',subcat:'北美',office:'硅谷',item:'物业管理费',total:18000,q1:4500,jan:1500,feb:1500,mar:1500,q2:4500,apr:1500,may:1500,jun:1500,q3:4500,jul:1500,aug:1500,sep:1500,q4:4500,oct:1500,nov:1500,dec:1500},
+  {cat:'职场',subcat:'新加坡',office:'新加坡',item:'房租',total:1320000,q1:330000,jan:110000,feb:110000,mar:110000,q2:330000,apr:110000,may:110000,jun:110000,q3:330000,jul:110000,aug:110000,sep:110000,q4:330000,oct:110000,nov:110000,dec:110000},
+  {cat:'职场',subcat:'新加坡',office:'新加坡',item:'能源费',total:13440,q1:3360,jan:1120,feb:1120,mar:1120,q2:3360,apr:1120,may:1120,jun:1120,q3:3360,jul:1120,aug:1120,sep:1120,q4:3360,oct:1120,nov:1120,dec:1120},
+  {cat:'职场',subcat:'新加坡',office:'新加坡',item:'保洁',total:38400,q1:9300,jan:3100,feb:3100,mar:3100,q2:9300,apr:3100,may:3100,jun:3100,q3:10500,jul:3500,aug:3500,sep:3500,q4:9300,oct:3100,nov:3100,dec:3100},
+  {cat:'职场',subcat:'马来西亚',office:'吉隆坡',item:'房租',total:180000,q1:45000,jan:15000,feb:15000,mar:15000,q2:45000,apr:15000,may:15000,jun:15000,q3:45000,jul:15000,aug:15000,sep:15000,q4:45000,oct:15000,nov:15000,dec:15000},
+  {cat:'职场',subcat:'马来西亚',office:'吉隆坡',item:'保洁',total:12000,q1:3000,jan:1000,feb:1000,mar:1000,q2:3000,apr:1000,may:1000,jun:1000,q3:3000,jul:1000,aug:1000,sep:1000,q4:3000,oct:1000,nov:1000,dec:1000},
+  {cat:'职场',subcat:'马来西亚',office:'吉隆坡',item:'绿植',total:6000,q1:1500,jan:500,feb:500,mar:500,q2:1500,apr:500,may:500,jun:500,q3:1500,jul:500,aug:500,sep:500,q4:1500,oct:500,nov:500,dec:500},
+  {cat:'职场',subcat:'俄罗斯',office:'俄罗斯',item:'房租',total:120000,q1:30000,jan:10000,feb:10000,mar:10000,q2:30000,apr:10000,may:10000,jun:10000,q3:30000,jul:10000,aug:10000,sep:10000,q4:30000,oct:10000,nov:10000,dec:10000},
+  {cat:'职场',subcat:'朝阳',office:'朝阳',item:'房租',total:6500,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:6500,jul:0,aug:0,sep:6500,q4:0,oct:0,nov:0,dec:0},
+  {cat:'职场',subcat:'南京',office:'南京仟壹',item:'房租',total:9600,q1:2400,jan:800,feb:800,mar:800,q2:2400,apr:800,may:800,jun:800,q3:2400,jul:800,aug:800,sep:800,q4:2400,oct:800,nov:800,dec:800},
+  {cat:'职场',subcat:'儋州',office:'儋州洋浦',item:'房租',total:24000,q1:6000,jan:2000,feb:2000,mar:2000,q2:6000,apr:2000,may:2000,jun:2000,q3:6000,jul:2000,aug:2000,sep:2000,q4:6000,oct:2000,nov:2000,dec:2000},
+  {cat:'福利',subcat:'公司级福利',office:'公司级福利',item:'北京福利活动',total:530000,q1:66000,jan:0,feb:0,mar:66000,q2:389000,apr:34000,may:15000,jun:340000,q3:40000,jul:10000,aug:15000,sep:15000,q4:35000,oct:10000,nov:20000,dec:5000},
+  {cat:'福利',subcat:'公司级福利',office:'公司级福利',item:'武汉福利活动',total:1467500,q1:645000,jan:605000,feb:35000,mar:5000,q2:280000,apr:50000,may:0,jun:230000,q3:53500,jul:0,aug:3500,sep:50000,q4:489000,oct:456000,nov:0,dec:33000},
+  {cat:'福利',subcat:'公司级福利',office:'公司级福利',item:'节日礼品（端午、中秋）',total:800000,q1:0,jan:0,feb:0,mar:0,q2:400000,apr:0,may:0,jun:400000,q3:400000,jul:0,aug:0,sep:400000,q4:0,oct:0,nov:0,dec:0},
+  {cat:'福利',subcat:'公司级福利',office:'公司级福利',item:'全员下午茶',total:1200000,q1:300000,jan:100000,feb:100000,mar:100000,q2:300000,apr:100000,may:100000,jun:100000,q3:300000,jul:100000,aug:100000,sep:100000,q4:300000,oct:100000,nov:100000,dec:100000},
+  {cat:'福利',subcat:'公司级福利',office:'公司级福利',item:'员工年度体检',total:532500,q1:0,jan:0,feb:0,mar:0,q2:532500,apr:0,may:0,jun:532500,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'福利',subcat:'公司级福利',office:'公司级福利',item:'慰问员工',total:20000,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'福利',subcat:'公司级福利',office:'公司级福利',item:'全员生日福利',total:220000,q1:55000,jan:0,feb:0,mar:55000,q2:55000,apr:0,may:0,jun:55000,q3:55000,jul:0,aug:0,sep:55000,q4:55000,oct:0,nov:0,dec:55000},
+  {cat:'福利',subcat:'公司级福利',office:'公司级福利',item:'全员周年礼品',total:1980946,q1:120000,jan:120000,feb:0,mar:0,q2:668940,apr:0,may:0,jun:668940,q3:0,jul:0,aug:0,sep:0,q4:1192006,oct:1192006,nov:0,dec:0},
+  {cat:'福利',subcat:'公司级福利',office:'公司级福利',item:'新员工入职餐券+入职包',total:85920,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'福利',subcat:'公司级福利',office:'公司级福利',item:'公司级社团',total:310360,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'福利',subcat:'公司级福利',office:'公司级福利',item:'双刊项目',total:655000,q1:0,jan:0,feb:0,mar:0,q2:455000,apr:0,may:0,jun:455000,q3:200000,jul:200000,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'办公',subcat:'办公及邮寄',office:'办公费',item:'名片',total:15600,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'办公',subcat:'办公及邮寄',office:'办公费',item:'日常办公用品+北京职场低值易耗品',total:95000,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'办公',subcat:'办公及邮寄',office:'办公费',item:'武汉职场低值易耗品',total:119200,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'办公',subcat:'办公及邮寄',office:'邮寄费',item:'北京快递费',total:610000,q1:178000,jan:96000,feb:34000,mar:48000,q2:156000,apr:41000,may:70000,jun:45000,q3:145000,jul:45000,aug:35000,sep:65000,q4:132000,oct:41000,nov:34000,dec:56000},
+  {cat:'星云专项',subcat:'星云训练营专项',office:'星云训练营专项',item:'房租（包含安保+保洁）',total:360000,q1:0,jan:0,feb:0,mar:0,q2:360000,apr:0,may:0,jun:360000,q3:120000,jul:120000,aug:120000,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'星云专项',subcat:'星云训练营专项',office:'星云训练营专项',item:'日常耗材',total:6000,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'星云专项',subcat:'星云训练营专项',office:'星云训练营专项',item:'软装设计+复原',total:35000,q1:0,jan:0,feb:0,mar:0,q2:0,apr:0,may:0,jun:0,q3:0,jul:0,aug:0,sep:0,q4:0,oct:0,nov:0,dec:0},
+  {cat:'平台',subcat:'数字化运营',office:'数字化运营',item:'分贝通平台服务费',total:72000,q1:18000,jan:6000,feb:6000,mar:6000,q2:18000,apr:6000,may:6000,jun:6000,q3:18000,jul:6000,aug:6000,sep:6000,q4:18000,oct:6000,nov:6000,dec:6000}
+];
+
+let _p13View = 'summary';
 
 /* ══════ PANEL SWITCH ══════ */
 function switchPanel(id, navEl){
@@ -2665,6 +2797,11 @@ function showTeamDetail(id){
 let _p13Year = 2026;
 
 function renderP13(){
+  if(_p13View === 'detail'){
+    renderP13Detail();
+    return;
+  }
+
   const el = document.getElementById('p13Content');
   const budget = BUDGETS[_p13Year];
 
@@ -2677,7 +2814,7 @@ function renderP13(){
     return;
   }
 
-  const pct = Math.round(budget.spent / budget.total * 100);
+  const pct = budget.total > 0 ? Math.round(budget.spent / budget.total * 100) : 0;
 
   let h = `<div class="p13-stats">
     <div class="p13-stat">
@@ -2701,7 +2838,7 @@ function renderP13(){
   h += `<div class="p13-categories">`;
 
   budget.categories.forEach(cat => {
-    const catPct = Math.round(cat.spent / cat.budget * 100);
+    const catPct = cat.budget > 0 ? Math.round(cat.spent / cat.budget * 100) : 0;
     const barColor = catPct > 80 ? 'var(--dan)' : catPct > 60 ? 'var(--warn)' : 'var(--suc)';
 
     h += `<div class="p13-category">
@@ -2719,7 +2856,7 @@ function renderP13(){
       <div class="p13-cat-items" id="budget-cat-${cat.id}">`;
 
     cat.items.forEach(item => {
-      const itemPct = Math.round(item.spent / item.budget * 100);
+      const itemPct = item.budget > 0 ? Math.round(item.spent / item.budget * 100) : 0;
       h += `<div class="p13-item">
         <div class="p13-item-name">${item.name}</div>
         <div class="p13-item-budget">¥${(item.budget/10000).toFixed(0)}万</div>
@@ -2733,18 +2870,181 @@ function renderP13(){
 
   h += `</div>`;
 
-  // Monthly chart (placeholder)
+  // Monthly chart
+  const monthlyTotals = Array(12).fill(0);
+  BUDGET_DETAIL.forEach(item => {
+    monthlyTotals[0] += item.jan;
+    monthlyTotals[1] += item.feb;
+    monthlyTotals[2] += item.mar;
+    monthlyTotals[3] += item.apr;
+    monthlyTotals[4] += item.may;
+    monthlyTotals[5] += item.jun;
+    monthlyTotals[6] += item.jul;
+    monthlyTotals[7] += item.aug;
+    monthlyTotals[8] += item.sep;
+    monthlyTotals[9] += item.oct;
+    monthlyTotals[10] += item.nov;
+    monthlyTotals[11] += item.dec;
+  });
+
+  const maxMonth = Math.max(...monthlyTotals);
+
   h += `<div class="p13-chart">
     <div class="p13-chart-title">📈 月度预算使用趋势</div>
     <div class="p13-bars">
       ${['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'].map((m,i) => {
-        const height = Math.round(Math.random() * 80 + 20);
+        const height = maxMonth > 0 ? Math.round(monthlyTotals[i] / maxMonth * 100) : 0;
         return `<div class="p13-bar-col"><div class="p13-bar" style="height:${height}%"></div><div class="p13-bar-label">${m}</div></div>`;
       }).join('')}
     </div>
   </div>`;
 
   el.innerHTML = h;
+}
+
+function renderP13Detail(){
+  const el = document.getElementById('p13Content');
+
+  // Filter detail data by category
+  const filterCat = window._p13FilterCat || 'all';
+  let filtered = BUDGET_DETAIL;
+  if(filterCat !== 'all'){
+    filtered = BUDGET_DETAIL.filter(item => item.cat === filterCat);
+  }
+
+  // Calculate summary
+  let totalSum = 0;
+  let q1Sum = 0, q2Sum = 0, q3Sum = 0, q4Sum = 0;
+  filtered.forEach(item => {
+    totalSum += item.total;
+    q1Sum += item.q1;
+    q2Sum += item.q2;
+    q3Sum += item.q3;
+    q4Sum += item.q4;
+  });
+
+  let h = '';
+
+  // Filter buttons
+  h += `<div class="p13-detail-filter">
+    <div class="p13-filter-btn ${filterCat==='all'?'active':''}" onclick="filterBudgetDetail('all')">全部</div>
+    <div class="p13-filter-btn ${filterCat==='职场'?'active':''}" onclick="filterBudgetDetail('职场')">🏢 职场</div>
+    <div class="p13-filter-btn ${filterCat==='福利'?'active':''}" onclick="filterBudgetDetail('福利')">🎉 福利</div>
+    <div class="p13-filter-btn ${filterCat==='办公'?'active':''}" onclick="filterBudgetDetail('办公')">📦 办公</div>
+    <div class="p13-filter-btn ${filterCat==='星云专项'?'active':''}" onclick="filterBudgetDetail('星云专项')">🌟 星云专项</div>
+    <div class="p13-filter-btn ${filterCat==='平台'?'active':''}" onclick="filterBudgetDetail('平台')">💻 平台</div>
+  </div>`;
+
+  // Summary cards
+  h += `<div class="p13-detail-summary">
+    <div class="p13-detail-summary-card">
+      <div class="p13-detail-summary-label">全年合计</div>
+      <div class="p13-detail-summary-value">¥${(totalSum/10000).toFixed(2)}万</div>
+    </div>
+    <div class="p13-detail-summary-card">
+      <div class="p13-detail-summary-label">Q1</div>
+      <div class="p13-detail-summary-value">¥${(q1Sum/10000).toFixed(2)}万</div>
+    </div>
+    <div class="p13-detail-summary-card">
+      <div class="p13-detail-summary-label">Q2</div>
+      <div class="p13-detail-summary-value">¥${(q2Sum/10000).toFixed(2)}万</div>
+    </div>
+    <div class="p13-detail-summary-card">
+      <div class="p13-detail-summary-label">Q3</div>
+      <div class="p13-detail-summary-value">¥${(q3Sum/10000).toFixed(2)}万</div>
+    </div>
+  </div>`;
+
+  // Detail table
+  h += `<div style="overflow-x:auto"><table class="p13-detail-table">
+    <thead>
+      <tr>
+        <th>分类</th>
+        <th>办公室</th>
+        <th>费用项</th>
+        <th class="amount">全年合计</th>
+        <th class="q-header">Q1</th>
+        <th class="amount month-col">1月</th>
+        <th class="amount month-col">2月</th>
+        <th class="amount month-col">3月</th>
+        <th class="q-header">Q2</th>
+        <th class="amount month-col">4月</th>
+        <th class="amount month-col">5月</th>
+        <th class="amount month-col">6月</th>
+        <th class="q-header">Q3</th>
+        <th class="amount month-col">7月</th>
+        <th class="amount month-col">8月</th>
+        <th class="amount month-col">9月</th>
+        <th class="q-header">Q4</th>
+        <th class="amount month-col">10月</th>
+        <th class="amount month-col">11月</th>
+        <th class="amount month-col">12月</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  // Group by category
+  const grouped = {};
+  filtered.forEach(item => {
+    if(!grouped[item.cat]) grouped[item.cat] = [];
+    grouped[item.cat].push(item);
+  });
+
+  const catNames = {'职场':'🏢 职场运营', '福利':'🎉 文化运营', '办公':'📦 办公及邮寄', '星云专项':'🌟 星云专项', '平台':'💻 数字化运营'};
+
+  Object.entries(grouped).forEach(([cat, items]) => {
+    // Category header row
+    let catTotal = 0;
+    items.forEach(i => catTotal += i.total);
+
+    h += `<tr class="cat-row">
+      <td colspan="3">${catNames[cat] || cat}</td>
+      <td class="amount amount-bold">¥${(catTotal/10000).toFixed(2)}万</td>
+      <td colspan="16"></td>
+    </tr>`;
+
+    // Items
+    items.forEach(item => {
+      const fmt = (v) => v > 0 ? (v/10000).toFixed(2) : '-';
+      h += `<tr>
+        <td></td>
+        <td>${item.office}</td>
+        <td>${item.item}</td>
+        <td class="amount amount-bold">¥${fmt(item.total)}万</td>
+        <td class="amount" style="color:var(--ac)">¥${fmt(item.q1)}万</td>
+        <td class="amount">${fmt(item.jan)}</td>
+        <td class="amount">${fmt(item.feb)}</td>
+        <td class="amount">${fmt(item.mar)}</td>
+        <td class="amount" style="color:var(--ac)">¥${fmt(item.q2)}万</td>
+        <td class="amount">${fmt(item.apr)}</td>
+        <td class="amount">${fmt(item.may)}</td>
+        <td class="amount">${fmt(item.jun)}</td>
+        <td class="amount" style="color:var(--ac)">¥${fmt(item.q3)}万</td>
+        <td class="amount">${fmt(item.jul)}</td>
+        <td class="amount">${fmt(item.aug)}</td>
+        <td class="amount">${fmt(item.sep)}</td>
+        <td class="amount" style="color:var(--ac)">¥${fmt(item.q4)}万</td>
+        <td class="amount">${fmt(item.oct)}</td>
+        <td class="amount">${fmt(item.nov)}</td>
+        <td class="amount">${fmt(item.dec)}</td>
+      </tr>`;
+    });
+  });
+
+  h += `</tbody></table></div>`;
+  el.innerHTML = h;
+}
+
+function switchBudgetView(view){
+  _p13View = view;
+  document.querySelectorAll('.p13-view-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelector(`.p13-view-btn[onclick*="${view}"]`).classList.add('active');
+  renderP13();
+}
+
+function filterBudgetDetail(cat){
+  window._p13FilterCat = cat;
+  renderP13Detail();
 }
 
 function toggleBudgetYear(){
