@@ -38,6 +38,12 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:11px;font-weight:600;padding:1px 6px;border-radius:10px}
 .nav-badge.warn{background:#F59E0B}
 .nav-sub-label{font-size:11px;font-weight:700;color:var(--sb-text-muted);letter-spacing:.06em;padding:6px 12px 2px;text-transform:none}
+/* Sidebar scrollbar */
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+.sidebar::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.2)}
+.sidebar{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
 /* ── Main Area ── */
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
 .topbar{height:52px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0}

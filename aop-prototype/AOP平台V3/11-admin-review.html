@@ -45,6 +45,12 @@ button{font:inherit;cursor:pointer;border:none;background:none;}
   text-decoration:none;display:block;transition:.15s;}
 .ni-sub:hover{color:var(--sb-text);}
 .ni-sub.active{color:#93c5fd;}
+/* Sidebar scrollbar */
+.nav::-webkit-scrollbar{width:4px}
+.nav::-webkit-scrollbar-track{background:transparent}
+.nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+.nav::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.2)}
+.nav{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
 
 /* ──────── MAIN ──────── */
 .main{margin-left:var(--nav-w);}
