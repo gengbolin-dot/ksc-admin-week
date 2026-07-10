@@ -812,21 +812,14 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
 .p13-view-btn.active{background:var(--bg);color:var(--ac);box-shadow:var(--sh)}
 
 /* Budget detail table */
-.p13-detail-wrap{
-  overflow-x:auto;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-  margin:0;
-  padding:0 0 8px 0;
-  scrollbar-width:thin;
-  scrollbar-color:var(--bd) transparent;
-  max-height:calc(100vh - 380px);
-  position:relative;
-}
-.p13-detail-wrap::-webkit-scrollbar{height:8px;width:8px}
-.p13-detail-wrap::-webkit-scrollbar-track{background:var(--bg2);border-radius:4px}
-.p13-detail-wrap::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
-.p13-detail-wrap::-webkit-scrollbar-thumb:hover{background:var(--t3)}
+/* Detail view layout */
+.p13-detail-view{display:flex;flex-direction:column;height:100%;overflow:hidden}
+.p13-detail-header{flex-shrink:0;padding:16px 24px;background:var(--bg);border-bottom:1px solid var(--bdl)}
+.p13-detail-body{flex:1;overflow:auto;padding:0 0 0 0;scrollbar-width:thin;scrollbar-color:var(--bd) transparent}
+.p13-detail-body::-webkit-scrollbar{height:8px;width:8px}
+.p13-detail-body::-webkit-scrollbar-track{background:var(--bg2);border-radius:4px}
+.p13-detail-body::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
+.p13-detail-body::-webkit-scrollbar-thumb:hover{background:var(--t3)}
 .p13-detail-table{border-collapse:separate;border-spacing:0;font-size:12px;white-space:nowrap;width:auto}
 .p13-detail-table th{background:var(--bg3);padding:10px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);text-align:left;border-bottom:2px solid var(--bd);position:sticky;top:0;z-index:10;white-space:nowrap}
 .p13-detail-table td{padding:10px 14px;border-bottom:1px solid var(--bdl);color:var(--t2);white-space:nowrap}
@@ -2940,6 +2933,12 @@ function renderP13Detail(){
 
   let h = '';
 
+  // Detail view container
+  h += `<div class="p13-detail-view">`;
+
+  // Header section (filter + summary)
+  h += `<div class="p13-detail-header">`;
+
   // Filter buttons
   h += `<div class="p13-detail-filter">
     <div class="p13-filter-btn ${filterCat==='all'?'active':''}" onclick="filterBudgetDetail('all')">全部</div>
@@ -2970,8 +2969,10 @@ function renderP13Detail(){
     </div>
   </div>`;
 
-  // Detail table
-  h += `<div class="p13-detail-wrap"><table class="p13-detail-table">
+  h += `</div>`; // end header
+
+  // Body section (table with fixed scrollbar)
+  h += `<div class="p13-detail-body"><table class="p13-detail-table">
     <thead>
       <tr>
         <th class="office-col">办公室</th>
@@ -3058,7 +3059,8 @@ function renderP13Detail(){
     });
   });
 
-  h += `</tbody></table></div>`;
+  h += `</tbody></table></div>`; // end body
+  h += `</div>`; // end detail view
   el.innerHTML = h;
 }
 
