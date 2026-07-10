@@ -163,6 +163,26 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* Sidebar groups */
+.sidebar-group{margin:2px 0}
+.sidebar-group-head{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:450;color:var(--text-secondary);transition:all 150ms;user-select:none}
+.sidebar-group-head:hover{background:var(--bg-secondary);color:var(--text-primary)}
+.sidebar-group-arrow{margin-left:auto;font-size:12px;transition:transform 150ms}
+.sidebar-group.open>.sidebar-group-head{color:var(--accent);font-weight:600}
+.sidebar-group.open>.sidebar-group-head .sidebar-group-arrow{transform:rotate(90deg)}
+.sidebar-group-body{display:none;padding:0 0 0 16px}
+.sidebar-group.open>.sidebar-group-body{display:block}
+.sidebar-group-sub{margin:2px 0}
+.sidebar-group-sub-head{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-tertiary);transition:all 150ms;user-select:none}
+.sidebar-group-sub-head:hover{background:var(--bg-secondary);color:var(--text-secondary)}
+.sidebar-group-sub-head .sidebar-group-arrow{margin-left:auto;font-size:10px;transition:transform 150ms}
+.sidebar-group-sub.open>.sidebar-group-sub-head{color:var(--text-secondary);font-weight:600}
+.sidebar-group-sub.open>.sidebar-group-sub-head .sidebar-group-arrow{transform:rotate(90deg)}
+.sidebar-group-sub-body{display:none;padding:0 0 0 12px}
+.sidebar-group-sub.open>.sidebar-group-sub-body{display:block}
+.sidebar-sub-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:13px;color:var(--text-tertiary);border-radius:6px;cursor:pointer;transition:all 150ms;text-decoration:none}
+.sidebar-sub-item:hover{background:var(--bg-secondary);color:var(--text-secondary)}
 </style>
 </head>
 <body>
@@ -184,7 +204,34 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
     </div>
     <div class="nav-group">
       <div class="nav-group-label">管理</div>
-      <div class="nav-item active"><span class="nav-icon">📋</span>行政总览</div>
+      <div class="sidebar-group">
+        <div class="sidebar-group-head" onclick="toggleSidebarGroup(this)">
+          <span class="nav-icon">📋</span> 行政总览
+          <span class="sidebar-group-arrow">▸</span>
+        </div>
+        <div class="sidebar-group-body">
+          <div class="sidebar-group-sub">
+            <div class="sidebar-group-sub-head" onclick="toggleSidebarSubGroup(this)">
+              <span class="nav-icon">🏢</span> 大行政
+              <span class="sidebar-group-arrow">▸</span>
+            </div>
+            <div class="sidebar-group-sub-body">
+              <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=职场运营">
+                <div class="pill-dot dot-blue" style="width:7px;height:7px;border-radius:50%;flex-shrink:0"></div> 职场运营
+              </a>
+              <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=文化运营">
+                <div class="pill-dot dot-green" style="width:7px;height:7px;border-radius:50%;flex-shrink:0"></div> 文化运营
+              </a>
+              <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=数字化运营">
+                <div class="pill-dot dot-blue" style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:#06B6D4"></div> 数字化运营
+              </a>
+            </div>
+          </div>
+          <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=总裁办">
+            <div class="pill-dot dot-purple" style="width:7px;height:7px;border-radius:50%;flex-shrink:0"></div> 总裁办
+          </a>
+        </div>
+      </div>
       <a class="nav-item" href="./05-key-projects.html"><span class="nav-icon">⭐</span>重点专项</a>
       <a class="nav-item" href="./06-ops-dashboard.html"><span class="nav-icon">📊</span>运营看板</a>
       <a class="nav-item" href="./07-weekly-meeting.html"><span class="nav-icon">👥</span>周会视图</a>
@@ -607,6 +654,16 @@ function render() {
 
 // Initial render
 render();
+
+function toggleSidebarGroup(el){
+  const group = el.parentElement;
+  group.classList.toggle('open');
+}
+
+function toggleSidebarSubGroup(el){
+  const subGroup = el.parentElement;
+  subGroup.classList.toggle('open');
+}
 </script>
 </body>
 </html>

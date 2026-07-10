@@ -43,6 +43,27 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
 .sb-un{font-size:13px;font-weight:600}
 .sb-ur{font-size:11px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
+/* Sidebar groups */
+.sb-group{margin:2px 0}
+.sb-group-head{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:450;color:var(--t2);transition:all var(--tr);user-select:none}
+.sb-group-head:hover{background:var(--bgH);color:var(--t1)}
+.sb-group-arrow{margin-left:auto;font-size:12px;transition:transform var(--tr)}
+.sb-group.open>.sb-group-head{color:var(--ac);font-weight:600}
+.sb-group.open>.sb-group-head .sb-group-arrow{transform:rotate(90deg)}
+.sb-group-body{display:none;padding:0 0 0 16px}
+.sb-group.open>.sb-group-body{display:block}
+.sb-group-sub{margin:2px 0}
+.sb-group-sub-head{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--t3);transition:all var(--tr);user-select:none}
+.sb-group-sub-head:hover{background:var(--bgH);color:var(--t2)}
+.sb-group-sub-head .sb-group-arrow{margin-left:auto;font-size:10px;transition:transform var(--tr)}
+.sb-group-sub.open>.sb-group-sub-head{color:var(--t2);font-weight:600}
+.sb-group-sub.open>.sb-group-sub-head .sb-group-arrow{transform:rotate(90deg)}
+.sb-group-sub-body{display:none;padding:0 0 0 12px}
+.sb-group-sub.open>.sb-group-sub-body{display:block}
+.sb-sub-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:13px;color:var(--t3);border-radius:6px;cursor:pointer;transition:all var(--tr)}
+.sb-sub-item:hover{background:var(--bgH);color:var(--t2)}
+.sb-sub-item.active{background:var(--acl);color:var(--ac);font-weight:600}
+
 /* ══════ MAIN AREA ══════ */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
@@ -912,8 +933,33 @@ body{font-family:'Inter','Noto Sans SC',-apple-system,sans-serif;background:var(
 
   <div class="sb-sec">
     <div class="sb-lbl">管理</div>
-    <div class="sb-i" data-panel="p04" onclick="switchPanel('p04',this)">
-      <div class="sb-ic">📋</div> 行政总览
+    <div class="sb-group">
+      <div class="sb-group-head" onclick="toggleSidebarGroup(this)">
+        <span class="sb-ic">📋</span> 行政总览
+        <span class="sb-group-arrow">▸</span>
+      </div>
+      <div class="sb-group-body">
+        <div class="sb-group-sub">
+          <div class="sb-group-sub-head" onclick="toggleSidebarSubGroup(this)">
+            <span class="sb-ic">🏢</span> 大行政
+            <span class="sb-group-arrow">▸</span>
+          </div>
+          <div class="sb-group-sub-body">
+            <div class="sb-sub-item" onclick="switchPanel('p04',this)" data-filter="职场运营">
+              <div class="sb-dot" style="background:#3B5BDB"></div> 职场运营
+            </div>
+            <div class="sb-sub-item" onclick="switchPanel('p04',this)" data-filter="文化运营">
+              <div class="sb-dot" style="background:#10B981"></div> 文化运营
+            </div>
+            <div class="sb-sub-item" onclick="switchPanel('p04',this)" data-filter="数字化运营">
+              <div class="sb-dot" style="background:#06B6D4"></div> 数字化运营
+            </div>
+          </div>
+        </div>
+        <div class="sb-sub-item" onclick="switchPanel('p04',this)" data-filter="总裁办">
+          <div class="sb-dot" style="background:#8B5CF6"></div> 总裁办
+        </div>
+      </div>
     </div>
     <div class="sb-i" data-panel="p05" onclick="switchPanel('p05',this)">
       <div class="sb-ic">⭐</div> 重点专项
@@ -2259,6 +2305,17 @@ const AI_PERFORMANCE = {
     }
   ]
 };
+
+/* ══════ SIDEBAR GROUPS ══════ */
+function toggleSidebarGroup(el){
+  const group = el.parentElement;
+  group.classList.toggle('open');
+}
+
+function toggleSidebarSubGroup(el){
+  const subGroup = el.parentElement;
+  subGroup.classList.toggle('open');
+}
 
 /* ══════ PANEL SWITCH ══════ */
 function switchPanel(id, navEl){

@@ -713,6 +713,26 @@
     color: var(--text-tertiary);
     font-size: 13px;
   }
+
+  /* Sidebar groups */
+.sidebar-group{margin:2px 0}
+.sidebar-group-head{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:450;color:var(--text-secondary);transition:all 150ms;user-select:none}
+.sidebar-group-head:hover{background:var(--bg-hover);color:var(--text-primary)}
+.sidebar-group-arrow{margin-left:auto;font-size:12px;transition:transform 150ms}
+.sidebar-group.open>.sidebar-group-head{color:var(--accent);font-weight:600}
+.sidebar-group.open>.sidebar-group-head .sidebar-group-arrow{transform:rotate(90deg)}
+.sidebar-group-body{display:none;padding:0 0 0 16px}
+.sidebar-group.open>.sidebar-group-body{display:block}
+.sidebar-group-sub{margin:2px 0}
+.sidebar-group-sub-head{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-tertiary);transition:all 150ms;user-select:none}
+.sidebar-group-sub-head:hover{background:var(--bg-hover);color:var(--text-secondary)}
+.sidebar-group-sub-head .sidebar-group-arrow{margin-left:auto;font-size:10px;transition:transform 150ms}
+.sidebar-group-sub.open>.sidebar-group-sub-head{color:var(--text-secondary);font-weight:600}
+.sidebar-group-sub.open>.sidebar-group-sub-head .sidebar-group-arrow{transform:rotate(90deg)}
+.sidebar-group-sub-body{display:none;padding:0 0 0 12px}
+.sidebar-group-sub.open>.sidebar-group-sub-body{display:block}
+.sidebar-sub-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:13px;color:var(--text-tertiary);border-radius:6px;cursor:pointer;transition:all 150ms;text-decoration:none}
+.sidebar-sub-item:hover{background:var(--bg-hover);color:var(--text-secondary)}
 </style>
 </head>
 <body>
@@ -744,8 +764,33 @@
 
     <div class="sidebar-section">
       <div class="sidebar-label">管理</div>
-      <div class="sidebar-item">
-        <div class="sidebar-icon">📋</div> 行政总览
+      <div class="sidebar-group">
+        <div class="sidebar-group-head" onclick="toggleSidebarGroup(this)">
+          <span class="sidebar-icon">📋</span> 行政总览
+          <span class="sidebar-group-arrow">▸</span>
+        </div>
+        <div class="sidebar-group-body">
+          <div class="sidebar-group-sub">
+            <div class="sidebar-group-sub-head" onclick="toggleSidebarSubGroup(this)">
+              <span class="sidebar-icon">🏢</span> 大行政
+              <span class="sidebar-group-arrow">▸</span>
+            </div>
+            <div class="sidebar-group-sub-body">
+              <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=职场运营">
+                <div class="sidebar-dot" style="background:#3B5BDB"></div> 职场运营
+              </a>
+              <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=文化运营">
+                <div class="sidebar-dot" style="background:#10B981"></div> 文化运营
+              </a>
+              <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=数字化运营">
+                <div class="sidebar-dot" style="background:#06B6D4"></div> 数字化运营
+              </a>
+            </div>
+          </div>
+          <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=总裁办">
+            <div class="sidebar-dot" style="background:#8B5CF6"></div> 总裁办
+          </a>
+        </div>
       </div>
       <div class="sidebar-item">
         <div class="sidebar-icon">⭐</div> 重点专项
@@ -1230,5 +1275,15 @@
 
 </div>
 
+<script>
+function toggleSidebarGroup(el){
+  const group = el.parentElement;
+  group.classList.toggle('open');
+}
+function toggleSidebarSubGroup(el){
+  const subGroup = el.parentElement;
+  subGroup.classList.toggle('open');
+}
+</script>
 </body>
 </html>

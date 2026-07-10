@@ -147,6 +147,26 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
 .anno-i{display:flex;gap:8px;margin-bottom:6px;line-height:1.5}
 .anno-n{width:16px;height:16px;background:var(--ac);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
 .anno-t{color:var(--t2)}
+
+/* Sidebar groups */
+.sidebar-group{margin:2px 0}
+.sidebar-group-head{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:450;color:var(--t2);transition:all var(--tr);user-select:none}
+.sidebar-group-head:hover{background:var(--bgH);color:var(--t1)}
+.sidebar-group-arrow{margin-left:auto;font-size:12px;transition:transform 150ms}
+.sidebar-group.open>.sidebar-group-head{color:var(--ac);font-weight:600}
+.sidebar-group.open>.sidebar-group-head .sidebar-group-arrow{transform:rotate(90deg)}
+.sidebar-group-body{display:none;padding:0 0 0 16px}
+.sidebar-group.open>.sidebar-group-body{display:block}
+.sidebar-group-sub{margin:2px 0}
+.sidebar-group-sub-head{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--t3);transition:all var(--tr);user-select:none}
+.sidebar-group-sub-head:hover{background:var(--bgH);color:var(--t2)}
+.sidebar-group-sub-head .sidebar-group-arrow{margin-left:auto;font-size:10px;transition:transform 150ms}
+.sidebar-group-sub.open>.sidebar-group-sub-head{color:var(--t2);font-weight:600}
+.sidebar-group-sub.open>.sidebar-group-sub-head .sidebar-group-arrow{transform:rotate(90deg)}
+.sidebar-group-sub-body{display:none;padding:0 0 0 12px}
+.sidebar-group-sub.open>.sidebar-group-sub-body{display:block}
+.sidebar-sub-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:13px;color:var(--t3);border-radius:6px;cursor:pointer;transition:all var(--tr);text-decoration:none}
+.sidebar-sub-item:hover{background:var(--bgH);color:var(--t2)}
 </style>
 </head>
 <body>
@@ -162,7 +182,34 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:v
     <a class="sb-i" href="./10-okr.html"><div class="sb-ic">🎯</div> OKR <span style="font-size:11px;color:var(--t3);margin-left:2px">手动导入</span></a>
   </div>
   <div class="sb-sec"><div class="sb-lbl">管理</div>
-    <div class="sb-i"><div class="sb-ic">📋</div> 行政总览</div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-head" onclick="toggleSidebarGroup(this)">
+        <span class="sb-ic">📋</span> 行政总览
+        <span class="sidebar-group-arrow">▸</span>
+      </div>
+      <div class="sidebar-group-body">
+        <div class="sidebar-group-sub">
+          <div class="sidebar-group-sub-head" onclick="toggleSidebarSubGroup(this)">
+            <span class="sb-ic">🏢</span> 大行政
+            <span class="sidebar-group-arrow">▸</span>
+          </div>
+          <div class="sidebar-group-sub-body">
+            <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=职场运营">
+              <div class="sb-dot" style="background:#3B5BDB"></div> 职场运营
+            </a>
+            <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=文化运营">
+              <div class="sb-dot" style="background:#10B981"></div> 文化运营
+            </a>
+            <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=数字化运营">
+              <div class="sb-dot" style="background:#06B6D4"></div> 数字化运营
+            </a>
+          </div>
+        </div>
+        <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=总裁办">
+          <div class="sb-dot" style="background:#8B5CF6"></div> 总裁办
+        </a>
+      </div>
+    </div>
     <div class="sb-i"><div class="sb-ic">⭐</div> 重点专项</div>
     <div class="sb-i"><div class="sb-ic">📊</div> 运营看板</div>
     <div class="sb-i act"><div class="sb-ic">👥</div> 周会视图</div>
@@ -484,6 +531,14 @@ function sendRemind(){
     btn.style.color = 'var(--ac)';
     btn.disabled = false;
   }, 2000);
+}
+function toggleSidebarGroup(el){
+  const group = el.parentElement;
+  group.classList.toggle('open');
+}
+function toggleSidebarSubGroup(el){
+  const subGroup = el.parentElement;
+  subGroup.classList.toggle('open');
 }
 </script>
 </body>
