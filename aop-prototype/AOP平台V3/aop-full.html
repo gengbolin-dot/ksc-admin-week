@@ -337,11 +337,21 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .proj-toolbar-btn.primary{background:var(--ac);color:#fff;border-color:var(--ac)}
 .proj-toolbar-btn.primary:hover{filter:brightness(1.08)}
 /* Formatting bar */
-.proj-format-bar{height:40px;background:var(--bg);border-bottom:1px solid var(--bdl);display:flex;align-items:center;padding:0 20px;gap:4px;flex-shrink:0}
-.proj-fmt-btn{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--t3);transition:all var(--tr);border:none;background:none}
+.proj-format-bar{height:auto;min-height:40px;background:var(--bg);border-bottom:1px solid var(--bdl);display:flex;align-items:center;padding:4px 16px;gap:4px;flex-shrink:0;flex-wrap:wrap}
+.proj-fmt-btn{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--t3);transition:all var(--tr);border:none;background:none;flex-shrink:0}
 .proj-fmt-btn:hover{background:var(--bgH);color:var(--t1)}
 .proj-fmt-btn.active{background:var(--acl);color:var(--ac)}
-.proj-fmt-sep{width:1px;height:20px;background:var(--bdl);margin:0 4px}
+.proj-fmt-sep{width:1px;height:20px;background:var(--bdl);margin:0 4px;flex-shrink:0}
+.proj-fmt-select{padding:4px 8px;border-radius:6px;border:1px solid var(--bd);background:var(--bg);font-size:12px;color:var(--t2);cursor:pointer;outline:none;min-width:80px}
+.proj-fmt-select:focus{border-color:var(--ac)}
+.proj-fmt-color-wrap{position:relative}
+.proj-fmt-color-picker{position:absolute;top:100%;left:0;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px;box-shadow:var(--shL);z-index:50;display:none;min-width:180px}
+.proj-fmt-color-picker.open{display:block}
+.proj-fmt-color-row{display:flex;gap:4px;margin-bottom:4px}
+.proj-fmt-color-dot{width:24px;height:24px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all var(--tr)}
+.proj-fmt-color-dot:hover{border-color:var(--ac);transform:scale(1.1)}
+.proj-fmt-color-clear{width:100%;padding:4px;border-radius:4px;border:none;background:var(--bg2);color:var(--t2);font-size:11px;cursor:pointer;margin-top:4px}
+.proj-fmt-color-clear:hover{background:var(--bgH)}
 /* Document area */
 .proj-doc{flex:1;overflow-y:auto;padding:40px 0;display:flex;justify-content:center}
 .proj-doc-inner{width:100%;max-width:720px;padding:0 40px}
@@ -368,13 +378,19 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .proj-h2:empty::before{content:'二级标题';color:var(--t3)}
 .proj-h3{font-size:18px;font-weight:700;color:var(--t1);line-height:1.4;outline:none;padding:4px 0;margin:12px 0 6px 0}
 .proj-h3:empty::before{content:'三级标题';color:var(--t3)}
-/* Editable images - inline for drag support */
-.proj-text img, .proj-h2 img, .proj-h3 img{
-  max-width:100%;max-height:300px;border-radius:8px;margin:4px 6px 4px 0;display:inline-block;cursor:pointer;
-  transition:box-shadow var(--tr);user-select:all;-webkit-user-select:all;vertical-align:middle;
+/* Editable images - inline and draggable */
+.proj-text img, .proj-h2 img, .proj-h3 img, .proj-h4 img{
+  max-width:100%;max-height:300px;border-radius:8px;margin:4px 8px 4px 0;cursor:grab;
+  transition:box-shadow var(--tr);vertical-align:middle;
 }
-.proj-text img:hover, .proj-h2 img:hover, .proj-h3 img:hover{
+.proj-text img:hover, .proj-h2 img:hover, .proj-h3 img:hover, .proj-h4 img:hover{
   box-shadow:0 0 0 2px var(--ac);
+}
+.proj-text img.dragging, .proj-h2 img.dragging, .proj-h3 img.dragging{
+  opacity:.5;cursor:grabbing;
+}
+.proj-text img[draggable="true"], .proj-h2 img[draggable="true"], .proj-h3 img[draggable="true"]{
+  -webkit-user-drag:element;
 }
 .proj-img-toolbar{
   position:absolute;top:-36px;left:50%;transform:translateX(-50%);
@@ -2258,22 +2274,107 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
       <button class="proj-toolbar-btn primary" onclick="projSave()">保存</button>
     </div>
   </div>
-  <!-- Format bar -->
+  <!-- Format bar - Rich Text Editor -->
   <div class="proj-format-bar">
-    <button class="proj-fmt-btn" title="正文" onclick="projFmt('p')">¶</button>
-    <button class="proj-fmt-btn" title="标题2" onclick="projFmt('h2')">H2</button>
-    <button class="proj-fmt-btn" title="标题3" onclick="projFmt('h3')">H3</button>
+    <!-- Block type -->
+    <select class="proj-fmt-select" onchange="projFmtBlock(this.value);this.value=''">
+      <option value="">段落样式</option>
+      <option value="p">正文</option>
+      <option value="h1">标题 1</option>
+      <option value="h2">标题 2</option>
+      <option value="h3">标题 3</option>
+      <option value="h4">标题 4</option>
+    </select>
+    <!-- Font size -->
+    <select class="proj-fmt-select" onchange="projFmtSize(this.value);this.value=''">
+      <option value="">字号</option>
+      <option value="1">12px</option>
+      <option value="2">14px</option>
+      <option value="3">16px</option>
+      <option value="4">18px</option>
+      <option value="5">20px</option>
+      <option value="6">24px</option>
+      <option value="7">32px</option>
+    </select>
     <div class="proj-fmt-sep"></div>
-    <button class="proj-fmt-btn" title="加粗" onclick="projFmt('bold')"><b>B</b></button>
-    <button class="proj-fmt-btn" title="斜体" onclick="projFmt('italic')"><i>I</i></button>
-    <button class="proj-fmt-btn" title="下划线" onclick="projFmt('underline')"><u>U</u></button>
+    <!-- Text formatting -->
+    <button class="proj-fmt-btn" title="加粗 (Ctrl+B)" onclick="document.execCommand('bold')"><b>B</b></button>
+    <button class="proj-fmt-btn" title="斜体 (Ctrl+I)" onclick="document.execCommand('italic')"><i>I</i></button>
+    <button class="proj-fmt-btn" title="下划线 (Ctrl+U)" onclick="document.execCommand('underline')"><u>U</u></button>
+    <button class="proj-fmt-btn" title="删除线" onclick="document.execCommand('strikethrough')"><s>S</s></button>
     <div class="proj-fmt-sep"></div>
-    <button class="proj-fmt-btn" title="图片" onclick="projAddImageBlock()">🖼️</button>
-    <button class="proj-fmt-btn" title="视频" onclick="projAddVideoBlock()">🎬</button>
-    <button class="proj-fmt-btn" title="附件" onclick="projAddAttach()">📎</button>
+    <!-- Text color -->
+    <div class="proj-fmt-color-wrap">
+      <button class="proj-fmt-btn" title="文字颜色" onclick="toggleColorPicker('text')">A<span style="border-bottom:3px solid var(--t1);display:block;margin-top:2px"></span></button>
+      <div class="proj-fmt-color-picker" id="textColorPicker">
+        <div class="proj-fmt-color-row">
+          <div class="proj-fmt-color-dot" style="background:#000" onclick="document.execCommand('foreColor',false,'#000')"></div>
+          <div class="proj-fmt-color-dot" style="background:#e74c3c" onclick="document.execCommand('foreColor',false,'#e74c3c')"></div>
+          <div class="proj-fmt-color-dot" style="background:#e67e22" onclick="document.execCommand('foreColor',false,'#e67e22')"></div>
+          <div class="proj-fmt-color-dot" style="background:#f1c40f" onclick="document.execCommand('foreColor',false,'#f1c40f')"></div>
+          <div class="proj-fmt-color-dot" style="background:#2ecc71" onclick="document.execCommand('foreColor',false,'#2ecc71')"></div>
+          <div class="proj-fmt-color-dot" style="background:#3498db" onclick="document.execCommand('foreColor',false,'#3498db')"></div>
+          <div class="proj-fmt-color-dot" style="background:#9b59b6" onclick="document.execCommand('foreColor',false,'#9b59b6')"></div>
+          <div class="proj-fmt-color-dot" style="background:#6b7280" onclick="document.execCommand('foreColor',false,'#6b7280')"></div>
+        </div>
+        <div class="proj-fmt-color-row">
+          <div class="proj-fmt-color-dot" style="background:#1a1d26" onclick="document.execCommand('foreColor',false,'#1a1d26')"></div>
+          <div class="proj-fmt-color-dot" style="background:#ff6b6b" onclick="document.execCommand('foreColor',false,'#ff6b6b')"></div>
+          <div class="proj-fmt-color-dot" style="background:#ffa94d" onclick="document.execCommand('foreColor',false,'#ffa94d')"></div>
+          <div class="proj-fmt-color-dot" style="background:#ffd43b" onclick="document.execCommand('foreColor',false,'#ffd43b')"></div>
+          <div class="proj-fmt-color-dot" style="background:#69db7c" onclick="document.execCommand('foreColor',false,'#69db7c')"></div>
+          <div class="proj-fmt-color-dot" style="background:#74c0fc" onclick="document.execCommand('foreColor',false,'#74c0fc')"></div>
+          <div class="proj-fmt-color-dot" style="background:#b197fc" onclick="document.execCommand('foreColor',false,'#b197fc')"></div>
+          <div class="proj-fmt-color-dot" style="background:#adb5bd" onclick="document.execCommand('foreColor',false,'#adb5bd')"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Highlight color -->
+    <div class="proj-fmt-color-wrap">
+      <button class="proj-fmt-btn" title="高亮背景" onclick="toggleColorPicker('bg')">🎨<span style="border-bottom:3px solid #ffd43b;display:block;margin-top:2px"></span></button>
+      <div class="proj-fmt-color-picker" id="bgColorPicker">
+        <div class="proj-fmt-color-row">
+          <div class="proj-fmt-color-dot" style="background:#fef3c7" onclick="document.execCommand('hiliteColor',false,'#fef3c7')"></div>
+          <div class="proj-fmt-color-dot" style="background:#fee2e2" onclick="document.execCommand('hiliteColor',false,'#fee2e2')"></div>
+          <div class="proj-fmt-color-dot" style="background:#dbeafe" onclick="document.execCommand('hiliteColor',false,'#dbeafe')"></div>
+          <div class="proj-fmt-color-dot" style="background:#dcfce7" onclick="document.execCommand('hiliteColor',false,'#dcfce7')"></div>
+          <div class="proj-fmt-color-dot" style="background:#f3e8ff" onclick="document.execCommand('hiliteColor',false,'#f3e8ff')"></div>
+          <div class="proj-fmt-color-dot" style="background:#fce7f3" onclick="document.execCommand('hiliteColor',false,'#fce7f3')"></div>
+          <div class="proj-fmt-color-dot" style="background:#ccfbf1" onclick="document.execCommand('hiliteColor',false,'#ccfbf1')"></div>
+          <div class="proj-fmt-color-dot" style="background:#f1f5f9" onclick="document.execCommand('hiliteColor',false,'#f1f5f9')"></div>
+        </div>
+        <div class="proj-fmt-color-row">
+          <div class="proj-fmt-color-dot" style="background:#fde68a" onclick="document.execCommand('hiliteColor',false,'#fde68a')"></div>
+          <div class="proj-fmt-color-dot" style="background:#fca5a5" onclick="document.execCommand('hiliteColor',false,'#fca5a5')"></div>
+          <div class="proj-fmt-color-dot" style="background:#93c5fd" onclick="document.execCommand('hiliteColor',false,'#93c5fd')"></div>
+          <div class="proj-fmt-color-dot" style="background:#86efac" onclick="document.execCommand('hiliteColor',false,'#86efac')"></div>
+          <div class="proj-fmt-color-dot" style="background:#c4b5fd" onclick="document.execCommand('hiliteColor',false,'#c4b5fd')"></div>
+          <div class="proj-fmt-color-dot" style="background:#f9a8d4" onclick="document.execCommand('hiliteColor',false,'#f9a8d4')"></div>
+          <div class="proj-fmt-color-dot" style="background:#99f6e4" onclick="document.execCommand('hiliteColor',false,'#99f6e4')"></div>
+          <div class="proj-fmt-color-dot" style="background:#e2e8f0" onclick="document.execCommand('hiliteColor',false,'#e2e8f0')"></div>
+        </div>
+        <button class="proj-fmt-color-clear" onclick="document.execCommand('hiliteColor',false,'transparent')">清除高亮</button>
+      </div>
+    </div>
     <div class="proj-fmt-sep"></div>
-    <button class="proj-fmt-btn" title="引用" onclick="projFmt('callout')">❝</button>
+    <!-- Alignment -->
+    <button class="proj-fmt-btn" title="左对齐" onclick="document.execCommand('justifyLeft')">⫷</button>
+    <button class="proj-fmt-btn" title="居中" onclick="document.execCommand('justifyCenter')">⫼</button>
+    <button class="proj-fmt-btn" title="右对齐" onclick="document.execCommand('justifyRight')">⫸</button>
+    <div class="proj-fmt-sep"></div>
+    <!-- Lists -->
+    <button class="proj-fmt-btn" title="无序列表" onclick="document.execCommand('insertUnorderedList')">•≡</button>
+    <button class="proj-fmt-btn" title="有序列表" onclick="document.execCommand('insertOrderedList')">1≡</button>
+    <div class="proj-fmt-sep"></div>
+    <!-- Media -->
+    <button class="proj-fmt-btn" title="插入图片" onclick="projAddImageBlock()">🖼️</button>
+    <button class="proj-fmt-btn" title="插入视频" onclick="projAddVideoBlock()">🎬</button>
+    <button class="proj-fmt-btn" title="插入附件" onclick="projAddAttach()">📎</button>
+    <div class="proj-fmt-sep"></div>
+    <!-- Other -->
+    <button class="proj-fmt-btn" title="引用块" onclick="projFmt('callout')">❝</button>
     <button class="proj-fmt-btn" title="分割线" onclick="projAddDivider()">—</button>
+    <button class="proj-fmt-btn" title="清除格式" onclick="document.execCommand('removeFormat')">🚫</button>
   </div>
   <!-- Document area -->
   <div class="proj-doc">
@@ -3092,6 +3193,7 @@ function openProjDetail(idx){
   }
 
   renderProjDoc();
+  initImageDrag();
 }
 
 function renderProjDoc(){
@@ -3439,6 +3541,32 @@ function projSave(){
   setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500);
 }
 
+// Rich text formatting functions
+function projFmtBlock(tag){
+  if(!tag) return;
+  document.execCommand('formatBlock', false, tag);
+}
+
+function projFmtSize(size){
+  if(!size) return;
+  document.execCommand('fontSize', false, size);
+}
+
+function toggleColorPicker(type){
+  // Close all pickers first
+  document.querySelectorAll('.proj-fmt-color-picker').forEach(p => p.classList.remove('open'));
+  // Toggle the requested one
+  const picker = document.getElementById(type === 'text' ? 'textColorPicker' : 'bgColorPicker');
+  if(picker) picker.classList.toggle('open');
+}
+
+// Close color pickers when clicking outside
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.proj-fmt-color-wrap')){
+    document.querySelectorAll('.proj-fmt-color-picker').forEach(p => p.classList.remove('open'));
+  }
+});
+
 function projFmt(type){
   switch(type){
     case 'bold': document.execCommand('bold'); break;
@@ -3459,6 +3587,56 @@ function projFmt(type){
       }
       break;
   }
+}
+
+// Image drag and drop support
+function initImageDrag(){
+  const docEl = document.getElementById('projDocContent');
+  if(!docEl) return;
+
+  let draggedImg = null;
+
+  docEl.addEventListener('dragstart', function(e){
+    if(e.target.tagName === 'IMG'){
+      draggedImg = e.target;
+      e.target.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', e.target.src);
+    }
+  });
+
+  docEl.addEventListener('dragend', function(e){
+    if(e.target.tagName === 'IMG'){
+      e.target.classList.remove('dragging');
+      draggedImg = null;
+    }
+  });
+
+  docEl.addEventListener('dragover', function(e){
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  });
+
+  docEl.addEventListener('drop', function(e){
+    e.preventDefault();
+    if(!draggedImg) return;
+
+    // Find the target element
+    const target = document.elementFromPoint(e.clientX, e.clientY);
+    if(!target) return;
+
+    // If dropping on a text block, insert the image there
+    if(target.classList.contains('proj-text') || target.classList.contains('proj-h2') || target.classList.contains('proj-h3')){
+      const range = document.caretRangeFromPoint(e.clientX, e.clientY);
+      if(range){
+        range.insertNode(draggedImg);
+        range.collapse(false);
+      }
+    }
+
+    draggedImg.classList.remove('dragging');
+    draggedImg = null;
+  });
 }
 
 function projAddBlock(){
