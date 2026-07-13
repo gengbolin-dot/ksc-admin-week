@@ -380,19 +380,33 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .proj-h2:empty::before{content:'二级标题';color:var(--t3)}
 .proj-h3{font-size:18px;font-weight:700;color:var(--t1);line-height:1.4;outline:none;padding:4px 0;margin:12px 0 6px 0}
 .proj-h3:empty::before{content:'三级标题';color:var(--t3)}
-/* Editable images - consistent size, keep aspect ratio */
+/* Editable images - flex-based auto-sizing */
 .proj-doc-inner img{
-  display:inline!important;
-  max-height:200px!important;
-  width:auto!important;
   border-radius:8px!important;
-  vertical-align:middle!important;
-  margin:4px 8px 4px 0!important;
   cursor:pointer;
   transition:box-shadow .15s;
-  float:none!important;
 }
 .proj-doc-inner img:hover{box-shadow:0 0 0 2px var(--ac)}
+/* Flex container for grouped images */
+.proj-img-row{
+  display:flex!important;
+  gap:8px;
+  margin:8px 0;
+  flex-wrap:wrap;
+  align-items:flex-start;
+}
+.proj-img-row img{
+  flex:1 1 auto;
+  max-height:280px;
+  min-width:80px;
+  max-width:100%;
+  height:auto;
+  border-radius:8px;
+  object-fit:cover;
+  cursor:pointer;
+  transition:box-shadow .15s;
+}
+.proj-img-row img:hover{box-shadow:0 0 0 2px var(--ac)}
 
 /* ══════ IMAGE LIGHTBOX ══════ */
 .img-lb{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column}
@@ -3339,9 +3353,9 @@ function renderProjDoc(){
 
   // ══════ PASTE HANDLER ══════
   el.addEventListener('paste', function(e){
-    // After paste, clean up and let images flow naturally
+    // After paste, wrap consecutive images in flex rows
     setTimeout(() => {
-      // Remove empty paragraphs that only contain images
+      // First, unwrap images from paragraphs
       el.querySelectorAll('p').forEach(p => {
         const imgs = p.querySelectorAll('img');
         const text = p.textContent.trim();
@@ -3354,11 +3368,37 @@ function renderProjDoc(){
         }
       });
 
-      // Style images - consistent size
-      el.querySelectorAll('img').forEach(img => {
-        img.style.cssText = 'display:inline!important;max-height:200px;width:auto;border-radius:8px;vertical-align:middle;margin:4px 8px 4px 0;cursor:pointer;float:none!important;';
+      // Now wrap consecutive images into flex rows
+      const allNodes = Array.from(el.childNodes);
+      let imgBatch = [];
+
+      function wrapImages(){
+        if(imgBatch.length === 0) return;
+        if(imgBatch.length === 1){
+          // Single image - display block, larger
+          imgBatch[0].style.cssText = 'display:block;max-width:100%;max-height:400px;height:auto;border-radius:8px;margin:8px 0;cursor:pointer;';
+        } else {
+          // Multiple images - wrap in flex row
+          const row = document.createElement('div');
+          row.className = 'proj-img-row';
+          imgBatch[0].parentNode.insertBefore(row, imgBatch[0]);
+          imgBatch.forEach(img => {
+            img.style.cssText = '';
+            row.appendChild(img);
+          });
+        }
+        imgBatch = [];
+      }
+
+      allNodes.forEach(node => {
+        if(node.tagName === 'IMG'){
+          imgBatch.push(node);
+        } else {
+          wrapImages();
+        }
       });
-    }, 100);
+      wrapImages();
+    }, 150);
   }, true);
 
   // ══════ IMAGE CLICK - Open Lightbox ══════
