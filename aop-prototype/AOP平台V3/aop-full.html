@@ -405,7 +405,10 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .proj-img-toolbar button.danger:hover{background:var(--danL);color:var(--dan)}
 /* Metric cards */
 .proj-metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
-.proj-metric-card{background:var(--bg);border:1px solid var(--bdl);border-radius:10px;padding:16px;text-align:center}
+.proj-metric-card{background:var(--bg);border:1px solid var(--bdl);border-radius:10px;padding:16px;text-align:center;position:relative}
+.proj-metric-card:hover .proj-metric-delete{opacity:1}
+.proj-metric-delete{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;border:none;background:rgba(0,0,0,.05);color:var(--t3);opacity:0;transition:all var(--tr)}
+.proj-metric-delete:hover{background:var(--danL);color:var(--dan);opacity:1}
 .proj-metric-val{font-size:28px;font-weight:900;color:var(--t1);letter-spacing:-.02em;outline:none;min-height:28px}
 .proj-metric-val:focus{background:var(--bg2);border-radius:4px}
 .proj-metric-label{font-size:11px;color:var(--t3);margin-top:4px;outline:none;min-height:14px}
@@ -3222,9 +3225,13 @@ function renderProjDoc(){
         h += `<div class="proj-block"><button class="proj-block-delete" title="删除" onclick="projDeleteBlock(${idx})">✕</button><div class="proj-divider"></div></div>`;
         break;
       case 'metrics':
-        h += `<div class="proj-block"><button class="proj-block-delete" title="删除" onclick="projDeleteBlock(${idx})">✕</button><div class="proj-metrics-row">`;
+        h += `<div class="proj-block"><div class="proj-metrics-row">`;
         (block.data || []).forEach((m, mIdx) => {
-          h += `<div class="proj-metric-card"><div class="proj-metric-val" contenteditable="true" data-block="${idx}" data-metric="${mIdx}" data-field="value">${m.value}</div><div class="proj-metric-label" contenteditable="true" data-block="${idx}" data-metric="${mIdx}" data-field="label">${m.label}</div></div>`;
+          h += `<div class="proj-metric-card">
+            <button class="proj-metric-delete" title="删除此指标" onclick="projDeleteMetric(${idx},${mIdx})">✕</button>
+            <div class="proj-metric-val" contenteditable="true" data-block="${idx}" data-metric="${mIdx}" data-field="value">${m.value}</div>
+            <div class="proj-metric-label" contenteditable="true" data-block="${idx}" data-metric="${mIdx}" data-field="label">${m.label}</div>
+          </div>`;
         });
         h += `<div class="proj-metric-card" style="cursor:pointer;border:2px dashed var(--bd)" onclick="projAddMetric(${idx})"><div class="proj-metric-val" style="color:var(--t3);font-size:20px">＋</div><div class="proj-metric-label">添加指标</div></div>`;
         h += `</div></div>`;
@@ -3446,6 +3453,20 @@ function projAddMetric(blockIdx){
   const block = _projDocBlocks[_currentProjId][blockIdx];
   if(block && block.data){
     block.data.push({value: '0', label: '新指标'});
+    saveProjDocBlocks();
+    renderProjDoc();
+  }
+}
+
+function projDeleteMetric(blockIdx, metricIdx){
+  if(!_projDocBlocks[_currentProjId]) return;
+  const block = _projDocBlocks[_currentProjId][blockIdx];
+  if(block && block.data){
+    block.data.splice(metricIdx, 1);
+    // If no metrics left, remove the entire block
+    if(block.data.length === 0){
+      _projDocBlocks[_currentProjId].splice(blockIdx, 1);
+    }
     saveProjDocBlocks();
     renderProjDoc();
   }
