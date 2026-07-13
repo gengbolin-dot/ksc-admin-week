@@ -293,16 +293,32 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p04-kanban-card:hover{box-shadow:var(--sh);border-color:var(--bd)}
 
 /* ══════ PANEL 05: KEY PROJECTS ══════ */
-.p05-view-switch{display:flex;gap:2px;padding:10px 24px;background:var(--bg);border-bottom:1px solid var(--bdl)}
-.p05-vs-btn{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bdl);background:var(--bg);color:var(--t3);transition:all var(--tr)}
-.p05-vs-btn.active{background:var(--acl);border-color:var(--ac);color:var(--ac)}
-.p05-gantt{padding:16px 24px}
-.p05-gantt-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.p05-gantt-label{width:200px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:6px;flex-shrink:0}
-.p05-gantt-track{flex:1;height:24px;background:var(--bg3);border-radius:4px;position:relative}
-.p05-gantt-bar{position:absolute;height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:10px;font-weight:600;color:#fff}
-.p05-gantt-milestone{position:absolute;top:-2px;width:10px;height:10px;background:var(--warn);transform:rotate(45deg);border-radius:2px}
-.p05-gantt-today{position:absolute;top:-4px;bottom:-4px;width:1px;background:var(--dan);border-left:1px dashed var(--dan)}
+.p05-hero{padding:32px 40px;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#1e1b4b 100%);position:relative;overflow:hidden}
+.p05-hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px}
+.p05-hero-title{font-size:28px;font-weight:900;color:#fff;letter-spacing:-.02em;margin-bottom:10px}
+.p05-hero-desc{font-size:13px;color:rgba(255,255,255,.65);line-height:1.65;max-width:600px}
+.p05-hero-upload{position:absolute;bottom:16px;right:20px;display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:99px;border:1px solid rgba(255,255,255,.25);font-size:11px;color:rgba(255,255,255,.6);cursor:pointer;background:rgba(255,255,255,.07);transition:.15s}
+.p05-hero-upload:hover{color:#fff;border-color:rgba(255,255,255,.5)}
+.p05-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:24px 32px}
+.p05-card{border-radius:14px;border:1px solid var(--bdl);overflow:hidden;background:var(--bg);transition:box-shadow .2s}
+.p05-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.p05-card-img{height:160px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.p05-card-img-bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.p05-card-img-emoji{font-size:56px;opacity:.25}
+.p05-card-img-upload{position:absolute;top:8px;right:8px;z-index:3;background:rgba(0,0,0,.35);color:#fff;font-size:10px;padding:3px 10px;border-radius:99px;cursor:pointer;border:1px solid rgba(255,255,255,.3);opacity:0;transition:.15s}
+.p05-card:hover .p05-card-img-upload{opacity:1}
+.p05-card-badge{position:absolute;top:8px;left:8px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;background:rgba(22,163,74,.9);color:#fff}
+.p05-card-body{padding:16px 18px}
+.p05-card-title{font-size:16px;font-weight:800;color:var(--t1);margin-bottom:4px}
+.p05-card-sub{font-size:12px;color:var(--t3);line-height:1.4;margin-bottom:12px}
+.p05-card-metrics{display:flex;gap:0;border-top:1px solid var(--bdl);border-bottom:1px solid var(--bdl);padding:10px 0;margin-bottom:12px}
+.p05-metric{flex:1;text-align:center;border-right:1px solid var(--bdl)}
+.p05-metric:last-child{border-right:none}
+.p05-metric-num{font-size:20px;font-weight:900;letter-spacing:-.02em;color:var(--t1)}
+.p05-metric-label{font-size:9px;color:var(--t4);margin-top:2px;line-height:1.2}
+.p05-card-quote{display:flex;gap:6px;align-items:flex-start;background:var(--bg2);border-radius:8px;padding:10px 12px}
+.p05-card-quote-icon{font-size:13px;flex-shrink:0;margin-top:1px;color:var(--ac)}
+.p05-card-quote-text{font-size:12px;color:var(--t2);line-height:1.5}
 .p05-timeline{padding:16px 24px}
 .p05-tl-group{margin-bottom:16px}
 .p05-tl-group-title{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
@@ -1293,18 +1309,7 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 <!-- ══════ PANEL 05: KEY PROJECTS ══════ -->
 <div class="panel" id="p05">
   <div class="topbar"><div class="topbar-title">重点专项</div></div>
-  <div class="p05-view-switch">
-    <div class="p05-vs-btn active" onclick="p05View('gantt')">甘特图</div>
-    <div class="p05-vs-btn" onclick="p05View('timeline')">时间线</div>
-    <div class="p05-vs-btn" onclick="p05View('list')">列表</div>
-  </div>
-  <div class="content-scroll">
-    <div id="p05Gantt" class="p05-gantt"></div>
-    <div id="p05Timeline" class="p05-timeline" style="display:none"></div>
-    <div id="p05List" style="display:none;padding:16px 24px">
-      <table class="p04-table" id="p05ListTable"></table>
-    </div>
-  </div>
+  <div class="content-scroll" id="p05Content"></div>
 </div>
 
 <!-- ══════ PANEL 06: OPS DASHBOARD ══════ -->
@@ -2711,46 +2716,124 @@ function toggleView(v){
 }
 
 /* ══════ P05: KEY PROJECTS ══════ */
+/* ══════ P05: KEY PROJECTS DATA ══════ */
+const P05_PROJECTS = [
+  {
+    id: 'family-day',
+    title: '第十二届家庭日',
+    badge: '重点成果',
+    subtitle: '北京"云巅小勇士"3公里丛林赛 · 武汉躺平度假',
+    bgGradient: 'linear-gradient(135deg,#7c2d12,#ea580c)',
+    emoji: '🎪',
+    metrics: [
+      {value: '665', label: '北京参与'},
+      {value: '380+', label: '武汉参与'},
+      {value: '双城', label: '同步举办'}
+    ],
+    quote: '选址武汉"小马尔代夫"，打造沉浸式躺平度假场景，进一步增强团队凝聚力与家属认同感。',
+    imageId: 'p05-img-family'
+  },
+  {
+    id: 'black-horse',
+    title: '第五届黑马大赛',
+    badge: null,
+    subtitle: '首创企业+高校双赛道 · 武汉金山软件园路演',
+    bgGradient: 'linear-gradient(135deg,#0c4a6e,#0ea5e9)',
+    emoji: '🤖',
+    metrics: [
+      {value: '19', label: '支战队'},
+      {value: '12', label: '课题产出'},
+      {value: '10万', label: '冠军奖金'}
+    ],
+    quote: '以赛促研、以赛引才、以赛促合，企业+高校战队共创，圆满落幕！',
+    imageId: 'p05-img-horse'
+  },
+  {
+    id: 'slim-contest',
+    title: '第二届甩肉大赛',
+    badge: null,
+    subtitle: '面向全员的健康减重主题活动，共持续一个季度',
+    bgGradient: 'linear-gradient(135deg,#134e4a,#0d9488)',
+    emoji: '🏃',
+    metrics: [
+      {value: '343', label: '参与人数'},
+      {value: '1,411', label: '减重(斤)'},
+      {value: '16.18%', label: '个人最高'}
+    ],
+    quote: '在自律比拼中收获健康与自我突破，改善职场久坐亚健康状态，最优团队合计减重 62.8 斤。',
+    imageId: 'p05-img-slim'
+  }
+];
+
 function renderP05(){
-  const projects=ITEMS.filter(i=>i.type==='project');
-  // Gantt
-  let gh='';
-  const months=['4月','5月','6月','7月','8月','9月'];
-  gh+='<div style="display:flex;gap:0;margin-bottom:8px;padding-left:210px">';
-  months.forEach(m=>{gh+='<div style="flex:1;font-size:10px;color:var(--t3);text-align:center">'+m+'</div>'});
-  gh+='</div>';
-  projects.forEach(it=>{
-    const start=Math.random()*30|0;const dur=30+Math.random()*40|0;
-    gh+='<div class="p05-gantt-row"><div class="p05-gantt-label"><span class="mod-tag" style="background:'+it.modBg+';color:'+it.modColor+';font-size:9px"><span class="mod-dot" style="background:'+it.modColor+'"></span>'+it.module+'</span> '+it.name+'</div><div class="p05-gantt-track"><div class="p05-gantt-bar" style="left:'+start+'%;width:'+dur+'%;background:'+it.modColor+';opacity:.7">'+it.pct+'%</div>'+(it.risk?'<div class="p05-gantt-milestone" style="left:'+(start+dur-5)+'%;background:var(--dan)"></div>':'')+'<div class="p05-gantt-today" style="left:55%"></div></div></div>';
+  const el = document.getElementById('p05Content');
+  let h = '';
+
+  // Hero section
+  h += `<div class="p05-hero">
+    <div class="p05-hero-eyebrow">AOP · 重点专项</div>
+    <div class="p05-hero-title">2026 H1 重点专项回顾</div>
+    <div class="p05-hero-desc">上半年三大重点活动全面落实：家庭日双城同办、黑马大赛圆满收官、甩肉大赛健康风潮，员工体验持续提升。</div>
+    <label class="p05-hero-upload">📷 上传封面<input type="file" accept="image/*" onchange="p05UploadHero(this)" style="display:none"></label>
+  </div>`;
+
+  // Cards
+  h += `<div class="p05-cards">`;
+
+  P05_PROJECTS.forEach(proj => {
+    h += `<div class="p05-card">
+      <div class="p05-card-img" style="background:${proj.bgGradient}">
+        <div class="p05-card-img-bg" id="${proj.imageId}"></div>
+        <div class="p05-card-img-emoji">${proj.emoji}</div>
+        ${proj.badge ? `<div class="p05-card-badge">${proj.badge}</div>` : ''}
+        <label class="p05-card-img-upload" onclick="event.stopPropagation()">📷 更换图片<input type="file" accept="image/*" onchange="p05UploadCardImg(this,'${proj.imageId}')" style="display:none"></label>
+      </div>
+      <div class="p05-card-body">
+        <div class="p05-card-title">${proj.title}</div>
+        <div class="p05-card-sub">${proj.subtitle}</div>
+        <div class="p05-card-metrics">
+          ${proj.metrics.map(m => `<div class="p05-metric"><div class="p05-metric-num">${m.value}</div><div class="p05-metric-label">${m.label}</div></div>`).join('')}
+        </div>
+        <div class="p05-card-quote">
+          <span class="p05-card-quote-icon">💬</span>
+          <div class="p05-card-quote-text">${proj.quote}</div>
+        </div>
+      </div>
+    </div>`;
   });
-  document.getElementById('p05Gantt').innerHTML=gh;
-  // Timeline
-  const groups={'职场运营':{icon:'🏢',color:'#3B5BDB',items:[]},'文化运营':{icon:'🎉',color:'#10B981',items:[]},'数字化运营':{icon:'💻',color:'#06B6D4',items:[]}};
-  projects.forEach(it=>{const g=it.module.startsWith('职场')?'职场运营':it.module.startsWith('文化')?'文化运营':'数字化运营';groups[g].items.push(it)});
-  let th='';
-  Object.entries(groups).forEach(([k,g])=>{
-    if(!g.items.length)return;
-    th+='<div class="p05-tl-group"><div class="p05-tl-group-title">'+g.icon+' '+k+'</div>';
-    g.items.forEach((it,idx)=>{
-      th+='<div class="p05-tl-node"><div class="p05-tl-dot '+(it.status==='done'?'done':it.status==='in-progress'?'active':'pending')+'"></div>'+(idx<g.items.length-1?'<div class="p05-tl-line"></div>':'')+'<div class="p05-tl-card"><div class="p05-tl-name">'+it.name+'</div><div class="p05-tl-pct">'+it.pct+'% 完成</div>'+(it.risk?'<div class="p05-risk">⚠️ '+it.risk+'</div>':'')+'</div></div>';
-    });
-    th+='</div>';
-  });
-  document.getElementById('p05Timeline').innerHTML=th;
-  // List table
-  let lh='<thead><tr><th>项目名称</th><th>模块</th><th>负责人</th><th>状态</th><th>完成度</th><th>风险</th><th>预计完成</th></tr></thead><tbody>';
-  projects.forEach(it=>{
-    lh+='<tr onclick="openSlide('+it.id+')" style="cursor:pointer"><td style="font-weight:600">'+it.name+'</td><td><span class="mod-tag" style="background:'+it.modBg+';color:'+it.modColor+'"><span class="mod-dot" style="background:'+it.modColor+'"></span>'+it.module+'</span></td><td>'+it.owner+'</td><td><span class="st-badge" style="background:'+stBg(it.status)+';color:'+stFg(it.status)+'"><span class="st-dot" style="background:'+stFg(it.status)+'"></span>'+it.statusLabel+'</span></td><td><div class="p04-prog-bar"><div class="p04-prog-fill" style="width:'+it.pct+'%;background:'+stFg(it.status)+'"></div></div> '+it.pct+'%</td><td>'+(it.risk?'<span style="color:var(--dan);font-weight:600;font-size:11px">⚠ 高</span>':'—')+'</td><td>'+(it.deadline||'—')+'</td></tr>';
-  });
-  lh+='</tbody>';
-  document.getElementById('p05ListTable').innerHTML=lh;
+
+  h += `</div>`;
+  el.innerHTML = h;
 }
-function p05View(v){
-  document.querySelectorAll('.p05-vs-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelector('.p05-vs-btn[onclick*="'+v+'"]').classList.add('active');
-  document.getElementById('p05Gantt').style.display=v==='gantt'?'':'none';
-  document.getElementById('p05Timeline').style.display=v==='timeline'?'':'none';
-  document.getElementById('p05List').style.display=v==='list'?'':'none';
+
+function p05UploadHero(input){
+  if(!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const hero = document.querySelector('.p05-hero');
+    hero.style.backgroundImage = `url(${e.target.result})`;
+    hero.style.backgroundSize = 'cover';
+    hero.style.backgroundPosition = 'center';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function p05UploadCardImg(input, targetId){
+  if(!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const el = document.getElementById(targetId);
+    if(el){
+      el.style.backgroundImage = `url(${e.target.result})`;
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center';
+      // Hide emoji placeholder
+      const emoji = el.parentElement.querySelector('.p05-card-img-emoji');
+      if(emoji) emoji.style.display = 'none';
+    }
+  };
+  reader.readAsDataURL(input.files[0]);
+}
   if(v==='list')document.getElementById('p05List').style.padding='16px 24px';
 }
 
