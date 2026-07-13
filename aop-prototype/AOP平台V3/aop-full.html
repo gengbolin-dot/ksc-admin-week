@@ -3089,6 +3089,7 @@ const P05_PROJECTS = [
     subtitle: '时光相册 + 故事集，留存企业记忆与员工故事',
     bgGradient: 'linear-gradient(135deg,#6d28d9,#8b5cf6)',
     emoji: '📚',
+    link: '',  // 外部链接，为空则打开详情页
     metrics: [
       {value: '2期', label: '年度双刊'},
       {value: '2817', label: '留存用户'},
@@ -3115,6 +3116,7 @@ const P05_PROJECTS = [
     subtitle: '北京"云巅小勇士"3公里丛林赛 · 武汉躺平度假',
     bgGradient: 'linear-gradient(135deg,#7c2d12,#ea580c)',
     emoji: '🎪',
+    link: '',
     metrics: [
       {value: '665', label: '北京参与'},
       {value: '380+', label: '武汉参与'},
@@ -3140,6 +3142,7 @@ const P05_PROJECTS = [
     subtitle: '首创企业+高校双赛道 · 武汉金山软件园路演',
     bgGradient: 'linear-gradient(135deg,#0c4a6e,#0ea5e9)',
     emoji: '🤖',
+    link: '',
     metrics: [
       {value: '19', label: '支战队'},
       {value: '12', label: '课题产出'},
@@ -3176,23 +3179,29 @@ function renderP05(){
   h += `<div class="p05-cards">`;
 
   P05_PROJECTS.forEach((proj, idx) => {
-    h += `<div class="p05-card" onclick="openProjDetail(${idx})">
-      <div class="p05-card-img" style="background:${proj.bgGradient}">
+    const clickAction = proj.link ? `window.open('${proj.link}','_blank')` : `openProjDetail(${idx})`;
+    h += `<div class="p05-card">
+      <div class="p05-card-img" style="background:${proj.bgGradient}" onclick="${clickAction}">
         <div class="p05-card-img-bg" id="${proj.imageId}"></div>
         <div class="p05-card-img-emoji">${proj.emoji}</div>
         ${proj.badge ? `<div class="p05-card-badge">${proj.badge}</div>` : ''}
         <label class="p05-card-img-upload" onclick="event.stopPropagation()">📷 更换图片<input type="file" accept="image/*" onchange="p05UploadCardImg(this,'${proj.imageId}')" style="display:none"></label>
+        ${proj.link ? '<div style="position:absolute;bottom:8px;right:8px;font-size:11px;background:rgba(0,0,0,.5);color:#fff;padding:3px 8px;border-radius:4px">🔗 外部链接</div>' : ''}
       </div>
-      <div class="p05-card-body">
-        <div class="p05-card-title">${proj.title}</div>
-        <div class="p05-card-sub">${proj.subtitle}</div>
+      <div class="p05-card-body" onclick="${clickAction}">
+        <div class="p05-card-title" contenteditable="true" onclick="event.stopPropagation()" onblur="p05SaveField(${idx},'title',this)">${proj.title}</div>
+        <div class="p05-card-sub" contenteditable="true" onclick="event.stopPropagation()" onblur="p05SaveField(${idx},'subtitle',this)">${proj.subtitle}</div>
         <div class="p05-card-metrics">
-          ${proj.metrics.map(m => `<div class="p05-metric"><div class="p05-metric-num">${m.value}</div><div class="p05-metric-label">${m.label}</div></div>`).join('')}
+          ${proj.metrics.map((m, mIdx) => `<div class="p05-metric"><div class="p05-metric-num" contenteditable="true" onclick="event.stopPropagation()" onblur="p05SaveMetric(${idx},${mIdx},'value',this)">${m.value}</div><div class="p05-metric-label" contenteditable="true" onclick="event.stopPropagation()" onblur="p05SaveMetric(${idx},${mIdx},'label',this)">${m.label}</div></div>`).join('')}
         </div>
         <div class="p05-card-quote">
           <span class="p05-card-quote-icon">💬</span>
-          <div class="p05-card-quote-text">${proj.quote}</div>
+          <div class="p05-card-quote-text" contenteditable="true" onclick="event.stopPropagation()" onblur="p05SaveField(${idx},'quote',this)">${proj.quote}</div>
         </div>
+      </div>
+      <div style="display:flex;gap:6px;padding:0 14px 10px">
+        <button class="btn btn-ghost" style="font-size:11px;flex:1" onclick="event.stopPropagation();p05SetLink(${idx})">🔗 设置链接</button>
+        <button class="btn btn-ghost" style="font-size:11px;flex:1" onclick="event.stopPropagation();openProjDetail(${idx})">📝 详情</button>
       </div>
     </div>`;
   });
@@ -3222,12 +3231,34 @@ function p05UploadCardImg(input, targetId){
       el.style.backgroundImage = `url(${e.target.result})`;
       el.style.backgroundSize = 'cover';
       el.style.backgroundPosition = 'center';
-      // Hide emoji placeholder
       const emoji = el.parentElement.querySelector('.p05-card-img-emoji');
       if(emoji) emoji.style.display = 'none';
     }
   };
   reader.readAsDataURL(input.files[0]);
+}
+
+// Editable field save
+function p05SaveField(idx, field, el){
+  if(P05_PROJECTS[idx]){
+    P05_PROJECTS[idx][field] = el.textContent;
+  }
+}
+
+function p05SaveMetric(idx, mIdx, field, el){
+  if(P05_PROJECTS[idx] && P05_PROJECTS[idx].metrics[mIdx]){
+    P05_PROJECTS[idx].metrics[mIdx][field] = el.textContent;
+  }
+}
+
+// Set external link
+function p05SetLink(idx){
+  const current = P05_PROJECTS[idx].link || '';
+  const link = prompt('输入外部链接URL（留空则打开详情页）：', current);
+  if(link !== null){
+    P05_PROJECTS[idx].link = link;
+    renderP05();
+  }
 }
 
 /* ══════ PROJECT DETAIL ══════ */
