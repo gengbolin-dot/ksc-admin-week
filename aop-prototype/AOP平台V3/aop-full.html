@@ -380,31 +380,40 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .proj-h2:empty::before{content:'二级标题';color:var(--t3)}
 .proj-h3{font-size:18px;font-weight:700;color:var(--t1);line-height:1.4;outline:none;padding:4px 0;margin:12px 0 6px 0}
 .proj-h3:empty::before{content:'三级标题';color:var(--t3)}
-/* Editable images - flexible inline for multiple per line */
-.proj-doc-inner img{
-  display:inline!important;
-  max-width:calc(25% - 12px)!important;  /* 4 images per line */
-  max-height:180px!important;
-  border-radius:8px!important;
-  vertical-align:middle!important;
-  margin:4px 6px 4px 0!important;
-  cursor:pointer;
+/* Editable images - auto-size based on count per line */
+.proj-doc-inner .img-group{
+  display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;
+}
+.proj-doc-inner .img-group img{
+  flex:1 1 auto;max-width:100%;min-width:120px;max-height:280px;
+  border-radius:8px;object-fit:cover;cursor:pointer;
   transition:box-shadow .15s;
-  float:none!important;
-  clear:none!important;
-  object-fit:cover;
 }
-.proj-doc-inner img:hover{box-shadow:0 0 0 2px var(--ac)}
-/* Force all images inline regardless of parent */
-.proj-doc-inner * img{
-  display:inline!important;
-  float:none!important;
+.proj-doc-inner .img-group img:hover{box-shadow:0 0 0 2px var(--ac)}
+/* Single image */
+.proj-doc-inner .img-single{
+  display:block;max-width:100%;max-height:400px;border-radius:8px;
+  margin:8px 0;cursor:pointer;transition:box-shadow .15s;
 }
-/* Make sure paragraphs don't force line breaks around images */
-.proj-doc-inner p{margin:4px 0;line-height:1.8;display:block}
-/* Remove any forced line breaks */
-.proj-doc-inner br + img{margin-left:0}
-.proj-doc-inner img + br{display:none}
+.proj-doc-inner .img-single:hover{box-shadow:0 0 0 2px var(--ac)}
+/* Standalone inline images (not in group) */
+.proj-doc-inner img:not(.img-group img):not(.img-single){
+  display:inline!important;max-width:calc(25% - 12px);max-height:180px;
+  border-radius:8px;vertical-align:middle;margin:4px 6px 4px 0;
+  cursor:pointer;transition:box-shadow .15s;object-fit:cover;
+}
+.proj-doc-inner img:not(.img-group img):not(.img-single):hover{box-shadow:0 0 0 2px var(--ac)}
+
+/* ══════ IMAGE LIGHTBOX ══════ */
+.img-lb{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column}
+.img-lb.show{display:flex}
+.img-lb-close{position:absolute;top:16px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;z-index:501;transition:all var(--tr);border:none}
+.img-lb-close:hover{background:rgba(255,255,255,.3)}
+.img-lb-img{max-width:90vw;max-height:85vh;border-radius:12px;object-fit:contain}
+.img-lb-actions{position:absolute;bottom:24px;display:flex;gap:12px}
+.img-lb-btn{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;transition:all var(--tr);display:flex;align-items:center;gap:6px}
+.img-lb-btn:hover{background:rgba(255,255,255,.25)}
+.img-lb-counter{position:absolute;top:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:13px}
 .proj-img-toolbar{
   position:absolute;top:-36px;left:50%;transform:translateX(-50%);
   background:var(--bg);border:1px solid var(--bd);border-radius:8px;
@@ -2404,6 +2413,17 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
   <div class="proj-present-body" id="projPresentBody"></div>
 </div>
 
+<!-- ══════ IMAGE LIGHTBOX ══════ -->
+<div class="img-lb" id="imgLightbox">
+  <button class="img-lb-close" onclick="closeImgLightbox()">✕</button>
+  <div class="img-lb-counter" id="imgLbCounter"></div>
+  <img class="img-lb-img" id="imgLbImg" src="" alt="">
+  <div class="img-lb-actions">
+    <button class="img-lb-btn" onclick="downloadImg()">📥 下载图片</button>
+    <button class="img-lb-btn" onclick="closeImgLightbox()">关闭</button>
+  </div>
+</div>
+
 <script>
 /* ══════ DATA ══════ */
 const ITEMS = [
@@ -3329,30 +3349,13 @@ function renderProjDoc(){
 
   // ══════ PASTE HANDLER - Let browser handle naturally ══════
   el.addEventListener('paste', function(e){
-    // Let the browser handle paste naturally
-    // Don't preventDefault - this allows native HTML paste
-    // CSS will force images to be inline
-
-    // After paste, clean up images to ensure they're inline
+    // After paste, clean up images and wrap consecutive ones in groups
     setTimeout(() => {
-      // Force all images to be inline with flexible sizing
-      el.querySelectorAll('img').forEach(img => {
-        img.style.display = 'inline';
-        img.style.verticalAlign = 'middle';
-        img.style.maxWidth = 'calc(25% - 12px)';
-        img.style.maxHeight = '180px';
-        img.style.margin = '4px 6px 4px 0';
-        img.style.borderRadius = '8px';
-        img.style.float = 'none';
-        img.style.objectFit = 'cover';
-      });
-
       // Remove empty paragraphs that only contain images
       el.querySelectorAll('p').forEach(p => {
         const imgs = p.querySelectorAll('img');
         const text = p.textContent.trim();
         if(imgs.length > 0 && text === ''){
-          // This p only has images - unwrap it
           const parent = p.parentNode;
           while(p.firstChild){
             parent.insertBefore(p.firstChild, p);
@@ -3360,10 +3363,49 @@ function renderProjDoc(){
           parent.removeChild(p);
         }
       });
-    }, 50);
+
+      // Wrap consecutive images in img-group divs
+      const allNodes = Array.from(el.childNodes);
+      let imgBatch = [];
+
+      function flushImgBatch(){
+        if(imgBatch.length === 0) return;
+        if(imgBatch.length === 1){
+          // Single image - add img-single class
+          imgBatch[0].classList.add('img-single');
+          imgBatch[0].style.display = '';
+          imgBatch[0].style.maxWidth = '';
+          imgBatch[0].style.maxHeight = '';
+          imgBatch[0].style.margin = '';
+        } else {
+          // Multiple images - wrap in group
+          const group = document.createElement('div');
+          group.className = 'img-group';
+          imgBatch[0].parentNode.insertBefore(group, imgBatch[0]);
+          imgBatch.forEach(img => {
+            img.classList.add('img-group-img');
+            img.style.cssText = '';
+            group.appendChild(img);
+          });
+        }
+        imgBatch = [];
+      }
+
+      allNodes.forEach(node => {
+        if(node.tagName === 'IMG'){
+          imgBatch.push(node);
+        } else if(node.nodeType === 1 && node.querySelector('img')){
+          // Element contains image
+          flushImgBatch();
+        } else {
+          flushImgBatch();
+        }
+      });
+      flushImgBatch();
+    }, 100);
   }, true);
 
-  // ══════ IMAGE INTERACTION (click to select, cut/paste to move) ══════
+  // ══════ IMAGE INTERACTION (click to view, double-click to edit) ══════
   el.addEventListener('click', function(e){
     document.querySelectorAll('.proj-img-toolbar').forEach(t => t.remove());
     el.querySelectorAll('img').forEach(i => i.style.outline = 'none');
@@ -3371,13 +3413,22 @@ function renderProjDoc(){
     if(e.target.tagName === 'IMG'){
       e.stopPropagation();
       const img = e.target;
+      // Single click - open lightbox
+      openImgLightbox(img.src);
+    }
+  });
+
+  el.addEventListener('dblclick', function(e){
+    if(e.target.tagName === 'IMG'){
+      e.stopPropagation();
+      const img = e.target;
       img.style.outline = '2px solid var(--ac)';
 
-      // Create floating toolbar
+      // Double click - show edit toolbar
       const toolbar = document.createElement('div');
       toolbar.className = 'proj-img-toolbar';
       toolbar.innerHTML = `
-        <button title="剪切(然后粘贴到目标位置)" onclick="projImgCut(this)">✂️ 剪切</button>
+        <button title="剪切(然后粘贴到目标位置)" onclick="projImgCut(this)">✂️</button>
         <button title="左对齐" onclick="projImgAlign(this, 'left')">⬅</button>
         <button title="居中" onclick="projImgAlign(this, 'center')">⬛</button>
         <button title="右对齐" onclick="projImgAlign(this, 'right')">➡</button>
@@ -3391,7 +3442,6 @@ function renderProjDoc(){
       toolbar.style.transform = 'translateX(-50%)';
       img.parentElement.appendChild(toolbar);
 
-      // Click elsewhere to deselect
       document.addEventListener('click', function handler(ev){
         if(!toolbar.contains(ev.target) && ev.target !== img){
           toolbar.remove();
@@ -3771,6 +3821,68 @@ function enterPresent(){
 function exitPresent(){
   document.getElementById('projPresent').classList.remove('show');
 }
+
+/* ══════ IMAGE LIGHTBOX ══════ */
+let _imgGallery = [];
+let _imgIdx = 0;
+
+function openImgLightbox(src, idx){
+  _imgGallery = [];
+  _imgIdx = idx || 0;
+
+  // Collect all images in the current editor
+  document.querySelectorAll('.proj-doc-inner img').forEach(img => {
+    _imgGallery.push(img.src);
+  });
+
+  if(_imgGallery.length === 0) _imgGallery = [src];
+
+  document.getElementById('imgLbImg').src = src;
+  document.getElementById('imgLightbox').classList.add('show');
+  updateImgCounter();
+}
+
+function closeImgLightbox(){
+  document.getElementById('imgLightbox').classList.remove('show');
+}
+
+function downloadImg(){
+  const img = document.getElementById('imgLbImg');
+  const link = document.createElement('a');
+  link.href = img.src;
+  link.download = 'image_' + Date.now() + '.png';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function updateImgCounter(){
+  const counter = document.getElementById('imgLbCounter');
+  if(_imgGallery.length > 1){
+    counter.textContent = (_imgIdx + 1) + ' / ' + _imgGallery.length;
+    counter.style.display = 'block';
+  } else {
+    counter.style.display = 'none';
+  }
+}
+
+// Keyboard navigation for lightbox
+document.addEventListener('keydown', function(e){
+  const lb = document.getElementById('imgLightbox');
+  if(!lb.classList.contains('show')) return;
+
+  if(e.key === 'Escape') closeImgLightbox();
+  if(e.key === 'ArrowLeft' && _imgIdx > 0){
+    _imgIdx--;
+    document.getElementById('imgLbImg').src = _imgGallery[_imgIdx];
+    updateImgCounter();
+  }
+  if(e.key === 'ArrowRight' && _imgIdx < _imgGallery.length - 1){
+    _imgIdx++;
+    document.getElementById('imgLbImg').src = _imgGallery[_imgIdx];
+    updateImgCounter();
+  }
+});
 
 /* ══════ P06: OPS DASHBOARD ══════ */
 function renderP06(){
