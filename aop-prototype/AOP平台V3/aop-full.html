@@ -3209,8 +3209,9 @@ function renderP05(){
   h += `</div>`;
   el.innerHTML = h;
 
-  // Restore uploaded images after render
-  setTimeout(applyProjectImages, 100);
+  // Restore uploaded images after DOM is ready
+  setTimeout(applyProjectImages, 200);
+  setTimeout(applyProjectImages, 500); // retry
 }
 
 // ══════ PROJECT IMAGE PERSISTENCE ══════
@@ -3218,33 +3219,55 @@ const _p05ImageStore = {};
 
 function loadProjectImages(){
   try {
-    const saved = localStorage.getItem('aop_p05_images');
-    if(saved) Object.assign(_p05ImageStore, JSON.parse(saved));
-  } catch(e) {}
+    const keys = ['aop_p05_hero', 'aop_p05_img_journal', 'aop_p05_img_family', 'aop_p05_img_horse'];
+    keys.forEach(key => {
+      const val = localStorage.getItem(key);
+      if(val) _p05ImageStore[key] = val;
+    });
+  } catch(e) { console.log('Load images error:', e); }
 }
 
-function saveProjectImages(){
+function saveProjectImage(key, dataUrl){
   try {
-    localStorage.setItem('aop_p05_images', JSON.stringify(_p05ImageStore));
-  } catch(e) {}
+    // Compress by reducing quality if too large
+    const maxLen = 500000; // ~500KB limit per image
+    if(dataUrl.length > maxLen){
+      // Create a canvas to compress
+      const img = new Image();
+      img.onload = function(){
+        const canvas = document.createElement('canvas');
+        const ratio = Math.sqrt(maxLen / dataUrl.length);
+        canvas.width = img.width * ratio;
+        canvas.height = img.height * ratio;
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        const compressed = canvas.toDataURL('image/jpeg', 0.7);
+        try { localStorage.setItem(key, compressed); } catch(e) {}
+      };
+      img.src = dataUrl;
+    } else {
+      localStorage.setItem(key, dataUrl);
+    }
+    _p05ImageStore[key] = dataUrl;
+  } catch(e) { console.log('Save image error:', e); }
 }
 
 function applyProjectImages(){
   // Apply hero image
-  if(_p05ImageStore._hero){
+  if(_p05ImageStore['aop_p05_hero']){
     const hero = document.querySelector('.p05-hero');
     if(hero){
-      hero.style.backgroundImage = 'url('+_p05ImageStore._hero+')';
+      hero.style.backgroundImage = 'url('+_p05ImageStore['aop_p05_hero']+')';
       hero.style.backgroundSize = 'cover';
       hero.style.backgroundPosition = 'center';
     }
   }
   // Apply card images
-  P05_PROJECTS.forEach(proj => {
-    if(_p05ImageStore[proj.imageId]){
-      const el = document.getElementById(proj.imageId);
+  const cardKeys = {'p05-img-journal':'aop_p05_img_journal', 'p05-img-family':'aop_p05_img_family', 'p05-img-horse':'aop_p05_img_horse'};
+  Object.entries(cardKeys).forEach(([elId, storeKey]) => {
+    if(_p05ImageStore[storeKey]){
+      const el = document.getElementById(elId);
       if(el){
-        el.style.backgroundImage = 'url('+_p05ImageStore[proj.imageId]+')';
+        el.style.backgroundImage = 'url('+_p05ImageStore[storeKey]+')';
         el.style.backgroundSize = 'cover';
         el.style.backgroundPosition = 'center';
         const emoji = el.parentElement.querySelector('.p05-card-img-emoji');
@@ -3261,8 +3284,7 @@ function p05UploadHero(input){
   if(!input.files[0]) return;
   const reader = new FileReader();
   reader.onload = function(e){
-    _p05ImageStore._hero = e.target.result;
-    saveProjectImages();
+    saveProjectImage('aop_p05_hero', e.target.result);
     const hero = document.querySelector('.p05-hero');
     hero.style.backgroundImage = `url(${e.target.result})`;
     hero.style.backgroundSize = 'cover';
@@ -3275,8 +3297,8 @@ function p05UploadCardImg(input, targetId){
   if(!input.files[0]) return;
   const reader = new FileReader();
   reader.onload = function(e){
-    _p05ImageStore[targetId] = e.target.result;
-    saveProjectImages();
+    const storeKey = {'p05-img-journal':'aop_p05_img_journal','p05-img-family':'aop_p05_img_family','p05-img-horse':'aop_p05_img_horse'}[targetId] || targetId;
+    saveProjectImage(storeKey, e.target.result);
     const el = document.getElementById(targetId);
     if(el){
       el.style.backgroundImage = `url(${e.target.result})`;
