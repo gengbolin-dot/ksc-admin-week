@@ -3199,7 +3199,7 @@ function renderP05(){
         </div>
       </div>
       <div style="display:flex;gap:6px;padding:0 14px 10px">
-        ${proj.link ? `<button class="btn btn-ac" style="font-size:11px;flex:1" onclick="event.stopPropagation();window.open('${proj.link}','_blank')">🔗 打开链接</button>` : ''}
+        ${proj.link ? `<button class="btn btn-ac" style="font-size:11px;flex:1" onclick="event.stopPropagation();p05OpenLink('${proj.link}')">🔗 打开链接</button>` : ''}
         <button class="btn btn-ghost" style="font-size:11px;flex:1" onclick="event.stopPropagation();p05SetLink(${idx})">⚙️ 设置链接</button>
         <button class="btn btn-ghost" style="font-size:11px;flex:1" onclick="event.stopPropagation();openProjDetail(${idx})">📝 详情</button>
       </div>
@@ -3255,10 +3255,28 @@ function p05SaveMetric(idx, mIdx, field, el){
 function p05SetLink(idx){
   const current = P05_PROJECTS[idx].link || '';
   const link = prompt('输入外部链接URL（留空则打开详情页）：', current);
-  if(link !== null){
-    P05_PROJECTS[idx].link = link;
+  if(link !== null && link.trim()){
+    // Ensure URL has protocol
+    let url = link.trim();
+    if(!url.startsWith('http://') && !url.startsWith('https://')){
+      url = 'https://' + url;
+    }
+    P05_PROJECTS[idx].link = url;
+    renderP05();
+  } else if(link !== null){
+    P05_PROJECTS[idx].link = '';
     renderP05();
   }
+}
+
+// Open link with protocol check
+function p05OpenLink(link){
+  if(!link) return;
+  let url = link.trim();
+  if(!url.startsWith('http://') && !url.startsWith('https://')){
+    url = 'https://' + url;
+  }
+  window.open(url, '_blank', 'noopener');
 }
 
 // Card click handler - navigate if link exists, else open detail
@@ -3271,7 +3289,7 @@ function p05CardClick(card){
   const idx = parseInt(card.dataset.idx);
 
   if(link && link.trim()){
-    window.open(link, '_blank');
+    window.open(link, '_blank', 'noopener');
   } else if(!isNaN(idx)){
     openProjDetail(idx);
   }
