@@ -156,6 +156,24 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p02-filter-chip .count{font-size:11px;color:var(--t3);margin-left:4px}
 .p02-filter-right{margin-left:auto;font-size:12px;color:var(--t3)}
 
+/* Attachment area */
+.p02-attachments{margin-top:10px;padding-top:10px;border-top:1px solid var(--bdl)}
+.p02-attach-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.p02-attach-title{font-size:11px;font-weight:600;color:var(--t3)}
+.p02-attach-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:1px dashed var(--bd);background:var(--bg);color:var(--t3);transition:all var(--tr)}
+.p02-attach-btn:hover{border-color:var(--ac);color:var(--ac)}
+.p02-attach-list{display:flex;gap:8px;flex-wrap:wrap}
+.p02-attach-item{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg2);border:1px solid var(--bdl);border-radius:8px;font-size:11px;color:var(--t2);transition:all var(--tr)}
+.p02-attach-item:hover{border-color:var(--bd)}
+.p02-attach-icon{font-size:14px}
+.p02-attach-name{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p02-attach-size{font-size:10px;color:var(--t3)}
+.p02-attach-remove{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;color:var(--t3);transition:all var(--tr)}
+.p02-attach-remove:hover{background:var(--danL);color:var(--dan)}
+.p02-attach-preview{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.p02-attach-img{width:60px;height:60px;border-radius:8px;object-fit:cover;border:1px solid var(--bdl);cursor:pointer;transition:all var(--tr)}
+.p02-attach-img:hover{border-color:var(--ac);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+
 /* Task group */
 .p02-task-group{padding:16px 24px 8px}
 .p02-group-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
@@ -1193,7 +1211,6 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
     <div class="p02-breadcrumb">AOP / <strong>我的工作</strong></div>
     <div class="p02-topbar-actions">
       <div class="p02-icon-btn" title="通知"><span>🔔</span><span class="dot"></span></div>
-      <div class="p02-btn p02-btn-ghost">📤 导入事项</div>
       <div class="p02-btn p02-btn-primary">＋ 新建事项</div>
     </div>
   </div>
@@ -2387,8 +2404,8 @@ function renderP02(){
       const progColor = it.pct >= 80 ? 'var(--suc)' : it.pct >= 50 ? 'var(--warn)' : 'var(--ac)';
       const badge = getStatusBadge(it);
 
-      h += `<div class="p02-task-card project" onclick="openSlide(${it.id})">
-        <div class="p02-task-left">
+      h += `<div class="p02-task-card project">
+        <div class="p02-task-left" onclick="openSlide(${it.id})">
           <div class="p02-task-header">
             <span class="p02-task-type p02-task-type-project">专项</span>
             <div class="p02-task-title">${it.name}</div>
@@ -2406,6 +2423,14 @@ function renderP02(){
         <div class="p02-task-right">
           ${badge}
         </div>
+      </div>
+      <div class="p02-attachments" onclick="event.stopPropagation()">
+        <div class="p02-attach-header">
+          <div class="p02-attach-title">📎 附件</div>
+          <label class="p02-attach-btn">＋ 添加<input type="file" multiple accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleAttach(this,${it.id})" style="display:none"></label>
+        </div>
+        <div class="p02-attach-list" id="attach-list-${it.id}"></div>
+        <div class="p02-attach-preview" id="attach-preview-${it.id}"></div>
       </div>`;
     });
 
@@ -2427,8 +2452,8 @@ function renderP02(){
         ? '<div class="p02-task-badge p02-badge-success">✓ 本周已更新</div>'
         : '<div class="p02-task-badge p02-badge-warn">⚠️ 本周未更新</div>';
 
-      h += `<div class="p02-task-card daily" onclick="openSlide(${it.id})">
-        <div class="p02-task-left">
+      h += `<div class="p02-task-card daily">
+        <div class="p02-task-left" onclick="openSlide(${it.id})">
           <div class="p02-task-header">
             <span class="p02-task-type p02-task-type-daily">日常</span>
             <div class="p02-task-title">${it.name}</div>
@@ -2442,6 +2467,14 @@ function renderP02(){
         <div class="p02-task-right">
           ${badge}
         </div>
+      </div>
+      <div class="p02-attachments" onclick="event.stopPropagation()">
+        <div class="p02-attach-header">
+          <div class="p02-attach-title">📎 附件</div>
+          <label class="p02-attach-btn">＋ 添加<input type="file" multiple accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="handleAttach(this,${it.id})" style="display:none"></label>
+        </div>
+        <div class="p02-attach-list" id="attach-list-${it.id}"></div>
+        <div class="p02-attach-preview" id="attach-preview-${it.id}"></div>
       </div>`;
     });
 
@@ -2472,6 +2505,87 @@ function filterTasks(type, el){
   document.querySelectorAll('.p02-filter-chip').forEach(c => c.classList.remove('active'));
   if(el) el.classList.add('active');
   renderP02();
+}
+
+// Attachment handling
+const _attachments = {}; // Store attachments per task
+
+function handleAttach(input, taskId){
+  const files = Array.from(input.files);
+  if(!files.length) return;
+
+  if(!_attachments[taskId]) _attachments[taskId] = [];
+
+  files.forEach(file => {
+    const id = 'att-' + Date.now() + '-' + Math.random().toString(36).substr(2,5);
+    const isImage = file.type.startsWith('image/');
+    const isVideo = file.type.startsWith('video/');
+    const size = (file.size / 1024).toFixed(1) + 'KB';
+    const icon = isImage ? '🖼️' : isVideo ? '🎬' : '📄';
+
+    _attachments[taskId].push({id, name: file.name, size, icon, isImage, isVideo, file});
+
+    // Read file for preview
+    if(isImage){
+      const reader = new FileReader();
+      reader.onload = function(e){
+        const previewEl = document.getElementById('attach-preview-' + taskId);
+        if(previewEl){
+          const img = document.createElement('img');
+          img.className = 'p02-attach-img';
+          img.src = e.target.result;
+          img.title = file.name;
+          previewEl.appendChild(img);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  renderAttachList(taskId);
+  input.value = '';
+}
+
+function renderAttachList(taskId){
+  const listEl = document.getElementById('attach-list-' + taskId);
+  if(!listEl) return;
+  const items = _attachments[taskId] || [];
+
+  let h = '';
+  items.forEach(att => {
+    h += `<div class="p02-attach-item">
+      <span class="p02-attach-icon">${att.icon}</span>
+      <span class="p02-attach-name" title="${att.name}">${att.name}</span>
+      <span class="p02-attach-size">${att.size}</span>
+      <span class="p02-attach-remove" onclick="removeAttach('${att.id}',${taskId})">✕</span>
+    </div>`;
+  });
+  listEl.innerHTML = h;
+}
+
+function removeAttach(attId, taskId){
+  if(!_attachments[taskId]) return;
+  _attachments[taskId] = _attachments[taskId].filter(a => a.id !== attId);
+  renderAttachList(taskId);
+
+  // Remove image preview if exists
+  const previewEl = document.getElementById('attach-preview-' + taskId);
+  if(previewEl) previewEl.innerHTML = '';
+
+  // Re-add remaining image previews
+  _attachments[taskId].forEach(att => {
+    if(att.isImage && att.file){
+      const reader = new FileReader();
+      reader.onload = function(e){
+        const img = document.createElement('img');
+        img.className = 'p02-attach-img';
+        img.src = e.target.result;
+        img.title = att.name;
+        if(previewEl) previewEl.appendChild(img);
+      };
+      reader.readAsDataURL(att.file);
+    }
+  });
 }
 
 // Tab switching
