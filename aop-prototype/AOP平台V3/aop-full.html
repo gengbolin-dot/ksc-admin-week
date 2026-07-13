@@ -380,18 +380,19 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .proj-h2:empty::before{content:'二级标题';color:var(--t3)}
 .proj-h3{font-size:18px;font-weight:700;color:var(--t1);line-height:1.4;outline:none;padding:4px 0;margin:12px 0 6px 0}
 .proj-h3:empty::before{content:'三级标题';color:var(--t3)}
-/* Editable images - force inline for same-line display */
+/* Editable images - flexible inline for multiple per line */
 .proj-doc-inner img{
   display:inline!important;
-  max-width:300px!important;
-  max-height:200px!important;
+  max-width:calc(25% - 12px)!important;  /* 4 images per line */
+  max-height:180px!important;
   border-radius:8px!important;
   vertical-align:middle!important;
-  margin:2px 8px 2px 0!important;
+  margin:4px 6px 4px 0!important;
   cursor:pointer;
   transition:box-shadow .15s;
   float:none!important;
   clear:none!important;
+  object-fit:cover;
 }
 .proj-doc-inner img:hover{box-shadow:0 0 0 2px var(--ac)}
 /* Force all images inline regardless of parent */
@@ -3334,14 +3335,16 @@ function renderProjDoc(){
 
     // After paste, clean up images to ensure they're inline
     setTimeout(() => {
-      // Force all images to be inline
+      // Force all images to be inline with flexible sizing
       el.querySelectorAll('img').forEach(img => {
         img.style.display = 'inline';
         img.style.verticalAlign = 'middle';
-        img.style.maxWidth = '300px';
-        img.style.maxHeight = '200px';
-        img.style.margin = '2px 8px 2px 0';
+        img.style.maxWidth = 'calc(25% - 12px)';
+        img.style.maxHeight = '180px';
+        img.style.margin = '4px 6px 4px 0';
         img.style.borderRadius = '8px';
+        img.style.float = 'none';
+        img.style.objectFit = 'cover';
       });
 
       // Remove empty paragraphs that only contain images
