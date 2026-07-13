@@ -116,26 +116,93 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 /* Content area */
 .content-scroll{flex:1;overflow-y:auto;overflow-x:auto;background:var(--bg2)}
 
-/* ══════ PANEL 02: MY WORK ══════ */
-.p02-greeting{padding:20px 24px;background:var(--bg);border-bottom:1px solid var(--bdl)}
-.p02-greeting h2{font-size:18px;font-weight:700}
-.p02-greeting p{font-size:12px;color:var(--t3);margin-top:4px}
-.p02-week-nav{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
-.p02-week-btn{padding:5px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr)}
-.p02-week-btn.active{background:var(--acl);border-color:var(--ac);color:var(--ac)}
-.p02-week-btn:hover{background:var(--bgH)}
-.p02-week-range{font-size:12px;color:var(--t2);font-weight:500}
-.p02-section{padding:16px 24px}
-.p02-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.p02-card{background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,.04);cursor:pointer;transition:all var(--tr)}
-.p02-card:hover{box-shadow:var(--sh);border-color:var(--bd)}
-.p02-card-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-.p02-card-name{font-size:14px;font-weight:700;flex:1}
-.p02-card-meta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t3)}
-.p02-card-update{font-size:12.5px;color:var(--t2);line-height:1.6;margin-top:6px}
-.p02-submit-bar{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--bd);padding:12px 24px;display:flex;align-items:center;gap:12px}
-.p02-submit-prog{font-size:12px;color:var(--t2)}
-.p02-submit-btn{padding:8px 20px;border-radius:var(--r);font-size:13px;font-weight:600;background:var(--ac);color:#fff;border:none;cursor:pointer;transition:all var(--tr)}
+/* ══════ PANEL 02: MY WORK (redesigned) ══════ */
+.p02-topbar{display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--bg);border-bottom:1px solid var(--bdl)}
+.p02-breadcrumb{font-size:13px;color:var(--t3)}
+.p02-breadcrumb strong{color:var(--t1);font-weight:600}
+.p02-topbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.p02-icon-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--t2);transition:all var(--tr);position:relative}
+.p02-icon-btn:hover{background:var(--bgH);color:var(--t1)}
+.p02-icon-btn .dot{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:#EF4444}
+.p02-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all var(--tr);white-space:nowrap}
+.p02-btn-ghost{background:var(--bg);border-color:var(--bd);color:var(--t2)}
+.p02-btn-ghost:hover{background:var(--bgH);color:var(--t1)}
+.p02-btn-primary{background:var(--ac);color:#fff}
+.p02-btn-primary:hover{filter:brightness(1.08)}
+
+/* Week period card */
+.p02-period-card{margin:16px 24px;padding:16px 20px;background:var(--bg);border:1px solid var(--bdl);border-radius:12px;display:flex;align-items:center;gap:16px}
+.p02-week-badge{width:44px;height:44px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.p02-period-info{flex:1}
+.p02-period-title{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:2px}
+.p02-period-sub{font-size:12px;color:var(--t3);margin-bottom:8px}
+.p02-progress-row{display:flex;align-items:center;gap:10px}
+.p02-progress-bar{flex:1;height:6px;border-radius:3px;background:var(--bg3);overflow:hidden}
+.p02-progress-fill{height:100%;border-radius:3px;background:var(--suc);transition:width .5s}
+.p02-progress-pct{font-size:12px;font-weight:700;color:var(--suc);min-width:32px}
+.p02-submit-week{margin-left:16px}
+
+/* Tabs */
+.p02-tabs{display:flex;gap:0;padding:0 24px;background:var(--bg);border-bottom:1px solid var(--bdl)}
+.p02-tab{padding:10px 18px;font-size:13px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all var(--tr)}
+.p02-tab:hover{color:var(--t2)}
+.p02-tab.active{color:var(--ac);border-bottom-color:var(--ac);font-weight:600}
+
+/* Filter bar */
+.p02-filter-bar{display:flex;align-items:center;gap:8px;padding:12px 24px;background:var(--bg);border-bottom:1px solid var(--bdl)}
+.p02-filter-chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr)}
+.p02-filter-chip:hover{background:var(--bgH)}
+.p02-filter-chip.active{background:var(--bg3);color:var(--t1);border-color:var(--bd)}
+.p02-filter-chip .count{font-size:11px;color:var(--t3);margin-left:4px}
+.p02-filter-right{margin-left:auto;font-size:12px;color:var(--t3)}
+
+/* Task group */
+.p02-task-group{padding:16px 24px 8px}
+.p02-group-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.p02-group-icon{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px}
+.p02-group-title{font-size:14px;font-weight:700;color:var(--t1)}
+.p02-group-count{font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--bg3);color:var(--t3)}
+.p02-group-desc{font-size:12px;color:var(--t3);margin-left:8px}
+
+/* Task card */
+.p02-task-card{background:var(--bg);border:1px solid var(--bdl);border-radius:10px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all var(--tr);display:flex;align-items:flex-start;gap:12px}
+.p02-task-card:hover{box-shadow:var(--sh);border-color:var(--bd)}
+.p02-task-left{flex:1;min-width:0}
+.p02-task-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.p02-task-type{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0}
+.p02-task-type-project{background:var(--purL);color:var(--pur)}
+.p02-task-type-daily{background:var(--sucL);color:var(--suc)}
+.p02-task-title{font-size:14px;font-weight:700;color:var(--t1)}
+.p02-task-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.p02-task-tag{font-size:10px;font-weight:500;padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px}
+.p02-task-tag-module{background:var(--acl);color:var(--ac)}
+.p02-task-tag-green{background:var(--sucL);color:var(--suc)}
+.p02-task-status{font-size:10px;font-weight:600;padding:3px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:3px}
+.p02-status-progress{background:var(--acl);color:var(--ac);border:1px solid rgba(59,91,219,.2)}
+.p02-status-risk{background:var(--warnL);color:#92400E}
+.p02-status-delayed{background:var(--danL);color:var(--dan)}
+.p02-status-done{background:var(--sucL);color:var(--suc)}
+.p02-task-due{font-size:11px;color:var(--t3);display:flex;align-items:center;gap:4px}
+.p02-task-due.overdue{color:var(--dan)}
+.p02-task-due.today{color:var(--warn)}
+.p02-task-progress{display:flex;align-items:center;gap:8px}
+.p02-task-prog-bar{flex:1;height:5px;border-radius:3px;background:var(--bg3);overflow:hidden;max-width:120px}
+.p02-task-prog-fill{height:100%;border-radius:3px}
+.p02-task-prog-pct{font-size:11px;font-weight:700;min-width:32px}
+.p02-task-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.p02-task-badge{font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;display:flex;align-items:center;gap:4px}
+.p02-badge-warn{background:var(--warnL);color:#92400E}
+.p02-badge-danger{background:var(--danL);color:var(--dan)}
+.p02-badge-success{background:var(--sucL);color:var(--suc)}
+.p02-badge-neutral{background:var(--bg3);color:var(--t3)}
+.p02-task-freq{font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px}
+
+/* Orange left border for daily ops */
+.p02-task-card.daily{border-left:3px solid #F97316}
+.p02-task-card.project{border-left:3px solid var(--pur)}
+
+/* Stats row (reuse existing) */
+.stats-row{display:flex;gap:12px;padding:16px 24px;background:var(--bg);border-bottom:1px solid var(--bdl)}
 .p02-submit-btn:hover{filter:brightness(1.08)}
 
 /* ══════ PANEL 03: ITEM DETAIL SLIDE-OVER ══════ */
@@ -1119,76 +1186,50 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
   </div>
 </div>
 
-<!-- ══════ PANEL 02: MY WORK (duplicate removed) ══════ -->
+<!-- ══════ PANEL 02: MY WORK ══════ -->
 <div class="panel active" id="p02">
-  <div class="topbar">
-    <div class="topbar-title">我的工作</div>
-    <div class="topbar-right">
-      <div class="topbar-search">🔍 搜索事项…</div>
-      <div style="cursor:pointer;color:var(--t3)">🔔</div>
-      <div class="topbar-avatar">耿</div>
+  <!-- Top bar with breadcrumb -->
+  <div class="p02-topbar">
+    <div class="p02-breadcrumb">AOP / <strong>我的工作</strong></div>
+    <div class="p02-topbar-actions">
+      <div class="p02-icon-btn" title="通知"><span>🔔</span><span class="dot"></span></div>
+      <div class="p02-btn p02-btn-ghost">📤 导入事项</div>
+      <div class="p02-btn p02-btn-primary">＋ 新建事项</div>
     </div>
   </div>
-  <div class="p02-greeting">
-    <h2>早上好，耿博琳 👋</h2>
-    <p>本周有 <strong>3</strong> 个事项待更新，<strong>2</strong> 个事项未提交</p>
-    <div class="p02-week-nav">
-      <div class="p02-week-btn active">本周</div>
-      <div class="p02-week-btn">上周</div>
-      <div class="p02-week-btn">近两周</div>
-      <div class="p02-week-btn">本月</div>
-      <div class="p02-week-range">2026.07.06 — 2026.07.12 · W28</div>
-    </div>
-  </div>
-  <div class="stats-row">
-    <div class="stat-card"><div class="stat-num">8</div><div class="stat-label">总事项</div></div>
-    <div class="stat-card" style="border-top:2px solid var(--warn)"><div class="stat-num" style="color:var(--warn)">3</div><div class="stat-label">待更新</div></div>
-    <div class="stat-card" style="border-top:2px solid var(--ac)"><div class="stat-num" style="color:var(--ac)">2</div><div class="stat-label">今日到期</div></div>
-    <div class="stat-card" style="border-top:2px solid var(--dan)"><div class="stat-num" style="color:var(--dan)">0</div><div class="stat-label">已逾期</div></div>
-  </div>
-  <div class="tab-bar">
-    <div class="tab-item active">全部 (8)</div>
-    <div class="tab-item">待更新 (3)</div>
-    <div class="tab-item">已更新 (5)</div>
-    <div class="tab-item">已逾期</div>
-  </div>
-  <div class="content-scroll">
-    <div class="p02-section">
-      <div class="p02-section-title">🏢 专项项目</div>
-      <div class="p02-card" onclick="openSlide(1)">
-        <div class="p02-card-head"><div class="p02-card-name">福利关怀</div><span class="st-badge" style="background:var(--purL);color:var(--pur)"><span class="st-dot" style="background:var(--pur)"></span>专项项目</span></div>
-        <div class="p02-card-meta"><span class="mod-tag" style="background:var(--acl);color:var(--ac)"><span class="mod-dot" style="background:var(--ac)"></span>职场运营(北京)</span> · 耿博琳 · P2 · 🔵进行中 · 80%</div>
-        <div class="p02-card-update">本周完成决赛环节策划方案，已确定7月28日决赛日期和场地</div>
-      </div>
-      <div class="p02-card" onclick="openSlide(2)">
-        <div class="p02-card-head"><div class="p02-card-name">家庭日</div><span class="st-badge" style="background:var(--purL);color:var(--pur)"><span class="st-dot" style="background:var(--pur)"></span>专项项目</span></div>
-        <div class="p02-card-meta"><span class="mod-tag" style="background:#ECFDF5;color:#059669"><span class="mod-dot" style="background:#10B981"></span>文化运营(活动)</span> · 聂茜茜 · P1 · 🔵进行中 · 70%</div>
-        <div class="p02-card-update">场地确认完成，开始发放邀请函，预计参与人数200+</div>
-      </div>
-      <div class="p02-card" onclick="openSlide(5)">
-        <div class="p02-card-head"><div class="p02-card-name">5楼装修改造</div><span class="st-badge" style="background:var(--purL);color:var(--pur)"><span class="st-dot" style="background:var(--pur)"></span>专项项目</span></div>
-        <div class="p02-card-meta"><span class="mod-tag" style="background:var(--acl);color:var(--ac)"><span class="mod-dot" style="background:var(--ac)"></span>职场运营(北京)</span> · 耿博琳 · P2 · 🔵进行中 · 35%</div>
-        <div class="p02-card-update">设计方案已通过审批，开始招标流程</div>
+
+  <!-- Week period card -->
+  <div class="p02-period-card">
+    <div class="p02-week-badge">W28</div>
+    <div class="p02-period-info">
+      <div class="p02-period-title">本周填报期 • 2026年7月6日 – 7月12日</div>
+      <div class="p02-period-sub">截止时间：周四 23:59 • 本周已更新 5 / 8 项</div>
+      <div class="p02-progress-row">
+        <div class="p02-progress-bar"><div class="p02-progress-fill" style="width:63%"></div></div>
+        <div class="p02-progress-pct">63%</div>
       </div>
     </div>
-    <div class="p02-section">
-      <div class="p02-section-title">🔄 日常运营</div>
-      <div class="p02-card" onclick="openSlide(7)">
-        <div class="p02-card-head"><div class="p02-card-name">行政服务台</div><span class="st-badge" style="background:var(--sucL);color:var(--suc)"><span class="st-dot" style="background:var(--suc)"></span>日常运营</span></div>
-        <div class="p02-card-meta"><span class="mod-tag" style="background:#ECFEFF;color:#06B6D4"><span class="mod-dot" style="background:#06B6D4"></span>数字化运营(行政服务台)</span> · 高琳 · P3 · 🔵进行中</div>
-        <div class="p02-card-update">本周工单57，人工19，机器人拦截38，拦截率100%</div>
-      </div>
-      <div class="p02-card" onclick="openSlide(8)">
-        <div class="p02-card-head"><div class="p02-card-name">公益内容运营</div><span class="st-badge" style="background:var(--sucL);color:var(--suc)"><span class="st-dot" style="background:var(--suc)"></span>日常运营</span></div>
-        <div class="p02-card-meta"><span class="mod-tag" style="background:#ECFDF5;color:#059669"><span class="mod-dot" style="background:#10B981"></span>文化运营(活动)</span> · 聂茜茜 · P3 · 🔵进行中</div>
-        <div class="p02-card-update">完成3篇公益推文发布，阅读量合计1.2万</div>
-      </div>
+    <div class="p02-submit-week">
+      <div class="p02-btn p02-btn-primary" onclick="submitWeek()">📤 一键提交本周</div>
     </div>
   </div>
-  <div class="p02-submit-bar">
-    <div class="p02-submit-prog">已更新 5/8 · 已提交 0/8</div>
-    <button class="p02-submit-btn" onclick="submitWeek()">提交本周更新</button>
+
+  <!-- Tabs -->
+  <div class="p02-tabs">
+    <div class="p02-tab active">本周工作</div>
+    <div class="p02-tab">历史周报</div>
   </div>
+
+  <!-- Filter bar -->
+  <div class="p02-filter-bar">
+    <div class="p02-filter-chip active" onclick="filterTasks('all',this)">全部<span class="count">8</span></div>
+    <div class="p02-filter-chip" onclick="filterTasks('project',this)">重点专项<span class="count">5</span></div>
+    <div class="p02-filter-chip" onclick="filterTasks('daily',this)">日常运营<span class="count">3</span></div>
+    <div class="p02-filter-right">已更新 5 / 8</div>
+  </div>
+
+  <!-- Task list -->
+  <div class="content-scroll" id="p02TaskList"></div>
 </div>
 
 <!-- ══════ PANEL 04: ADMIN OVERVIEW ══════ -->
@@ -2312,6 +2353,134 @@ function toggleSidebarSubGroup(el){
   const subGroup = el.parentElement;
   subGroup.classList.toggle('open');
 }
+
+/* ══════ PANEL 02: RENDER ══════ */
+let _p02Filter = 'all';
+
+function renderP02(){
+  const el = document.getElementById('p02TaskList');
+  const projects = ITEMS.filter(i => i.type === 'project');
+  const daily = ITEMS.filter(i => i.type === 'daily-ops');
+
+  let filtered = ITEMS;
+  if(_p02Filter === 'project') filtered = projects;
+  else if(_p02Filter === 'daily') filtered = daily;
+
+  const projFiltered = filtered.filter(i => i.type === 'project');
+  const dailyFiltered = filtered.filter(i => i.type === 'daily-ops');
+
+  let h = '';
+
+  // 重点专项 group
+  if(projFiltered.length > 0){
+    h += `<div class="p02-task-group">
+      <div class="p02-group-header">
+        <div class="p02-group-icon" style="background:var(--purL);color:var(--pur)">◆</div>
+        <div class="p02-group-title">重点专项 ${projFiltered.length}</div>
+        <div class="p02-group-desc">有明确截止日期或完成目标的阶段性项目</div>
+      </div>`;
+
+    projFiltered.forEach(it => {
+      const statusClass = it.status === 'done' ? 'p02-status-done' : it.status === 'in-progress' ? 'p02-status-progress' : 'p02-status-risk';
+      const statusLabel = it.statusLabel || (it.status === 'done' ? '已完成' : it.status === 'in-progress' ? '进行中' : '未开始');
+      const dueStatus = getDueStatus(it);
+      const progColor = it.pct >= 80 ? 'var(--suc)' : it.pct >= 50 ? 'var(--warn)' : 'var(--ac)';
+      const badge = getStatusBadge(it);
+
+      h += `<div class="p02-task-card project" onclick="openSlide(${it.id})">
+        <div class="p02-task-left">
+          <div class="p02-task-header">
+            <span class="p02-task-type p02-task-type-project">专项</span>
+            <div class="p02-task-title">${it.name}</div>
+          </div>
+          <div class="p02-task-meta">
+            <span class="p02-task-tag p02-task-tag-module">${it.module}</span>
+            <span class="p02-task-status ${statusClass}">● ${statusLabel}</span>
+            ${it.deadline ? '<span class="p02-task-due ' + (dueStatus.class || '') + '">📅 ' + it.deadline + (dueStatus.text ? ' · ' + dueStatus.text : '') + '</span>' : ''}
+          </div>
+          ${it.pct >= 0 ? `<div class="p02-task-progress">
+            <div class="p02-task-prog-bar"><div class="p02-task-prog-fill" style="width:${it.pct}%;background:${progColor}"></div></div>
+            <div class="p02-task-prog-pct" style="color:${progColor}">${it.pct}%</div>
+          </div>` : ''}
+        </div>
+        <div class="p02-task-right">
+          ${badge}
+        </div>
+      </div>`;
+    });
+
+    h += `</div>`;
+  }
+
+  // 日常运营 group
+  if(dailyFiltered.length > 0){
+    h += `<div class="p02-task-group">
+      <div class="p02-group-header">
+        <div class="p02-group-icon" style="background:var(--sucL);color:var(--suc)">↻</div>
+        <div class="p02-group-title">日常运营 ${dailyFiltered.length}</div>
+        <div class="p02-group-desc">每周/每月循环执行的常规工作</div>
+      </div>`;
+
+    dailyFiltered.forEach(it => {
+      const updated = it.updated && it.updated !== '—';
+      const badge = updated
+        ? '<div class="p02-task-badge p02-badge-success">✓ 本周已更新</div>'
+        : '<div class="p02-task-badge p02-badge-warn">⚠️ 本周未更新</div>';
+
+      h += `<div class="p02-task-card daily" onclick="openSlide(${it.id})">
+        <div class="p02-task-left">
+          <div class="p02-task-header">
+            <span class="p02-task-type p02-task-type-daily">日常</span>
+            <div class="p02-task-title">${it.name}</div>
+          </div>
+          <div class="p02-task-meta">
+            <span class="p02-task-tag p02-task-tag-module">${it.module}</span>
+            <span class="p02-task-status p02-status-progress">● 进行中</span>
+            <span class="p02-task-freq">⏱ 每周</span>
+          </div>
+        </div>
+        <div class="p02-task-right">
+          ${badge}
+        </div>
+      </div>`;
+    });
+
+    h += `</div>`;
+  }
+
+  el.innerHTML = h;
+}
+
+function getDueStatus(item){
+  if(!item.deadline || item.status === 'done') return {text:'已完成', class:''};
+  // Simulate some statuses for demo
+  if(item.id === 2) return {text:'今日截止', class:'today'};
+  if(item.id === 5) return {text:'逾期3天', class:'overdue'};
+  return {text:'', class:''};
+}
+
+function getStatusBadge(item){
+  if(item.status === 'done') return '<div class="p02-task-badge p02-badge-success">✓ 已归档</div>';
+  if(item.id === 2) return '<div class="p02-task-badge p02-badge-warn">⚠️ 本周未更新</div>';
+  if(item.id === 5) return '<div class="p02-task-badge p02-badge-danger">📌 已逾期</div>';
+  if(item.risk) return '<div class="p02-task-badge p02-badge-warn">⚠️ 风险</div>';
+  return '<div class="p02-task-badge p02-badge-neutral">本周未更新</div>';
+}
+
+function filterTasks(type, el){
+  _p02Filter = type;
+  document.querySelectorAll('.p02-filter-chip').forEach(c => c.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderP02();
+}
+
+// Tab switching
+document.addEventListener('click', function(e){
+  if(e.target.classList.contains('p02-tab')){
+    document.querySelectorAll('.p02-tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+  }
+});
 
 /* ══════ PANEL SWITCH ══════ */
 function switchPanel(id, navEl){
@@ -3499,7 +3668,7 @@ document.addEventListener('click', e => {
 });
 
 /* ══════ INIT ══════ */
-// P02 is already visible as default active panel
+renderP02(); // Render default panel on load
 </script>
 </body>
 </html>
