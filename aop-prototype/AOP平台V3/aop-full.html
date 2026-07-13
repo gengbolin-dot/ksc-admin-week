@@ -365,6 +365,25 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .proj-h2:empty::before{content:'二级标题';color:var(--t3)}
 .proj-h3{font-size:18px;font-weight:700;color:var(--t1);line-height:1.4;outline:none;padding:4px 0;margin:12px 0 6px 0}
 .proj-h3:empty::before{content:'三级标题';color:var(--t3)}
+/* Editable images */
+.proj-text img, .proj-h2 img, .proj-h3 img{
+  max-width:100%;border-radius:8px;margin:8px 0;display:block;cursor:pointer;
+  transition:box-shadow var(--tr);user-select:all;-webkit-user-select:all;
+}
+.proj-text img:hover, .proj-h2 img:hover, .proj-h3 img:hover{
+  box-shadow:0 0 0 2px var(--ac);
+}
+.proj-img-toolbar{
+  position:absolute;top:-36px;left:50%;transform:translateX(-50%);
+  background:var(--bg);border:1px solid var(--bd);border-radius:8px;
+  padding:4px 8px;display:flex;gap:4px;box-shadow:var(--sh);z-index:10;
+}
+.proj-img-toolbar button{
+  width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:12px;border:none;background:none;color:var(--t2);transition:all var(--tr)
+}
+.proj-img-toolbar button:hover{background:var(--bgH);color:var(--t1)}
+.proj-img-toolbar button.danger:hover{background:var(--danL);color:var(--dan)}
 /* Metric cards */
 .proj-metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
 .proj-metric-card{background:var(--bg);border:1px solid var(--bdl);border-radius:10px;padding:16px;text-align:center}
@@ -3011,6 +3030,27 @@ const _projImages = {}; // Store uploaded images per project
 const _projDocBlocks = {}; // Store document blocks per project
 let _currentProjId = null;
 
+// Load saved data from localStorage
+function loadProjDocBlocks(){
+  try {
+    const saved = localStorage.getItem('aop_proj_docs');
+    if(saved){
+      const data = JSON.parse(saved);
+      Object.assign(_projDocBlocks, data);
+    }
+  } catch(e) { console.log('No saved docs found'); }
+}
+
+// Save data to localStorage
+function saveProjDocBlocks(){
+  try {
+    localStorage.setItem('aop_proj_docs', JSON.stringify(_projDocBlocks));
+  } catch(e) { console.log('Failed to save docs'); }
+}
+
+// Initialize on page load
+loadProjDocBlocks();
+
 function openProjDetail(idx){
   const proj = P05_PROJECTS[idx];
   if(!proj) return;
@@ -3191,9 +3231,89 @@ function renderProjDoc(){
       }
     }
   }, true);
+
+  // Image click handler - show toolbar for resize/delete
+  el.addEventListener('click', function(e){
+    // Remove any existing image toolbar
+    document.querySelectorAll('.proj-img-toolbar').forEach(t => t.remove());
+
+    if(e.target.tagName === 'IMG'){
+      e.stopPropagation();
+      const img = e.target;
+
+      // Make image selectable
+      img.style.outline = '2px solid var(--ac)';
+
+      // Create toolbar
+      const toolbar = document.createElement('div');
+      toolbar.className = 'proj-img-toolbar';
+      toolbar.innerHTML = `
+        <button title="放大" onclick="projImgResize(this, 1.2)">🔍+</button>
+        <button title="缩小" onclick="projImgResize(this, 0.8)">🔍-</button>
+        <button title="左对齐" onclick="projImgAlign(this, 'left')">⬅</button>
+        <button title="居中" onclick="projImgAlign(this, 'center')">⬛</button>
+        <button title="右对齐" onclick="projImgAlign(this, 'right')">➡</button>
+        <button class="danger" title="删除" onclick="projImgDelete(this)">🗑</button>
+      `;
+
+      // Position toolbar above image
+      img.style.position = 'relative';
+      img.parentElement.style.position = 'relative';
+      toolbar.style.position = 'absolute';
+      toolbar.style.top = '-36px';
+      toolbar.style.left = '50%';
+      toolbar.style.transform = 'translateX(-50%)';
+      img.parentElement.appendChild(toolbar);
+
+      // Click elsewhere to remove toolbar
+      document.addEventListener('click', function handler(ev){
+        if(!toolbar.contains(ev.target) && ev.target !== img){
+          toolbar.remove();
+          img.style.outline = 'none';
+          document.removeEventListener('click', handler);
+        }
+      });
+    }
+  });
+}
+
+// Image toolbar functions
+function projImgResize(btn, factor){
+  const img = btn.closest('.proj-img-toolbar').parentElement.querySelector('img');
+  if(img){
+    const currentWidth = img.offsetWidth;
+    img.style.width = Math.min(800, Math.max(100, currentWidth * factor)) + 'px';
+  }
+}
+
+function projImgAlign(btn, align){
+  const img = btn.closest('.proj-img-toolbar').parentElement.querySelector('img');
+  if(img){
+    img.style.display = 'block';
+    img.style.margin = align === 'center' ? '8px auto' : align === 'right' ? '8px 0 8px auto' : '8px 0';
+  }
+}
+
+function projImgDelete(btn){
+  const toolbar = btn.closest('.proj-img-toolbar');
+  const img = toolbar.parentElement.querySelector('img');
+  if(img){
+    img.remove();
+    toolbar.remove();
+  }
 }
 
 function closeProjDetail(){
+  // Auto-save before closing
+  if(_currentProjId){
+    document.querySelectorAll('[data-block]').forEach(el => {
+      const blockIdx = parseInt(el.dataset.block);
+      if(_projDocBlocks[_currentProjId] && _projDocBlocks[_currentProjId][blockIdx]){
+        _projDocBlocks[_currentProjId][blockIdx].content = el.innerHTML;
+      }
+    });
+    saveProjDocBlocks();
+  }
   document.getElementById('projOverlay').classList.remove('show');
   document.getElementById('projDetail').classList.remove('show');
   _currentProjId = null;
@@ -3207,6 +3327,18 @@ function projSave(){
       _projDocBlocks[_currentProjId][blockIdx].content = el.innerHTML;
     }
   });
+
+  // Save inline images from contenteditable blocks
+  document.querySelectorAll('.proj-text[contenteditable], .proj-h2[contenteditable], .proj-h3[contenteditable]').forEach(el => {
+    const blockIdx = parseInt(el.dataset.block);
+    if(_projDocBlocks[_currentProjId] && _projDocBlocks[_currentProjId][blockIdx]){
+      _projDocBlocks[_currentProjId][blockIdx].content = el.innerHTML;
+    }
+  });
+
+  // Persist to localStorage
+  saveProjDocBlocks();
+
   // Show save feedback
   const btn = document.querySelector('.proj-toolbar-btn.primary');
   const orig = btn.textContent;
