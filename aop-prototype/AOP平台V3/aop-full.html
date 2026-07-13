@@ -408,6 +408,36 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 }
 .proj-img-row img:hover{box-shadow:0 0 0 2px var(--ac)}
 
+/* Image resize toolbar */
+.img-resize-bar{
+  display:flex;align-items:center;gap:8px;padding:6px 10px;
+  background:var(--bg);border:1px solid var(--bd);border-radius:8px;
+  box-shadow:var(--shL);z-index:20;white-space:nowrap;
+}
+.img-resize-presets{display:flex;gap:2px}
+.img-resize-presets button{
+  width:28px;height:28px;border-radius:6px;font-size:11px;font-weight:600;
+  cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);
+  transition:all var(--tr)
+}
+.img-resize-presets button:hover{background:var(--bgH);color:var(--t1)}
+.img-resize-custom{
+  display:flex;align-items:center;gap:4px;padding:0 4px;
+  border-left:1px solid var(--bdl);border-right:1px solid var(--bdl)
+}
+.img-resize-custom input{
+  width:60px;height:26px;border:1px solid var(--bd);border-radius:4px;
+  padding:0 6px;font-size:12px;text-align:center;outline:none
+}
+.img-resize-custom input:focus{border-color:var(--ac)}
+.img-resize-custom span{font-size:11px;color:var(--t3)}
+.img-resize-view,.img-resize-del{
+  width:28px;height:28px;border-radius:6px;font-size:13px;
+  cursor:pointer;border:none;background:none;color:var(--t3);transition:all var(--tr)
+}
+.img-resize-view:hover{background:var(--acl);color:var(--ac)}
+.img-resize-del:hover{background:var(--danL);color:var(--dan)}
+
 /* ══════ IMAGE LIGHTBOX ══════ */
 .img-lb{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;display:none;align-items:center;justify-content:center;flex-direction:column}
 .img-lb.show{display:flex}
@@ -3401,23 +3431,51 @@ function renderProjDoc(){
     }, 150);
   }, true);
 
-  // ══════ IMAGE CLICK - Open Lightbox ══════
+  // ══════ IMAGE CLICK - Show resize toolbar ══════
   el.addEventListener('click', function(e){
+    // Remove existing toolbars
+    document.querySelectorAll('.img-resize-bar').forEach(b => b.remove());
+    el.querySelectorAll('img').forEach(i => i.style.outline = 'none');
+
     if(e.target.tagName === 'IMG'){
       e.preventDefault();
       e.stopPropagation();
+      const img = e.target;
+      img.style.outline = '2px solid var(--ac)';
 
-      // Get all images in the editor
-      const allImgs = Array.from(el.querySelectorAll('img'));
-      const idx = allImgs.indexOf(e.target);
+      // Create resize toolbar
+      const bar = document.createElement('div');
+      bar.className = 'img-resize-bar';
+      bar.innerHTML = `
+        <div class="img-resize-presets">
+          <button onclick="imgResize(this,'100px')" title="小图">S</button>
+          <button onclick="imgResize(this,'200px')" title="中图">M</button>
+          <button onclick="imgResize(this,'350px')" title="大图">L</button>
+          <button onclick="imgResize(this,'100%')" title="全宽">XL</button>
+        </div>
+        <div class="img-resize-custom">
+          <input type="number" min="50" max="800" placeholder="宽度px" onchange="imgResize(this, this.value+'px')">
+          <span>px</span>
+        </div>
+        <button class="img-resize-view" onclick="imgView(this)" title="查看大图">🔍</button>
+        <button class="img-resize-del" onclick="imgDel(this)" title="删除">🗑</button>
+      `;
 
-      // Open lightbox
-      _imgGallery = allImgs.map(i => i.src);
-      _imgIdx = idx >= 0 ? idx : 0;
+      img.parentElement.style.position = 'relative';
+      bar.style.position = 'absolute';
+      bar.style.bottom = '-40px';
+      bar.style.left = '50%';
+      bar.style.transform = 'translateX(-50%)';
+      img.parentElement.appendChild(bar);
 
-      document.getElementById('imgLbImg').src = e.target.src;
-      document.getElementById('imgLightbox').classList.add('show');
-      updateImgCounter();
+      // Click elsewhere to close
+      document.addEventListener('click', function handler(ev){
+        if(!bar.contains(ev.target) && ev.target !== img){
+          bar.remove();
+          img.style.outline = 'none';
+          document.removeEventListener('click', handler);
+        }
+      });
     }
   });
 }
@@ -3426,7 +3484,6 @@ function renderProjDoc(){
 function projImgCut(btn){
   const img = btn.closest('.proj-img-toolbar').parentElement.querySelector('img');
   if(img){
-    // Copy to clipboard and remove
     const range = document.createRange();
     range.selectNode(img);
     const sel = window.getSelection();
@@ -3435,6 +3492,56 @@ function projImgCut(btn){
     document.execCommand('cut');
     btn.closest('.proj-img-toolbar').remove();
   }
+}
+
+// Image resize functions
+function imgResize(btn, size){
+  const bar = btn.closest('.img-resize-bar');
+  const img = bar.parentElement.querySelector('img');
+  if(!img) return;
+
+  if(size === '100%'){
+    img.style.width = '100%';
+    img.style.maxWidth = '100%';
+    img.style.height = 'auto';
+    // If in a flex row, make it full width
+    const row = img.closest('.proj-img-row');
+    if(row){
+      row.style.flexWrap = 'wrap';
+    }
+  } else {
+    img.style.width = size;
+    img.style.maxWidth = '100%';
+    img.style.height = 'auto';
+  }
+  bar.remove();
+  img.style.outline = 'none';
+}
+
+function imgView(btn){
+  const bar = btn.closest('.img-resize-bar');
+  const img = bar.parentElement.querySelector('img');
+  if(!img) return;
+
+  // Collect all images for gallery navigation
+  const editor = document.getElementById('projDocContent');
+  const allImgs = Array.from(editor.querySelectorAll('img'));
+  _imgGallery = allImgs.map(i => i.src);
+  _imgIdx = allImgs.indexOf(img);
+
+  document.getElementById('imgLbImg').src = img.src;
+  document.getElementById('imgLightbox').classList.add('show');
+  updateImgCounter();
+
+  bar.remove();
+  img.style.outline = 'none';
+}
+
+function imgDel(btn){
+  const bar = btn.closest('.img-resize-bar');
+  const img = bar.parentElement.querySelector('img');
+  if(img) img.remove();
+  bar.remove();
 }
 
 // Clean paste HTML - preserve text and images, remove scripts
