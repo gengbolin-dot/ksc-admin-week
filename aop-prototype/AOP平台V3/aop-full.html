@@ -380,23 +380,30 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .proj-h2:empty::before{content:'二级标题';color:var(--t3)}
 .proj-h3{font-size:18px;font-weight:700;color:var(--t1);line-height:1.4;outline:none;padding:4px 0;margin:12px 0 6px 0}
 .proj-h3:empty::before{content:'三级标题';color:var(--t3)}
-/* Editable images - truly inline like Feishu/WPS */
+/* Editable images - force inline for same-line display */
 .proj-doc-inner img{
-  max-width:calc(100% - 16px);max-height:280px;border-radius:8px;
-  margin:2px 8px 2px 0;vertical-align:middle;
-  display:inline!important;cursor:pointer;transition:box-shadow .15s;
+  display:inline!important;
+  max-width:300px!important;
+  max-height:200px!important;
+  border-radius:8px!important;
+  vertical-align:middle!important;
+  margin:2px 8px 2px 0!important;
+  cursor:pointer;
+  transition:box-shadow .15s;
+  float:none!important;
+  clear:none!important;
 }
 .proj-doc-inner img:hover{box-shadow:0 0 0 2px var(--ac)}
-/* Force images inline even inside p/div wrappers */
-.proj-doc-inner p > img, .proj-doc-inner div > img{
-  display:inline!important;vertical-align:middle!important;margin:2px 8px 2px 0!important;
+/* Force all images inline regardless of parent */
+.proj-doc-inner * img{
+  display:inline!important;
+  float:none!important;
 }
-/* Image-only paragraphs should collapse */
-.proj-doc-inner p{margin:4px 0;line-height:1.8}
-/* Text blocks */
-.proj-doc-inner .proj-text{margin:4px 0;line-height:1.8}
-.proj-doc-inner .proj-h2{margin:16px 0 8px}
-.proj-doc-inner .proj-h3{margin:12px 0 6px}
+/* Make sure paragraphs don't force line breaks around images */
+.proj-doc-inner p{margin:4px 0;line-height:1.8;display:block}
+/* Remove any forced line breaks */
+.proj-doc-inner br + img{margin-left:0}
+.proj-doc-inner img + br{display:none}
 .proj-img-toolbar{
   position:absolute;top:-36px;left:50%;transform:translateX(-50%);
   background:var(--bg);border:1px solid var(--bd);border-radius:8px;
@@ -3319,41 +3326,38 @@ function renderProjDoc(){
     saveProjDocBlocks();
   }, true);
 
-  // ══════ PASTE HANDLER (WPS/Feishu compatible) ══════
+  // ══════ PASTE HANDLER - Let browser handle naturally ══════
   el.addEventListener('paste', function(e){
-    const clipboardData = e.clipboardData || e.originalEvent.clipboardData;
-    const html = clipboardData.getData('text/html');
-    const plainText = clipboardData.getData('text/plain');
+    // Let the browser handle paste naturally
+    // Don't preventDefault - this allows native HTML paste
+    // CSS will force images to be inline
 
-    // Check if clipboard has HTML content (from WPS/Feishu)
-    if(html && html.length > 0){
-      // Parse the HTML to extract text and images
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const imgs = doc.querySelectorAll('img');
+    // After paste, clean up images to ensure they're inline
+    setTimeout(() => {
+      // Force all images to be inline
+      el.querySelectorAll('img').forEach(img => {
+        img.style.display = 'inline';
+        img.style.verticalAlign = 'middle';
+        img.style.maxWidth = '300px';
+        img.style.maxHeight = '200px';
+        img.style.margin = '2px 8px 2px 0';
+        img.style.borderRadius = '8px';
+      });
 
-      if(imgs.length > 0){
-        // Has images - insert as HTML to preserve text+image structure
-        e.preventDefault();
-
-        // Clean up the HTML - remove scripts, styles, and unwanted attributes
-        const cleanedHtml = cleanPasteHtml(html);
-
-        // Insert at cursor position
-        document.execCommand('insertHTML', false, cleanedHtml);
-
-        // Make all pasted images draggable
-        setTimeout(() => {
-          el.querySelectorAll('img').forEach(img => {
-            if(!img.hasAttribute('draggable')){
-              img.setAttribute('draggable', 'true');
-            }
-          });
-        }, 100);
-      }
-      // If no images in HTML, let default paste handle it (text only)
-    }
-    // If only plain text, let default paste handle it
+      // Remove empty paragraphs that only contain images
+      el.querySelectorAll('p').forEach(p => {
+        const imgs = p.querySelectorAll('img');
+        const text = p.textContent.trim();
+        if(imgs.length > 0 && text === ''){
+          // This p only has images - unwrap it
+          const parent = p.parentNode;
+          while(p.firstChild){
+            parent.insertBefore(p.firstChild, p);
+          }
+          parent.removeChild(p);
+        }
+      });
+    }, 50);
   }, true);
 
   // ══════ IMAGE INTERACTION (click to select, cut/paste to move) ══════
