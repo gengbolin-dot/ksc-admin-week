@@ -380,10 +380,11 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .proj-h2:empty::before{content:'二级标题';color:var(--t3)}
 .proj-h3{font-size:18px;font-weight:700;color:var(--t1);line-height:1.4;outline:none;padding:4px 0;margin:12px 0 6px 0}
 .proj-h3:empty::before{content:'三级标题';color:var(--t3)}
-/* Editable images - auto-size based on line content */
+/* Editable images - auto-size, keep aspect ratio */
 .proj-doc-inner img{
   display:inline!important;
   max-height:280px!important;
+  width:auto!important;
   border-radius:8px!important;
   vertical-align:middle!important;
   margin:4px 8px 4px 0!important;
@@ -3353,9 +3354,9 @@ function renderProjDoc(){
         }
       });
 
-      // Style images - let them auto-size naturally
+      // Style images - auto-size, keep aspect ratio
       el.querySelectorAll('img').forEach(img => {
-        img.style.cssText = 'display:inline!important;max-height:280px;border-radius:8px;vertical-align:middle;margin:4px 8px 4px 0;cursor:pointer;float:none!important;';
+        img.style.cssText = 'display:inline!important;max-height:280px;width:auto;border-radius:8px;vertical-align:middle;margin:4px 8px 4px 0;cursor:pointer;float:none!important;';
       });
     }, 100);
   }, true);
