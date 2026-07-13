@@ -3121,6 +3121,76 @@ function renderProjDoc(){
       }
     }
   }, true);
+
+  // Paste handler for images (supports WPS/Feishu clipboard)
+  el.addEventListener('paste', function(e){
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    let hasImage = false;
+
+    for(let i = 0; i < items.length; i++){
+      if(items[i].type.indexOf('image') !== -1){
+        hasImage = true;
+        e.preventDefault();
+
+        const blob = items[i].getAsFile();
+        const reader = new FileReader();
+        reader.onload = function(ev){
+          const imgUrl = ev.target.result;
+
+          // Find or create gallery block
+          let galleryBlock = _projDocBlocks[_currentProjId]?.find(b => b.type === 'gallery');
+          if(!galleryBlock){
+            galleryBlock = {type:'gallery', data: []};
+            _projDocBlocks[_currentProjId].push(galleryBlock);
+          }
+          galleryBlock.data.push(imgUrl);
+
+          // Also insert inline into the current text block
+          const sel = window.getSelection();
+          if(sel.rangeCount > 0){
+            const range = sel.getRangeAt(0);
+            const img = document.createElement('img');
+            img.src = imgUrl;
+            img.style.cssText = 'max-width:100%;border-radius:8px;margin:8px 0;display:block';
+            range.deleteContents();
+            range.insertNode(img);
+            range.collapse(false);
+          }
+
+          // Update gallery display
+          renderProjDoc();
+        };
+        reader.readAsDataURL(blob);
+        break;
+      }
+    }
+
+    // If no image but has HTML content (from WPS/Feishu rich text)
+    if(!hasImage){
+      const html = e.clipboardData.getData('text/html');
+      if(html && (html.includes('img') || html.includes('base64'))){
+        // Extract images from HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const imgs = doc.querySelectorAll('img');
+
+        if(imgs.length > 0){
+          e.preventDefault();
+          const sel = window.getSelection();
+          if(sel.rangeCount > 0){
+            const range = sel.getRangeAt(0);
+            imgs.forEach(img => {
+              const newImg = document.createElement('img');
+              newImg.src = img.src;
+              newImg.style.cssText = 'max-width:100%;border-radius:8px;margin:8px 0;display:block';
+              range.insertNode(newImg);
+              range.collapse(false);
+            });
+          }
+        }
+      }
+    }
+  }, true);
 }
 
 function closeProjDetail(){
