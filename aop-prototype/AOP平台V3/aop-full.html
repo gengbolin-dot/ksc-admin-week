@@ -1316,14 +1316,41 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
       <button class="btn btn-ghost" style="font-size:12px">📤 导出</button>
     </div>
   </div>
-  <div class="stats-row">
-    <div class="stat-card" style="border-top:2px solid var(--ac)"><div class="stat-num">40</div><div class="stat-label">总事项</div></div>
-    <div class="stat-card" style="border-top:2px solid var(--ac)"><div class="stat-num" style="color:var(--ac)">28</div><div class="stat-label">进行中</div></div>
-    <div class="stat-card" style="border-top:2px solid var(--suc)"><div class="stat-num" style="color:var(--suc)">9</div><div class="stat-label">已完成</div></div>
-    <div class="stat-card" style="border-top:2px solid var(--warn)"><div class="stat-num" style="color:var(--warn)">3</div><div class="stat-label">需协调</div></div>
+  <div class="p04-mod-tabs">
+    <div class="p04-mod-group">
+      <div class="p04-mod-header">🏢 职场运营</div>
+      <div class="p04-mod-pills">
+        <div class="p04-pill active" onclick="selMod(this)"><div class="p04-pill-dot" style="background:#3B5BDB"></div>北京职场<div class="p04-pill-owner">张灵玉</div></div>
+        <div class="p04-pill" onclick="selMod(this)"><div class="p04-pill-dot" style="background:#8B5CF6"></div>武汉职场<div class="p04-pill-owner">程宇亮/董诗昀</div></div>
+        <div class="p04-pill" onclick="selMod(this)"><div class="p04-pill-dot" style="background:#EC4899"></div>异地职场<div class="p04-pill-owner">傅中南</div></div>
+      </div>
+    </div>
+    <div class="p04-mod-group">
+      <div class="p04-mod-header">🎉 文化运营</div>
+      <div class="p04-mod-pills">
+        <div class="p04-pill" onclick="selMod(this)"><div class="p04-pill-dot" style="background:#10B981"></div>活动运营<div class="p04-pill-owner">聂茜茜</div></div>
+        <div class="p04-pill" onclick="selMod(this)"><div class="p04-pill-dot" style="background:#F59E0B"></div>员工福利<div class="p04-pill-owner">高琳</div></div>
+      </div>
+    </div>
+    <div class="p04-mod-group">
+      <div class="p04-mod-header">💻 数字化运营</div>
+      <div class="p04-mod-pills">
+        <div class="p04-pill" onclick="selMod(this)"><div class="p04-pill-dot" style="background:#06B6D4"></div>行政服务台<div class="p04-pill-owner">高琳</div></div>
+        <div class="p04-pill" onclick="selMod(this)"><div class="p04-pill-dot" style="background:#6366F1"></div>数字化后台运营<div class="p04-pill-owner">丁玉萍</div></div>
+      </div>
+    </div>
+    <div class="p04-view-toggle">
+      <div class="p04-vt-btn active" onclick="toggleViewP06('list')">列表</div>
+      <div class="p04-vt-btn" onclick="toggleViewP06('kanban')">看板</div>
+    </div>
   </div>
-  <div class="content-scroll">
-    <div class="p06-grid" id="p06Grid"></div>
+  <div class="content-scroll" id="p06Content">
+    <div id="p06ListView" style="padding:16px 24px">
+      <table class="p04-table" id="p06Table"></table>
+    </div>
+    <div id="p06KanbanView" style="display:none">
+      <div class="p04-kanban" id="p06Kanban"></div>
+    </div>
   </div>
 </div>
 
@@ -2729,42 +2756,41 @@ function p05View(v){
 
 /* ══════ P06: OPS DASHBOARD ══════ */
 function renderP06(){
-  let h='';
-  // Module distribution (stacked bar)
-  h+='<div class="p06-card full"><h3>📊 模块分布</h3>';
-  const mods=[{name:'职场运营(北京)',c:'#3B5BDB',n:8},{name:'职场运营(武汉)',c:'#8B5CF6',n:6},{name:'职场运营(异地)',c:'#EC4899',n:4},{name:'文化运营(活动)',c:'#10B981',n:5},{name:'文化运营(福利)',c:'#F59E0B',n:3},{name:'数字化运营(服务台)',c:'#06B6D4',n:5},{name:'数字化运营(后台)',c:'#6366F1',n:9}];
-  const total=mods.reduce((s,m)=>s+m.n,0);
-  mods.forEach(m=>{
-    h+='<div class="p06-bar-row"><div class="p06-bar-label">'+m.name+'</div><div class="p06-bar-track"><div class="stacked-bar" style="width:100%">';
-    const p=Math.round(m.n/total*100);
-    h+='<div class="stacked-seg" style="width:'+p+'%;background:'+m.c+';opacity:.8"></div>';
-    h+='</div></div><div style="font-size:11px;font-weight:600;width:24px;text-align:right;color:var(--t3)">'+m.n+'</div></div>';
+  // TABLE VIEW
+  let h = '<thead><tr><th>事项名称</th><th>类型</th><th>负责人</th><th>状态</th><th>完成度</th><th>更新时间</th></tr></thead><tbody>';
+  ITEMS.forEach(it => {
+    const pctColor = it.pct >= 100 ? 'var(--suc)' : it.pct > 0 ? 'var(--ac)' : 'var(--t3)';
+    h += '<tr onclick="openSlide('+it.id+')" style="cursor:pointer">';
+    h += '<td style="font-weight:600">'+it.name+'</td>';
+    h += '<td><span class="st-badge" style="background:'+(it.type==='project'?'var(--purL)':'var(--sucL)')+';color:'+(it.type==='project'?'var(--pur)':'var(--suc)')+'"><span class="st-dot" style="background:'+(it.type==='project'?'var(--pur)':'var(--suc)')+'"></span>'+(it.type==='project'?'专项项目':'日常运营')+'</span></td>';
+    h += '<td><div style="display:flex;align-items:center;gap:6px"><div class="sb-av" style="width:22px;height:22px;font-size:9px;background:'+it.ownerColor+'">'+it.owner[0]+'</div>'+it.owner+'</div></td>';
+    h += '<td><span class="st-badge" style="background:'+stBg(it.status)+';color:'+stFg(it.status)+'"><span class="st-dot" style="background:'+stFg(it.status)+'"></span>'+it.statusLabel+'</span></td>';
+    h += '<td>'+(it.pct>=0?'<div class="p04-prog-bar"><div class="p04-prog-fill" style="width:'+it.pct+'%;background:'+pctColor+'"></div></div><span style="font-size:11px;font-weight:600;margin-left:6px;color:'+pctColor+'">'+it.pct+'%</span>':'—')+'</td>';
+    h += '<td style="color:var(--t3);font-size:12px">'+it.updated+'</td>';
+    h += '</tr>';
   });
-  h+='</div>';
-  // Owner workload
-  h+='<div class="p06-card"><h3>👤 负责人工作量 TOP 10</h3>';
-  const ranks=[{n:'丁玉萍',v:9},{n:'耿博琳',v:8},{n:'张灵玉',v:7},{n:'高琳',v:6},{n:'聂茜茜',v:5},{n:'程宇亮',v:3},{n:'傅中南',v:3},{n:'董诗昀',v:2},{n:'胡丽婷',v:2},{n:'王刚',v:1}];
-  const maxV=ranks[0].v;
-  ranks.forEach((r,i)=>{
-    const bg=i<3?'var(--ac)':i<6?'var(--pur)':'var(--warn)';
-    h+='<div class="p06-bar-row"><div class="p06-bar-label">'+r.n+'</div><div class="p06-bar-track" style="background:var(--bdl)"><div style="height:100%;border-radius:4px;width:'+r.v/maxV*100+'%;background:'+bg+';transition:width .5s"></div></div><div style="font-size:11px;font-weight:600;width:24px;text-align:right">'+r.v+'</div></div>';
+  h += '</tbody>';
+  document.getElementById('p06Table').innerHTML = h;
+
+  // KANBAN VIEW
+  const cols = [{label:'未开始',key:'not-started'},{label:'进行中',key:'in-progress'},{label:'已完成',key:'done'}];
+  let kh = '';
+  cols.forEach(c => {
+    const its = ITEMS.filter(i => i.status === c.key);
+    kh += '<div class="p04-kanban-col"><div class="p04-kanban-header">'+c.label+'<div class="p04-kanban-count">'+its.length+'</div></div>';
+    its.forEach(it => {
+      kh += '<div class="p04-kanban-card" onclick="openSlide('+it.id+')"><div style="font-weight:600;font-size:12.5px;margin-bottom:4px">'+it.name+'</div><div style="display:flex;align-items:center;gap:6px"><span class="mod-tag" style="background:'+it.modBg+';color:'+it.modColor+';font-size:9px"><span class="mod-dot" style="background:'+it.modColor+'"></span>'+it.module+'</span></div><div style="display:flex;align-items:center;gap:6px;margin-top:4px;font-size:11px;color:var(--t3)"><div class="sb-av" style="width:18px;height:18px;font-size:8px;background:'+it.ownerColor+'">'+it.owner[0]+'</div>'+it.owner+(it.pct>=0?' · '+it.pct+'%':'')+'</div></div>';
+    });
+    kh += '</div>';
   });
-  h+='</div>';
-  // Status donut
-  h+='<div class="p06-card"><h3>📈 状态分布</h3><div class="p06-donut-wrap"><div class="p06-donut" style="background:conic-gradient(var(--ac) 0% 70%,var(--suc) 70% 92.5%,var(--t3) 92.5% 100%)"><div class="p06-donut-center"><div class="big">40</div><div class="small">总事项</div></div></div><div class="p06-legend"><div class="p06-legend-item"><div class="p06-legend-dot" style="background:var(--ac)"></div>进行中 <div class="p06-legend-val">28</div></div><div class="p06-legend-item"><div class="p06-legend-dot" style="background:var(--suc)"></div>已完成 <div class="p06-legend-val">9</div></div><div class="p06-legend-item"><div class="p06-legend-dot" style="background:var(--t3)"></div>未开始 <div class="p06-legend-val">3</div></div></div></div></div>';
-  // Recent updates
-  h+='<div class="p06-card"><h3>🕐 最近更新</h3>';
-  [{n:'高琳',t:'2分钟前',m:'行政服务台 — 更新工单数据',c:'#764ba2'},{n:'耿博琳',t:'15分钟前',m:'5楼装修 — 招标进行中',c:'#667eea'},{n:'聂茜茜',t:'1小时前',m:'家庭日 — 邀请函发放',c:'#f093fb'},{n:'张灵玉',t:'2小时前',m:'酒店协议 — 条款确认',c:'#4facfe'},{n:'丁玉萍',t:'3小时前',m:'体检项目 — 供应商对接',c:'#fbc2eb'}].forEach(u=>{
-    h+='<div class="p06-list-item"><div class="p06-list-av" style="background:'+u.c+'">'+u.n[0]+'</div><div><div class="p06-list-name">'+u.n+'</div><div class="p06-list-time">'+u.t+'</div></div><div style="font-size:11.5px;color:var(--t2);flex:1;text-align:right">'+u.m+'</div></div>';
-  });
-  h+='</div>';
-  // Needs coordination
-  h+='<div class="p06-card"><h3>⚠️ 需协调</h3>';
-  [{name:'深圳职场装修 — 采购审批',desc:'需行政部审批装修采购清单，涉及预算12万',tags:[{t:'职场运营(异地)',bg:'#EC4899',fg:'#EC4899'},{t:'数字化运营(后台)',bg:'#6366F1',fg:'#6366F1'}]},{name:'兰州办公区续租 — 预算审批',desc:'兰州办公区租期到期，需审批续租预算',tags:[{t:'职场运营(异地)',bg:'#EC4899',fg:'#EC4899'}]},{name:'武汉空调改造 — 审批流程',desc:'武汉空调改造方案需物业部和行政部联合审批',tags:[{t:'职场运营(武汉)',bg:'#8B5CF6',fg:'#8B5CF6'}]}].forEach(c=>{
-    h+='<div class="p06-coord-card"><div class="p06-coord-tags">'+c.tags.map(t=>'<div class="p06-coord-tag" style="background:'+t.bg+'18;color:'+t.fg+'">'+t.t+'</div>').join('')+'</div><div class="p06-coord-name">'+c.name+'</div><div class="p06-coord-desc">'+c.desc+'</div></div>';
-  });
-  h+='</div>';
-  document.getElementById('p06Grid').innerHTML=h;
+  document.getElementById('p06Kanban').innerHTML = kh;
+}
+
+function toggleViewP06(v){
+  document.querySelectorAll('.p04-vt-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.p04-vt-btn[onclick*="'+v+'"]').classList.add('active');
+  document.getElementById('p06ListView').style.display = v==='list' ? '' : 'none';
+  document.getElementById('p06KanbanView').style.display = v==='kanban' ? '' : 'none';
 }
 
 /* ══════ P07: WEEKLY MEETING ══════ */
