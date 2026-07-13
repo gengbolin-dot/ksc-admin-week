@@ -380,15 +380,14 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .proj-h2:empty::before{content:'二级标题';color:var(--t3)}
 .proj-h3{font-size:18px;font-weight:700;color:var(--t1);line-height:1.4;outline:none;padding:4px 0;margin:12px 0 6px 0}
 .proj-h3:empty::before{content:'三级标题';color:var(--t3)}
-/* Editable images - inline and draggable */
+/* Editable images - truly inline like Feishu/WPS */
 .proj-doc img{
-  max-width:100%;max-height:300px;border-radius:8px;
-  margin:4px 8px 4px 0;cursor:grab;vertical-align:middle;
-  display:inline-block;transition:box-shadow .15s;
+  max-width:calc(100% - 16px);max-height:280px;border-radius:8px;
+  margin:0 8px 0 0;vertical-align:middle;
+  display:inline;cursor:pointer;transition:box-shadow .15s;
 }
 .proj-doc img:hover{box-shadow:0 0 0 2px var(--ac)}
-.proj-doc img.dragging{opacity:.4;cursor:grabbing}
-.proj-doc img.drop-target{box-shadow:0 0 0 3px var(--ac);border-radius:8px}
+.proj-doc img.dragging{opacity:.4}
 .proj-img-toolbar{
   position:absolute;top:-36px;left:50%;transform:translateX(-50%);
   background:var(--bg);border:1px solid var(--bd);border-radius:8px;
@@ -3348,98 +3347,21 @@ function renderProjDoc(){
     // If only plain text, let default paste handle it
   }, true);
 
-  // ══════ IMAGE DRAG & DROP ══════
-  let draggedImg = null;
-  let dragPlaceholder = null;
-
-  el.addEventListener('dragstart', function(e){
-    if(e.target.tagName === 'IMG'){
-      draggedImg = e.target;
-      e.target.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', ''); // Required for Firefox
-
-      // Create placeholder
-      dragPlaceholder = document.createElement('span');
-      dragPlaceholder.style.cssText = 'display:inline-block;width:4px;height:20px;background:var(--ac);margin:0 4px;animation:blink 1s infinite';
-      dragPlaceholder.id = 'drag-placeholder';
-    }
-  });
-
-  el.addEventListener('dragend', function(e){
-    if(e.target.tagName === 'IMG'){
-      e.target.classList.remove('dragging');
-      if(dragPlaceholder && dragPlaceholder.parentNode){
-        dragPlaceholder.parentNode.removeChild(dragPlaceholder);
-      }
-      draggedImg = null;
-      dragPlaceholder = null;
-      // Remove all drop targets
-      el.querySelectorAll('.drop-target').forEach(t => t.classList.remove('drop-target'));
-    }
-  });
-
-  el.addEventListener('dragover', function(e){
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-
-    if(!draggedImg) return;
-
-    // Find closest text/image element to cursor
-    const target = document.elementFromPoint(e.clientX, e.clientY);
-    if(!target) return;
-
-    // Remove previous drop targets
-    el.querySelectorAll('.drop-target').forEach(t => t.classList.remove('drop-target'));
-
-    // If hovering over text content, show insertion point
-    if(target.contentEditable === 'true' || target.closest('[contenteditable="true"]')){
-      const range = document.caretRangeFromPoint(e.clientX, e.clientY);
-      if(range){
-        // Remove old placeholder
-        if(dragPlaceholder && dragPlaceholder.parentNode){
-          dragPlaceholder.parentNode.removeChild(dragPlaceholder);
-        }
-        range.insertNode(dragPlaceholder);
-        range.collapse(false);
-      }
-    }
-  });
-
-  el.addEventListener('drop', function(e){
-    e.preventDefault();
-    if(!draggedImg) return;
-
-    // Remove placeholder
-    if(dragPlaceholder && dragPlaceholder.parentNode){
-      dragPlaceholder.parentNode.removeChild(dragPlaceholder);
-    }
-
-    // Insert image at drop position
-    const range = document.caretRangeFromPoint(e.clientX, e.clientY);
-    if(range){
-      range.insertNode(draggedImg);
-      range.collapse(false);
-    }
-
-    draggedImg.classList.remove('dragging');
-    draggedImg = null;
-  });
-
-  // ══════ IMAGE CLICK HANDLER ══════
+  // ══════ IMAGE INTERACTION (click to select, cut/paste to move) ══════
   el.addEventListener('click', function(e){
     document.querySelectorAll('.proj-img-toolbar').forEach(t => t.remove());
+    el.querySelectorAll('img').forEach(i => i.style.outline = 'none');
 
     if(e.target.tagName === 'IMG'){
       e.stopPropagation();
       const img = e.target;
       img.style.outline = '2px solid var(--ac)';
 
+      // Create floating toolbar
       const toolbar = document.createElement('div');
       toolbar.className = 'proj-img-toolbar';
       toolbar.innerHTML = `
-        <button title="放大" onclick="projImgResize(this, 1.2)">🔍+</button>
-        <button title="缩小" onclick="projImgResize(this, 0.8)">🔍-</button>
+        <button title="剪切(然后粘贴到目标位置)" onclick="projImgCut(this)">✂️ 剪切</button>
         <button title="左对齐" onclick="projImgAlign(this, 'left')">⬅</button>
         <button title="居中" onclick="projImgAlign(this, 'center')">⬛</button>
         <button title="右对齐" onclick="projImgAlign(this, 'right')">➡</button>
@@ -3453,6 +3375,7 @@ function renderProjDoc(){
       toolbar.style.transform = 'translateX(-50%)';
       img.parentElement.appendChild(toolbar);
 
+      // Click elsewhere to deselect
       document.addEventListener('click', function handler(ev){
         if(!toolbar.contains(ev.target) && ev.target !== img){
           toolbar.remove();
@@ -3462,6 +3385,21 @@ function renderProjDoc(){
       });
     }
   });
+}
+
+// Image toolbar functions
+function projImgCut(btn){
+  const img = btn.closest('.proj-img-toolbar').parentElement.querySelector('img');
+  if(img){
+    // Copy to clipboard and remove
+    const range = document.createRange();
+    range.selectNode(img);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand('cut');
+    btn.closest('.proj-img-toolbar').remove();
+  }
 }
 
 // Clean paste HTML - preserve text and images, remove scripts
@@ -3477,17 +3415,32 @@ function cleanPasteHtml(html){
 
   // Remove class attributes but keep essential formatting
   body = body.replace(/\sclass="[^"]*"/g, '');
-  body = body.replace(/\sstyle="[^"]*"/g, '');
 
-  // Ensure images are inline
+  // Remove complex inline styles but keep basic ones
+  body = body.replace(/\sstyle="[^"]*"/g, function(match){
+    // Keep only color, font-size, font-weight, text-align
+    const keep = match.match(/(color|font-size|font-weight|text-align):[^;]+/g);
+    return keep ? ' style="' + keep.join(';') + '"' : '';
+  });
+
+  // Ensure images are truly inline - wrap in span if needed
   body = body.replace(/<img([^>]*)>/g, function(match, attrs){
-    // Keep src and alt, add inline style
     const srcMatch = attrs.match(/src="([^"]*)"/);
     const altMatch = attrs.match(/alt="([^"]*)"/);
     const src = srcMatch ? srcMatch[1] : '';
     const alt = altMatch ? altMatch[1] : '';
-    return `<img src="${src}" alt="${alt}" style="max-width:100%;max-height:300px;border-radius:8px;display:inline-block;vertical-align:middle;margin:4px 8px 4px 0" draggable="true">`;
+    // Return inline image that flows with text
+    return `<img src="${src}" alt="${alt}" style="display:inline;max-width:100%;max-height:280px;border-radius:8px;vertical-align:middle;margin:0 8px 0 0">`;
   });
+
+  // Remove empty paragraphs and divs
+  body = body.replace(/<p[^>]*>\s*<\/p>/g, '');
+  body = body.replace(/<div[^>]*>\s*<\/div>/g, '');
+
+  // Ensure content is wrapped in a block element
+  if(!body.match(/^<(p|div|h[1-6]|ul|ol)/)){
+    body = '<p>' + body + '</p>';
+  }
 
   return body;
 }
@@ -3560,32 +3513,6 @@ function projAddTimeline(blockIdx){
     block.data.push({title: '新里程碑', date: '待定', status: 'pending'});
     saveProjDocBlocks();
     renderProjDoc();
-  }
-}
-
-// Image toolbar functions
-function projImgResize(btn, factor){
-  const img = btn.closest('.proj-img-toolbar').parentElement.querySelector('img');
-  if(img){
-    const currentWidth = img.offsetWidth;
-    img.style.width = Math.min(800, Math.max(100, currentWidth * factor)) + 'px';
-  }
-}
-
-function projImgAlign(btn, align){
-  const img = btn.closest('.proj-img-toolbar').parentElement.querySelector('img');
-  if(img){
-    img.style.display = 'block';
-    img.style.margin = align === 'center' ? '8px auto' : align === 'right' ? '8px 0 8px auto' : '8px 0';
-  }
-}
-
-function projImgDelete(btn){
-  const toolbar = btn.closest('.proj-img-toolbar');
-  const img = toolbar.parentElement.querySelector('img');
-  if(img){
-    img.remove();
-    toolbar.remove();
   }
 }
 
