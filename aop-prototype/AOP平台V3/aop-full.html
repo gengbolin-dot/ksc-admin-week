@@ -2719,9 +2719,24 @@ function toggleView(v){
 /* ══════ P05: KEY PROJECTS DATA ══════ */
 const P05_PROJECTS = [
   {
+    id: 'dual-journal',
+    title: '2025双刊项目',
+    badge: '重点成果',
+    subtitle: '时光相册 + 故事集，留存企业记忆与员工故事',
+    bgGradient: 'linear-gradient(135deg,#6d28d9,#8b5cf6)',
+    emoji: '📚',
+    metrics: [
+      {value: '2期', label: '年度双刊'},
+      {value: '2817', label: '留存用户'},
+      {value: '11篇', label: '累计发布'}
+    ],
+    quote: '通过双刊项目打造企业文化载体，时光相册记录成长瞬间，故事集传递员工心声，增强组织认同感。',
+    imageId: 'p05-img-journal'
+  },
+  {
     id: 'family-day',
     title: '第十二届家庭日',
-    badge: '重点成果',
+    badge: null,
     subtitle: '北京"云巅小勇士"3公里丛林赛 · 武汉躺平度假',
     bgGradient: 'linear-gradient(135deg,#7c2d12,#ea580c)',
     emoji: '🎪',
@@ -2747,21 +2762,6 @@ const P05_PROJECTS = [
     ],
     quote: '以赛促研、以赛引才、以赛促合，企业+高校战队共创，圆满落幕！',
     imageId: 'p05-img-horse'
-  },
-  {
-    id: 'slim-contest',
-    title: '第二届甩肉大赛',
-    badge: null,
-    subtitle: '面向全员的健康减重主题活动，共持续一个季度',
-    bgGradient: 'linear-gradient(135deg,#134e4a,#0d9488)',
-    emoji: '🏃',
-    metrics: [
-      {value: '343', label: '参与人数'},
-      {value: '1,411', label: '减重(斤)'},
-      {value: '16.18%', label: '个人最高'}
-    ],
-    quote: '在自律比拼中收获健康与自我突破，改善职场久坐亚健康状态，最优团队合计减重 62.8 斤。',
-    imageId: 'p05-img-slim'
   }
 ];
 
@@ -2773,7 +2773,7 @@ function renderP05(){
   h += `<div class="p05-hero">
     <div class="p05-hero-eyebrow">AOP · 重点专项</div>
     <div class="p05-hero-title">2026 H1 重点专项回顾</div>
-    <div class="p05-hero-desc">上半年三大重点活动全面落实：家庭日双城同办、黑马大赛圆满收官、甩肉大赛健康风潮，员工体验持续提升。</div>
+    <div class="p05-hero-desc">上半年三大重点活动全面落实：双刊项目打造企业文化载体、家庭日双城同办、黑马大赛圆满收官。</div>
     <label class="p05-hero-upload">📷 上传封面<input type="file" accept="image/*" onchange="p05UploadHero(this)" style="display:none"></label>
   </div>`;
 
