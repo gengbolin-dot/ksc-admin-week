@@ -3208,12 +3208,61 @@ function renderP05(){
 
   h += `</div>`;
   el.innerHTML = h;
+
+  // Restore uploaded images after render
+  setTimeout(applyProjectImages, 100);
 }
+
+// ══════ PROJECT IMAGE PERSISTENCE ══════
+const _p05ImageStore = {};
+
+function loadProjectImages(){
+  try {
+    const saved = localStorage.getItem('aop_p05_images');
+    if(saved) Object.assign(_p05ImageStore, JSON.parse(saved));
+  } catch(e) {}
+}
+
+function saveProjectImages(){
+  try {
+    localStorage.setItem('aop_p05_images', JSON.stringify(_p05ImageStore));
+  } catch(e) {}
+}
+
+function applyProjectImages(){
+  // Apply hero image
+  if(_p05ImageStore._hero){
+    const hero = document.querySelector('.p05-hero');
+    if(hero){
+      hero.style.backgroundImage = 'url('+_p05ImageStore._hero+')';
+      hero.style.backgroundSize = 'cover';
+      hero.style.backgroundPosition = 'center';
+    }
+  }
+  // Apply card images
+  P05_PROJECTS.forEach(proj => {
+    if(_p05ImageStore[proj.imageId]){
+      const el = document.getElementById(proj.imageId);
+      if(el){
+        el.style.backgroundImage = 'url('+_p05ImageStore[proj.imageId]+')';
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = 'center';
+        const emoji = el.parentElement.querySelector('.p05-card-img-emoji');
+        if(emoji) emoji.style.display = 'none';
+      }
+    }
+  });
+}
+
+// Load on init
+loadProjectImages();
 
 function p05UploadHero(input){
   if(!input.files[0]) return;
   const reader = new FileReader();
   reader.onload = function(e){
+    _p05ImageStore._hero = e.target.result;
+    saveProjectImages();
     const hero = document.querySelector('.p05-hero');
     hero.style.backgroundImage = `url(${e.target.result})`;
     hero.style.backgroundSize = 'cover';
@@ -3226,6 +3275,8 @@ function p05UploadCardImg(input, targetId){
   if(!input.files[0]) return;
   const reader = new FileReader();
   reader.onload = function(e){
+    _p05ImageStore[targetId] = e.target.result;
+    saveProjectImages();
     const el = document.getElementById(targetId);
     if(el){
       el.style.backgroundImage = `url(${e.target.result})`;
