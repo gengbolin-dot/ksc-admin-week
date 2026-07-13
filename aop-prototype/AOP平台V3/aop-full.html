@@ -381,13 +381,22 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .proj-h3{font-size:18px;font-weight:700;color:var(--t1);line-height:1.4;outline:none;padding:4px 0;margin:12px 0 6px 0}
 .proj-h3:empty::before{content:'三级标题';color:var(--t3)}
 /* Editable images - truly inline like Feishu/WPS */
-.proj-doc img{
+.proj-doc-inner img{
   max-width:calc(100% - 16px);max-height:280px;border-radius:8px;
-  margin:0 8px 0 0;vertical-align:middle;
-  display:inline;cursor:pointer;transition:box-shadow .15s;
+  margin:2px 8px 2px 0;vertical-align:middle;
+  display:inline!important;cursor:pointer;transition:box-shadow .15s;
 }
-.proj-doc img:hover{box-shadow:0 0 0 2px var(--ac)}
-.proj-doc img.dragging{opacity:.4}
+.proj-doc-inner img:hover{box-shadow:0 0 0 2px var(--ac)}
+/* Force images inline even inside p/div wrappers */
+.proj-doc-inner p > img, .proj-doc-inner div > img{
+  display:inline!important;vertical-align:middle!important;margin:2px 8px 2px 0!important;
+}
+/* Image-only paragraphs should collapse */
+.proj-doc-inner p{margin:4px 0;line-height:1.8}
+/* Text blocks */
+.proj-doc-inner .proj-text{margin:4px 0;line-height:1.8}
+.proj-doc-inner .proj-h2{margin:16px 0 8px}
+.proj-doc-inner .proj-h3{margin:12px 0 6px}
 .proj-img-toolbar{
   position:absolute;top:-36px;left:50%;transform:translateX(-50%);
   background:var(--bg);border:1px solid var(--bd);border-radius:8px;
@@ -3413,27 +3422,30 @@ function cleanPasteHtml(html){
   // Get body content
   let body = doc.body.innerHTML;
 
-  // Remove class attributes but keep essential formatting
+  // Remove class attributes
   body = body.replace(/\sclass="[^"]*"/g, '');
 
-  // Remove complex inline styles but keep basic ones
+  // Remove complex inline styles, keep basic ones
   body = body.replace(/\sstyle="[^"]*"/g, function(match){
-    // Keep only color, font-size, font-weight, text-align
     const keep = match.match(/(color|font-size|font-weight|text-align):[^;]+/g);
     return keep ? ' style="' + keep.join(';') + '"' : '';
   });
 
-  // Ensure images are truly inline - wrap in span if needed
+  // Unwrap images from <p> tags to make them inline with text
+  // <p><img ...></p> → <img ...>
+  body = body.replace(/<p[^>]*>\s*(<img[^>]*>)\s*<\/p>/g, '$1');
+  // <p>text<img ...>text</p> → keep as is (image already inline with text)
+
+  // Ensure images are truly inline
   body = body.replace(/<img([^>]*)>/g, function(match, attrs){
     const srcMatch = attrs.match(/src="([^"]*)"/);
     const altMatch = attrs.match(/alt="([^"]*)"/);
     const src = srcMatch ? srcMatch[1] : '';
     const alt = altMatch ? altMatch[1] : '';
-    // Return inline image that flows with text
-    return `<img src="${src}" alt="${alt}" style="display:inline;max-width:100%;max-height:280px;border-radius:8px;vertical-align:middle;margin:0 8px 0 0">`;
+    return `<img src="${src}" alt="${alt}" style="display:inline;max-width:100%;max-height:280px;border-radius:8px;vertical-align:middle;margin:2px 8px 2px 0">`;
   });
 
-  // Remove empty paragraphs and divs
+  // Remove empty paragraphs
   body = body.replace(/<p[^>]*>\s*<\/p>/g, '');
   body = body.replace(/<div[^>]*>\s*<\/div>/g, '');
 
