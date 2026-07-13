@@ -321,58 +321,100 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p05-card-quote-text{font-size:12px;color:var(--t2);line-height:1.5}
 .p05-card{cursor:pointer}
 
-/* ══════ PROJECT DETAIL OVERLAY ══════ */
-.proj-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none}
+/* ══════ PROJECT DETAIL — Feishu/WPS Style ══════ */
+.proj-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;backdrop-filter:blur(2px)}
 .proj-overlay.show{display:block}
-.proj-detail{position:fixed;right:0;top:0;bottom:0;width:720px;background:var(--bg);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease;box-shadow:-4px 0 20px rgba(0,0,0,.15)}
-.proj-detail.show{transform:translateX(0)}
-.proj-detail-head{padding:16px 24px;border-bottom:1px solid var(--bdl);display:flex;align-items:center;gap:12px;flex-shrink:0}
-.proj-detail-close{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);transition:all var(--tr);font-size:18px;border:none;background:none}
-.proj-detail-close:hover{background:var(--bgH);color:var(--t1)}
-.proj-detail-title{font-size:16px;font-weight:700;flex:1}
-.proj-detail-actions{display:flex;gap:8px}
-.proj-detail-body{flex:1;overflow-y:auto;padding:24px}
-.proj-detail-hero{height:200px;border-radius:12px;overflow:hidden;position:relative;margin-bottom:24px;display:flex;align-items:center;justify-content:center}
-.proj-detail-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center}
-.proj-detail-hero-emoji{font-size:64px;opacity:.3}
-.proj-detail-hero-upload{position:absolute;bottom:12px;right:12px;display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.3);color:#fff;transition:all var(--tr)}
-.proj-detail-hero-upload:hover{background:rgba(0,0,0,.5)}
-.proj-detail-section{margin-bottom:24px}
-.proj-detail-section-title{font-size:13px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.proj-detail-text{font-size:14px;color:var(--t2);line-height:1.7;padding:12px 14px;background:var(--bg2);border-radius:8px;min-height:60px;outline:none;border:1px solid transparent;transition:border var(--tr)}
-.proj-detail-text:focus{border-color:var(--ac);background:var(--bg)}
-.proj-detail-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
-.proj-detail-metric{background:var(--bg2);border-radius:10px;padding:14px;text-align:center}
-.proj-detail-metric-val{font-size:24px;font-weight:900;color:var(--t1)}
-.proj-detail-metric-label{font-size:11px;color:var(--t3);margin-top:4px}
-.proj-detail-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.proj-detail-img{aspect-ratio:16/10;border-radius:8px;overflow:hidden;position:relative;background:var(--bg3);cursor:pointer;transition:all var(--tr)}
-.proj-detail-img:hover{box-shadow:var(--sh)}
-.proj-detail-img img{width:100%;height:100%;object-fit:cover}
-.proj-detail-img-upload{display:flex;align-items:center;justify-content:center;border:2px dashed var(--bd);border-radius:8px;aspect-ratio:16/10;cursor:pointer;color:var(--t3);font-size:24px;transition:all var(--tr)}
-.proj-detail-img-upload:hover{border-color:var(--ac);color:var(--ac)}
-.proj-detail-video{width:100%;aspect-ratio:16/9;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:14px;margin-bottom:12px}
-.proj-detail-video video{width:100%;height:100%;border-radius:8px}
-
-/* Presentation Mode */
+.proj-detail{position:fixed;inset:0;background:var(--bg2);z-index:201;display:none;flex-direction:column}
+.proj-detail.show{display:flex}
+/* Top toolbar */
+.proj-toolbar{height:48px;background:var(--bg);border-bottom:1px solid var(--bdl);display:flex;align-items:center;padding:0 20px;gap:8px;flex-shrink:0}
+.proj-toolbar-back{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--t2);transition:all var(--tr);border:none;background:none}
+.proj-toolbar-back:hover{background:var(--bgH);color:var(--t1)}
+.proj-toolbar-title{font-size:14px;font-weight:600;color:var(--t1);flex:1;text-align:center}
+.proj-toolbar-actions{display:flex;gap:6px}
+.proj-toolbar-btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr);display:flex;align-items:center;gap:4px}
+.proj-toolbar-btn:hover{background:var(--bgH);color:var(--t1)}
+.proj-toolbar-btn.primary{background:var(--ac);color:#fff;border-color:var(--ac)}
+.proj-toolbar-btn.primary:hover{filter:brightness(1.08)}
+/* Formatting bar */
+.proj-format-bar{height:40px;background:var(--bg);border-bottom:1px solid var(--bdl);display:flex;align-items:center;padding:0 20px;gap:4px;flex-shrink:0}
+.proj-fmt-btn{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--t3);transition:all var(--tr);border:none;background:none}
+.proj-fmt-btn:hover{background:var(--bgH);color:var(--t1)}
+.proj-fmt-btn.active{background:var(--acl);color:var(--ac)}
+.proj-fmt-sep{width:1px;height:20px;background:var(--bdl);margin:0 4px}
+/* Document area */
+.proj-doc{flex:1;overflow-y:auto;padding:40px 0;display:flex;justify-content:center}
+.proj-doc-inner{width:100%;max-width:720px;padding:0 40px}
+/* Document blocks */
+.proj-block{margin-bottom:8px;position:relative}
+.proj-block:hover .proj-block-handle{opacity:1}
+.proj-block-handle{position:absolute;left:-28px;top:4px;width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--t3);cursor:grab;opacity:0;transition:opacity var(--tr);border:none;background:none}
+.proj-block-handle:hover{background:var(--bgH)}
+/* Title block */
+.proj-title{font-size:32px;font-weight:900;color:var(--t1);line-height:1.3;outline:none;border:none;padding:0;margin:0 0 4px 0}
+.proj-title:empty::before{content:'输入项目标题...';color:var(--t3)}
+/* Subtitle */
+.proj-subtitle{font-size:15px;color:var(--t3);line-height:1.5;outline:none;border:none;padding:0;margin:0 0 24px 0}
+.proj-subtitle:empty::before{content:'输入项目副标题...';color:var(--t3)}
+/* Text block */
+.proj-text{font-size:15px;color:var(--t2);line-height:1.8;outline:none;padding:4px 0;min-height:24px}
+.proj-text:empty::before{content:'输入内容，或从飞书/金山文档粘贴...';color:var(--t3)}
+.proj-text:focus{color:var(--t1)}
+/* Heading blocks */
+.proj-h2{font-size:22px;font-weight:700;color:var(--t1);line-height:1.4;outline:none;padding:4px 0;margin:16px 0 8px 0}
+.proj-h2:empty::before{content:'二级标题';color:var(--t3)}
+.proj-h3{font-size:18px;font-weight:700;color:var(--t1);line-height:1.4;outline:none;padding:4px 0;margin:12px 0 6px 0}
+.proj-h3:empty::before{content:'三级标题';color:var(--t3)}
+/* Metric cards */
+.proj-metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.proj-metric-card{background:var(--bg);border:1px solid var(--bdl);border-radius:10px;padding:16px;text-align:center}
+.proj-metric-val{font-size:28px;font-weight:900;color:var(--t1);letter-spacing:-.02em}
+.proj-metric-label{font-size:11px;color:var(--t3);margin-top:4px}
+/* Image block */
+.proj-img-block{margin:16px 0;border-radius:10px;overflow:hidden;position:relative;background:var(--bg3);min-height:120px;display:flex;align-items:center;justify-content:center}
+.proj-img-block img{width:100%;display:block;border-radius:10px}
+.proj-img-upload{display:flex;flex-direction:column;align-items:center;gap:8px;padding:32px;cursor:pointer;color:var(--t3);transition:all var(--tr);border:2px dashed var(--bd);border-radius:10px}
+.proj-img-upload:hover{border-color:var(--ac);color:var(--ac)}
+.proj-img-upload-icon{font-size:32px;opacity:.5}
+.proj-img-upload-text{font-size:13px;font-weight:500}
+/* Video block */
+.proj-video-block{margin:16px 0;border-radius:10px;overflow:hidden;background:var(--bg3)}
+.proj-video-block video{width:100%;display:block;border-radius:10px}
+.proj-video-upload{display:flex;flex-direction:column;align-items:center;gap:8px;padding:40px;cursor:pointer;color:var(--t3);transition:all var(--tr);border:2px dashed var(--bd);border-radius:10px}
+.proj-video-upload:hover{border-color:var(--ac);color:var(--ac)}
+/* Timeline block */
+.proj-timeline{margin:16px 0;padding:16px;background:var(--bg);border:1px solid var(--bdl);border-radius:10px}
+.proj-tl-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bdl)}
+.proj-tl-item:last-child{border-bottom:none}
+.proj-tl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.proj-tl-dot.done{background:var(--suc)}
+.proj-tl-dot.active{background:var(--ac);box-shadow:0 0 0 3px var(--acl)}
+.proj-tl-dot.pending{background:var(--bdl);border:1.5px solid var(--bd)}
+.proj-tl-content{flex:1}
+.proj-tl-title{font-size:14px;font-weight:600;color:var(--t1)}
+.proj-tl-date{font-size:12px;color:var(--t3)}
+/* Divider */
+.proj-divider{height:1px;background:var(--bdl);margin:24px 0}
+/* Gallery grid */
+.proj-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.proj-gallery-item{aspect-ratio:16/10;border-radius:8px;overflow:hidden;background:var(--bg3);cursor:pointer}
+.proj-gallery-item img{width:100%;height:100%;object-fit:cover}
+/* Attachment block */
+.proj-attach{margin:16px 0;padding:12px;background:var(--bg);border:1px solid var(--bdl);border-radius:10px}
+.proj-attach-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;cursor:pointer;transition:all var(--tr)}
+.proj-attach-item:hover{background:var(--bg2)}
+.proj-attach-icon{font-size:18px}
+.proj-attach-name{font-size:13px;font-weight:500;color:var(--t1)}
+.proj-attach-size{font-size:11px;color:var(--t3);margin-left:auto}
+/* Callout block */
+.proj-callout{margin:16px 0;padding:14px 16px;border-radius:10px;border-left:3px solid var(--ac);background:var(--acl)}
+.proj-callout-text{font-size:14px;color:var(--t2);line-height:1.6}
+/* Presentation mode */
 .proj-present{position:fixed;inset:0;background:var(--bg);z-index:300;display:none;flex-direction:column}
 .proj-present.show{display:flex}
 .proj-present-close{position:absolute;top:20px;right:24px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.1);color:var(--t2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;z-index:301;transition:all var(--tr)}
 .proj-present-close:hover{background:rgba(0,0,0,.2)}
 .proj-present-body{flex:1;overflow-y:auto;padding:60px 80px;max-width:960px;margin:0 auto;width:100%}
-.proj-present-hero{height:300px;border-radius:16px;overflow:hidden;position:relative;margin-bottom:32px;display:flex;align-items:center;justify-content:center}
-.proj-present-title{font-size:32px;font-weight:900;letter-spacing:-.02em;margin-bottom:8px}
-.proj-present-sub{font-size:16px;color:var(--t3);margin-bottom:24px}
-.proj-present-section{margin-bottom:32px}
-.proj-present-section-title{font-size:18px;font-weight:700;margin-bottom:12px;color:var(--t1)}
-.proj-present-text{font-size:15px;color:var(--t2);line-height:1.8}
-.proj-present-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.proj-present-img{aspect-ratio:16/10;border-radius:12px;overflow:hidden;background:var(--bg3)}
-.proj-present-img img{width:100%;height:100%;object-fit:cover}
-.proj-present-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px}
-.proj-present-metric{background:var(--bg2);border-radius:12px;padding:20px;text-align:center}
-.proj-present-metric-val{font-size:28px;font-weight:900;color:var(--t1)}
-.proj-present-metric-label{font-size:12px;color:var(--t3);margin-top:4px}
 .p05-timeline{padding:16px 24px}
 .p05-tl-group{margin-bottom:16px}
 .p05-tl-group-title{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
@@ -2177,18 +2219,40 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
   <img class="p12-lb-img" id="p12LbImg" src="" alt="预览">
 </div>
 
-<!-- ══════ PROJECT DETAIL OVERLAY ══════ -->
+<!-- ══════ PROJECT DETAIL OVERLAY (Feishu Style) ══════ -->
 <div class="proj-overlay" id="projOverlay" onclick="closeProjDetail()"></div>
 <div class="proj-detail" id="projDetail">
-  <div class="proj-detail-head">
-    <div class="proj-detail-close" onclick="closeProjDetail()">✕</div>
-    <div class="proj-detail-title" id="projDetailTitle">项目详情</div>
-    <div class="proj-detail-actions">
-      <div class="btn btn-ghost" onclick="editProjContent()">✏️ 编辑</div>
-      <div class="btn btn-ac" onclick="enterPresent()">📽 演示</div>
+  <!-- Toolbar -->
+  <div class="proj-toolbar">
+    <button class="proj-toolbar-back" onclick="closeProjDetail()">← 返回</button>
+    <div class="proj-toolbar-title" id="projToolbarTitle">项目文档</div>
+    <div class="proj-toolbar-actions">
+      <button class="proj-toolbar-btn" onclick="projAddBlock()">＋ 添加块</button>
+      <button class="proj-toolbar-btn" onclick="enterPresent()">📽 演示</button>
+      <button class="proj-toolbar-btn primary" onclick="projSave()">保存</button>
     </div>
   </div>
-  <div class="proj-detail-body" id="projDetailBody"></div>
+  <!-- Format bar -->
+  <div class="proj-format-bar">
+    <button class="proj-fmt-btn" title="正文" onclick="projFmt('p')">¶</button>
+    <button class="proj-fmt-btn" title="标题2" onclick="projFmt('h2')">H2</button>
+    <button class="proj-fmt-btn" title="标题3" onclick="projFmt('h3')">H3</button>
+    <div class="proj-fmt-sep"></div>
+    <button class="proj-fmt-btn" title="加粗" onclick="projFmt('bold')"><b>B</b></button>
+    <button class="proj-fmt-btn" title="斜体" onclick="projFmt('italic')"><i>I</i></button>
+    <button class="proj-fmt-btn" title="下划线" onclick="projFmt('underline')"><u>U</u></button>
+    <div class="proj-fmt-sep"></div>
+    <button class="proj-fmt-btn" title="图片" onclick="projAddImageBlock()">🖼️</button>
+    <button class="proj-fmt-btn" title="视频" onclick="projAddVideoBlock()">🎬</button>
+    <button class="proj-fmt-btn" title="附件" onclick="projAddAttach()">📎</button>
+    <div class="proj-fmt-sep"></div>
+    <button class="proj-fmt-btn" title="引用" onclick="projFmt('callout')">❝</button>
+    <button class="proj-fmt-btn" title="分割线" onclick="projAddDivider()">—</button>
+  </div>
+  <!-- Document area -->
+  <div class="proj-doc">
+    <div class="proj-doc-inner" id="projDocContent"></div>
+  </div>
 </div>
 
 <!-- ══════ PROJECT PRESENTATION MODE ══════ -->
@@ -2943,137 +3007,188 @@ function p05UploadCardImg(input, targetId){
 /* ══════ PROJECT DETAIL ══════ */
 const _projImages = {}; // Store uploaded images per project
 
+/* ══════ PROJECT DETAIL — Feishu Style Editor ══════ */
+const _projDocBlocks = {}; // Store document blocks per project
+let _currentProjId = null;
+
 function openProjDetail(idx){
   const proj = P05_PROJECTS[idx];
   if(!proj) return;
 
+  _currentProjId = proj.id;
   document.getElementById('projOverlay').classList.add('show');
   document.getElementById('projDetail').classList.add('show');
-  document.getElementById('projDetailTitle').textContent = proj.title;
+  document.getElementById('projToolbarTitle').textContent = proj.title;
 
-  const detail = proj.detail || {};
-  const images = _projImages[proj.id] || [];
+  // Initialize document blocks if not exist
+  if(!_projDocBlocks[proj.id]){
+    const detail = proj.detail || {};
+    _projDocBlocks[proj.id] = [
+      {type:'title', content: proj.title},
+      {type:'subtitle', content: proj.subtitle},
+      {type:'divider'},
+      {type:'metrics', data: proj.metrics},
+      {type:'h2', content: '项目概述'},
+      {type:'text', content: detail.overview || proj.quote},
+      {type:'h2', content: '项目目标'},
+      {type:'text', content: (detail.objectives || []).map((o,i) => `${i+1}. ${o}`).join('\n')},
+      {type:'h2', content: '项目进展'},
+      {type:'timeline', data: detail.timeline || []},
+      {type:'divider'},
+      {type:'h2', content: '项目图片'},
+      {type:'gallery', data: []},
+      {type:'h2', content: '项目视频'},
+      {type:'video', data: null},
+      {type:'h2', content: '补充说明'},
+      {type:'text', content: '在此添加项目的补充说明、关键数据、重要决策等内容...'},
+    ];
+  }
 
+  renderProjDoc();
+}
+
+function renderProjDoc(){
+  const el = document.getElementById('projDocContent');
+  const blocks = _projDocBlocks[_currentProjId] || [];
   let h = '';
 
-  // Hero image
-  h += `<div class="proj-detail-hero" style="background:${proj.bgGradient}">
-    <div class="proj-detail-hero-bg" id="proj-hero-${proj.id}"></div>
-    <div class="proj-detail-hero-emoji">${proj.emoji}</div>
-    <label class="proj-detail-hero-upload">📷 上传封面<input type="file" accept="image/*" onchange="projUploadHero(this,'${proj.id}')" style="display:none"></label>
-  </div>`;
-
-  // Metrics
-  h += `<div class="proj-detail-metrics">`;
-  proj.metrics.forEach(m => {
-    h += `<div class="proj-detail-metric"><div class="proj-detail-metric-val">${m.value}</div><div class="proj-detail-metric-label">${m.label}</div></div>`;
+  blocks.forEach((block, idx) => {
+    switch(block.type){
+      case 'title':
+        h += `<div class="proj-block"><div class="proj-block-handle" title="拖拽排序">⠿</div><div class="proj-title" contenteditable="true" data-block="${idx}">${block.content}</div></div>`;
+        break;
+      case 'subtitle':
+        h += `<div class="proj-block"><div class="proj-subtitle" contenteditable="true" data-block="${idx}">${block.content}</div></div>`;
+        break;
+      case 'h2':
+        h += `<div class="proj-block"><div class="proj-block-handle">⠿</div><div class="proj-h2" contenteditable="true" data-block="${idx}">${block.content}</div></div>`;
+        break;
+      case 'h3':
+        h += `<div class="proj-block"><div class="proj-block-handle">⠿</div><div class="proj-h3" contenteditable="true" data-block="${idx}">${block.content}</div></div>`;
+        break;
+      case 'text':
+        h += `<div class="proj-block"><div class="proj-block-handle">⠿</div><div class="proj-text" contenteditable="true" data-block="${idx}">${(block.content || '').replace(/\n/g, '<br>')}</div></div>`;
+        break;
+      case 'divider':
+        h += `<div class="proj-block"><div class="proj-divider"></div></div>`;
+        break;
+      case 'metrics':
+        h += `<div class="proj-block"><div class="proj-metrics-row">`;
+        (block.data || []).forEach(m => {
+          h += `<div class="proj-metric-card"><div class="proj-metric-val">${m.value}</div><div class="proj-metric-label">${m.label}</div></div>`;
+        });
+        h += `</div></div>`;
+        break;
+      case 'timeline':
+        h += `<div class="proj-block"><div class="proj-timeline">`;
+        (block.data || []).forEach(t => {
+          const dotClass = t.status === 'done' ? 'done' : t.status === 'active' ? 'active' : 'pending';
+          h += `<div class="proj-tl-item"><div class="proj-tl-dot ${dotClass}"></div><div class="proj-tl-content"><div class="proj-tl-title">${t.title}</div></div><div class="proj-tl-date">${t.date}</div></div>`;
+        });
+        h += `</div></div>`;
+        break;
+      case 'gallery':
+        h += `<div class="proj-block"><div class="proj-gallery" id="proj-gallery-${_currentProjId}">`;
+        (block.data || []).forEach(img => {
+          h += `<div class="proj-gallery-item"><img src="${img}" alt="图片"></div>`;
+        });
+        h += `<div class="proj-img-upload" onclick="projDocAddImage()"><div class="proj-img-upload-icon">🖼️</div><div class="proj-img-upload-text">点击或拖拽上传图片</div></div>`;
+        h += `</div></div>`;
+        break;
+      case 'video':
+        h += `<div class="proj-block"><div class="proj-video-block" id="proj-video-${_currentProjId}">`;
+        if(block.data){
+          h += `<video controls src="${block.data}"></video>`;
+        } else {
+          h += `<div class="proj-video-upload" onclick="projDocAddVideo()"><div style="font-size:32px;opacity:.5">🎬</div><div style="font-size:13px;font-weight:500">点击上传项目视频</div></div>`;
+        }
+        h += `</div></div>`;
+        break;
+      case 'callout':
+        h += `<div class="proj-block"><div class="proj-block-handle">⠿</div><div class="proj-callout"><div class="proj-callout-text" contenteditable="true" data-block="${idx}">${block.content || '输入提示信息...'}</div></div></div>`;
+        break;
+    }
   });
-  h += `</div>`;
 
-  // Overview section
-  h += `<div class="proj-detail-section">
-    <div class="proj-detail-section-title">📋 项目概述</div>
-    <div class="proj-detail-text" contenteditable="true">${detail.overview || proj.quote}</div>
-  </div>`;
+  el.innerHTML = h;
 
-  // Objectives
-  if(detail.objectives && detail.objectives.length > 0){
-    h += `<div class="proj-detail-section">
-      <div class="proj-detail-section-title">🎯 项目目标</div>
-      <div class="proj-detail-text" contenteditable="true">${detail.objectives.map((o,i) => `${i+1}. ${o}`).join('\n')}</div>
-    </div>`;
-  }
-
-  // Timeline
-  if(detail.timeline && detail.timeline.length > 0){
-    h += `<div class="proj-detail-section">
-      <div class="proj-detail-section-title">📅 项目时间线</div>`;
-    detail.timeline.forEach(t => {
-      const dotClass = t.status === 'done' ? 'done' : t.status === 'active' ? 'active' : 'pending';
-      h += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdl)">
-        <div class="p05-tl-dot ${dotClass}" style="margin:0"></div>
-        <div style="flex:1"><div style="font-size:13px;font-weight:600">${t.title}</div></div>
-        <div style="font-size:12px;color:var(--t3)">${t.date}</div>
-      </div>`;
-    });
-    h += `</div>`;
-  }
-
-  // Gallery
-  h += `<div class="proj-detail-section">
-    <div class="proj-detail-section-title">🖼️ 项目图片</div>
-    <div class="proj-detail-gallery" id="proj-gallery-${proj.id}">`;
-
-  images.forEach((img, i) => {
-    h += `<div class="proj-detail-img"><img src="${img}" alt="项目图片${i+1}"></div>`;
-  });
-
-  h += `<div class="proj-detail-img-upload" onclick="projAddImage('${proj.id}')">＋<br>添加图片</div>`;
-  h += `</div></div>`;
-
-  // Video section
-  h += `<div class="proj-detail-section">
-    <div class="proj-detail-section-title">🎬 项目视频</div>
-    <div class="proj-detail-video" id="proj-video-${proj.id}" onclick="projAddVideo('${proj.id}')">点击上传项目视频</div>
-  </div>`;
-
-  // Editable notes
-  h += `<div class="proj-detail-section">
-    <div class="proj-detail-section-title">📝 补充说明</div>
-    <div class="proj-detail-text" contenteditable="true" style="min-height:100px">在此添加项目的补充说明、关键数据、重要决策等内容...</div>
-  </div>`;
-
-  document.getElementById('projDetailBody').innerHTML = h;
+  // Auto-save on blur
+  el.addEventListener('blur', function(e){
+    if(e.target.dataset.block !== undefined){
+      const blockIdx = parseInt(e.target.dataset.block);
+      if(_projDocBlocks[_currentProjId] && _projDocBlocks[_currentProjId][blockIdx]){
+        _projDocBlocks[_currentProjId][blockIdx].content = e.target.innerHTML;
+      }
+    }
+  }, true);
 }
 
 function closeProjDetail(){
   document.getElementById('projOverlay').classList.remove('show');
   document.getElementById('projDetail').classList.remove('show');
+  _currentProjId = null;
 }
 
-function editProjContent(){
-  // Enable editing on all text areas
-  document.querySelectorAll('.proj-detail-text').forEach(el => {
-    el.contentEditable = 'true';
-    el.focus();
-  });
-}
-
-function projUploadHero(input, projId){
-  if(!input.files[0]) return;
-  const reader = new FileReader();
-  reader.onload = function(e){
-    const el = document.getElementById('proj-hero-' + projId);
-    if(el){
-      el.style.backgroundImage = `url(${e.target.result})`;
-      el.style.backgroundSize = 'cover';
-      el.style.backgroundPosition = 'center';
-      const emoji = el.parentElement.querySelector('.proj-detail-hero-emoji');
-      if(emoji) emoji.style.display = 'none';
+function projSave(){
+  // Save all editable content
+  document.querySelectorAll('[data-block]').forEach(el => {
+    const blockIdx = parseInt(el.dataset.block);
+    if(_projDocBlocks[_currentProjId] && _projDocBlocks[_currentProjId][blockIdx]){
+      _projDocBlocks[_currentProjId][blockIdx].content = el.innerHTML;
     }
-  };
-  reader.readAsDataURL(input.files[0]);
+  });
+  // Show save feedback
+  const btn = document.querySelector('.proj-toolbar-btn.primary');
+  const orig = btn.textContent;
+  btn.textContent = '✓ 已保存';
+  btn.style.background = 'var(--suc)';
+  setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 1500);
 }
 
-function projAddImage(projId){
+function projFmt(type){
+  switch(type){
+    case 'bold': document.execCommand('bold'); break;
+    case 'italic': document.execCommand('italic'); break;
+    case 'underline': document.execCommand('underline'); break;
+    case 'h2': document.execCommand('formatBlock', false, 'h2'); break;
+    case 'h3': document.execCommand('formatBlock', false, 'h3'); break;
+    case 'p': document.execCommand('formatBlock', false, 'p'); break;
+    case 'callout':
+      const sel = window.getSelection();
+      if(sel.rangeCount > 0){
+        const range = sel.getRangeAt(0);
+        const div = document.createElement('div');
+        div.className = 'proj-callout';
+        div.innerHTML = `<div class="proj-callout-text" contenteditable="true">${range.toString() || '输入提示信息...'}</div>`;
+        range.deleteContents();
+        range.insertNode(div);
+      }
+      break;
+  }
+}
+
+function projAddBlock(){
+  if(!_currentProjId || !_projDocBlocks[_currentProjId]) return;
+  _projDocBlocks[_currentProjId].push({type:'text', content:''});
+  renderProjDoc();
+  // Focus on the new block
+  const blocks = document.querySelectorAll('.proj-text');
+  if(blocks.length > 0) blocks[blocks.length - 1].focus();
+}
+
+function projAddImageBlock(){
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
   input.multiple = true;
   input.onchange = function(){
+    if(!_currentProjId || !_projDocBlocks[_currentProjId]) return;
+    const galleryBlock = _projDocBlocks[_currentProjId].find(b => b.type === 'gallery');
     Array.from(input.files).forEach(file => {
       const reader = new FileReader();
       reader.onload = function(e){
-        if(!_projImages[projId]) _projImages[projId] = [];
-        _projImages[projId].push(e.target.result);
-        const gallery = document.getElementById('proj-gallery-' + projId);
-        if(gallery){
-          const uploadBtn = gallery.querySelector('.proj-detail-img-upload');
-          const imgDiv = document.createElement('div');
-          imgDiv.className = 'proj-detail-img';
-          imgDiv.innerHTML = `<img src="${e.target.result}" alt="项目图片">`;
-          gallery.insertBefore(imgDiv, uploadBtn);
-        }
+        if(galleryBlock) galleryBlock.data.push(e.target.result);
+        renderProjDoc();
       };
       reader.readAsDataURL(file);
     });
@@ -3081,94 +3196,111 @@ function projAddImage(projId){
   input.click();
 }
 
-function projAddVideo(projId){
+function projDocAddImage(){ projAddImageBlock(); }
+
+function projAddVideoBlock(){
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'video/*';
   input.onchange = function(){
+    if(!_currentProjId || !_projDocBlocks[_currentProjId]) return;
     const file = input.files[0];
     if(!file) return;
     const reader = new FileReader();
     reader.onload = function(e){
-      const container = document.getElementById('proj-video-' + projId);
-      if(container){
-        container.innerHTML = `<video controls><source src="${e.target.result}" type="${file.type}">您的浏览器不支持视频播放</video>`;
-      }
+      const videoBlock = _projDocBlocks[_currentProjId].find(b => b.type === 'video');
+      if(videoBlock) videoBlock.data = e.target.result;
+      renderProjDoc();
     };
     reader.readAsDataURL(file);
   };
   input.click();
 }
 
+function projDocAddVideo(){ projAddVideoBlock(); }
+
+function projAddAttach(){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.multiple = true;
+  input.onchange = function(){
+    // Add attachment blocks
+    Array.from(input.files).forEach(file => {
+      const size = (file.size / 1024).toFixed(1) + 'KB';
+      const icon = file.type.startsWith('image/') ? '🖼️' : file.type.startsWith('video/') ? '🎬' : '📄';
+      if(!_currentProjId || !_projDocBlocks[_currentProjId]) return;
+      _projDocBlocks[_currentProjId].push({type:'callout', content:`${icon} ${file.name} (${size})`});
+    });
+    renderProjDoc();
+  };
+  input.click();
+}
+
+function projAddDivider(){
+  if(!_currentProjId || !_projDocBlocks[_currentProjId]) return;
+  _projDocBlocks[_currentProjId].push({type:'divider'});
+  renderProjDoc();
+}
+
 /* ══════ PRESENTATION MODE ══════ */
 function enterPresent(){
-  const projIdx = P05_PROJECTS.findIndex(p => document.getElementById('projDetailTitle').textContent === p.title);
-  if(projIdx < 0) return;
+  const proj = P05_PROJECTS.find(p => p.id === _currentProjId);
+  if(!proj) return;
 
-  const proj = P05_PROJECTS[projIdx];
-  const detail = proj.detail || {};
-  const images = _projImages[proj.id] || [];
-
-  document.getElementById('projOverlay').classList.remove('show');
-  document.getElementById('projDetail').classList.remove('show');
+  const blocks = _projDocBlocks[proj.id] || [];
+  const images = (blocks.find(b => b.type === 'gallery') || {}).data || [];
 
   let h = '';
 
   // Hero
-  h += `<div class="proj-present-hero" style="background:${proj.bgGradient}">
-    <div class="proj-detail-hero-bg" style="position:absolute;inset:0;background-size:cover;background-position:center"></div>
+  h += `<div style="height:300px;border-radius:16px;overflow:hidden;position:relative;margin-bottom:32px;display:flex;align-items:center;justify-content:center;background:${proj.bgGradient}">
     <div style="position:relative;z-index:2;text-align:center;color:#fff">
       <div style="font-size:48px;margin-bottom:16px">${proj.emoji}</div>
-      <div class="proj-present-title">${proj.title}</div>
-      <div class="proj-present-sub">${proj.subtitle}</div>
+      <div style="font-size:32px;font-weight:900">${proj.title}</div>
+      <div style="font-size:16px;opacity:.8;margin-top:8px">${proj.subtitle}</div>
     </div>
   </div>`;
 
   // Metrics
-  h += `<div class="proj-present-metrics">`;
+  h += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px">`;
   proj.metrics.forEach(m => {
-    h += `<div class="proj-present-metric"><div class="proj-present-metric-val">${m.value}</div><div class="proj-present-metric-label">${m.label}</div></div>`;
+    h += `<div style="background:var(--bg2);border-radius:12px;padding:20px;text-align:center"><div style="font-size:28px;font-weight:900">${m.value}</div><div style="font-size:12px;color:var(--t3);margin-top:4px">${m.label}</div></div>`;
   });
   h += `</div>`;
 
-  // Overview
-  h += `<div class="proj-present-section">
-    <div class="proj-present-section-title">📋 项目概述</div>
-    <div class="proj-present-text">${(detail.overview || proj.quote).replace(/\n/g, '<br>')}</div>
-  </div>`;
-
-  // Objectives
-  if(detail.objectives){
-    h += `<div class="proj-present-section">
-      <div class="proj-present-section-title">🎯 项目目标</div>
-      <div class="proj-present-text">${detail.objectives.map((o,i) => `${i+1}. ${o}`).join('<br>')}</div>
-    </div>`;
-  }
-
-  // Timeline
-  if(detail.timeline){
-    h += `<div class="proj-present-section">
-      <div class="proj-present-section-title">📅 项目进展</div>`;
-    detail.timeline.forEach(t => {
-      const icon = t.status === 'done' ? '✅' : t.status === 'active' ? '🔵' : '⚪';
-      h += `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bdl)">
-        <span>${icon}</span>
-        <div style="flex:1;font-size:15px;font-weight:600">${t.title}</div>
-        <div style="font-size:13px;color:var(--t3)">${t.date}</div>
-      </div>`;
-    });
-    h += `</div>`;
-  }
+  // Content blocks
+  blocks.forEach(block => {
+    if(block.type === 'title' || block.type === 'subtitle' || block.type === 'divider' || block.type === 'metrics') return;
+    if(block.type === 'text' && block.content){
+      h += `<div style="margin-bottom:16px;font-size:15px;color:var(--t2);line-height:1.8">${block.content.replace(/\n/g, '<br>')}</div>`;
+    }
+    if(block.type === 'h2'){
+      h += `<h2 style="font-size:22px;font-weight:700;margin:24px 0 12px">${block.content}</h2>`;
+    }
+    if(block.type === 'h3'){
+      h += `<h3 style="font-size:18px;font-weight:700;margin:16px 0 8px">${block.content}</h3>`;
+    }
+    if(block.type === 'timeline' && block.data){
+      h += `<div style="margin:16px 0">`;
+      block.data.forEach(t => {
+        const icon = t.status === 'done' ? '✅' : t.status === 'active' ? '🔵' : '⚪';
+        h += `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bdl)"><span>${icon}</span><div style="flex:1;font-size:15px;font-weight:600">${t.title}</div><div style="font-size:13px;color:var(--t3)">${t.date}</div></div>`;
+      });
+      h += `</div>`;
+    }
+    if(block.type === 'callout' && block.content){
+      h += `<div style="margin:16px 0;padding:14px 16px;border-radius:10px;border-left:3px solid var(--ac);background:var(--acl)"><div style="font-size:14px;color:var(--t2);line-height:1.6">${block.content}</div></div>`;
+    }
+  });
 
   // Gallery
   if(images.length > 0){
-    h += `<div class="proj-present-section">
-      <div class="proj-present-section-title">🖼️ 项目影像</div>
-      <div class="proj-present-gallery">`;
+    h += `<h2 style="font-size:22px;font-weight:700;margin:24px 0 12px">项目影像</h2>`;
+    h += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">`;
     images.forEach(img => {
-      h += `<div class="proj-present-img"><img src="${img}" alt="项目图片"></div>`;
+      h += `<div style="border-radius:12px;overflow:hidden"><img src="${img}" style="width:100%;display:block"></div>`;
     });
-    h += `</div></div>`;
+    h += `</div>`;
   }
 
   document.getElementById('projPresentBody').innerHTML = h;
