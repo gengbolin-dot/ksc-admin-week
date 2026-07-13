@@ -3431,6 +3431,84 @@ function renderProjDoc(){
     }, 150);
   }, true);
 
+  // ══════ DRAG & DROP FILE UPLOAD ══════
+  el.addEventListener('dragover', function(e){
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    el.style.outline = '2px dashed var(--ac)';
+    el.style.outlineOffset = '-4px';
+  });
+
+  el.addEventListener('dragleave', function(e){
+    el.style.outline = '';
+    el.style.outlineOffset = '';
+  });
+
+  el.addEventListener('drop', function(e){
+    e.preventDefault();
+    el.style.outline = '';
+    el.style.outlineOffset = '';
+
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    if(files.length === 0) return;
+
+    // Insert images at drop position
+    const range = document.caretRangeFromPoint(e.clientX, e.clientY);
+    let targetBlock = null;
+    if(range){
+      const node = range.startContainer;
+      if(node.nodeType === 3) targetBlock = node.parentElement.closest('.proj-text');
+      else targetBlock = node.closest('.proj-text');
+    }
+
+    // Read and insert
+    let imagesToInsert = [];
+    let loaded = 0;
+
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = function(ev){
+        imagesToInsert.push(ev.target.result);
+        loaded++;
+
+        if(loaded === files.length){
+          if(imagesToInsert.length === 1){
+            const img = document.createElement('img');
+            img.src = imagesToInsert[0];
+            img.style.cssText = 'display:block;max-width:100%;max-height:400px;height:auto;border-radius:8px;margin:8px 0;cursor:pointer;';
+            if(targetBlock){
+              targetBlock.appendChild(img);
+            } else {
+              const block = document.createElement('div');
+              block.className = 'proj-block';
+              block.innerHTML = '<div class="proj-text" contenteditable="true" data-block="0"></div>';
+              block.querySelector('.proj-text').appendChild(img);
+              el.appendChild(block);
+            }
+          } else {
+            const row = document.createElement('div');
+            row.className = 'proj-img-row';
+            imagesToInsert.forEach(src => {
+              const img = document.createElement('img');
+              img.src = src;
+              row.appendChild(img);
+            });
+            if(targetBlock){
+              targetBlock.appendChild(row);
+            } else {
+              const block = document.createElement('div');
+              block.className = 'proj-block';
+              block.innerHTML = '<div class="proj-text" contenteditable="true" data-block="0"></div>';
+              block.querySelector('.proj-text').appendChild(row);
+              el.appendChild(block);
+            }
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
   // ══════ IMAGE CLICK - Show resize toolbar ══════
   el.addEventListener('click', function(e){
     // Remove existing toolbars
@@ -3769,13 +3847,74 @@ function projAddImageBlock(){
   input.accept = 'image/*';
   input.multiple = true;
   input.onchange = function(){
-    if(!_currentProjId || !_projDocBlocks[_currentProjId]) return;
-    const galleryBlock = _projDocBlocks[_currentProjId].find(b => b.type === 'gallery');
-    Array.from(input.files).forEach(file => {
+    const files = Array.from(input.files);
+    if(files.length === 0) return;
+
+    // Find the text block to insert into (or create one)
+    const editor = document.getElementById('projDocContent');
+    const textBlocks = editor.querySelectorAll('.proj-text[contenteditable]');
+    let targetBlock = null;
+
+    // Use the focused text block, or the last one
+    const focused = document.activeElement;
+    if(focused && focused.classList.contains('proj-text')){
+      targetBlock = focused;
+    } else if(textBlocks.length > 0){
+      targetBlock = textBlocks[textBlocks.length - 1];
+    }
+
+    // Read and insert images
+    let imagesToInsert = [];
+    let loaded = 0;
+
+    files.forEach(file => {
       const reader = new FileReader();
       reader.onload = function(e){
-        if(galleryBlock) galleryBlock.data.push(e.target.result);
-        renderProjDoc();
+        imagesToInsert.push(e.target.result);
+        loaded++;
+
+        if(loaded === files.length){
+          // All images loaded - insert them
+          if(imagesToInsert.length === 1){
+            // Single image - insert inline
+            const img = document.createElement('img');
+            img.src = imagesToInsert[0];
+            img.style.cssText = 'display:block;max-width:100%;max-height:400px;height:auto;border-radius:8px;margin:8px 0;cursor:pointer;';
+
+            if(targetBlock){
+              targetBlock.appendChild(img);
+            } else {
+              // Create new text block with image
+              const block = document.createElement('div');
+              block.className = 'proj-block';
+              block.innerHTML = '<div class="proj-text" contenteditable="true" data-block="0"></div>';
+              block.querySelector('.proj-text').appendChild(img);
+              editor.appendChild(block);
+            }
+          } else {
+            // Multiple images - wrap in flex row
+            const row = document.createElement('div');
+            row.className = 'proj-img-row';
+            imagesToInsert.forEach(src => {
+              const img = document.createElement('img');
+              img.src = src;
+              row.appendChild(img);
+            });
+
+            if(targetBlock){
+              targetBlock.appendChild(row);
+            } else {
+              const block = document.createElement('div');
+              block.className = 'proj-block';
+              block.innerHTML = '<div class="proj-text" contenteditable="true" data-block="0"></div>';
+              block.querySelector('.proj-text').appendChild(row);
+              editor.appendChild(block);
+            }
+          }
+
+          // Save to blocks
+          saveProjDocBlocks();
+        }
       };
       reader.readAsDataURL(file);
     });
