@@ -5040,12 +5040,18 @@ function renderP09(){
     // Generic table for other modules
     if(mod.table && mod.table.length > 0 && mod.id !== 'employee'){
       h += `<table class="p09-tbl"><thead><tr>`;
-      const headers = mod.id === 'service' ? ['服务类型','类型','事项数','满意度','响应时长','状态'] :
-                      mod.id === 'workplace' ? [{name:'职场',cls:'col-name'},{name:'面积',cls:'col-area'},{name:'工位数量',cls:'col-num'},{name:'入驻人数',cls:'col-num'},{name:'利用率',cls:'col-pct'},{name:'操作',cls:'col-action'}] :null;
       if(mod.id === 'workplace'){
-        headers.forEach(th => h += `<th class="${th.cls}">${th.name}</th>`);
+        [{name:'职场',cls:'col-name'},{name:'面积',cls:'col-area'},{name:'工位数量',cls:'col-num'},{name:'入驻人数',cls:'col-num'},{name:'利用率',cls:'col-pct'},{name:'操作',cls:'col-action'}].forEach(th => h += `<th class="${th.cls}">${th.name}</th>`);
+      } else if(mod.id === 'service'){
+        ['服务类型','类型','事项数','满意度','响应时长','状态'].forEach(th => h += `<th>${th}</th>`);
+      } else if(mod.id === 'travel'){
+        ['类型','费用','订单量','趋势'].forEach(th => h += `<th>${th}</th>`);
+      } else if(mod.id === 'investment'){
+        ['项目','预算','已用','执行率','状态'].forEach(th => h += `<th>${th}</th>`);
+      } else if(mod.id === 'digital'){
+        ['系统','功能','状态','覆盖用户'].forEach(th => h += `<th>${th}</th>`);
       } else {
-        headers.forEach(th => h += `<th>${th}</th>`);
+        ['名称','数据'].forEach(th => h += `<th>${th}</th>`);
       }
       h += `</tr></thead><tbody>`;
 
