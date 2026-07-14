@@ -774,6 +774,15 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p09-drawer-label{font-size:12px;font-weight:600;color:var(--t3);margin-bottom:4px}
 .p09-drawer-input{width:100%;padding:8px 12px;border:1px solid var(--bd);border-radius:8px;font-size:13px;outline:none}
 .p09-drawer-input:focus{border-color:var(--ac)}
+
+/* Editable cells and table actions */
+.p09-editable{cursor:pointer;padding:2px 4px;border-radius:4px;transition:background var(--tr)}
+.p09-editable:hover{background:var(--bgH)}
+.p09-editable.editing{background:var(--bg);border:1px solid var(--ac);outline:none;min-width:60px;display:inline-block}
+.p09-del-btn{width:24px;height:24px;border-radius:4px;border:none;background:none;color:var(--t3);cursor:pointer;font-size:12px;transition:all var(--tr)}
+.p09-del-btn:hover{background:var(--danL);color:var(--dan)}
+.p09-add-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px dashed var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr);margin-top:12px}
+.p09-add-btn:hover{border-color:var(--ac);color:var(--ac)}
 .p09-prog-fill{height:100%;border-radius:3px}
 .p09-travel-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .p09-travel-card{background:var(--bg2);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:2px}
@@ -2892,17 +2901,17 @@ const DATA_CENTER = {
       owner: '职场运营负责人',
       lastUpdate: '2026-07-14',
       kpis: [
-        {val: '8', label: '职场数量', chg: '', up: true},
-        {val: '12,500㎡', label: '总面积', chg: '+800㎡', up: true},
-        {val: '850', label: '工位数量', chg: '+50', up: true},
-        {val: '720', label: '入驻人数', chg: '+30', up: true}
+        {val: '8', label: '职场数量'},
+        {val: '12,500㎡', label: '总面积'},
+        {val: '850', label: '工位数量'},
+        {val: '720', label: '入驻人数'}
       ],
       table: [
         {name:'北京职场',area:'4,200㎡',seats:280,people:245,util:'87%'},
         {name:'武汉职场',area:'3,800㎡',seats:250,people:210,util:'84%'},
         {name:'异地职场',area:'2,100㎡',seats:150,people:130,util:'87%'},
         {name:'上海职场',area:'800㎡',seats:50,people:42,util:'84%'},
-        {name:'深圳职场',area:'600㎡',seats:40,assembled:35,util:'88%'},
+        {name:'深圳职场',area:'600㎡',seats:40,people:35,util:'88%'},
         {name:'厦门职场',area:'500㎡',seats:35,people:28,util:'80%'},
         {name:'杭州职场',area:'300㎡',seats:20,people:18,util:'90%'},
         {name:'珠海横琴',area:'400㎡',seats:30,people:25,util:'83%'}
@@ -5016,19 +5025,34 @@ function renderP09(){
     if(mod.table && mod.table.length > 0 && mod.id !== 'employee'){
       h += `<table class="p09-tbl"><thead><tr>`;
       const headers = mod.id === 'service' ? ['服务类型','类型','事项数','满意度','响应时长','状态'] :
-                      mod.id === 'workplace' ? ['职场','面积','工位','入驻','利用率'] :
+                      mod.id === 'workplace' ? ['职场','面积','工位','入驻','利用率','操作'] :
                       mod.id === 'travel' ? ['类型','费用','订单量','趋势'] :
                       mod.id === 'investment' ? ['项目','预算','已用','执行率','状态'] :
                       mod.id === 'digital' ? ['系统','功能','状态','覆盖用户'] : ['名称','数据'];
       headers.forEach(th => h += `<th>${th}</th>`);
       h += `</tr></thead><tbody>`;
 
-      mod.table.forEach(row => {
+      mod.table.forEach((row, rowIdx) => {
         h += `<tr>`;
-        Object.values(row).forEach(val => h += `<td>${val}</td>`);
+        if(mod.id === 'workplace'){
+          // Editable workplace table
+          h += `<td style="font-weight:600">${row.name||''}</td>`;
+          h += `<td class="num"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="area">${row.area||'—'}</span></td>`;
+          h += `<td class="num"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="seats">${row.seats||0}</span></td>`;
+          h += `<td class="num"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="people">${row.people||0}</span></td>`;
+          h += `<td class="num">${row.util||'—'}</td>`;
+          h += `<td><button class="p09-del-btn" onclick="deleteWorkplace(${rowIdx})">🗑</button></td>`;
+        } else {
+          Object.values(row).forEach(val => h += `<td>${val}</td>`);
+        }
         h += `</tr>`;
       });
       h += `</tbody></table>`;
+
+      // Add workplace button
+      if(mod.id === 'workplace'){
+        h += `<button class="p09-add-btn" onclick="addWorkplace()">＋ 添加职场</button>`;
+      }
     }
 
     h += `</div></div>`;
@@ -5143,6 +5167,95 @@ function openDataCenterEdit(moduleId){
   drawer.innerHTML = h;
   document.body.appendChild(drawer);
 }
+
+// ══════ WORKPLACE TABLE EDITING ══════
+function deleteWorkplace(rowIdx){
+  const workMod = DATA_CENTER.modules.find(m => m.id === 'workplace');
+  if(!workMod || !workMod.table) return;
+  if(!confirm('确定删除此职场？')) return;
+  workMod.table.splice(rowIdx, 1);
+  recalcWorkplaceKpis();
+  renderP09();
+}
+
+function addWorkplace(){
+  const name = prompt('请输入职场名称：');
+  if(!name) return;
+  const workMod = DATA_CENTER.modules.find(m => m.id === 'workplace');
+  if(!workMod) return;
+  if(!workMod.table) workMod.table = [];
+  workMod.table.push({name:name, area:'0㎡', seats:0, people:0, util:'0%'});
+  recalcWorkplaceKpis();
+  renderP09();
+}
+
+function recalcWorkplaceKpis(){
+  const workMod = DATA_CENTER.modules.find(m => m.id === 'workplace');
+  if(!workMod || !workMod.table) return;
+  let totalSeats = 0, totalPeople = 0, totalArea = 0;
+  workMod.table.forEach(row => {
+    totalSeats += (row.seats || 0);
+    totalPeople += (row.people || 0);
+    const areaNum = parseFloat(String(row.area).replace(/[^\d.]/g,'')) || 0;
+    totalArea += areaNum;
+  });
+  workMod.kpis[0].val = String(workMod.table.length);
+  workMod.kpis[1].val = totalArea >= 10000 ? (totalArea/10000).toFixed(1) + '万㎡' : totalArea.toLocaleString() + '㎡';
+  workMod.kpis[2].val = String(totalSeats);
+  workMod.kpis[3].val = String(totalPeople);
+  // Update utilization rates
+  workMod.table.forEach(row => {
+    if(row.seats > 0){
+      row.util = Math.floor((row.people || 0) / row.seats * 100) + '%';
+    }
+  });
+}
+
+// Inline editing for workplace table
+document.addEventListener('click', function(e){
+  if(e.target.classList.contains('p09-editable')){
+    // Already editing
+    if(e.target.classList.contains('editing')) return;
+    e.target.classList.add('editing');
+    e.target.contentEditable = 'true';
+    e.target.focus();
+
+    const origVal = e.target.textContent;
+    e.target.dataset.origVal = origVal;
+
+    function finishEdit(){
+      e.target.contentEditable = 'false';
+      e.target.classList.remove('editing');
+
+      const newVal = e.target.textContent.trim();
+      const modId = e.target.dataset.mod;
+      const rowIdx = parseInt(e.target.dataset.row);
+      const field = e.target.dataset.field;
+
+      if(modId === 'workplace'){
+        const workMod = DATA_CENTER.modules.find(m => m.id === 'workplace');
+        if(workMod && workMod.table && workMod.table[rowIdx]){
+          if(field === 'seats' || field === 'people'){
+            workMod.table[rowIdx][field] = parseInt(newVal) || 0;
+          } else {
+            workMod.table[rowIdx][field] = newVal;
+          }
+          recalcWorkplaceKpis();
+          // Don't re-render, just update the cell
+          e.target.textContent = newVal;
+        }
+      }
+    }
+
+    e.target.addEventListener('blur', finishEdit, {once:true});
+    e.target.addEventListener('keydown', function(ev){
+      if(ev.key === 'Enter'){
+        ev.preventDefault();
+        e.target.blur();
+      }
+    });
+  }
+});
 
 /* ══════ P10: OKR ══════ */
 function renderP10(){
