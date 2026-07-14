@@ -4865,14 +4865,19 @@ function renderP08(){
 /* ══════ P09: DATA COCKPIT ══════ */
 function renderP09(){
   const el = document.getElementById('p09Content');
+  if(!el) return;
   const data = DATA_CENTER;
+  if(!data || !data.modules) {
+    el.innerHTML = '<div style="padding:24px;color:var(--dan)">数据加载失败</div>';
+    return;
+  }
   let h = '';
 
   // Header
   h += `<div class="p09-header">
     <div class="p09-header-top">
       <div class="p09-title">📊 行政运营数据中心</div>
-      <div class="p09-badge">${data.year}年度</div>
+      <div class="p09-badge">${data.year||'2026'}年度</div>
     </div>
     <div class="p09-desc">沉淀行政运营过程中产生的重要数据资产，统一记录、持续沉淀、长期积累。支持季度运营回顾、半年度汇报、年度总结、CEO经营汇报直接引用。</div>
   </div>`;
@@ -4880,67 +4885,69 @@ function renderP09(){
   h += `<div class="p09-content">`;
 
   // Render each module
-  data.modules.forEach(mod => {
+  (data.modules || []).forEach(mod => {
     h += `<div class="p09-mod">
       <div class="p09-mod-head">
-        <div class="p09-mod-icon" style="background:${mod.color}18;color:${mod.color}">${mod.icon}</div>
+        <div class="p09-mod-icon" style="background:${mod.color||'#3B82F6'}18;color:${mod.color||'#3B82F6'}">${mod.icon||'📊'}</div>
         <div class="p09-mod-info">
-          <div class="p09-mod-title">${mod.title}</div>
-          <div class="p09-mod-desc">${mod.desc}</div>
+          <div class="p09-mod-title">${mod.title||'未命名模块'}</div>
+          <div class="p09-mod-desc">${mod.desc||''}</div>
         </div>
         <button class="p09-mod-edit" onclick="openDataCenterEdit('${mod.id}')">✏️ 编辑</button>
       </div>
       <div class="p09-mod-meta">
-        <span class="p09-mod-meta-item">📊 数据来源：${mod.source}</span>
-        <span class="p09-mod-meta-item">🕐 最近更新：${mod.lastUpdate}</span>
-        <span class="p09-mod-meta-item">👤 负责人：${mod.owner}</span>
+        <span class="p09-mod-meta-item">📊 数据来源：${mod.source||'人工维护'}</span>
+        <span class="p09-mod-meta-item">🕐 最近更新：${mod.lastUpdate||'—'}</span>
+        <span class="p09-mod-meta-item">👤 负责人：${mod.owner||'—'}</span>
       </div>
       <div class="p09-mod-body">`;
 
     // KPI row
-    h += `<div class="p09-kpi-row">`;
-    mod.kpis.forEach(k => {
-      h += `<div class="p09-kpi">
-        <div class="p09-kpi-val">${k.val}</div>
-        <div class="p09-kpi-lbl">${k.label}</div>
-        ${k.chg ? `<div class="p09-kpi-chg ${k.up?'p09-kpi-up':'p09-kpi-dn'}">${k.up?'↑':'↓'}${k.chg}</div>` : ''}
-      </div>`;
-    });
-    h += `</div>`;
+    if(mod.kpis && mod.kpis.length > 0){
+      h += `<div class="p09-kpi-row">`;
+      mod.kpis.forEach(k => {
+        h += `<div class="p09-kpi">
+          <div class="p09-kpi-val">${k.val||'—'}</div>
+          <div class="p09-kpi-lbl">${k.label||''}</div>
+          ${k.chg ? `<div class="p09-kpi-chg ${k.up?'p09-kpi-up':'p09-kpi-dn'}">${k.up?'↑':'↓'}${k.chg}</div>` : ''}
+        </div>`;
+      });
+      h += `</div>`;
+    }
 
     // Module-specific content
-    if(mod.id === 'employee' && mod.cities){
+    if(mod.id === 'employee' && mod.cities && mod.cities.length > 0){
       h += `<div style="margin-bottom:16px"><div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px">🏙️ 年度城市统计</div>`;
       mod.cities.forEach(c => {
         h += `<div class="p09-city-row">
-          <div class="p09-city-name">${c.name}</div>
-          <div class="p09-city-bar"><div class="p09-city-fill" style="width:${c.pct}%;background:var(--ac)"></div></div>
-          <div class="p09-city-val">${c.events}场 · ${c.people}人</div>
+          <div class="p09-city-name">${c.name||''}</div>
+          <div class="p09-city-bar"><div class="p09-city-fill" style="width:${c.pct||0}%;background:var(--ac)"></div></div>
+          <div class="p09-city-val">${c.events||0}场 · ${c.people||0}人</div>
         </div>`;
       });
       h += `</div>`;
     }
 
     // Activity table for employee module
-    if(mod.activities){
+    if(mod.activities && mod.activities.length > 0){
       h += `<div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px">📋 活动记录</div>`;
       h += `<table class="p09-act-tbl"><thead><tr><th>活动名称</th><th>城市</th><th>参与人数</th><th>满意度</th><th>📷</th><th>🎬</th></tr></thead><tbody>`;
       mod.activities.forEach(a => {
-        h += `<tr><td style="font-weight:600">${a.name}</td><td>${a.city}</td><td>${a.people}</td><td>${a.satisfaction}</td><td>${a.imgs}</td><td>${a.videos}</td></tr>`;
+        h += `<tr><td style="font-weight:600">${a.name||''}</td><td>${a.city||''}</td><td>${a.people||0}</td><td>${a.satisfaction||'—'}</td><td>${a.imgs||0}</td><td>${a.videos||0}</td></tr>`;
       });
       h += `</tbody></table>`;
     }
 
     // Archive sections
-    if(mod.sections){
+    if(mod.sections && mod.sections.length > 0){
       h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">`;
       mod.sections.forEach(sec => {
         h += `<div style="background:var(--bg2);border-radius:10px;padding:14px">
-          <div style="font-size:13px;font-weight:700;margin-bottom:10px">${sec.icon} ${sec.title}</div>`;
-        sec.items.forEach(item => {
+          <div style="font-size:13px;font-weight:700;margin-bottom:10px">${sec.icon||''} ${sec.title||''}</div>`;
+        (sec.items || []).forEach(item => {
           h += `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bdl);font-size:12px">
-            <span style="color:var(--t2)">${item.label}</span>
-            <span style="font-weight:600">${item.val}</span>
+            <span style="color:var(--t2)">${item.label||''}</span>
+            <span style="font-weight:600">${item.val||'—'}</span>
           </div>`;
         });
         h += `</div>`;
@@ -4949,7 +4956,7 @@ function renderP09(){
     }
 
     // Generic table for other modules
-    if(mod.table && mod.id !== 'employee'){
+    if(mod.table && mod.table.length > 0 && mod.id !== 'employee'){
       h += `<table class="p09-tbl"><thead><tr>`;
       const headers = mod.id === 'service' ? ['服务类型','类型','事项数','满意度','响应时长','状态'] :
                       mod.id === 'workplace' ? ['职场','面积','工位','入驻','利用率'] :
