@@ -5032,7 +5032,7 @@ function renderP09(){
     if(mod.table && mod.table.length > 0 && mod.id !== 'employee'){
       h += `<table class="p09-tbl"><thead><tr>`;
       const headers = mod.id === 'service' ? ['服务类型','类型','事项数','满意度','响应时长','状态'] :
-                      mod.id === 'workplace' ? ['职场','面积','工位','入驻','利用率','操作'] :
+                      mod.id === 'workplace' ? ['职场','面积','工位数量','入驻人数','利用率','操作'] :
                       mod.id === 'travel' ? ['类型','费用','订单量','趋势'] :
                       mod.id === 'investment' ? ['项目','预算','已用','执行率','状态'] :
                       mod.id === 'digital' ? ['系统','功能','状态','覆盖用户'] : ['名称','数据'];
@@ -5042,13 +5042,13 @@ function renderP09(){
       mod.table.forEach((row, rowIdx) => {
         h += `<tr>`;
         if(mod.id === 'workplace'){
-          // Editable workplace table
+          // Editable workplace table with proper alignment
           h += `<td style="font-weight:600"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="name">${row.name||'新职场'}</span></td>`;
-          h += `<td class="num"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="area">${row.area||'—'}</span></td>`;
-          h += `<td class="num"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="seats">${row.seats||0}</span></td>`;
-          h += `<td class="num"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="people">${row.people||0}</span></td>`;
-          h += `<td class="num">${row.util||'—'}</td>`;
-          h += `<td><button class="p09-del-btn" onclick="deleteWorkplace(${rowIdx})">🗑</button></td>`;
+          h += `<td class="num" style="font-variant-numeric:tabular-nums"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="area">${row.area||'0㎡'}</span></td>`;
+          h += `<td class="num" style="font-variant-numeric:tabular-nums"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="seats">${row.seats||0}</span></td>`;
+          h += `<td class="num" style="font-variant-numeric:tabular-nums"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="people">${row.people||0}</span></td>`;
+          h += `<td class="num" style="font-variant-numeric:tabular-nums;font-weight:600">${row.util||'0%'}</td>`;
+          h += `<td style="text-align:center"><button class="p09-del-btn" onclick="deleteWorkplace(${rowIdx})">🗑</button></td>`;
         } else {
           Object.values(row).forEach(val => h += `<td>${val}</td>`);
         }
