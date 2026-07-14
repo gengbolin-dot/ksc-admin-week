@@ -2927,21 +2927,21 @@ const DATA_CENTER = {
       owner: '文化负责人',
       lastUpdate: '2026-07-14',
       kpis: [
-        {val: '21', label: '年度活动', chg: '+5', up: true},
-        {val: '6,000+', label: '累计参与', chg: '+1200', up: true},
-        {val: '85%', label: '活动覆盖率', chg: '+8%', up: true},
-        {val: '4.5', label: '平均满意度', chg: '+0.2', up: true}
+        {val: '21', label: '年度活动'},
+        {val: '6,000+', label: '累计参与'},
+        {val: '85%', label: '活动覆盖率'},
+        {val: '92%', label: '平均满意度'}
       ],
       cities: [
         {name:'北京',events:12,people:3600,pct:57},
         {name:'武汉',events:9,people:2400,pct:43}
       ],
       activities: [
-        {name:'第十二届家庭日',city:'北京+武汉',people:1045,satisfaction:'4.8',imgs:24,videos:3},
-        {name:'第五届黑马大赛',city:'武汉',people:19,satisfaction:'—',imgs:12,videos:2},
-        {name:'端午节礼品发放',city:'全员',people:800,satisfaction:'4.5',imgs:5,videos:0},
-        {name:'六一儿童节',city:'全员',people:600,satisfaction:'4.6',imgs:8,videos:1},
-        {name:'Q2生日会',city:'北京',people:45,satisfaction:'4.7',imgs:6,videos:0}
+        {name:'第十二届家庭日',city:'北京+武汉',people:1045,satisfaction:'96%',desc:'双城同办，沉浸式体验'},
+        {name:'第五届黑马大赛',city:'武汉',people:19,satisfaction:'—',desc:'企业+高校双赛道'},
+        {name:'端午节礼品发放',city:'全员',people:800,satisfaction:'90%',desc:'节日礼品发放'},
+        {name:'六一儿童节',city:'全员',people:600,satisfaction:'92%',desc:'亲子活动'},
+        {name:'Q2生日会',city:'北京',people:45,satisfaction:'94%',desc:'季度生日会'}
       ]
     },
     {
@@ -4987,11 +4987,19 @@ function renderP09(){
     // Activity table for employee module
     if(mod.activities && mod.activities.length > 0){
       h += `<div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px">📋 活动记录</div>`;
-      h += `<table class="p09-act-tbl"><thead><tr><th>活动名称</th><th>城市</th><th>参与人数</th><th>满意度</th><th>📷</th><th>🎬</th></tr></thead><tbody>`;
-      mod.activities.forEach(a => {
-        h += `<tr><td style="font-weight:600">${a.name||''}</td><td>${a.city||''}</td><td>${a.people||0}</td><td>${a.satisfaction||'—'}</td><td>${a.imgs||0}</td><td>${a.videos||0}</td></tr>`;
+      h += `<table class="p09-act-tbl"><thead><tr><th>活动名称</th><th>城市</th><th>参与人数</th><th>满意度</th><th>活动描述</th><th>操作</th></tr></thead><tbody>`;
+      mod.activities.forEach((a, aIdx) => {
+        h += `<tr>
+          <td style="font-weight:600"><span class="p09-editable" data-mod="employee" data-row="${aIdx}" data-field="name">${a.name||''}</span></td>
+          <td><span class="p09-editable" data-mod="employee" data-row="${aIdx}" data-field="city">${a.city||''}</span></td>
+          <td class="num"><span class="p09-editable" data-mod="employee" data-row="${aIdx}" data-field="people">${a.people||0}</span></td>
+          <td><span class="p09-editable" data-mod="employee" data-row="${aIdx}" data-field="satisfaction">${a.satisfaction||'—'}</span></td>
+          <td><span class="p09-editable" data-mod="employee" data-row="${aIdx}" data-field="desc">${a.desc||''}</span></td>
+          <td><button class="p09-del-btn" onclick="deleteActivity(${aIdx})">🗑</button></td>
+        </tr>`;
       });
       h += `</tbody></table>`;
+      h += `<button class="p09-add-btn" onclick="addActivity()">＋ 添加活动</button>`;
     }
 
     // Weekly history for service module
@@ -5241,7 +5249,17 @@ document.addEventListener('click', function(e){
             workMod.table[rowIdx][field] = newVal;
           }
           recalcWorkplaceKpis();
-          // Don't re-render, just update the cell
+          e.target.textContent = newVal;
+        }
+      }
+      if(modId === 'employee'){
+        const empMod = DATA_CENTER.modules.find(m => m.id === 'employee');
+        if(empMod && empMod.activities && empMod.activities[rowIdx]){
+          if(field === 'people'){
+            empMod.activities[rowIdx][field] = parseInt(newVal) || 0;
+          } else {
+            empMod.activities[rowIdx][field] = newVal;
+          }
           e.target.textContent = newVal;
         }
       }
@@ -5256,6 +5274,23 @@ document.addEventListener('click', function(e){
     });
   }
 });
+
+// ══════ ACTIVITY TABLE EDITING ══════
+function deleteActivity(rowIdx){
+  const empMod = DATA_CENTER.modules.find(m => m.id === 'employee');
+  if(!empMod || !empMod.activities) return;
+  if(!confirm('确定删除此活动？')) return;
+  empMod.activities.splice(rowIdx, 1);
+  renderP09();
+}
+
+function addActivity(){
+  const empMod = DATA_CENTER.modules.find(m => m.id === 'employee');
+  if(!empMod) return;
+  if(!empMod.activities) empMod.activities = [];
+  empMod.activities.push({name:'新活动',city:'全员',people:0,satisfaction:'—',desc:''});
+  renderP09();
+}
 
 /* ══════ P10: OKR ══════ */
 function renderP10(){
