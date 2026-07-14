@@ -3332,7 +3332,7 @@ function switchPanel(id, navEl){
   if(id==='p06'&&!window._p06Rendered){renderP06();window._p06Rendered=true}
   if(id==='p07'&&!window._p07Rendered){renderP07();window._p07Rendered=true}
   if(id==='p08'&&!window._p08Rendered){renderP08();window._p08Rendered=true}
-  if(id==='p09'&&!window._p09Rendered){renderP09();window._p09Rendered=true}
+  if(id==='p09'&&!window._p09Rendered){try{renderP09();window._p09Rendered=true}catch(e){console.error('renderP09 error:',e);document.getElementById('p09Content').innerHTML='<div style=\"padding:24px;color:var(--dan)\">渲染错误: '+e.message+'</div>'}}
   if(id==='p10'&&!window._p10Rendered){renderP10();window._p10Rendered=true}
   if(id==='p11'&&!window._p11Rendered){renderP11();window._p11Rendered=true}
   if(id==='p12'&&!window._p12Rendered){renderP12();window._p12Rendered=true}
