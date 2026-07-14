@@ -5043,7 +5043,7 @@ function renderP09(){
         h += `<tr>`;
         if(mod.id === 'workplace'){
           // Editable workplace table
-          h += `<td style="font-weight:600">${row.name||''}</td>`;
+          h += `<td style="font-weight:600"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="name">${row.name||'新职场'}</span></td>`;
           h += `<td class="num"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="area">${row.area||'—'}</span></td>`;
           h += `<td class="num"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="seats">${row.seats||0}</span></td>`;
           h += `<td class="num"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="people">${row.people||0}</span></td>`;
@@ -5186,12 +5186,10 @@ function deleteWorkplace(rowIdx){
 }
 
 function addWorkplace(){
-  const name = prompt('请输入职场名称：');
-  if(!name) return;
   const workMod = DATA_CENTER.modules.find(m => m.id === 'workplace');
   if(!workMod) return;
   if(!workMod.table) workMod.table = [];
-  workMod.table.push({name:name, area:'0㎡', seats:0, people:0, util:'0%'});
+  workMod.table.push({name:'新职场',area:'0㎡',seats:0,people:0,util:'0%'});
   recalcWorkplaceKpis();
   renderP09();
 }
