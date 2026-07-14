@@ -4987,25 +4987,7 @@ function renderP09(){
 
     // Weekly history for service module
     if(mod.id === 'service' && mod.weeklyHistory && mod.weeklyHistory.length > 0){
-      // Calculate cumulative totals
-      let cumTotal = 0, cumManual = 0, cumBot = 0, cumSat = 0, satCount = 0;
-      mod.weeklyHistory.forEach(w => {
-        cumTotal += (w.total || 0);
-        cumManual += (w.manual || 0);
-        cumBot += (w.bot || 0);
-        if(w.satisfaction > 0){ cumSat += w.satisfaction; satCount++; }
-      });
-      const avgSat = satCount > 0 ? (cumSat / satCount).toFixed(1) : '—';
-
-      h += `<div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px;margin-top:16px">📊 累计统计</div>`;
-      h += `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">`;
-      h += `<div style="background:var(--bg2);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900">${cumTotal}</div><div style="font-size:10px;color:var(--t3)">累计工单</div></div>`;
-      h += `<div style="background:var(--bg2);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900">${cumManual}</div><div style="font-size:10px;color:var(--t3)">人工工单</div></div>`;
-      h += `<div style="background:var(--bg2);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900">${cumBot}</div><div style="font-size:10px;color:var(--t3)">机器人拦截</div></div>`;
-      h += `<div style="background:var(--bg2);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900">${avgSat}%</div><div style="font-size:10px;color:var(--t3)">平均满意度</div></div>`;
-      h += `</div>`;
-
-      h += `<div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px">📋 周度明细</div>`;
+      h += `<div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px;margin-top:16px">📋 周度明细</div>`;
       h += `<table class="p09-tbl"><thead><tr><th>周次</th><th>日期范围</th><th>创建工单</th><th>人工工单</th><th>机器人拦截</th><th>满意度</th></tr></thead><tbody>`;
       mod.weeklyHistory.forEach(w => {
         h += `<tr><td style="font-weight:600">${w.week||''}</td><td>${w.date||''}</td><td class="num">${w.total||0}</td><td class="num">${w.manual||0}</td><td class="num">${w.bot||0}</td><td class="num">${w.satisfaction||0}%</td></tr>`;
