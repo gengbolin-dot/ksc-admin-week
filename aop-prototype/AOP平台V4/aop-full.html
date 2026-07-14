@@ -2860,24 +2860,26 @@ const DATA_CENTER = {
   modules: [
     {
       id: 'service',
-      title: '行政服务数据',
+      title: '行政服务台数据',
       icon: '🛎️',
       color: '#3B82F6',
-      desc: '沉淀行政服务过程中产生的关键数据',
-      source: '自动统计 + 人工维护',
+      desc: '沉淀行政服务台运营数据，支持周报自动累计统计',
+      source: '周报自动统计 + 人工维护',
       owner: '服务负责人',
       lastUpdate: '2026-07-14',
       kpis: [
-        {val: '57', label: '服务事项', chg: '+12%', up: true},
-        {val: '4.5', label: '平均满意度', chg: '+0.3', up: true},
-        {val: '2.1h', label: '平均响应', chg: '-15%', up: true},
-        {val: '96%', label: '完成率', chg: '+2%', up: true}
+        {val: '103', label: '创建工单', chg: '+15', up: true},
+        {val: '58', label: '人工工单', chg: '+8', up: true},
+        {val: '45', label: '机器人拦截', chg: '+7', up: true},
+        {val: '100%', label: '满意度', chg: '稳定', up: true}
       ],
-      table: [
-        {name:'行政服务台',type:'日常运营',count:57,satisfaction:'4.5',response:'2.1h',status:'进行中'},
-        {name:'会议室预约',type:'日常运营',count:128,satisfaction:'4.3',response:'0.5h',status:'进行中'},
-        {name:'资产领用',type:'日常运营',count:23,satisfaction:'4.6',response:'1.2h',status:'进行中'},
-        {name:'快递收发',type:'日常运营',count:312,satisfaction:'4.7',response:'0.3h',status:'进行中'}
+      weeklyHistory: [
+        {week:'W28',date:'2026-07-06 ~ 2026-07-12',total:103,manual:58,bot:45,satisfaction:100},
+        {week:'W27',date:'2026-06-29 ~ 2026-07-05',total:98,manual:55,bot:43,satisfaction:100},
+        {week:'W26',date:'2026-06-22 ~ 2026-06-28',total:91,manual:52,bot:39,satisfaction:100},
+        {week:'W25',date:'2026-06-15 ~ 2026-06-21',total:87,manual:48,bot:39,satisfaction:100},
+        {week:'W24',date:'2026-06-08 ~ 2026-06-14',total:82,manual:46,bot:36,satisfaction:100},
+        {week:'W23',date:'2026-06-01 ~ 2026-06-07',total:76,manual:42,bot:34,satisfaction:100}
       ]
     },
     {
@@ -4926,8 +4928,29 @@ function renderP09(){
       </div>
       <div class="p09-mod-body">`;
 
-    // KPI row
-    if(mod.kpis && mod.kpis.length > 0){
+    // KPI row - use cumulative data for service module
+    if(mod.id === 'service' && mod.weeklyHistory && mod.weeklyHistory.length > 0){
+      let cumTotal = 0, cumManual = 0, cumBot = 0, cumSat = 0, satCount = 0;
+      mod.weeklyHistory.forEach(w => {
+        cumTotal += (w.total || 0);
+        cumManual += (w.manual || 0);
+        cumBot += (w.bot || 0);
+        if(w.satisfaction > 0){ cumSat += w.satisfaction; satCount++; }
+      });
+      const avgSat = satCount > 0 ? (cumSat / satCount).toFixed(0) : '—';
+      const latestWeek = mod.weeklyHistory[0];
+      const prevWeek = mod.weeklyHistory.length > 1 ? mod.weeklyHistory[1] : null;
+      const totalChg = prevWeek ? (latestWeek.total - prevWeek.total) : 0;
+      const manualChg = prevWeek ? (latestWeek.manual - prevWeek.manual) : 0;
+      const botChg = prevWeek ? (latestWeek.bot - prevWeek.bot) : 0;
+
+      h += `<div class="p09-kpi-row">
+        <div class="p09-kpi"><div class="p09-kpi-val">${cumTotal}</div><div class="p09-kpi-lbl">累计工单</div><div class="p09-kpi-chg p09-kpi-up">本周+${latestWeek.total}</div></div>
+        <div class="p09-kpi"><div class="p09-kpi-val">${cumManual}</div><div class="p09-kpi-lbl">人工工单</div><div class="p09-kpi-chg p09-kpi-up">本周+${latestWeek.manual}</div></div>
+        <div class="p09-kpi"><div class="p09-kpi-val">${cumBot}</div><div class="p09-kpi-lbl">机器人拦截</div><div class="p09-kpi-chg p09-kpi-up">本周+${latestWeek.bot}</div></div>
+        <div class="p09-kpi"><div class="p09-kpi-val">${avgSat}%</div><div class="p09-kpi-lbl">平均满意度</div><div class="p09-kpi-chg p09-kpi-up">稳定</div></div>
+      </div>`;
+    } else if(mod.kpis && mod.kpis.length > 0){
       h += `<div class="p09-kpi-row">`;
       mod.kpis.forEach(k => {
         h += `<div class="p09-kpi">
@@ -4958,6 +4981,34 @@ function renderP09(){
       h += `<table class="p09-act-tbl"><thead><tr><th>活动名称</th><th>城市</th><th>参与人数</th><th>满意度</th><th>📷</th><th>🎬</th></tr></thead><tbody>`;
       mod.activities.forEach(a => {
         h += `<tr><td style="font-weight:600">${a.name||''}</td><td>${a.city||''}</td><td>${a.people||0}</td><td>${a.satisfaction||'—'}</td><td>${a.imgs||0}</td><td>${a.videos||0}</td></tr>`;
+      });
+      h += `</tbody></table>`;
+    }
+
+    // Weekly history for service module
+    if(mod.id === 'service' && mod.weeklyHistory && mod.weeklyHistory.length > 0){
+      // Calculate cumulative totals
+      let cumTotal = 0, cumManual = 0, cumBot = 0, cumSat = 0, satCount = 0;
+      mod.weeklyHistory.forEach(w => {
+        cumTotal += (w.total || 0);
+        cumManual += (w.manual || 0);
+        cumBot += (w.bot || 0);
+        if(w.satisfaction > 0){ cumSat += w.satisfaction; satCount++; }
+      });
+      const avgSat = satCount > 0 ? (cumSat / satCount).toFixed(1) : '—';
+
+      h += `<div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px;margin-top:16px">📊 累计统计</div>`;
+      h += `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">`;
+      h += `<div style="background:var(--bg2);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900">${cumTotal}</div><div style="font-size:10px;color:var(--t3)">累计工单</div></div>`;
+      h += `<div style="background:var(--bg2);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900">${cumManual}</div><div style="font-size:10px;color:var(--t3)">人工工单</div></div>`;
+      h += `<div style="background:var(--bg2);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900">${cumBot}</div><div style="font-size:10px;color:var(--t3)">机器人拦截</div></div>`;
+      h += `<div style="background:var(--bg2);border-radius:8px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:900">${avgSat}%</div><div style="font-size:10px;color:var(--t3)">平均满意度</div></div>`;
+      h += `</div>`;
+
+      h += `<div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:8px">📋 周度明细</div>`;
+      h += `<table class="p09-tbl"><thead><tr><th>周次</th><th>日期范围</th><th>创建工单</th><th>人工工单</th><th>机器人拦截</th><th>满意度</th></tr></thead><tbody>`;
+      mod.weeklyHistory.forEach(w => {
+        h += `<tr><td style="font-weight:600">${w.week||''}</td><td>${w.date||''}</td><td class="num">${w.total||0}</td><td class="num">${w.manual||0}</td><td class="num">${w.bot||0}</td><td class="num">${w.satisfaction||0}%</td></tr>`;
       });
       h += `</tbody></table>`;
     }
@@ -5004,6 +5055,73 @@ function renderP09(){
   h += `</div>`;
   el.innerHTML = h;
 }
+
+// ══════ SERVICE DATA ACCUMULATION ══════
+// This function is called when new weekly data is available
+// It adds the new week's data to the service module's weeklyHistory
+function addServiceWeekData(weekData){
+  // weekData: {week:'W29', date:'2026-07-13 ~ 2026-07-19', total:105, manual:60, bot:45, satisfaction:100}
+  const serviceMod = DATA_CENTER.modules.find(m => m.id === 'service');
+  if(!serviceMod) return;
+
+  // Add to beginning of array (most recent first)
+  serviceMod.weeklyHistory.unshift(weekData);
+
+  // Recalculate KPIs
+  let cumTotal = 0, cumManual = 0, cumBot = 0;
+  serviceMod.weeklyHistory.forEach(w => {
+    cumTotal += (w.total || 0);
+    cumManual += (w.manual || 0);
+    cumBot += (w.bot || 0);
+  });
+
+  // Update KPI values
+  serviceMod.kpis[0].val = String(cumTotal);
+  serviceMod.kpis[1].val = String(cumManual);
+  serviceMod.kpis[2].val = String(cumBot);
+
+  // Calculate average satisfaction
+  const satWeeks = serviceMod.weeklyHistory.filter(w => w.satisfaction > 0);
+  const avgSat = satWeeks.length > 0 ? (satWeeks.reduce((s,w) => s + w.satisfaction, 0) / satWeeks.length).toFixed(0) : '100';
+  serviceMod.kpis[3].val = avgSat + '%';
+
+  // Update last update date
+  serviceMod.lastUpdate = weekData.date.split(' ~ ')[1] || weekData.date;
+
+  // Save to localStorage
+  try {
+    localStorage.setItem('aop_service_data', JSON.stringify(serviceMod.weeklyHistory));
+  } catch(e) {}
+
+  // Re-render if visible
+  if(window._p09Rendered){
+    renderP09();
+  }
+}
+
+// Load saved service data on init
+try {
+  const savedService = localStorage.getItem('aop_service_data');
+  if(savedService){
+    const serviceMod = DATA_CENTER.modules.find(m => m.id === 'service');
+    if(serviceMod){
+      serviceMod.weeklyHistory = JSON.parse(savedService);
+      // Recalculate KPIs
+      let cumTotal = 0, cumManual = 0, cumBot = 0;
+      serviceMod.weeklyHistory.forEach(w => {
+        cumTotal += (w.total || 0);
+        cumManual += (w.manual || 0);
+        cumBot += (w.bot || 0);
+      });
+      serviceMod.kpis[0].val = String(cumTotal);
+      serviceMod.kpis[1].val = String(cumManual);
+      serviceMod.kpis[2].val = String(cumBot);
+      const satWeeks = serviceMod.weeklyHistory.filter(w => w.satisfaction > 0);
+      const avgSat = satWeeks.length > 0 ? (satWeeks.reduce((s,w) => s + w.satisfaction, 0) / satWeeks.length).toFixed(0) : '100';
+      serviceMod.kpis[3].val = avgSat + '%';
+    }
+  }
+} catch(e) {}
 
 function openDataCenterEdit(moduleId){
   const mod = DATA_CENTER.modules.find(m => m.id === moduleId);
