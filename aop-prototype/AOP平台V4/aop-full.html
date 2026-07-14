@@ -696,6 +696,14 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p09-title{font-size:20px;font-weight:700;color:var(--t1)}
 .p09-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--acl);color:var(--ac)}
 .p09-desc{font-size:13px;color:var(--t2);line-height:1.6}
+.p09-year-sel{position:relative;display:inline-block}
+.p09-year-btn{display:flex;align-items:center;gap:8px;padding:5px 12px;background:var(--acl);border:1px solid var(--ac);border-radius:99px;font-size:12px;font-weight:600;color:var(--ac);cursor:pointer;transition:all var(--tr)}
+.p09-year-btn:hover{filter:brightness(0.95)}
+.p09-year-dd{position:absolute;top:calc(100% + 6px);right:0;width:120px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--shL);z-index:20;display:none;overflow:hidden}
+.p09-year-dd.open{display:block}
+.p09-year-dd-item{display:block;width:100%;text-align:left;padding:8px 14px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--t2);transition:background var(--tr)}
+.p09-year-dd-item:hover{background:var(--bgH)}
+.p09-year-dd-item.current{font-weight:700;color:var(--t1)}
 .p09-content{padding:24px;overflow-y:auto}
 
 /* Data module card */
@@ -1766,9 +1774,6 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 <div class="panel" id="p09">
   <div class="topbar">
     <div class="topbar-title">行政运营数据中心</div>
-    <div class="topbar-right">
-      <select style="padding:5px 12px;border-radius:7px;font-size:13px;font-weight:600;border:1px solid var(--bd)"><option>2026年</option><option>2025年</option></select>
-    </div>
   </div>
   <div class="content-scroll" id="p09Content"></div>
 </div>
@@ -4863,6 +4868,19 @@ function renderP08(){
 }
 
 /* ══════ P09: DATA COCKPIT ══════ */
+/* ══════ P09: ADMIN OPS DATA CENTER ══════ */
+let _dcYear = 2026;
+
+function toggleDCYear(){
+  document.getElementById('dcYearDd').classList.toggle('open');
+}
+
+function selectDCYear(year){
+  _dcYear = year;
+  document.getElementById('dcYearDd').classList.remove('open');
+  renderP09();
+}
+
 function renderP09(){
   const el = document.getElementById('p09Content');
   if(!el) return;
@@ -4877,9 +4895,15 @@ function renderP09(){
   h += `<div class="p09-header">
     <div class="p09-header-top">
       <div class="p09-title">📊 行政运营数据中心</div>
-      <div class="p09-badge">${data.year||'2026'}年度</div>
+      <div class="p09-year-sel">
+        <div class="p09-year-btn" onclick="toggleDCYear()">${_dcYear}年度 ▾</div>
+        <div class="p09-year-dd" id="dcYearDd">
+          <div class="p09-year-dd-item${_dcYear===2026?' current':''}" onclick="selectDCYear(2026)">2026年度</div>
+          <div class="p09-year-dd-item${_dcYear===2025?' current':''}" onclick="selectDCYear(2025)">2025年度</div>
+        </div>
+      </div>
     </div>
-    <div class="p09-desc">沉淀行政运营过程中产生的重要数据资产，统一记录、持续沉淀、长期积累。支持季度运营回顾、半年度汇报、年度总结、CEO经营汇报直接引用。</div>
+    <div class="p09-desc">沉淀行政运营过程中产生的重要数据资产，统一记录、持续沉淀、长期积累。</div>
   </div>`;
 
   h += `<div class="p09-content">`;
