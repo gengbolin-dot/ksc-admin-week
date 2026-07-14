@@ -4560,12 +4560,6 @@ function renderP09(){
     h+='<tr><td style="font-weight:600">'+r.n+'</td><td>'+r.b+'</td><td>'+r.u+'</td><td style="font-weight:600;color:'+r.c+'">'+r.p+'%</td><td><div class="p09-prog-bar"><div class="p09-prog-fill" style="width:'+r.p+'%;background:'+r.c+'"></div></div></td></tr>';
   });
   h+='</tbody></table></div>';
-  // Meeting rooms
-  h+='<div class="p09-card"><h3>🏢 会议室利用率</h3>';
-  [{n:'大会议室A',p:85,c:'var(--ac)'},{n:'中会议室B',p:72,c:'var(--ac)'},{n:'小会议室C',p:90,c:'var(--dan)'},{n:'视频会议室',p:65,c:'var(--warn)'},{n:'武汉-1',p:58,c:'var(--warn)'},{n:'武汉-2',p:45,c:'var(--dan)'}].forEach(r=>{
-    h+='<div class="p09-meeting-row"><div class="p09-meeting-label">'+r.n+'</div><div class="p09-meeting-track"><div class="p09-meeting-fill" style="width:'+r.p+'%;background:'+r.c+'"></div></div><div class="p09-meeting-pct">'+r.p+'%</div></div>';
-  });
-  h+='</div>';
   // Satisfaction
   h+='<div class="p09-card"><h3>⭐ 行政服务满意度</h3><div class="p09-kpi-row"><div class="p09-kpi"><div class="num">4.5</div><div class="lbl">综合评分</div><div class="chg up">↑0.3</div></div><div class="p09-kpi"><div class="num">1280</div><div class="lbl">参评人数</div></div><div class="p09-kpi"><div class="num">96%</div><div class="lbl">参评率</div></div></div>';
   [{l:'办公环境',v:'4.4',p:88,c:'var(--ac)'},{l:'响应速度',v:'4.6',p:92,c:'var(--suc)'},{l:'福利满意度',v:'4.3',p:86,c:'var(--ac)'},{l:'活动组织',v:'4.5',p:90,c:'var(--suc)'}].forEach(d=>{
