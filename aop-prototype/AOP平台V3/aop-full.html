@@ -3169,25 +3169,31 @@ function loadP05State(){
     const saved = localStorage.getItem('aop_p05_state');
     if(saved){
       const state = JSON.parse(saved);
-      // Merge saved links into P05_PROJECTS
-      if(state.links){
-        P05_PROJECTS.forEach(proj => {
-          if(state.links[proj.id] !== undefined){
-            proj.link = state.links[proj.id];
-          }
-        });
-      }
+      P05_PROJECTS.forEach(proj => {
+        // Restore links
+        if(state.links && state.links[proj.id] !== undefined){
+          proj.link = state.links[proj.id];
+        }
+        // Restore metrics
+        if(state.metrics && state.metrics[proj.id]){
+          proj.metrics = state.metrics[proj.id];
+        }
+        // Restore other fields
+        if(state.fields && state.fields[proj.id]){
+          Object.assign(proj, state.fields[proj.id]);
+        }
+      });
     }
   } catch(e) { console.log('Load P05 state error:', e); }
 }
 
 function saveP05State(){
   try {
-    const state = {
-      links: {}
-    };
+    const state = { links: {}, metrics: {}, fields: {} };
     P05_PROJECTS.forEach(proj => {
       if(proj.link) state.links[proj.id] = proj.link;
+      if(proj.metrics) state.metrics[proj.id] = proj.metrics;
+      state.fields[proj.id] = { title: proj.title, subtitle: proj.subtitle, quote: proj.quote };
     });
     localStorage.setItem('aop_p05_state', JSON.stringify(state));
   } catch(e) { console.log('Save P05 state error:', e); }
@@ -3348,12 +3354,14 @@ function p05UploadCardImg(input, targetId){
 function p05SaveField(idx, field, el){
   if(P05_PROJECTS[idx]){
     P05_PROJECTS[idx][field] = el.textContent;
+    saveP05State();
   }
 }
 
 function p05SaveMetric(idx, mIdx, field, el){
   if(P05_PROJECTS[idx] && P05_PROJECTS[idx].metrics[mIdx]){
     P05_PROJECTS[idx].metrics[mIdx][field] = el.textContent;
+    saveP05State();
   }
 }
 
