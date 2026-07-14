@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AOP OKR — 目标与关键成果</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF;--bg2:#F8F9FB;--bg3:#F1F3F8;--bgH:#EEF0F6;--bd:#E5E7EB;--bdl:#F1F3F8;--t1:#1A1D26;--t2:#6B7280;--t3:#9CA3AF;--ac:#3B5BDB;--acl:#EBF0FF;--suc:#10B981;--sucL:#ECFDF5;--warn:#F59E0B;--warnL:#FFFBEB;--dan:#EF4444;--danL:#FEF2F2;--pur:#8B5CF6;--purL:#F5F3FF;--r:10px;--rl:14px;--rxl:18px;--sh:0 1px 3px rgba(0,0,0,.06);--shL:0 10px 25px rgba(0,0,0,.06);--tr:150ms cubic-bezier(.4,0,.2,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:var(--t1);font-size:14px;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sb{width:280px;background:var(--bg);border-right:1px solid var(--bdl);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sb-logo{padding:16px 18px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--bdl);flex-shrink:0}
+.sb-logo-i{width:28px;height:28px;background:var(--ac);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.sb-logo-t{font-size:16px;font-weight:700}
+.sb-logo-badge{font-size:10px;background:var(--bg3);color:var(--t3);border-radius:8px;padding:1px 7px;font-weight:600}
+.sb-ws{padding:12px 18px;font-size:13px;color:var(--t2);cursor:pointer;border-bottom:1px solid var(--bdl)}
+.sb-sec{padding:8px 12px;border-top:1px solid var(--bdl)}
+.sb-lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);padding:7px 9px 3px}
+.sb-grp{font-size:12px;font-weight:700;color:var(--t3);padding:5px 12px 0;text-transform:uppercase;letter-spacing:.06em;margin-top:7px}
+.sb-i{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:450;color:var(--t2);transition:all var(--tr);text-decoration:none}
+.sb-i:hover{background:var(--bgH);color:var(--t1)}
+.sb-i.act{background:var(--acl);color:var(--ac);font-weight:600}
+.sb-ic{width:17px;text-align:center;font-size:14px;flex-shrink:0}
+.sb-bg{font-size:11px;font-weight:600;min-width:17px;height:17px;display:flex;align-items:center;justify-content:center;border-radius:8px;margin-left:auto;padding:0 5px;background:var(--warn);color:#fff}
+.sb-sub{display:flex;align-items:center;gap:7px;padding:5px 14px 5px 24px;font-size:14px;color:var(--t3);border-radius:5px;cursor:pointer;transition:all var(--tr);text-decoration:none}
+.sb-sub:hover{background:var(--bgH);color:var(--t2)}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}.sb-bt{margin-top:auto;padding:12px;border-top:1px solid var(--bdl);flex-shrink:0}
+.sb-u{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:7px;cursor:pointer}
+.sb-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600}
+.sb-un{font-size:13px;font-weight:600}
+.sb-ur{font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.main-hd{padding:20px 32px 0;flex-shrink:0}
+.main-body{flex:1;overflow-y:auto;padding:20px 32px 48px}
+
+/* OKR Top Bar */
+.okr-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.okr-top-left{display:flex;align-items:center;gap:12px}
+.okr-top-right{display:flex;align-items:center;gap:8px}
+
+/* Period Selector */
+.period-sel{position:relative;display:inline-block}
+.period-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--r);font-size:15px;font-weight:700;color:var(--t1);cursor:pointer;transition:all var(--tr)}
+.period-btn:hover{border-color:var(--ac)}
+.period-btn svg{width:14px;height:14px;color:var(--t3);transition:transform var(--tr)}
+.period-dd{position:absolute;top:calc(100% + 6px);left:0;width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--shL);z-index:20;display:none;overflow:hidden}
+.period-dd.open{display:block}
+.period-dd-item{display:block;width:100%;text-align:left;padding:8px 14px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--t2);transition:background var(--tr)}
+.period-dd-item:hover{background:var(--bgH)}
+.period-dd-item.current{font-weight:700;color:var(--t1)}
+
+/* Search */
+.search-box{position:relative;min-width:200px}
+.search-box svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--t3);pointer-events:none}
+.search-box input{width:100%;padding:7px 12px 7px 30px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--r);font-size:13px;color:var(--t1);outline:none;transition:border var(--tr),box-shadow var(--tr)}
+.search-box input:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(59,91,219,.12)}
+.search-box input::placeholder{color:var(--t3)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all var(--tr);white-space:nowrap}
+.btn--ghost{background:var(--bg);border-color:var(--bd);color:var(--t2)}
+.btn--ghost:hover{background:var(--bgH);color:var(--t1)}
+.btn--ac{background:var(--ac);color:#fff;border-color:rgba(255,255,255,.18)}
+.btn--ac:hover{filter:brightness(1.08)}
+.btn svg{width:14px;height:14px}
+
+/* OKR Cards */
+.okr-list{display:flex;flex-direction:column;gap:20px;max-width:820px}
+.okr-card{background:var(--bg);border:1px solid var(--bd);border-radius:var(--rl);padding:24px;box-shadow:var(--sh)}
+.okr-card:hover{box-shadow:var(--shL)}
+
+.okr-head{display:flex;align-items:flex-start;gap:16px}
+.okr-num{font-size:28px;font-weight:700;color:var(--t3);line-height:1;flex-shrink:0;width:44px;user-select:none;letter-spacing:-.02em}
+.okr-body{flex:1;min-width:0}
+.okr-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:4px}
+.okr-obj{font-size:17px;font-weight:700;color:var(--t1);line-height:1.4;padding:4px 6px;border-radius:6px;cursor:pointer;transition:background var(--tr);min-height:28px}
+.okr-obj:hover{background:var(--bgH)}
+.okr-del{padding:6px;color:var(--dan);background:none;border:none;cursor:pointer;border-radius:6px;flex-shrink:0;transition:background var(--tr);opacity:.5}
+.okr-del:hover{background:var(--danL);opacity:1}
+.okr-del svg{width:16px;height:16px}
+
+/* Key Results */
+.kr-section{margin-top:16px;padding-left:44px}
+.kr-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:8px}
+.kr-list{display:flex;flex-direction:column;gap:6px}
+.kr-row{display:flex;align-items:flex-start;gap:10px}
+.kr-id{font-size:12px;font-weight:600;color:var(--t3);width:72px;flex-shrink:0;padding-top:5px;user-select:none;font-family:'Inter',monospace;letter-spacing:-.01em}
+.kr-desc{flex:1;font-size:14px;color:var(--t2);line-height:1.5;padding:4px 8px;border-radius:6px;cursor:pointer;transition:background var(--tr);min-height:26px}
+.kr-desc:hover{background:var(--bgH)}
+.kr-del{padding:4px;color:var(--dan);background:none;border:none;cursor:pointer;border-radius:4px;flex-shrink:0;opacity:.35;transition:all var(--tr)}
+.kr-del:hover{opacity:.8;background:var(--danL)}
+.kr-del svg{width:13px;height:13px}
+
+/* Add KR link */
+.add-kr{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--ac);cursor:pointer;padding:4px 6px;border-radius:5px;border:none;background:none;transition:background var(--tr);margin-top:4px}
+.add-kr:hover{background:var(--acl)}
+.add-kr svg{width:12px;height:12px}
+
+/* Empty state */
+.empty-state{text-align:center;padding:48px 0;color:var(--t3)}
+.empty-state svg{width:32px;height:32px;color:var(--t3);margin-bottom:8px;opacity:.4}
+.empty-state p{font-size:14px}
+
+/* Period indicator */
+.period-hint{font-size:11px;color:var(--t3);margin-top:8px;display:flex;align-items:center;gap:4px}
+.period-hint svg{width:12px;height:12px}
+
+/* Linked projects hint */
+.linked-hint{margin-top:8px;padding:8px 10px;background:var(--acl);border:1px solid rgba(59,91,219,.12);border-radius:6px;font-size:11px;color:var(--ac);display:flex;align-items:flex-start;gap:6px}
+.linked-hint svg{width:13px;height:13px;flex-shrink:0;margin-top:1px}
+
+/* Annotation Panel */
+.anno{position:fixed;right:20px;top:20px;width:260px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rl);box-shadow:var(--shL);padding:16px;font-size:12px;z-index:100}
+.anno h4{font-size:11px;font-weight:700;color:var(--ac);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:5px}
+.anno h4 svg{width:13px;height:13px}
+.anno-i{display:flex;gap:8px;margin-bottom:7px;line-height:1.5}
+.anno-n{width:16px;height:16px;background:var(--ac);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.anno-t{color:var(--t2)}
+.anno-t strong{color:var(--t1)}
+
+/* Sidebar groups */
+.sidebar-group{margin:2px 0}
+.sidebar-group-head{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:450;color:var(--t2);transition:all var(--tr);user-select:none}
+.sidebar-group-head:hover{background:var(--bgH);color:var(--t1)}
+.sidebar-group-arrow{margin-left:auto;font-size:12px;transition:transform 150ms}
+.sidebar-group.open>.sidebar-group-head{color:var(--ac);font-weight:600}
+.sidebar-group.open>.sidebar-group-head .sidebar-group-arrow{transform:rotate(90deg)}
+.sidebar-group-body{display:none;padding:0 0 0 16px}
+.sidebar-group.open>.sidebar-group-body{display:block}
+.sidebar-group-sub{margin:2px 0}
+.sidebar-group-sub-head{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--t3);transition:all var(--tr);user-select:none}
+.sidebar-group-sub-head:hover{background:var(--bgH);color:var(--t2)}
+.sidebar-group-sub-head .sidebar-group-arrow{margin-left:auto;font-size:10px;transition:transform 150ms}
+.sidebar-group-sub.open>.sidebar-group-sub-head{color:var(--t2);font-weight:600}
+.sidebar-group-sub.open>.sidebar-group-sub-head .sidebar-group-arrow{transform:rotate(90deg)}
+.sidebar-group-sub-body{display:none;padding:0 0 0 12px}
+.sidebar-group-sub.open>.sidebar-group-sub-body{display:block}
+.sidebar-sub-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:13px;color:var(--t3);border-radius:6px;cursor:pointer;transition:all var(--tr);text-decoration:none}
+.sidebar-sub-item:hover{background:var(--bgH);color:var(--t2)}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sb">
+    <div class="sb-logo">
+      <div class="sb-logo-i">A</div>
+      <div style="display:flex;flex-direction:column"><div style="display:flex;align-items:center;gap:6px"><div class="sb-logo-t">AOP</div><div class="sb-logo-badge">Beta</div></div><div style="font-size:10px;font-weight:500;color:var(--t3);letter-spacing:.06em;white-space:nowrap;margin-top:1px">行政运营管理平台</div></div>
+    </div>
+    <div class="sb-ws">▼ 行政部</div>
+
+    <div class="sb-scroll" style="flex:1;overflow-y:auto;overflow-x:hidden">
+
+  <div class="sb-scroll">
+    <div class="sb-sec">
+      <div class="sb-lbl">个人</div>
+      <a class="sb-i" href="./02-my-work.html"><div class="sb-ic">🏠</div> 我的工作 <div class="sb-bg warn">3</div></a>
+      <a class="sb-i act" href="./10-okr.html"><div class="sb-ic">🎯</div> OKR <span style="font-size:11px;color:var(--t3);margin-left:2px">手动导入</span></a>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-lbl">管理</div>
+      <div class="sidebar-group">
+        <div class="sidebar-group-head" onclick="toggleSidebarGroup(this)">
+          <span class="sb-ic">📋</span> 行政总览
+          <span class="sidebar-group-arrow">▸</span>
+        </div>
+        <div class="sidebar-group-body">
+          <div class="sidebar-group-sub">
+            <div class="sidebar-group-sub-head" onclick="toggleSidebarSubGroup(this)">
+              <span class="sb-ic">🏢</span> 大行政
+              <span class="sidebar-group-arrow">▸</span>
+            </div>
+            <div class="sidebar-group-sub-body">
+              <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=职场运营">
+                <div class="sb-dot" style="background:#3B5BDB"></div> 职场运营
+              </a>
+              <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=文化运营">
+                <div class="sb-dot" style="background:#10B981"></div> 文化运营
+              </a>
+              <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=数字化运营">
+                <div class="sb-dot" style="background:#06B6D4"></div> 数字化运营
+              </a>
+            </div>
+          </div>
+          <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=总裁办">
+            <div class="sb-dot" style="background:#8B5CF6"></div> 总裁办
+          </a>
+        </div>
+      </div>
+      <a class="sb-i" href="./05-key-projects.html"><div class="sb-ic">⭐</div> 重点专项</a>
+      <a class="sb-i" href="./06-ops-dashboard.html"><div class="sb-ic">📊</div> 运营看板</a>
+      <a class="sb-i" href="./07-weekly-meeting.html"><div class="sb-ic">👥</div> 周会视图</a>
+      <a class="sb-i" href="./08-weekly-report.html"><div class="sb-ic">📝</div> 周报</a>
+      <a class="sb-i" href="./11-team-structure.html"><div class="sb-ic">👥</div> 团队人员架构</a>
+      <a class="sb-i" href="./12-budget.html"><div class="sb-ic">💰</div> 年度预算</a>
+      <a class="sb-i" href="./13-ai-performance.html"><div class="sb-ic">🤖</div> AI 绩效</a>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-lbl">经营复盘</div>
+      <a class="sb-i" href="11-admin-review.html"><div class="sb-ic">📈</div> 行政经营复盘</a>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-lbl">分析</div>
+      <a class="sb-i" href="./09-data-cockpit.html"><div class="sb-ic">📈</div> 数据驾驶舱</a>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-lbl">业务模块</div>
+      <div class="sb-grp">职场运营</div>
+      <a class="sb-sub" href="#"><div class="sb-dot" style="background:#3B5BDB"></div> 北京职场</a>
+      <a class="sb-sub" href="#"><div class="sb-dot" style="background:#8B5CF6"></div> 武汉职场</a>
+      <a class="sb-sub" href="#"><div class="sb-dot" style="background:#EC4899"></div> 异地职场</a>
+      <div class="sb-grp">文化运营</div>
+      <div class="sb-grp">数字化运营</div>
+      <a class="sb-sub" href="#"><div class="sb-dot" style="background:#06B6D4"></div> 行政服务台</a>
+      <a class="sb-sub" href="#"><div class="sb-dot" style="background:#6366F1"></div> 数字化后台运营</a>
+    </div>
+
+    </div>
+
+  </div>
+    <div class="sb-bt">
+      <div class="sb-u">
+        <div class="sb-av">耿</div>
+          <div style="min-width:0">
+            <div class="sb-un">耿博琳</div>
+            <div class="sb-ur">职场管理(北京+异地)、行政数字化、文化运营</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="main-hd">
+      <div style="font-size:11px;color:var(--t3);margin-bottom:4px">AOP / 工作</div>
+      <h1 style="font-size:22px;font-weight:700;letter-spacing:-.02em">🎯 OKR</h1>
+      <p style="font-size:13px;color:var(--t2);margin-top:4px">目标与关键成果 · 手动导入/编辑 · 按 OKR 周期管理</p>
+    </div>
+
+    <div class="main-body">
+      <!-- Top Bar -->
+      <div class="okr-top">
+        <div class="okr-top-left">
+          <div class="period-sel">
+            <button class="period-btn" id="periodBtn" onclick="togglePeriod()">
+              2026 上半年
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="period-dd" id="periodDd">
+              <button class="period-dd-item current" onclick="selectPeriod('2026-H1')">2026 上半年</button>
+              <button class="period-dd-item" onclick="selectPeriod('2025-H2')">2025 下半年</button>
+            </div>
+          </div>
+        </div>
+        <div class="okr-top-right">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="搜索目标或关键成果..." id="searchInput" oninput="handleSearch()" />
+          </div>
+          <button class="btn btn--ghost">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            创建新周期
+          </button>
+          <button class="btn btn--ac">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            添加 OKR
+          </button>
+        </div>
+      </div>
+
+      <!-- OKR List (2026-H1 current period) -->
+      <div class="okr-list" id="okrList">
+
+        <!-- O1 -->
+        <div class="okr-card">
+          <div class="okr-head">
+            <div class="okr-num">O1</div>
+            <div class="okr-body">
+              <div class="okr-label">目标 (Objective)</div>
+              <div class="okr-obj">提升行政服务响应效率与满意度</div>
+            </div>
+            <button class="okr-del" title="删除此目标">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+          <div class="kr-section">
+            <div class="kr-label">关键成果 (Key Results)</div>
+            <div class="kr-list">
+              <div class="kr-row">
+                <span class="kr-id">O1-KR1</span>
+                <span class="kr-desc">行政服务台平均响应时间 ≤ 2 小时</span>
+                <button class="kr-del" title="删除">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+              <div class="kr-row">
+                <span class="kr-id">O1-KR2</span>
+                <span class="kr-desc">员工满意度评分 ≥ 4.5 / 5.0</span>
+                <button class="kr-del" title="删除">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+              <div class="kr-row">
+                <span class="kr-id">O1-KR3</span>
+                <span class="kr-desc">工单自动化拦截率 ≥ 30%</span>
+                <button class="kr-del" title="删除">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </div>
+            <button class="add-kr">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              添加关键成果
+            </button>
+            <div class="linked-hint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span>已关联 2 个重点专项：行政服务台升级、AI 自动拦截引擎</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- O2 -->
+        <div class="okr-card">
+          <div class="okr-head">
+            <div class="okr-num">O2</div>
+            <div class="okr-body">
+              <div class="okr-label">目标 (Objective)</div>
+              <div class="okr-obj">优化办公空间利用率与成本控制</div>
+            </div>
+            <button class="okr-del" title="删除此目标">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+          <div class="kr-section">
+            <div class="kr-label">关键成果 (Key Results)</div>
+            <div class="kr-list">
+              <div class="kr-row">
+                <span class="kr-id">O2-KR1</span>
+                <span class="kr-desc">北京办公区空间利用率 ≥ 85%</span>
+                <button class="kr-del" title="删除">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+              <div class="kr-row">
+                <span class="kr-id">O2-KR2</span>
+                <span class="kr-desc">会议室综合使用率 ≥ 70%</span>
+                <button class="kr-del" title="删除">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </div>
+            <button class="add-kr">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              添加关键成果
+            </button>
+            <div class="linked-hint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span>已关联 1 个重点专项：办公空间智能调度</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- O3 -->
+        <div class="okr-card">
+          <div class="okr-head">
+            <div class="okr-num">O3</div>
+            <div class="okr-body">
+              <div class="okr-label">目标 (Objective)</div>
+              <div class="okr-obj">建设数字化行政运营体系</div>
+            </div>
+            <button class="okr-del" title="删除此目标">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+          <div class="kr-section">
+            <div class="kr-label">关键成果 (Key Results)</div>
+            <div class="kr-list">
+              <div class="kr-row">
+                <span class="kr-id">O3-KR1</span>
+                <span class="kr-desc">AOP 平台覆盖全部行政业务模块（8/8 上线）</span>
+                <button class="kr-del" title="删除">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+              <div class="kr-row">
+                <span class="kr-id">O3-KR2</span>
+                <span class="kr-desc">周报自动生成覆盖率 100%（含全部重点专项）</span>
+                <button class="kr-del" title="删除">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+              <div class="kr-row">
+                <span class="kr-id">O3-KR3</span>
+                <span class="kr-desc">差旅费用数据驾驶舱实现实时同步（T+1）</span>
+                <button class="kr-del" title="删除">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </div>
+            <button class="add-kr">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              添加关键成果
+            </button>
+            <div class="linked-hint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span>已关联 4 个重点专项：AOP 平台搭建、周报自动化、数据驾驶舱、AI 推送引擎</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /okr-list -->
+
+      <!-- Period hint -->
+      <div class="period-hint" style="margin-top:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        当前周期：2026 上半年（2026-01-01 ~ 2026-06-30）· 下次周期自动创建于 2026-07-01
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ANNOTATION PANEL -->
+<div class="anno">
+  <h4>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    页面说明
+  </h4>
+  <div class="anno-i"><div class="anno-n">1</div><div class="anno-t"><strong>手动导入</strong> — OKR 是 AOP 唯一不自动生成的数据实体，目标来自管理层规划，需人工导入或行内编辑</div></div>
+  <div class="anno-i"><div class="anno-n">2</div><div class="anno-t"><strong>周期选择器</strong> — 按 OKR 周期（半年/季度）切换数据，下拉切换历史周期</div></div>
+  <div class="anno-i"><div class="anno-n">3</div><div class="anno-t"><strong>行内编辑</strong> — 点击 Objective 或 KR 文本即可编辑，Enter 保存，Escape 取消</div></div>
+  <div class="anno-i"><div class="anno-n">4</div><div class="anno-t"><strong>关联关系</strong> — 蓝色提示条显示该 Objective 下已关联的重点专项，数据来自项目的 <strong>key_result_ids</strong></div></div>
+  <div class="anno-i"><div class="anno-n">5</div><div class="anno-n">6</div><div class="anno-t"><strong>添加 OKR</strong> 紫色主按钮 + <strong>创建新周期</strong> 次按钮，创建后自动进入新周期编辑</div></div>
+  <div class="anno-i"><div class="anno-n">7</div><div class="anno-t"><strong>删除保护</strong> — 删除 Objective 或 KR 需二次确认，防止误操作丢失管理层规划</div></div>
+  <div class="anno-i"><div class="anno-n">8</div><div class="anno-t"><strong>权限差异</strong> — 普通员工只读，主管可编辑本组 OKR，部门负责人/管理员可编辑全部</div></div>
+</div>
+
+<script>
+// Period selector toggle
+function togglePeriod() {
+  const dd = document.getElementById('periodDd');
+  dd.classList.toggle('open');
+}
+
+function selectPeriod(id) {
+  document.getElementById('periodDd').classList.remove('open');
+  // In real app: switch data; in prototype: just close
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const sel = document.querySelector('.period-sel');
+  if (sel && !sel.contains(e.target)) {
+    document.getElementById('periodDd').classList.remove('open');
+  }
+});
+
+// Search filtering
+function handleSearch() {
+  const term = document.getElementById('searchInput').value.toLowerCase();
+  const cards = document.querySelectorAll('.okr-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    const match = !term || text.includes(term);
+    card.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  // Show empty state if no matches
+  const existing = document.querySelector('.empty-state');
+  if (visible === 0 && term) {
+    if (!existing) {
+      const el = document.createElement('div');
+      el.className = 'empty-state';
+      el.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>没有匹配的 OKR</p>';
+      document.getElementById('okrList').appendChild(el);
+    }
+  } else if (existing) {
+    existing.remove();
+  }
+}
+
+function toggleSidebarGroup(el){
+  const group = el.parentElement;
+  group.classList.toggle('open');
+}
+function toggleSidebarSubGroup(el){
+  const subGroup = el.parentElement;
+  subGroup.classList.toggle('open');
+}
+</script>
+</body>
+</html>

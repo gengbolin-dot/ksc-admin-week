@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AOP 数据驾驶舱</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF;--bg2:#F8F9FB;--bg3:#F1F3F8;--bgH:#EEF0F6;--bd:#E5E7EB;--bdl:#F1F3F8;--t1:#1A1D26;--t2:#6B7280;--t3:#9CA3AF;--ac:#3B5BDB;--acl:#EBF0FF;--suc:#10B981;--sucL:#ECFDF5;--warn:#F59E0B;--warnL:#FFFBEB;--dan:#EF4444;--danL:#FEF2F2;--pur:#8B5CF6;--purL:#F5F3FF;--r:10px;--rl:14px;--sh:0 1px 3px rgba(0,0,0,.06);--shL:0 10px 25px rgba(0,0,0,.06);--tr:150ms cubic-bezier(.4,0,.2,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg2);color:var(--t1);font-size:14px;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+.sb{width:280px;background:var(--bg);border-right:1px solid var(--bdl);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sb-logo{padding:16px 18px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--bdl);flex-shrink:0}
+.sb-logo-i{width:28px;height:28px;background:var(--ac);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.sb-logo-t{font-size:16px;font-weight:700}
+.sb-sec{padding:8px 12px;border-top:1px solid var(--bdl)}
+.sb-lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);padding:7px 9px 3px}
+.sb-i{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:450;color:var(--t2);transition:all var(--tr)}
+.sb-i:hover{background:var(--bgH);color:var(--t1)}
+.sb-i.act{background:var(--acl);color:var(--ac);font-weight:600}
+.sb-ic{width:17px;text-align:center;font-size:14px;flex-shrink:0}
+.sb-sub{display:flex;align-items:center;gap:7px;padding:5px 14px 5px 24px;font-size:14px;color:var(--t3);border-radius:5px;cursor:pointer;transition:all var(--tr)}
+.sb-sub:hover{background:var(--bgH);color:var(--t2)}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .sb-grp{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);padding:7px 9px 3px;margin-top:7px}
+.sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}.sb-bt{margin-top:auto;padding:12px;border-top:1px solid var(--bdl);flex-shrink:0}
+.sb-u{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:7px;cursor:pointer}
+.sb-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600}
+
+/* Main */
+.main{flex:1;overflow-y:auto;background:var(--bg2);padding:24px 32px}
+
+/* Header */
+.hd{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.hd h1{font-size:20px;font-weight:700}
+.year-sel{padding:5px 12px;border-radius:7px;font-size:13px;font-weight:600;border:1px solid var(--bd);background:var(--bg);color:var(--t1);cursor:pointer}
+
+/* Dashboard grid */
+.dash{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* Card */
+.card{background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:18px 20px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.card.full{grid-column:1/-1}
+.card h3{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.card h3 .note{font-size:10px;font-weight:400;color:var(--t3);margin-left:auto}
+
+/* KPI numbers */
+.kpi-row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px}
+.kpi{display:flex;flex-direction:column;align-items:center;flex:1}
+.kpi .num{font-size:24px;font-weight:700;color:var(--t1);letter-spacing:-.02em}
+.kpi .lbl{font-size:11px;color:var(--t3);margin-top:2px}
+.kpi .chg{font-size:10px;font-weight:600;padding:1px 5px;border-radius:6px;margin-top:2px}
+.kpi .up{background:var(--sucL);color:var(--suc)}
+.kpi .dn{background:var(--danL);color:var(--dan)}
+
+/* CSS Bar chart */
+.bars{display:flex;align-items:flex-end;gap:6px;height:100px;padding-top:8px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .5s ease}
+.bar-label{font-size:10px;color:var(--t3);font-weight:500}
+
+/* CSS donut */
+.donut-wrap{display:flex;align-items:center;gap:20px}
+.donut{width:140px;height:140px;border-radius:50%;position:relative;flex-shrink:0}
+.donut-center{position:absolute;inset:25px;border-radius:50%;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-center .big{font-size:20px;font-weight:700;color:var(--t1)}
+.donut-center .small{font-size:9px;color:var(--t3)}
+.donut-legend{display:flex;flex-direction:column;gap:6px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-val{font-weight:700;color:var(--t1);margin-left:auto}
+
+/* Project table */
+.proj-table{width:100%;border-collapse:separate;border-spacing:0}
+.proj-table th{background:var(--bg3);padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);text-align:left;border-bottom:1px solid var(--bd)}
+.proj-table td{padding:8px 12px;font-size:12.5px;border-bottom:1px solid var(--bdl)}
+.proj-table tr:last-child td{border-bottom:none}
+.proj-table tr:hover td{background:var(--bg2)}
+.prog-bar{height:6px;border-radius:3px;background:var(--bg3);overflow:hidden;width:100px;display:inline-block;vertical-align:middle}
+.prog-fill{height:100%;border-radius:3px}
+.rate-text{font-size:11px;font-weight:600;margin-left:6px}
+
+/* Travel cards */
+.travel-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.travel-card{background:var(--bg2);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.travel-card .icon{font-size:16px;margin-bottom:4px}
+.travel-card .num{font-size:18px;font-weight:700;color:var(--t1)}
+.travel-card .lbl{font-size:11px;color:var(--t3)}
+.travel-card .chg{font-size:10px;font-weight:600}
+
+/* Meeting bars */
+.meeting-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.meeting-label{width:100px;font-size:12px;font-weight:500;color:var(--t2);flex-shrink:0}
+.meeting-track{flex:1;height:20px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.meeting-fill{height:100%;border-radius:4px}
+.meeting-pct{font-size:11px;font-weight:600;color:var(--t3);width:36px;text-align:right;flex-shrink:0}
+
+/* Anno */
+.anno{position:fixed;right:20px;top:20px;width:260px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--rl);box-shadow:var(--shL);padding:16px;font-size:12px;z-index:100}
+.anno h4{font-size:11px;font-weight:700;color:var(--ac);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em}
+.anno-i{display:flex;gap:8px;margin-bottom:6px;line-height:1.5}
+.anno-n{width:16px;height:16px;background:var(--ac);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.anno-t{color:var(--t2)}
+
+/* Sidebar groups */
+.sidebar-group{margin:2px 0}
+.sidebar-group-head{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:450;color:var(--t2);transition:all var(--tr);user-select:none}
+.sidebar-group-head:hover{background:var(--bgH);color:var(--t1)}
+.sidebar-group-arrow{margin-left:auto;font-size:12px;transition:transform 150ms}
+.sidebar-group.open>.sidebar-group-head{color:var(--ac);font-weight:600}
+.sidebar-group.open>.sidebar-group-head .sidebar-group-arrow{transform:rotate(90deg)}
+.sidebar-group-body{display:none;padding:0 0 0 16px}
+.sidebar-group.open>.sidebar-group-body{display:block}
+.sidebar-group-sub{margin:2px 0}
+.sidebar-group-sub-head{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--t3);transition:all var(--tr);user-select:none}
+.sidebar-group-sub-head:hover{background:var(--bgH);color:var(--t2)}
+.sidebar-group-sub-head .sidebar-group-arrow{margin-left:auto;font-size:10px;transition:transform 150ms}
+.sidebar-group-sub.open>.sidebar-group-sub-head{color:var(--t2);font-weight:600}
+.sidebar-group-sub.open>.sidebar-group-sub-head .sidebar-group-arrow{transform:rotate(90deg)}
+.sidebar-group-sub-body{display:none;padding:0 0 0 12px}
+.sidebar-group-sub.open>.sidebar-group-sub-body{display:block}
+.sidebar-sub-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:13px;color:var(--t3);border-radius:6px;cursor:pointer;transition:all var(--tr);text-decoration:none}
+.sidebar-sub-item:hover{background:var(--bgH);color:var(--t2)}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="sb">
+  <div class="sb-logo"><div class="sb-logo-i">A</div><div style="display:flex;flex-direction:column"><div style="display:flex;align-items:center;gap:6px"><div class="sb-logo-t">AOP</div><div class="sb-logo-badge">Beta</div></div><div style="font-size:10px;font-weight:500;color:var(--t3);letter-spacing:0.06em;white-space:nowrap;margin-top:1px">行政运营管理平台</div></div></div>
+  <div class="sb-scroll" style="flex:1;overflow-y:auto;overflow-x:hidden">
+  <div class="sb-scroll">
+  <div class="sb-sec"><div class="sb-lbl">个人</div>
+    <div class="sb-i"><div class="sb-ic">🏠</div> 我的工作</div>
+    <a class="sb-i" href="./10-okr.html"><div class="sb-ic">🎯</div> OKR <span style="font-size:11px;color:var(--t3);margin-left:2px">手动导入</span></a>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">管理</div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-head" onclick="toggleSidebarGroup(this)">
+        <span class="sb-ic">📋</span> 行政总览
+        <span class="sidebar-group-arrow">▸</span>
+      </div>
+      <div class="sidebar-group-body">
+        <div class="sidebar-group-sub">
+          <div class="sidebar-group-sub-head" onclick="toggleSidebarSubGroup(this)">
+            <span class="sb-ic">🏢</span> 大行政
+            <span class="sidebar-group-arrow">▸</span>
+          </div>
+          <div class="sidebar-group-sub-body">
+            <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=职场运营">
+              <div class="sb-dot" style="background:#3B5BDB"></div> 职场运营
+            </a>
+            <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=文化运营">
+              <div class="sb-dot" style="background:#10B981"></div> 文化运营
+            </a>
+            <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=数字化运营">
+              <div class="sb-dot" style="background:#06B6D4"></div> 数字化运营
+            </a>
+          </div>
+        </div>
+        <a class="sidebar-sub-item" href="./04-admin-overview.html?filter=总裁办">
+          <div class="sb-dot" style="background:#8B5CF6"></div> 总裁办
+        </a>
+      </div>
+    </div>
+    <div class="sb-i"><div class="sb-ic">⭐</div> 重点专项</div>
+    <div class="sb-i"><div class="sb-ic">📊</div> 运营看板</div>
+    <div class="sb-i"><div class="sb-ic">👥</div> 周会视图</div>
+    <div class="sb-i"><div class="sb-ic">📝</div> 周报</div>
+    <a class="sb-i" href="./11-team-structure.html"><div class="sb-ic">👥</div> 团队人员架构</a>
+    <a class="sb-i" href="./12-budget.html"><div class="sb-ic">💰</div> 年度预算</a>
+    <a class="sb-i" href="./13-ai-performance.html"><div class="sb-ic">🤖</div> AI 绩效</a>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">经营复盘</div>
+    <a class="sb-i" href="11-admin-review.html"><div class="sb-ic">📈</div> 行政经营复盘</a>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">分析</div>
+    <div class="sb-i act"><div class="sb-ic">📈</div> 数据驾驶舱</div>
+  </div>
+  <div class="sb-sec"><div class="sb-lbl">业务模块</div>
+    <div class="sb-grp">职场运营</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#3B5BDB"></div> 北京职场</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#8B5CF6"></div> 武汉职场</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#EC4899"></div> 异地职场</div>
+    <div class="sb-grp">文化运营</div>
+    <div class="sb-grp">数字化运营</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#06B6D4"></div> 行政服务台</div>
+    <div class="sb-sub"><div class="sb-dot" style="background:#6366F1"></div> 数字化后台运营</div>
+  </div>
+  </div>
+  </div>
+  <div class="sb-bt"><div class="sb-u"><div class="sb-av">耿</div><div style="min-width:0"><div style="font-size:13px;font-weight:600">耿博琳</div><div style="font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">职场管理(北京+异地)、行政数字化、文化运营</div></div></div></div>
+</div>
+
+<div class="main">
+
+  <div class="hd">
+    <h1>📈 数据驾驶舱</h1>
+    <select class="year-sel"><option>2026年</option><option>2025年</option></select>
+  </div>
+
+  <div class="dash">
+
+    <!-- Row 1: Budget (full width) -->
+    <div class="card full">
+      <h3>💰 行政年度预算 <span class="note">数据来源：财务系统</span></h3>
+      <div class="kpi-row">
+        <div class="kpi"><div class="num">¥8,500,000</div><div class="lbl">年度预算</div></div>
+        <div class="kpi"><div class="num">¥4,200,000</div><div class="lbl">已支出</div></div>
+        <div class="kpi"><div class="num" style="color:var(--ac)">49.4%</div><div class="lbl">预算执行率</div><div class="chg up">+2.1%</div></div>
+        <div class="kpi"><div class="num">¥4,300,000</div><div class="lbl">剩余预算</div></div>
+      </div>
+      <div class="bars">
+        <div class="bar-col"><div class="bar" style="height:40%;background:var(--ac)"></div><div class="bar-label">1月</div></div>
+        <div class="bar-col"><div class="bar" style="height:55%;background:var(--ac)"></div><div class="bar-label">2月</div></div>
+        <div class="bar-col"><div class="bar" style="height:35%;background:var(--ac)"></div><div class="bar-label">3月</div></div>
+        <div class="bar-col"><div class="bar" style="height:65%;background:var(--ac)"></div><div class="bar-label">4月</div></div>
+        <div class="bar-col"><div class="bar" style="height:80%;background:var(--warn)"></div><div class="bar-label">5月</div></div>
+        <div class="bar-col"><div class="bar" style="height:70%;background:var(--ac)"></div><div class="bar-label">6月</div></div>
+      </div>
+    </div>
+
+    <!-- Row 2: Travel expenses (2 cards) -->
+    <div class="card">
+      <h3>✈️ 差旅费用 <span class="note">数据来源：差旅平台，后续通过接口自动同步</span></h3>
+      <div class="travel-grid">
+        <div class="travel-card"><div class="icon">🚗</div><div class="num">¥186,500</div><div class="lbl">公司用车</div><div class="chg up">↑12%</div></div>
+        <div class="travel-card"><div class="icon">✈️</div><div class="num">¥324,800</div><div class="lbl">机票费用</div><div class="chg dn">↓5%</div></div>
+        <div class="travel-card"><div class="icon">🚄</div><div class="num">¥89,200</div><div class="lbl">火车票费用</div><div class="chg up">↑8%</div></div>
+        <div class="travel-card"><div class="icon">🏨</div><div class="num">¥215,600</div><div class="lbl">酒店费用</div><div class="chg dn">↓3%</div></div>
+      </div>
+    </div>
+
+    <!-- Activity participation donut -->
+    <div class="card">
+      <h3>🎉 活动参与率 <span class="note">数据支持手动编辑输入</span></h3>
+      <div class="donut-wrap">
+        <div class="donut" style="background:conic-gradient(#3B5BDB 0% 21%,#8B5CF6 21% 39%,#10B981 39% 62%,#F59E0B 62% 81%,#EF4444 81% 100%)">
+          <div class="donut-center"><div class="big">79%</div><div class="small">平均参与</div></div>
+        </div>
+        <div class="donut-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#3B5BDB"></div>下午茶 <div class="legend-val">92%</div></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#8B5CF6"></div>儿童节 <div class="legend-val">85%</div></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div>新年活动 <div class="legend-val">78%</div></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div>家庭日 <div class="legend-val">72%</div></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#EF4444"></div>团建 <div class="legend-val">65%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Project budget execution (full width) -->
+    <div class="card full">
+      <h3>📊 项目预算执行率 <span class="note">采购数据来源：采购系统</span></h3>
+      <table class="proj-table">
+        <thead><tr><th>项目名称</th><th>年度预算</th><th>已采购金额</th><th>执行率</th><th style="width:180px">进度</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">5层装修项目</td><td>¥2,000,000</td><td>¥1,400,000</td><td style="font-weight:600;color:var(--ac)">70%</td><td><div class="prog-bar"><div class="prog-fill" style="width:70%;background:var(--ac)"></div></div><span class="rate-text">70%</span></td></tr>
+          <tr><td style="font-weight:600">家庭日活动</td><td>¥300,000</td><td>¥120,000</td><td style="font-weight:600;color:var(--ac)">40%</td><td><div class="prog-bar"><div class="prog-fill" style="width:40%;background:var(--ac)"></div></div><span class="rate-text">40%</span></td></tr>
+          <tr><td style="font-weight:600">服务台升级2.0</td><td>¥800,000</td><td>¥200,000</td><td style="font-weight:600;color:var(--pur)">25%</td><td><div class="prog-bar"><div class="prog-fill" style="width:25%;background:var(--pur)"></div></div><span class="rate-text">25%</span></td></tr>
+          <tr><td style="font-weight:600">儿童节福利</td><td>¥150,000</td><td>¥135,000</td><td style="font-weight:600;color:var(--warn)">90%</td><td><div class="prog-bar"><div class="prog-fill" style="width:90%;background:var(--warn)"></div></div><span class="rate-text">90%</span></td></tr>
+          <tr><td style="font-weight:600">空调维保项目</td><td>¥200,000</td><td>¥120,000</td><td style="font-weight:600;color:var(--ac)">60%</td><td><div class="prog-bar"><div class="prog-fill" style="width:60%;background:var(--ac)"></div></div><span class="rate-text">60%</span></td></tr>
+          <tr><td style="font-weight:600">门禁系统改造</td><td>¥500,000</td><td>¥75,000</td><td style="font-weight:600;color:var(--pur)">15%</td><td><div class="prog-bar"><div class="prog-fill" style="width:15%;background:var(--pur)"></div></div><span class="rate-text">15%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Meeting room utilization -->
+    <div class="card">
+      <h3>🏢 会议室利用率</h3>
+      <div class="meeting-row"><div class="meeting-label">大会议室A</div><div class="meeting-track"><div class="meeting-fill" style="width:85%;background:var(--ac)"></div></div><div class="meeting-pct">85%</div></div>
+      <div class="meeting-row"><div class="meeting-label">中会议室B</div><div class="meeting-track"><div class="meeting-fill" style="width:72%;background:var(--ac)"></div></div><div class="meeting-pct">72%</div></div>
+      <div class="meeting-row"><div class="meeting-label">小会议室C</div><div class="meeting-track"><div class="meeting-fill" style="width:90%;background:var(--warn)"></div></div><div class="meeting-pct">90%</div></div>
+      <div class="meeting-row"><div class="meeting-label">视频会议室</div><div class="meeting-track"><div class="meeting-fill" style="width:65%;background:var(--ac)"></div></div><div class="meeting-pct">65%</div></div>
+      <div class="meeting-row"><div class="meeting-label">武汉-1号</div><div class="meeting-track"><div class="meeting-fill" style="width:58%;background:var(--ac)"></div></div><div class="meeting-pct">58%</div></div>
+      <div class="meeting-row"><div class="meeting-label">武汉-2号</div><div class="meeting-track"><div class="meeting-fill" style="width:45%;background:var(--pur)"></div></div><div class="meeting-pct">45%</div></div>
+    </div>
+
+    <!-- Satisfaction -->
+    <div class="card">
+      <h3>⭐ 行政服务满意度 <span class="note">数据支持手动编辑输入</span></h3>
+      <div class="kpi-row" style="margin-bottom:14px">
+        <div class="kpi"><div class="num" style="color:var(--ac)">4.5</div><div class="lbl">综合评分</div><div class="chg up">↑0.3</div></div>
+        <div class="kpi"><div class="num">1,280</div><div class="lbl">参评人数</div></div>
+        <div class="kpi"><div class="num">96%</div><div class="lbl">参评率</div></div>
+      </div>
+      <div class="meeting-row"><div class="meeting-label">办公环境</div><div class="meeting-track"><div class="meeting-fill" style="width:88%;background:var(--suc)"></div></div><div class="meeting-pct">4.4</div></div>
+      <div class="meeting-row"><div class="meeting-label">服务响应</div><div class="meeting-track"><div class="meeting-fill" style="width:92%;background:var(--suc)"></div></div><div class="meeting-pct">4.6</div></div>
+      <div class="meeting-row"><div class="meeting-label">员工福利</div><div class="meeting-track"><div class="meeting-fill" style="width:82%;background:var(--ac)"></div></div><div class="meeting-pct">4.3</div></div>
+      <div class="meeting-row"><div class="meeting-label">活动组织</div><div class="meeting-track"><div class="meeting-fill" style="width:86%;background:var(--ac)"></div></div><div class="meeting-pct">4.5</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Annotation -->
+<div class="anno">
+  <h4>📋 数据驾驶舱说明</h4>
+  <div class="anno-i"><div class="anno-n">1</div><div class="anno-t">行政年度预算：总额/已支出/执行率/剩余</div></div>
+  <div class="anno-i"><div class="anno-n">2</div><div class="anno-t">差旅费用：用车/机票/火车/酒店 四维度</div></div>
+  <div class="anno-i"><div class="anno-n">3</div><div class="anno-t">项目预算执行率：每项预算 vs 实际采购</div></div>
+  <div class="anno-i"><div class="anno-n">4</div><div class="anno-t">活动参与率：环形图 + 手动编辑输入</div></div>
+  <div class="anno-i"><div class="anno-n">5</div><div class="anno-t">会议室利用率：横向柱状图</div></div>
+  <div class="anno-i"><div class="anno-n">6</div><div class="anno-t">满意度评分：综合 + 分维度</div></div>
+  <div class="anno-i"><div class="anno-n">7</div><div class="anno-t">差旅数据后续通过接口自动同步</div></div>
+  <div class="anno-i"><div class="anno-n">8</div><div class="anno-t">参与率/满意度支持手动编辑输入</div></div>
+</div>
+
+</div>
+
+<script>
+function toggleSidebarGroup(el){
+  const group = el.parentElement;
+  group.classList.toggle('open');
+}
+function toggleSidebarSubGroup(el){
+  const subGroup = el.parentElement;
+  subGroup.classList.toggle('open');
+}
+</script>
+</body>
+</html>

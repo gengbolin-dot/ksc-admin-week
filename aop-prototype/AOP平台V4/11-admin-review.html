@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Q2 行政运营回顾 · AOP</title>
+<style>
+/* ──────── TOKENS ──────── */
+:root{
+  --bg:#f5f5f3;
+  --card:#ffffff;
+  --border:rgba(0,0,0,.07);
+  --s900:#0f172a;--s700:#334155;--s600:#475569;--s500:#64748b;--s400:#94a3b8;--s200:#e2e8f0;--s100:#f1f5f9;
+  --blue:#2563eb;--blue-bg:#eff6ff;--green:#16a34a;--green-bg:#f0fdf4;
+  --amber:#d97706;--amber-bg:#fffbeb;--red:#dc2626;--red-bg:#fef2f2;
+  --nav-w:224px;--r:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);color:var(--s900);line-height:1.6;overflow-x:hidden;}
+button{font:inherit;cursor:pointer;border:none;background:none;}
+
+/* ──────── SIDEBAR ──────── */
+.nav{position:fixed;left:0;top:0;bottom:0;width:var(--nav-w);background:#0f172a;
+  z-index:200;display:flex;flex-direction:column;overflow-y:auto;}
+.nav-logo{padding:18px 16px 14px;display:flex;align-items:center;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,.08);}
+.nav-mark{width:30px;height:30px;background:var(--blue);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:13px;font-weight:900;flex-shrink:0;}
+.nav-txt{color:#fff;font-size:13px;font-weight:700;}
+.nav-sub{color:rgba(255,255,255,.4);font-size:10px;}
+.nav-lbl{padding:14px 16px 5px;font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:rgba(255,255,255,.3);}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 16px;font-size:13px;
+  color:rgba(255,255,255,.6);cursor:pointer;transition:.15s;text-decoration:none;position:relative;}
+.ni:hover{background:rgba(255,255,255,.06);color:#fff;}
+.ni.active{background:rgba(37,99,235,.2);color:#fff;}
+.ni.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;
+  width:3px;background:var(--blue);border-radius:0 2px 2px 0;}
+.ni-icon{width:16px;font-size:14px;text-align:center;flex-shrink:0;}
+.ni-sub{padding:6px 16px 6px 42px;font-size:12px;color:rgba(255,255,255,.4);
+  text-decoration:none;display:block;transition:.15s;}
+.ni-sub:hover{color:rgba(255,255,255,.8);}
+.ni-sub.active{color:#93c5fd;}
+
+/* ──────── MAIN ──────── */
+.main{margin-left:var(--nav-w);}
+
+/* ──────── COMPACT HERO ──────── */
+.page-hero{
+  background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#1e1b4b 100%);
+  position:relative;overflow:hidden;
+  padding:48px 56px 52px;
+  min-height:200px;display:flex;flex-direction:column;justify-content:flex-end;
+}
+.page-hero-bg{
+  position:absolute;inset:0;background-size:cover;background-position:center;
+  opacity:0;transition:opacity .4s;
+}
+.page-hero-bg.loaded{opacity:1;}
+.page-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,rgba(0,0,0,.3) 100%);}
+.page-hero-content{position:relative;z-index:2;max-width:700px;}
+.page-hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(255,255,255,.5);margin-bottom:8px;}
+.page-hero-title{font-size:32px;font-weight:900;letter-spacing:-.02em;color:#fff;margin-bottom:10px;}
+.page-hero-summary{font-size:13px;color:rgba(255,255,255,.65);line-height:1.65;max-width:580px;margin-bottom:14px;}
+.page-hero-tags{display:flex;gap:8px;flex-wrap:wrap;}
+.hero-tag{padding:4px 14px;border-radius:99px;border:1px solid rgba(255,255,255,.2);
+  font-size:12px;color:rgba(255,255,255,.75);background:rgba(255,255,255,.07);}
+.hero-upload-btn{
+  position:absolute;bottom:20px;right:24px;z-index:3;
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 14px;border-radius:99px;border:1px solid rgba(255,255,255,.25);
+  font-size:11px;color:rgba(255,255,255,.6);cursor:pointer;
+  background:rgba(255,255,255,.07);backdrop-filter:blur(8px);transition:.15s;
+}
+.hero-upload-btn:hover{color:#fff;border-color:rgba(255,255,255,.5);}
+
+/* ──────── CONTENT WRAPPER ──────── */
+.content{padding:24px 40px 60px;max-width:1160px;margin:0 auto;}
+
+/* ──────── SECTION CARD ──────── */
+.sec-card{
+  background:var(--card);border-radius:20px;
+  border:1px solid var(--border);
+  margin-bottom:16px;overflow:hidden;
+}
+.sec-head{
+  display:flex;align-items:center;gap:12px;
+  padding:20px 24px 0;
+}
+.sec-icon{
+  width:32px;height:32px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;
+}
+.sec-num{font-size:13px;font-weight:800;color:var(--s400);}
+.sec-pipe{color:var(--s200);font-size:13px;margin:0 2px;}
+.sec-title{font-size:17px;font-weight:800;color:var(--s900);}
+.sec-badge{
+  margin-left:auto;font-size:10px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;padding:3px 10px;border-radius:99px;
+}
+.sec-body{padding:16px 24px 24px;}
+.sec-desc{font-size:13px;color:var(--s500);line-height:1.65;margin-bottom:16px;}
+
+/* ──────── KPI ROW ──────── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.kpi-box{background:var(--s100);border-radius:14px;padding:18px 16px;}
+.kpi-box-label{font-size:10px;font-weight:700;color:var(--s500);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:6px;}
+.kpi-box-num{font-size:36px;font-weight:900;letter-spacing:-.04em;color:var(--s900);line-height:1;}
+.kpi-box-unit{font-size:16px;font-weight:600;color:var(--s400);}
+.kpi-box-note{font-size:11px;color:var(--s500);margin-top:5px;line-height:1.4;}
+
+/* ──────── EVENT CARDS (员工体验) ──────── */
+.event-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.event-card{
+  border-radius:14px;border:1px solid var(--border);overflow:hidden;
+  background:var(--card);transition:box-shadow .2s;
+}
+.event-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);}
+.event-img-wrap{position:relative;height:150px;overflow:hidden;cursor:pointer;}
+.event-img-bg{
+  position:absolute;inset:0;background-size:cover;background-position:center;
+  transition:transform .4s;
+}
+.event-card:hover .event-img-bg{transform:scale(1.05);}
+.event-img-emoji{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:52px;opacity:.25;
+}
+.event-img-upload{
+  position:absolute;top:8px;right:8px;z-index:3;
+  background:rgba(0,0,0,.35);color:#fff;font-size:10px;
+  padding:3px 10px;border-radius:99px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.3);opacity:0;transition:.15s;
+}
+.event-img-wrap:hover .event-img-upload{opacity:1;}
+/* ── EVENT IMAGE CAROUSEL ── */
+.eic-track{position:absolute;inset:0;display:flex;transition:transform .45s cubic-bezier(.4,0,.2,1);}
+.eic-slide{
+  flex-shrink:0;width:100%;height:100%;
+  background-size:cover;background-position:center;
+  display:flex;align-items:center;justify-content:center;
+}
+.eic-dots{
+  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  display:flex;gap:4px;z-index:4;pointer-events:none;
+}
+.eic-dot{
+  width:5px;height:5px;border-radius:99px;
+  background:rgba(255,255,255,.45);transition:.25s;
+}
+.eic-dot.active{width:14px;background:#fff;}
+.eic-btn{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(0,0,0,.38);color:#fff;
+  border:none;font-size:15px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:4;opacity:0;transition:opacity .15s;
+}
+.eic-prev{left:7px;}
+.eic-next{right:36px;}
+.event-img-wrap:hover .eic-btn{opacity:1;}
+.eic-single .eic-btn{display:none!important;}
+.eic-single .eic-dots{display:none;}
+.eic-count{
+  position:absolute;top:8px;left:8px;z-index:4;
+  background:rgba(0,0,0,.4);color:#fff;
+  font-size:10px;font-weight:700;border-radius:99px;
+  padding:2px 8px;display:none;
+}
+.eic-multi .eic-count{display:block;}
+
+.event-body{padding:12px 14px 14px;}
+.event-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:3px;}
+.event-name{font-size:14px;font-weight:800;color:var(--s900);}
+.event-highlight{
+  font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 7px;border-radius:99px;background:var(--green-bg);color:var(--green);
+  flex-shrink:0;margin-top:2px;
+}
+.event-sub{font-size:11px;color:var(--s500);margin-bottom:10px;line-height:1.4;}
+.event-metrics{display:flex;gap:0;border-top:1px solid var(--s100);border-bottom:1px solid var(--s100);
+  padding:8px 0;margin-bottom:10px;}
+.em-item{flex:1;text-align:center;border-right:1px solid var(--s100);}
+.em-item:last-child{border-right:none;}
+.em-num{font-size:18px;font-weight:900;letter-spacing:-.02em;color:var(--s900);}
+.em-lbl{font-size:9px;color:var(--s400);margin-top:1px;line-height:1.2;}
+.event-quote{
+  display:flex;gap:6px;align-items:flex-start;
+  background:var(--s100);border-radius:8px;padding:8px 10px;
+}
+.eq-icon{font-size:12px;flex-shrink:0;margin-top:1px;color:var(--blue);}
+.eq-text{font-size:11px;color:var(--s600);line-height:1.5;}
+
+/* ──────── EFFICIENCY TABLE (运营效率) ──────── */
+.eff-table{width:100%;border-collapse:collapse;}
+.eff-table th{
+  text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--s400);
+  padding:8px 16px;border-bottom:2px solid var(--s100);
+}
+.eff-table td{padding:12px 16px;border-bottom:1px solid var(--s100);font-size:13px;}
+.eff-table tr:last-child td{border-bottom:none;}
+.eff-table td:first-child{font-weight:600;color:var(--s900);width:35%;}
+.eff-table td:last-child{color:var(--s600);}
+.eff-tag{
+  display:inline-block;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:99px;background:var(--green-bg);color:var(--green);
+  margin-left:6px;
+}
+
+/* ──────── COST SECTION ──────── */
+.cost-quote{
+  border-left:3px solid var(--blue);padding:12px 18px;
+  background:var(--blue-bg);border-radius:0 10px 10px 0;
+  font-size:16px;font-weight:700;color:var(--s900);margin-bottom:16px;
+}
+.cost-items{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.cost-item{
+  display:flex;align-items:flex-start;gap:10px;
+  background:var(--s100);border-radius:12px;padding:14px;
+}
+.ci-icon{font-size:20px;flex-shrink:0;}
+.ci-name{font-size:13px;font-weight:700;color:var(--s900);margin-bottom:3px;}
+.ci-desc{font-size:12px;color:var(--s500);line-height:1.5;}
+.ci-num{font-size:18px;font-weight:900;color:var(--blue);margin-top:4px;}
+
+/* ──────── CAPABILITY SECTION (组织能力建设) ──────── */
+.cap-headline{
+  border-left:3px solid #7c3aed;padding:12px 18px;
+  background:#f5f3ff;border-radius:0 10px 10px 0;
+  font-size:15px;font-weight:700;color:var(--s900);margin-bottom:16px;
+}
+.cap-items{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.cap-item{
+  background:var(--s100);border-radius:12px;padding:16px;
+  transition:box-shadow .2s;
+}
+.cap-item:hover{box-shadow:0 2px 12px rgba(0,0,0,.07);}
+.cap-icon{font-size:24px;margin-bottom:8px;}
+.cap-name{font-size:13px;font-weight:800;color:var(--s900);margin-bottom:4px;}
+.cap-desc{font-size:12px;color:var(--s500);line-height:1.5;}
+.cap-ceo-note{
+  margin-top:14px;padding:12px 16px;
+  background:var(--amber-bg);border-radius:10px;
+  font-size:12px;color:#92400e;line-height:1.5;
+  border-left:3px solid var(--amber);
+}
+
+/* ──────── GALLERY ──────── */
+.gallery-card-head{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:14px;
+}
+.gallery-card-title{font-size:16px;font-weight:800;color:var(--s900);}
+.gallery-card-sub{font-size:12px;color:var(--s500);margin-top:3px;}
+.gallery-badge{
+  font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;
+  background:var(--blue-bg);color:var(--blue);flex-shrink:0;
+}
+.gallery-strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory;}
+.gallery-strip::-webkit-scrollbar{height:4px;}
+.gallery-strip::-webkit-scrollbar-track{background:transparent;}
+.gallery-strip::-webkit-scrollbar-thumb{background:var(--s200);border-radius:99px;}
+.gallery-thumb{
+  flex:0 0 220px;height:160px;border-radius:12px;overflow:hidden;
+  position:relative;cursor:pointer;scroll-snap-align:start;
+  background:var(--s100);
+}
+.gallery-thumb.wide{flex:0 0 320px;}
+.gallery-thumb-bg{
+  position:absolute;inset:0;background-size:cover;background-position:center;
+  transition:transform .3s;
+}
+.gallery-thumb:hover .gallery-thumb-bg{transform:scale(1.05);}
+.gallery-thumb-emoji{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:40px;opacity:.25;
+}
+.gallery-thumb-overlay{
+  position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55) 0%,transparent 50%);
+  opacity:0;transition:.2s;
+}
+.gallery-thumb:hover .gallery-thumb-overlay{opacity:1;}
+.gallery-thumb-caption{
+  position:absolute;bottom:10px;left:12px;right:12px;
+  font-size:11px;font-weight:700;color:#fff;line-height:1.2;
+}
+.gallery-thumb-count{
+  position:absolute;bottom:8px;right:10px;
+  background:rgba(0,0,0,.6);color:#fff;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:99px;backdrop-filter:blur(6px);
+}
+.gallery-upload-btn{
+  display:inline-flex;align-items:center;gap:5px;margin-top:10px;
+  padding:7px 16px;border-radius:99px;border:1.5px dashed var(--s200);
+  font-size:12px;color:var(--s500);cursor:pointer;transition:.15s;
+}
+.gallery-upload-btn:hover{border-color:var(--blue);color:var(--blue);}
+.gallery-thumb-upload{
+  position:absolute;top:6px;right:6px;z-index:4;
+  background:rgba(0,0,0,.3);color:#fff;font-size:9px;
+  padding:2px 8px;border-radius:99px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.25);opacity:0;transition:.15s;
+}
+.gallery-thumb:hover .gallery-thumb-upload{opacity:1;}
+
+/* ──────── ATTENTION SECTION ──────── */
+.att-list{display:flex;flex-direction:column;gap:10px;}
+.att-item{
+  display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:flex-start;
+  padding:16px 18px;border-radius:12px;border:1px solid transparent;
+}
+.att-item.level-high{background:var(--red-bg);border-color:rgba(220,38,38,.15);}
+.att-item.level-mid{background:var(--amber-bg);border-color:rgba(217,119,6,.15);}
+.att-item.level-ok{background:var(--green-bg);border-color:rgba(22,163,74,.15);}
+.att-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.att-item.level-high .att-dot{background:var(--red);}
+.att-item.level-mid .att-dot{background:var(--amber);}
+.att-item.level-ok .att-dot{background:var(--green);}
+.att-title{font-size:14px;font-weight:700;color:var(--s900);margin-bottom:4px;}
+.att-desc{font-size:12px;color:var(--s600);line-height:1.55;}
+.att-action{font-size:11px;color:var(--s500);margin-top:6px;
+  padding:6px 10px;background:rgba(255,255,255,.6);border-radius:8px;line-height:1.5;}
+.att-meta{
+  display:flex;flex-direction:column;align-items:flex-end;gap:6px;
+  flex-shrink:0;min-width:100px;
+}
+.att-owner{font-size:11px;color:var(--s500);font-weight:600;}
+.att-ceo{font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;}
+.att-ceo.need{background:var(--red-bg);color:var(--red);border:1px solid rgba(220,38,38,.2);}
+.att-ceo.no{background:var(--s100);color:var(--s500);}
+
+/* ──────── ROADMAP ──────── */
+.roadmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.rm-col-head{
+  font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--s500);margin-bottom:8px;padding-left:2px;
+}
+.rm-item{
+  border-radius:10px;padding:12px 14px;margin-bottom:8px;
+  border-left:3px solid transparent;
+}
+.rm-item:last-child{margin-bottom:0;}
+.rm-item.p0{background:var(--red-bg);border-left-color:var(--red);}
+.rm-item.p1{background:var(--amber-bg);border-left-color:var(--amber);}
+.rm-item.p2{background:var(--green-bg);border-left-color:var(--green);}
+.rm-item-name{font-size:13px;font-weight:700;color:var(--s900);margin-bottom:3px;}
+.rm-item-goal{font-size:11px;color:var(--s500);line-height:1.4;margin-bottom:6px;}
+.rm-item-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.rm-pri{font-size:10px;font-weight:700;}
+.rm-pri.p0{color:var(--red);}
+.rm-pri.p1{color:var(--amber);}
+.rm-pri.p2{color:var(--green);}
+.rm-tag{font-size:10px;color:var(--s500);background:rgba(0,0,0,.05);
+  padding:1px 7px;border-radius:99px;}
+
+/* ──────── LIGHTBOX ──────── */
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;
+  display:none;align-items:center;justify-content:center;}
+.lb.open{display:flex;}
+.lb-close{position:fixed;top:20px;right:24px;width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.1);color:#fff;font-size:18px;display:flex;
+  align-items:center;justify-content:center;cursor:pointer;transition:.15s;}
+.lb-close:hover{background:rgba(255,255,255,.2);}
+.lb-img{max-width:90vw;max-height:90vh;border-radius:12px;object-fit:contain;}
+
+/* ──────── TOPBAR ──────── */
+.topbar{position:fixed;top:0;left:var(--nav-w);right:0;height:48px;
+  background:rgba(245,245,243,.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);z-index:100;
+  display:flex;align-items:center;padding:0 40px;gap:12px;
+  transform:translateY(-100%);transition:transform .3s;}
+.topbar.show{transform:translateY(0);}
+.tb-title{font-size:14px;font-weight:700;color:var(--s900);}
+.tb-meta{font-size:12px;color:var(--s400);}
+.tb-sp{flex:1;}
+.tb-btn{padding:5px 14px;border-radius:99px;font-size:12px;font-weight:600;
+  background:var(--s900);color:#fff;transition:opacity .15s;}
+.tb-btn:hover{opacity:.8;}
+
+/* ── NAV GROUPS ── */
+.ni-group{}
+.ni-group-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:5px 14px 5px 16px;cursor:pointer;
+  font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:rgba(255,255,255,.28);transition:.15s;
+}
+.ni-group-head:hover{color:rgba(255,255,255,.55);}
+.ni-group-yr{}
+.ni-group-chevron{font-size:9px;opacity:.7;}
+.ni-group-body{overflow:hidden;}
+.ni-group.ni-group-collapsed .ni-group-body{display:none;}
+.ni-sq{
+  display:inline-block;width:6px;height:6px;border-radius:2px;
+  flex-shrink:0;margin-right:6px;margin-top:1px;
+}
+.ni-st{
+  margin-left:auto;font-size:9px;font-weight:700;
+  padding:1px 6px;border-radius:99px;flex-shrink:0;
+}
+.ni-pub{background:rgba(22,163,74,.22);color:#86efac;}
+.ni-dft{background:rgba(217,119,6,.22);color:#fcd34d;}
+.ni-gen{background:rgba(37,99,235,.25);color:#93c5fd;}
+.ni-pnd{background:rgba(148,163,184,.15);color:rgba(255,255,255,.3);}
+.ni-sub{display:flex;align-items:center;}
+.ni-pending .ni-sq{opacity:.5;}
+.ni-pending{opacity:.55;}
+.ni-annual .ni-sq{border-radius:50%;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-mark">A</div>
+    <div><div class="nav-txt">AOP</div><div class="nav-sub">行政运营平台</div></div>
+  </div>
+  <div class="nav-lbl">个人</div>
+  <a class="ni" href="02-my-work.html"><span class="ni-icon">🏠</span>我的工作</a>
+  <a class="ni" href="10-okr.html"><span class="ni-icon">🎯</span>OKR</a>
+  <div class="nav-lbl">管理</div>
+  <a class="ni" href="04-admin-overview.html"><span class="ni-icon">📋</span>行政总览</a>
+  <a class="ni" href="05-key-projects.html"><span class="ni-icon">⭐</span>重点专项</a>
+  <a class="ni" href="06-ops-dashboard.html"><span class="ni-icon">📊</span>运营看板</a>
+  <a class="ni" href="07-weekly-meeting.html"><span class="ni-icon">👥</span>周会视图</a>
+  <a class="ni" href="08-weekly-report.html"><span class="ni-icon">📝</span>周报</a>
+  <div class="nav-lbl">经营复盘</div>
+  <a class="ni active" href="11-admin-review.html"><span class="ni-icon">📈</span>行政经营复盘</a>
+
+  <!-- 2026 group -->
+  <div class="ni-group" id="grp-2026">
+    <div class="ni-group-head" onclick="toggleNavGrp('2026')">
+      <span class="ni-group-yr">2026 年</span>
+      <span class="ni-group-chevron" id="chv-2026">▾</span>
+    </div>
+    <div class="ni-group-body" id="grpb-2026">
+      <a class="ni-sub active" href="11-admin-review.html">
+        <span class="ni-sq" style="background:#16a34a"></span>Q2 季度回顾
+        <span class="ni-st ni-pub">已发布</span>
+      </a>
+      <a class="ni-sub" href="#">
+        <span class="ni-sq" style="background:#2563eb"></span>Q1 季度回顾
+        <span class="ni-st ni-dft">草稿</span>
+      </a>
+      <a class="ni-sub ni-pending" href="#">
+        <span class="ni-sq" style="background:#475569"></span>Q3 季度回顾
+        <span class="ni-st ni-pnd">待生成</span>
+      </a>
+      <a class="ni-sub ni-pending" href="#">
+        <span class="ni-sq" style="background:#475569"></span>Q4 季度回顾
+        <span class="ni-st ni-pnd">待生成</span>
+      </a>
+      <a class="ni-sub ni-annual" href="#">
+        <span class="ni-sq" style="background:#7c3aed"></span>年度回顾
+        <span class="ni-st ni-gen">生成中</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 2025 group -->
+  <div class="ni-group ni-group-collapsed" id="grp-2025">
+    <div class="ni-group-head" onclick="toggleNavGrp('2025')">
+      <span class="ni-group-yr">2025 年</span>
+      <span class="ni-group-chevron" id="chv-2025">▸</span>
+    </div>
+    <div class="ni-group-body" id="grpb-2025" style="display:none">
+      <a class="ni-sub" href="#">
+        <span class="ni-sq" style="background:#7c3aed"></span>年度回顾
+        <span class="ni-st ni-pub">已发布</span>
+      </a>
+      <a class="ni-sub" href="#"><span class="ni-sq" style="background:#7c3aed"></span>Q4 季度回顾 <span class="ni-st ni-pub">已发布</span></a>
+      <a class="ni-sub" href="#"><span class="ni-sq" style="background:#d97706"></span>Q3 季度回顾 <span class="ni-st ni-pub">已发布</span></a>
+      <a class="ni-sub" href="#"><span class="ni-sq" style="background:#16a34a"></span>Q2 季度回顾 <span class="ni-st ni-pub">已发布</span></a>
+      <a class="ni-sub" href="#"><span class="ni-sq" style="background:#2563eb"></span>Q1 季度回顾 <span class="ni-st ni-pub">已发布</span></a>
+    </div>
+  </div>
+  <div class="nav-lbl">设置</div>
+  <a class="ni" href="#"><span class="ni-icon">⚙️</span>平台设置</a>
+</nav>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar">
+  <span class="tb-title">Q2 行政运营回顾</span>
+  <span class="tb-meta">2026年 4—6月</span>
+  <span class="tb-sp"></span>
+  <button class="tb-btn" onclick="window.print()">导出</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- HERO -->
+<div class="page-hero" id="hero">
+  <div class="page-hero-bg" id="heroBgPhoto"></div>
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-content">
+    <div class="page-hero-eyebrow">AOP · 行政运营管理平台</div>
+    <div class="page-hero-title">Q2 行政运营回顾</div>
+    <div class="page-hero-summary">双城职场运营提质、10+ 场员工活动全面落地、AI 数字化能力持续建设，行政团队在 Q2 交出了一份有温度、有数据的答卷。</div>
+    <div class="page-hero-tags">
+      <span class="hero-tag">员工体验</span>
+      <span class="hero-tag">运营效率</span>
+      <span class="hero-tag">数字化建设</span>
+      <span class="hero-tag">2026 Q2</span>
+    </div>
+  </div>
+  <label class="hero-upload-btn">
+    📷 上传封面
+    <input type="file" accept="image/*" onchange="uploadHeroBg(this)" style="display:none">
+  </label>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+
+<!-- ═══ 01 | 本季度概览 ═══ -->
+<div class="sec-card" id="s1">
+  <div class="sec-head">
+    <div class="sec-icon" style="background:#eff6ff;color:#2563eb;">🔲</div>
+    <span class="sec-num">01</span><span class="sec-pipe">|</span>
+    <span class="sec-title">本季度概览</span>
+  </div>
+  <div class="sec-body">
+    <div class="sec-desc">这一屏回答：<strong>行政这一季度整体状态怎么样？</strong></div>
+    <div class="kpi-row">
+      <div class="kpi-box">
+        <div class="kpi-box-label">家庭日参与</div>
+        <div class="kpi-box-num">1,045<span class="kpi-box-unit">+人次</span></div>
+        <div class="kpi-box-note">北京 665 人 · 武汉 380+ 人，双城同步举办</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-box-label">甩肉大赛减重</div>
+        <div class="kpi-box-num">1,411<span class="kpi-box-unit">斤</span></div>
+        <div class="kpi-box-note">343 人参与，个人最高减重比例 16.18%</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-box-label">黑马大赛战队</div>
+        <div class="kpi-box-num">19<span class="kpi-box-unit">支</span></div>
+        <div class="kpi-box-note">企业+高校双赛道，产出 12 个课题，圆满落幕</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-box-label">会务接待满意度</div>
+        <div class="kpi-box-num">100<span class="kpi-box-unit">%</span></div>
+        <div class="kpi-box-note">共完成 57 场会务接待，收获一致好评</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 02 | 员工体验 ═══ -->
+<div class="sec-card" id="s2">
+  <div class="sec-head">
+    <div class="sec-icon" style="background:#fff0f3;color:#e11d48;">♡</div>
+    <span class="sec-num">02</span><span class="sec-pipe">|</span>
+    <span class="sec-title">员工体验</span>
+  </div>
+  <div class="sec-body">
+    <div class="sec-desc">Q2 四大重点活动全面落地：家庭日双城同办、黑马大赛圆满收官、甩肉大赛健康风潮、武汉特色活动持续破圈。</div>
+    <div class="event-grid">
+
+      <!-- 家庭日 -->
+      <div class="event-card">
+        <div class="event-img-wrap eic-single" id="ev1-wrap" onclick="evLightbox('ev1')">
+          <div class="eic-track" id="eic-ev1">
+            <div class="eic-slide" style="background:linear-gradient(135deg,#7c2d12,#ea580c);">
+              <div class="event-img-emoji">🎪</div>
+            </div>
+          </div>
+          <div class="eic-dots" id="eic-dots-ev1">
+            <span class="eic-dot active"></span>
+          </div>
+          <span class="eic-count" id="eic-count-ev1">1 / 1</span>
+          <button class="eic-btn eic-prev" onclick="event.stopPropagation();evSlide('ev1',-1)">‹</button>
+          <button class="eic-btn eic-next" onclick="event.stopPropagation();evSlide('ev1',1)">›</button>
+          <label class="event-img-upload" onclick="event.stopPropagation()">📷 +图片<input type="file" accept="image/*" multiple onchange="evAddPhotos(this,'ev1')" style="display:none"></label>
+        </div>
+        <div class="event-body">
+          <div class="event-header">
+            <div class="event-name">第十二届家庭日</div>
+            <span class="event-highlight">重点成果</span>
+          </div>
+          <div class="event-sub">北京"云巅小勇士"3公里丛林赛 · 武汉躺平度假</div>
+          <div class="event-metrics">
+            <div class="em-item"><div class="em-num">665</div><div class="em-lbl">北京参与</div></div>
+            <div class="em-item"><div class="em-num">380+</div><div class="em-lbl">武汉参与</div></div>
+            <div class="em-item"><div class="em-num">双城</div><div class="em-lbl">同步举办</div></div>
+          </div>
+          <div class="event-quote">
+            <span class="eq-icon">💬</span>
+            <div class="eq-text">选址武汉"小马尔代夫"，打造沉浸式躺平度假场景，进一步增强团队凝聚力与家属认同感。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 儿童节 -->
+      <div class="event-card">
+        <div class="event-img-wrap eic-single" id="ev2-wrap" onclick="evLightbox('ev2')">
+          <div class="eic-track" id="eic-ev2">
+            <div class="eic-slide" style="background:linear-gradient(135deg,#0c4a6e,#0ea5e9);">
+              <div class="event-img-emoji">🧸</div>
+            </div>
+          </div>
+          <div class="eic-dots" id="eic-dots-ev2">
+            <span class="eic-dot active"></span>
+          </div>
+          <span class="eic-count" id="eic-count-ev2">1 / 1</span>
+          <button class="eic-btn eic-prev" onclick="event.stopPropagation();evSlide('ev2',-1)">‹</button>
+          <button class="eic-btn eic-next" onclick="event.stopPropagation();evSlide('ev2',1)">›</button>
+          <label class="event-img-upload" onclick="event.stopPropagation()">📷 +图片<input type="file" accept="image/*" multiple onchange="evAddPhotos(this,'ev2')" style="display:none"></label>
+        </div>
+        <div class="event-body">
+          <div class="event-header">
+            <div class="event-name">第五届黑马大赛</div>
+          </div>
+          <div class="event-sub">首创企业+高校双赛道 · 武汉金山软件园路演</div>
+          <div class="event-metrics">
+            <div class="em-item"><div class="em-num">19</div><div class="em-lbl">支战队</div></div>
+            <div class="em-item"><div class="em-num">12</div><div class="em-lbl">课题产出</div></div>
+            <div class="em-item"><div class="em-num">10万</div><div class="em-lbl">冠军奖金</div></div>
+          </div>
+          <div class="event-quote">
+            <span class="eq-icon">💬</span>
+            <div class="eq-text">以赛促研、以赛引才、以赛促合，企业+高校战队共创，圆满落幕！</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下午茶 & 生日 -->
+      <div class="event-card">
+        <div class="event-img-wrap eic-single" id="ev3-wrap" onclick="evLightbox('ev3')">
+          <div class="eic-track" id="eic-ev3">
+            <div class="eic-slide" style="background:linear-gradient(135deg,#134e4a,#0d9488);">
+              <div class="event-img-emoji">🎂</div>
+            </div>
+          </div>
+          <div class="eic-dots" id="eic-dots-ev3">
+            <span class="eic-dot active"></span>
+          </div>
+          <span class="eic-count" id="eic-count-ev3">1 / 1</span>
+          <button class="eic-btn eic-prev" onclick="event.stopPropagation();evSlide('ev3',-1)">‹</button>
+          <button class="eic-btn eic-next" onclick="event.stopPropagation();evSlide('ev3',1)">›</button>
+          <label class="event-img-upload" onclick="event.stopPropagation()">📷 +图片<input type="file" accept="image/*" multiple onchange="evAddPhotos(this,'ev3')" style="display:none"></label>
+        </div>
+        <div class="event-body">
+          <div class="event-header">
+            <div class="event-name">第二届甩肉大赛</div>
+          </div>
+          <div class="event-sub">面向全员的健康减重主题活动，共持续一个季度</div>
+          <div class="event-metrics">
+            <div class="em-item"><div class="em-num">343</div><div class="em-lbl">参与人数</div></div>
+            <div class="em-item"><div class="em-num">1,411</div><div class="em-lbl">减重(斤)</div></div>
+            <div class="em-item"><div class="em-num">16.18%</div><div class="em-lbl">个人最高</div></div>
+          </div>
+          <div class="event-quote">
+            <span class="eq-icon">💬</span>
+            <div class="eq-text">在自律比拼中收获健康与自我突破，改善职场久坐亚健康状态，最优团队合计减重 62.8 斤。</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 健康活动 -->
+      <div class="event-card">
+        <div class="event-img-wrap eic-single" id="ev4-wrap" onclick="evLightbox('ev4')">
+          <div class="eic-track" id="eic-ev4">
+            <div class="eic-slide" style="background:linear-gradient(135deg,#312e81,#6d28d9);">
+              <div class="event-img-emoji">🏃</div>
+            </div>
+          </div>
+          <div class="eic-dots" id="eic-dots-ev4">
+            <span class="eic-dot active"></span>
+          </div>
+          <span class="eic-count" id="eic-count-ev4">1 / 1</span>
+          <button class="eic-btn eic-prev" onclick="event.stopPropagation();evSlide('ev4',-1)">‹</button>
+          <button class="eic-btn eic-next" onclick="event.stopPropagation();evSlide('ev4',1)">›</button>
+          <label class="event-img-upload" onclick="event.stopPropagation()">📷 +图片<input type="file" accept="image/*" multiple onchange="evAddPhotos(this,'ev4')" style="display:none"></label>
+        </div>
+        <div class="event-body">
+          <div class="event-header">
+            <div class="event-name">武汉小龙虾节 & 趣味运动会</div>
+          </div>
+          <div class="event-sub">首届武汉小龙虾之夜 + 跃动 2026 趣味运动</div>
+          <div class="event-metrics">
+            <div class="em-item"><div class="em-num">200</div><div class="em-lbl">小龙虾参与</div></div>
+            <div class="em-item"><div class="em-num">2分钟</div><div class="em-lbl">报名满额</div></div>
+            <div class="em-item"><div class="em-num">100+</div><div class="em-lbl">运动会参与</div></div>
+          </div>
+          <div class="event-quote">
+            <span class="eq-icon">💬</span>
+            <div class="eq-text">协同武汉集团平台完成整体落地，员工自主报名先到先得，2分钟即报满，参与热情高涨。</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 03 | 运营效率 ═══ -->
+<div class="sec-card" id="s3">
+  <div class="sec-head">
+    <div class="sec-icon" style="background:#f0fdf4;color:#16a34a;">⚙️</div>
+    <span class="sec-num">03</span><span class="sec-pipe">|</span>
+    <span class="sec-title">运营效率</span>
+  </div>
+  <div class="sec-body">
+    <div class="sec-desc">Q2 职场运营关键进展：庆阳焕新落地、武汉工位优化、数字化巡查上线、57 场会务接待满意度 100%。</div>
+    <table class="eff-table">
+      <thead>
+        <tr>
+          <th>项目</th>
+          <th>变化</th>
+          <th>覆盖范围</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>庆阳职场焕新</td>
+          <td>5月中旬完成环境升级改造，举行职场焕新仪式，为西北业务提供优质空间 <span class="eff-tag">已完成</span></td>
+          <td>庆阳全员</td>
+        </tr>
+        <tr>
+          <td>武汉工位调整</td>
+          <td>配合校招入职合理合并分散工位，新增共享出差工位，提高利用率，成本不变 <span class="eff-tag">已完成</span></td>
+          <td>武汉全员</td>
+        </tr>
+        <tr>
+          <td>报修巡查二维码上线</td>
+          <td>覆盖武汉全区公共区域，"发现即上报、上报即流转"，从被动救火变主动守护 <span class="eff-tag">已上线</span></td>
+          <td>武汉职场</td>
+        </tr>
+        <tr>
+          <td>武汉公寓二期招租</td>
+          <td>144人报名，释放名额40个，通过摇号公平分配，满足员工住宿需求 <span class="eff-tag">已完成</span></td>
+          <td>武汉员工</td>
+        </tr>
+        <tr>
+          <td>商旅平台年度招标</td>
+          <td>完成供应商多维度评估，携程商旅续约，服务品质与成本管控双达标，降本增效显著 <span class="eff-tag">已完成</span></td>
+          <td>全员差旅</td>
+        </tr>
+        <tr>
+          <td>武汉会务接待</td>
+          <td>Q2 完成会务接待 57 场，满意度 100%，收获需求部门一致好评 <span class="eff-tag">持续进行</span></td>
+          <td>武汉职场</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ 04 | 成本与规范 ═══ -->
+<div class="sec-card" id="s4">
+  <div class="sec-head">
+    <div class="sec-icon" style="background:#eff6ff;color:#2563eb;">💼</div>
+    <span class="sec-num">04</span><span class="sec-pipe">|</span>
+    <span class="sec-title">成本与规范</span>
+  </div>
+  <div class="sec-body">
+    <div class="cost-quote">"合规管控+主动降本，Q2实现有效节省。"</div>
+    <div class="cost-items">
+      <div class="cost-item">
+        <div class="ci-icon">🏢</div>
+        <div>
+          <div class="ci-name">深圳职场续租降本</div>
+          <div class="ci-desc">租金单价由 100 元/㎡ 下调至 90 元/㎡，续签一年，全年节省约 6 万元</div>
+          <div class="ci-num">年省 ¥6万+</div>
+        </div>
+      </div>
+      <div class="cost-item">
+        <div class="ci-icon">♻️</div>
+        <div>
+          <div class="ci-name">金山智能退租资产处置</div>
+          <div class="ci-desc">遗留办公家具现场整体转让，全部完成资产处置，退租遗留事项全部闭环</div>
+          <div class="ci-num">资产回收 ¥3万</div>
+        </div>
+      </div>
+      <div class="cost-item">
+        <div class="ci-icon">✈️</div>
+        <div>
+          <div class="ci-name">商旅平台年度招标续约</div>
+          <div class="ci-desc">携程商旅经多维评估续约，资源整合能力强，实现年度商旅成本大幅优化，服务品质双达标</div>
+          <div class="ci-num">成本大幅优化</div>
+        </div>
+      </div>
+      <div class="cost-item">
+        <div class="ci-icon">🏨</div>
+        <div>
+          <div class="ci-name">差旅协议酒店签约</div>
+          <div class="ci-desc">本年度签约集团协议酒店 12 家，定向签约高频目的地单体酒店 29 家，降本提质</div>
+          <div class="ci-num">集团12家 + 单体29家</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 05 | 组织能力建设 ═══ -->
+<div class="sec-card" id="s5">
+  <div class="sec-head">
+    <div class="sec-icon" style="background:#f5f3ff;color:#7c3aed;">🚀</div>
+    <span class="sec-num">05</span><span class="sec-pipe">|</span>
+    <span class="sec-title">组织能力建设</span>
+    <span class="sec-badge" style="background:#f5f3ff;color:#7c3aed;">CEO最关注</span>
+  </div>
+  <div class="sec-body">
+    <div class="cap-headline">"我们正在把行政从'做事情'升级为'做体系'。"</div>
+    <div class="cap-ceo-note" style="margin-bottom:16px;">这一块是很多行政汇报里最容易被忽略、但CEO最看重的部分——行政不只是执行，而是在建立可持续运转的能力底座。</div>
+    <div class="cap-items">
+      <div class="cap-item">
+        <div class="cap-icon">🏢</div>
+        <div class="cap-name">智能工位系统</div>
+        <div class="cap-desc">应用平台轻应用，解决职场工位灵活调度问题，从"固定分配"走向"动态共享"，数据驱动实现实时感知与高效复用</div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-icon">📦</div>
+        <div class="cap-name">行政库存管理系统</div>
+        <div class="cap-desc">应用 KSCC 平台，实现出入库及时更新与查询，告别手工台账，拥抱智能管理，内部提效显著</div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-icon">📊</div>
+        <div class="cap-name">差旅数据主动推送</div>
+        <div class="cap-desc">补齐差旅（机酒火）费用数据盲区，通过 AI 能力主动推送至管理者终端，变被动查看为主动获取、变数字为洞察</div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-icon">📺</div>
+        <div class="cap-name">职场数据看板上线</div>
+        <div class="cap-desc">职场运营数据实时可视化，管理层随时掌握空间利用率、费用趋势等核心指标</div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-icon">🎬</div>
+        <div class="cap-name">AI 视频制作能力</div>
+        <div class="cap-desc">集团行政部 AI 短视频实操分享，手把手教学，轻松自制行政宣传视频，员工行为准则宣传片已产出</div>
+      </div>
+      <div class="cap-item">
+        <div class="cap-icon">🌐</div>
+        <div class="cap-name">微信订阅号恢复运营</div>
+        <div class="cap-desc">留存用户 2,817 人次，运营周期内累计发布推文 11 篇，转发 106 次，打通行政对外发声渠道</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ 06 | 季度影像 ═══ -->
+<div class="sec-card" id="s6">
+  <div class="sec-head">
+    <div class="sec-icon" style="background:#f0fdf4;color:#16a34a;">🖼️</div>
+    <span class="sec-num">06</span><span class="sec-pipe">|</span>
+    <span class="sec-title">季度影像</span>
+    <span class="sec-badge" style="background:#f0fdf4;color:#16a34a;margin-left:auto;">重点</span>
+  </div>
+  <div class="sec-body">
+    <div class="gallery-card-head">
+      <div>
+        <div class="gallery-card-title">Q2 影像</div>
+        <div class="gallery-card-sub">用图片讲故事，而不是用文字堆事情。行政最大的优势是有大量真实场景。</div>
+      </div>
+      <span class="gallery-badge">精选</span>
+    </div>
+    <div class="gallery-strip" id="galleryStrip">
+
+      <div class="gallery-thumb wide" onclick="openLB('g1-bg')">
+        <div class="gallery-thumb-bg" id="g1-bg" style="background:linear-gradient(135deg,#7c2d12,#ea580c);">
+          <div class="gallery-thumb-emoji">🎪</div>
+        </div>
+        <div class="gallery-thumb-overlay"></div>
+        <div class="gallery-thumb-caption">家庭日 · 北京云巅小勇士</div>
+        <label class="gallery-thumb-upload">📷<input type="file" accept="image/*" onchange="uploadImg(this,'g1-bg')" style="display:none"></label>
+      </div>
+
+      <div class="gallery-thumb" onclick="openLB('g2-bg')">
+        <div class="gallery-thumb-bg" id="g2-bg" style="background:linear-gradient(135deg,#065f46,#059669);">
+          <div class="gallery-thumb-emoji">🏃</div>
+        </div>
+        <div class="gallery-thumb-overlay"></div>
+        <div class="gallery-thumb-caption">趣味运动会 · 跃动2026</div>
+        <label class="gallery-thumb-upload">📷<input type="file" accept="image/*" onchange="uploadImg(this,'g2-bg')" style="display:none"></label>
+      </div>
+
+      <div class="gallery-thumb" onclick="openLB('g3-bg')">
+        <div class="gallery-thumb-bg" id="g3-bg" style="background:linear-gradient(135deg,#1e3a5f,#2563eb);">
+          <div class="gallery-thumb-emoji">🤖</div>
+        </div>
+        <div class="gallery-thumb-overlay"></div>
+        <div class="gallery-thumb-caption">第五届黑马大赛 · 路演答辩</div>
+        <div class="gallery-thumb-count">图6</div>
+        <label class="gallery-thumb-upload">📷<input type="file" accept="image/*" onchange="uploadImg(this,'g3-bg')" style="display:none"></label>
+      </div>
+
+      <div class="gallery-thumb" onclick="openLB('g4-bg')">
+        <div class="gallery-thumb-bg" id="g4-bg" style="background:linear-gradient(135deg,#0c4a6e,#0ea5e9);">
+          <div class="gallery-thumb-emoji">🧸</div>
+        </div>
+        <div class="gallery-thumb-overlay"></div>
+        <div class="gallery-thumb-caption">武汉小龙虾之夜</div>
+        <label class="gallery-thumb-upload">📷<input type="file" accept="image/*" onchange="uploadImg(this,'g4-bg')" style="display:none"></label>
+      </div>
+
+      <div class="gallery-thumb" onclick="openLB('g5-bg')">
+        <div class="gallery-thumb-bg" id="g5-bg" style="background:linear-gradient(135deg,#312e81,#4f46e5);">
+          <div class="gallery-thumb-emoji">🏢</div>
+        </div>
+        <div class="gallery-thumb-overlay"></div>
+        <div class="gallery-thumb-caption">庆阳职场焕新仪式</div>
+        <label class="gallery-thumb-upload">📷<input type="file" accept="image/*" onchange="uploadImg(this,'g5-bg')" style="display:none"></label>
+      </div>
+
+      <div class="gallery-thumb" onclick="openLB('g6-bg')">
+        <div class="gallery-thumb-bg" id="g6-bg" style="background:linear-gradient(135deg,#134e4a,#0d9488);">
+          <div class="gallery-thumb-emoji">🎖️</div>
+        </div>
+        <div class="gallery-thumb-overlay"></div>
+        <div class="gallery-thumb-caption">甩肉大赛颁奖</div>
+        <label class="gallery-thumb-upload">📷<input type="file" accept="image/*" onchange="uploadImg(this,'g6-bg')" style="display:none"></label>
+      </div>
+
+      <div class="gallery-thumb" onclick="openLB('g7-bg')">
+        <div class="gallery-thumb-bg" id="g7-bg" style="background:linear-gradient(135deg,#7c2d12,#b45309);">
+          <div class="gallery-thumb-emoji">🎊</div>
+        </div>
+        <div class="gallery-thumb-overlay"></div>
+        <div class="gallery-thumb-caption">Q2生日会 · 小黄人主题</div>
+        <label class="gallery-thumb-upload">📷<input type="file" accept="image/*" onchange="uploadImg(this,'g7-bg')" style="display:none"></label>
+      </div>
+
+    </div>
+    <label class="gallery-upload-btn">
+      ＋ 批量上传照片
+      <input type="file" accept="image/*" multiple onchange="batchUpload(this)" style="display:none">
+    </label>
+  </div>
+</div>
+
+<!-- ═══ 07 | 需要关注的事项 ═══ -->
+<div class="sec-card" id="s7">
+  <div class="sec-head">
+    <div class="sec-icon" style="background:#fef2f2;color:#dc2626;">⚠️</div>
+    <span class="sec-num">07</span><span class="sec-pipe">|</span>
+    <span class="sec-title">需要关注的事项</span>
+  </div>
+  <div class="sec-body">
+    <div class="sec-desc">只放 <strong>2–3件</strong> 真正需要管理层知道的。不制造焦虑，只透明呈现。</div>
+    <div class="att-list">
+
+      <div class="att-item level-high">
+        <div class="att-dot"></div>
+        <div>
+          <div class="att-title">兰州、上海职场装修时间节点紧张</div>
+          <div class="att-desc">兰州职场（605㎡）预计8月1日进场装修，9月25日交付；上海职场（579㎡）需推动租赁与装修动作，保证新旧址无缝衔接。两个项目同步推进，供应链协同压力较大。</div>
+          <div class="att-action">📋 正在筛选装修单位，推进招标动作，负责人：傅中南</div>
+        </div>
+        <div class="att-meta">
+          <span class="att-owner">傅中南</span>
+          <span class="att-ceo need">需持续关注</span>
+        </div>
+      </div>
+
+      <div class="att-item level-mid">
+        <div class="att-dot"></div>
+        <div>
+          <div class="att-title">珠海职场二次搬迁：需配合集团从7号楼搬回1号楼</div>
+          <div class="att-desc">珠海园区职场已于五一前由1号楼搬至7号楼，现接集团通知需搬回1号楼。集团正在测算最新租赁面积，后续配合集团完成园区职场搬迁动作。</div>
+          <div class="att-action">📋 等待集团确认方案，配合推进，无需立即介入</div>
+        </div>
+        <div class="att-meta">
+          <span class="att-owner">傅中南</span>
+          <span class="att-ceo no">等待集团指示</span>
+        </div>
+      </div>
+
+      <div class="att-item level-mid">
+        <div class="att-dot"></div>
+        <div>
+          <div class="att-title">深圳职场翻新施工中，预计8月中交付</div>
+          <div class="att-desc">整体改造预算10W，包含全屋墙面翻新、地毯更换、窗帘换新、增设隔音四项工程，目前持续跟进中，施工期间需关注对员工办公的影响。</div>
+          <div class="att-action">📋 Q3跟进施工进度，8月中交付，胡丽婷负责</div>
+        </div>
+        <div class="att-meta">
+          <span class="att-owner">胡丽婷</span>
+          <span class="att-ceo no">无需CEO介入</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 08 | 下一季规划 ═══ -->
+<div class="sec-card" id="s8">
+  <div class="sec-head">
+    <div class="sec-icon" style="background:#eff6ff;color:#2563eb;">📅</div>
+    <span class="sec-num">08</span><span class="sec-pipe">|</span>
+    <span class="sec-title">Q3 重点规划</span>
+  </div>
+  <div class="sec-body">
+    <div class="sec-desc">Q3 三条主线并行：职场建设（兰州/深圳/上海/武汉露台）、总裁室年中支撑、AI 数字化项目落地。</div>
+    <div class="roadmap-grid">
+      <div>
+        <div class="rm-col-head">七月</div>
+        <div class="rm-item p0">
+          <div class="rm-item-name">武汉露台改造交付</div>
+          <div class="rm-item-goal">7月1日前整体交付，打造武汉专属打卡点</div>
+          <div class="rm-item-meta"><span class="rm-pri p0">P0</span><span class="rm-tag">职场运营</span></div>
+        </div>
+        <div class="rm-item p0">
+          <div class="rm-item-name">年中大会行政保障</div>
+          <div class="rm-item-goal">配合7月31日年中大会，完成双刊发布及颁奖仪式落地</div>
+          <div class="rm-item-meta"><span class="rm-pri p0">P0</span><span class="rm-tag">总裁室支撑</span></div>
+        </div>
+        <div class="rm-item p1">
+          <div class="rm-item-name">智能工位系统上线</div>
+          <div class="rm-item-goal">动态工位调度，提高资源利用率，员工可感知</div>
+          <div class="rm-item-meta"><span class="rm-pri p1">P1</span><span class="rm-tag">数字化</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="rm-col-head">八月</div>
+        <div class="rm-item p0">
+          <div class="rm-item-name">兰州职场装修进场</div>
+          <div class="rm-item-goal">8月1日进场，9月25日交付，605㎡新职场</div>
+          <div class="rm-item-meta"><span class="rm-pri p0">P0</span><span class="rm-tag">职场运营</span></div>
+        </div>
+        <div class="rm-item p0">
+          <div class="rm-item-name">深圳职场翻新交付</div>
+          <div class="rm-item-goal">8月中旬整体交付，预算10W，提升员工办公体验</div>
+          <div class="rm-item-meta"><span class="rm-pri p0">P0</span><span class="rm-tag">职场运营</span></div>
+        </div>
+        <div class="rm-item p1">
+          <div class="rm-item-name">全员年度体检上线</div>
+          <div class="rm-item-goal">完成三方招标，体检聚合平台正式启动，覆盖全国职场</div>
+          <div class="rm-item-meta"><span class="rm-pri p1">P1</span><span class="rm-tag">员工福利</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="rm-col-head">九月</div>
+        <div class="rm-item p0">
+          <div class="rm-item-name">兰州职场竣工交付</div>
+          <div class="rm-item-goal">预计9月25日整体交付，为西北业务提供新阵地</div>
+          <div class="rm-item-meta"><span class="rm-pri p0">P0</span><span class="rm-tag">职场运营</span></div>
+        </div>
+        <div class="rm-item p1">
+          <div class="rm-item-name">上海职场换租推进</div>
+          <div class="rm-item-goal">徐汇区星扬西岸中心36F，确保新旧址无缝衔接</div>
+          <div class="rm-item-meta"><span class="rm-pri p1">P1</span><span class="rm-tag">职场运营</span></div>
+        </div>
+        <div class="rm-item p2">
+          <div class="rm-item-name">Q3季报生成</div>
+          <div class="rm-item-goal">基于Q3周报数据，AI自动生成季度回顾初稿</div>
+          <div class="rm-item-meta"><span class="rm-pri p2">P2</span><span class="rm-tag">管理支持</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="display:flex;align-items:center;gap:14px;padding:16px 0 32px;margin-top:8px;">
+  <div style="width:36px;height:36px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0;">A</div>
+  <div style="flex:1;">
+    <div style="font-size:13px;font-weight:700;color:var(--s700);">AOP 行政运营管理平台 · Q2 2026 经营复盘</div>
+    <div style="font-size:11px;color:var(--s400);margin-top:2px;">行政部全体 · 汇报对象：CEO · 生成于2026年7月</div>
+  </div>
+  <button onclick="window.print()" style="padding:7px 18px;border-radius:99px;border:1.5px solid var(--s200);font-size:12px;font-weight:600;color:var(--s600);cursor:pointer;transition:.15s;" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--s200)';this.style.color='var(--s600)'">🖨️ 打印</button>
+  <button onclick="copyLink()" style="padding:7px 18px;border-radius:99px;border:1.5px solid var(--s200);font-size:12px;font-weight:600;color:var(--s600);cursor:pointer;transition:.15s;margin-left:4px;" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--s200)';this.style.color='var(--s600)'">🔗 分享</button>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" onclick="closeLB()">
+  <div class="lb-close" onclick="closeLB()">✕</div>
+  <img class="lb-img" id="lbImg" src="" alt="">
+</div>
+
+<script>
+// Topbar
+const topbar = document.getElementById('topbar');
+window.addEventListener('scroll', () => {
+  const hero = document.getElementById('hero');
+  topbar.classList.toggle('show', window.scrollY > (hero ? hero.offsetHeight * 0.6 : 150));
+}, {passive:true});
+
+// Read image file
+function readImg(file, cb){
+  const r = new FileReader();
+  r.onload = e => cb(e.target.result);
+  r.readAsDataURL(file);
+}
+
+function applyBg(id, url){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.style.backgroundImage = `url(${url})`;
+  el.style.backgroundSize = 'cover';
+  el.style.backgroundPosition = 'center';
+  ['.event-img-emoji','.gallery-thumb-emoji','.page-hero-bg'].forEach(s => {
+    const ph = el.querySelector(s);
+    if(ph) ph.style.display = 'none';
+  });
+}
+
+// Hero bg
+function uploadHeroBg(input){
+  if(!input.files[0]) return;
+  readImg(input.files[0], url => {
+    const el = document.getElementById('heroBgPhoto');
+    el.style.backgroundImage = `url(${url})`;
+    el.classList.add('loaded');
+  });
+}
+
+// Any image element (legacy, kept for gallery)
+function uploadImg(input, targetId){
+  if(!input.files[0]) return;
+  readImg(input.files[0], url => applyBg(targetId, url));
+}
+
+/* ── EVENT CARD CAROUSEL ── */
+const evState = {
+  ev1:{slides:[null],idx:0,timer:null},
+  ev2:{slides:[null],idx:0,timer:null},
+  ev3:{slides:[null],idx:0,timer:null},
+  ev4:{slides:[null],idx:0,timer:null},
+};
+
+function evAddPhotos(input, evId){
+  const files = Array.from(input.files);
+  if(!files.length) return;
+  files.forEach(f => {
+    readImg(f, url => {
+      const state = evState[evId];
+      const track = document.getElementById('eic-'+evId);
+      const wrap  = document.getElementById(evId+'-wrap');
+      const dotsEl= document.getElementById('eic-dots-'+evId);
+      const countEl=document.getElementById('eic-count-'+evId);
+
+      if(state.slides.length===1 && state.slides[0]===null){
+        // Replace placeholder
+        state.slides[0] = url;
+        const slide = track.querySelector('.eic-slide');
+        slide.style.backgroundImage = 'url("'+url+'")';
+        slide.style.backgroundSize  = 'cover';
+        const em = slide.querySelector('.event-img-emoji');
+        if(em) em.style.opacity = '0';
+      } else {
+        // Append new slide
+        state.slides.push(url);
+        const slide = document.createElement('div');
+        slide.className = 'eic-slide';
+        slide.style.cssText = 'background-image:url("'+url+'");background-size:cover;background-position:center;';
+        track.appendChild(slide);
+        const dot = document.createElement('span');
+        dot.className = 'eic-dot';
+        dotsEl.appendChild(dot);
+      }
+
+      const count = state.slides.length;
+      // Update track so all slides lay out side-by-side
+      track.style.width = (count*100)+'%';
+      track.querySelectorAll('.eic-slide').forEach(s => s.style.width=(100/count)+'%');
+
+      if(count > 1){
+        wrap.classList.remove('eic-single');
+        wrap.classList.add('eic-multi');
+        startEicPlay(evId);
+      }
+      evUpdateDots(evId);
+      if(countEl) countEl.textContent = (state.idx+1)+' / '+count;
+    });
+  });
+}
+
+function evSlide(evId, dir){
+  const state = evState[evId];
+  state.idx = (state.idx + dir + state.slides.length) % state.slides.length;
+  evApplySlide(evId);
+  resetEicPlay(evId);
+}
+
+function evApplySlide(evId){
+  const state = evState[evId];
+  const track = document.getElementById('eic-'+evId);
+  const count = state.slides.length;
+  track.style.transform = 'translateX(-'+(state.idx*(100/count))+'%)';
+  evUpdateDots(evId);
+  const countEl = document.getElementById('eic-count-'+evId);
+  if(countEl) countEl.textContent = (state.idx+1)+' / '+count;
+}
+
+function evUpdateDots(evId){
+  const state = evState[evId];
+  document.querySelectorAll('#eic-dots-'+evId+' .eic-dot').forEach((d,i)=>{
+    d.classList.toggle('active', i===state.idx);
+  });
+}
+
+function startEicPlay(evId){
+  const state = evState[evId];
+  if(state.timer) return;
+  state.timer = setInterval(()=>{
+    state.idx = (state.idx+1) % state.slides.length;
+    evApplySlide(evId);
+  }, 4000);
+}
+
+function resetEicPlay(evId){
+  const state = evState[evId];
+  if(state.timer){ clearInterval(state.timer); state.timer=null; }
+  if(state.slides.length > 1) startEicPlay(evId);
+}
+
+function evLightbox(evId){
+  const state = evState[evId];
+  const url = state.slides[state.idx];
+  if(!url) return;
+  document.getElementById('lbImg').src = url;
+  document.getElementById('lb').classList.add('open');
+}
+
+// Batch gallery
+const galleryIds = ['g1-bg','g2-bg','g3-bg','g4-bg','g5-bg','g6-bg','g7-bg'];
+function batchUpload(input){
+  Array.from(input.files).forEach((f,i) => {
+    readImg(f, url => applyBg(galleryIds[i % galleryIds.length], url));
+  });
+}
+
+// Lightbox
+function openLB(bgId){
+  const el = document.getElementById(bgId);
+  if(!el) return;
+  const m = getComputedStyle(el).backgroundImage.match(/url\(["']?([^"')]+)["']?\)/);
+  if(!m) return;
+  document.getElementById('lbImg').src = m[1];
+  document.getElementById('lb').classList.add('open');
+}
+function closeLB(){
+  document.getElementById('lb').classList.remove('open');
+  setTimeout(()=>{ document.getElementById('lbImg').src=''; }, 300);
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeLB(); });
+
+// Copy link
+function copyLink(){
+  if(navigator.clipboard) navigator.clipboard.writeText(location.href).then(()=>alert('✅ 链接已复制'));
+  else alert('链接：' + location.href);
+}
+
+function toggleNavGrp(yr){
+  const body = document.getElementById('grpb-'+yr);
+  const chv  = document.getElementById('chv-'+yr);
+  const grp  = document.getElementById('grp-'+yr);
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  chv.textContent = open ? '▸' : '▾';
+  grp.classList.toggle('ni-group-collapsed', open);
+}
+</script>
+</body>
+</html>
