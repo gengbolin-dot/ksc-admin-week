@@ -17,26 +17,33 @@
   --danger:#EF4444;--danger-light:#FEF2F2;
   --purple:#8B5CF6;--purple-light:#F5F3FF;
   --radius:10px;--radius-lg:14px;
+  --sb-bg:#0F172A;--sb-border:#1E293B;--sb-text:#CBD5E1;--sb-text-muted:#64748B;--sb-active:#1E293B;--sb-active-text:#FFF;--sb-hover:rgba(255,255,255,.06)
 }
 html{font-size:14px}
-body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary);color:var(--text-primary);display:flex;min-height:100vh}
+body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;background:var(--bg-secondary);color:var(--text-primary);display:flex;min-height:100vh}
 /* ── Sidebar ── */
-.sidebar{width:280px;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0;overflow:hidden}
-.sidebar-logo{padding:16px 18px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border-light);flex-shrink:0}
-.sidebar-logo .logo-icon{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
-.sidebar-logo .logo-text{font-weight:700;font-size:17px;color:var(--text-primary)}
-.sidebar-logo .logo-sub{font-size:11px;color:var(--text-tertiary);margin-top:1px;letter-spacing:0.06em;white-space:nowrap}
+.sidebar{width:280px;background:var(--sb-bg);border-right:1px solid var(--sb-border);display:flex;flex-direction:column;flex-shrink:0;height:100vh;position:sticky;top:0;overflow:hidden}
+.sidebar-logo{padding:16px 18px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--sb-border);flex-shrink:0}
+.sidebar-logo .logo-icon{width:34px;height:34px;background:#3B82F6;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
+.sidebar-logo .logo-text{font-weight:700;font-size:17px;color:#fff}
+.sidebar-logo .logo-sub{font-size:11px;color:var(--sb-text-muted);margin-top:1px;letter-spacing:0.06em;white-space:nowrap}
 .sidebar-nav{flex:1;padding:14px 12px;overflow-y:auto}
 .nav-group{margin-bottom:18px}
-.nav-group-label{font-size:12px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;padding:4px 12px 6px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px 10px 12px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s;font-size:14px;font-weight:500;color:var(--text-secondary);position:relative;text-decoration:none}
-.nav-item:hover{background:var(--bg-secondary);color:var(--text-primary)}
-.nav-item.active{background:var(--accent-light);color:var(--accent);font-weight:600}
-.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-group-label{font-size:11px;font-weight:700;color:var(--sb-text-muted);text-transform:uppercase;letter-spacing:.06em;padding:4px 12px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px 10px 12px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s;font-size:14px;font-weight:500;color:var(--sb-text);position:relative;text-decoration:none}
+.nav-item:hover{background:var(--sb-hover);color:#fff}
+.nav-item.active{background:var(--sb-active);color:var(--sb-active-text);font-weight:600}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:#3B82F6;border-radius:0 3px 3px 0}
 .nav-icon{width:18px;text-align:center;font-size:15px;flex-shrink:0}
 .nav-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:11px;font-weight:600;padding:1px 6px;border-radius:10px}
 .nav-badge.warn{background:#F59E0B}
-.nav-sub-label{font-size:12px;font-weight:700;color:var(--text-tertiary);letter-spacing:.06em;padding:6px 12px 2px;text-transform:none}
+.nav-sub-label{font-size:11px;font-weight:700;color:var(--sb-text-muted);letter-spacing:.06em;padding:6px 12px 2px;text-transform:none}
+/* Sidebar scrollbar */
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+.sidebar::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.2)}
+.sidebar{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
 /* ── Main Area ── */
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
 .topbar{height:52px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0}
@@ -166,23 +173,23 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
 
 /* Sidebar groups */
 .sidebar-group{margin:2px 0}
-.sidebar-group-head{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:450;color:var(--text-secondary);transition:all 150ms;user-select:none}
-.sidebar-group-head:hover{background:var(--bg-secondary);color:var(--text-primary)}
-.sidebar-group-arrow{margin-left:auto;font-size:12px;transition:transform 150ms}
-.sidebar-group.open>.sidebar-group-head{color:var(--accent);font-weight:600}
+.sidebar-group-head{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:450;color:var(--sb-text);transition:all 150ms;user-select:none}
+.sidebar-group-head:hover{background:var(--sb-hover);color:#fff}
+.sidebar-group-arrow{margin-left:auto;font-size:12px;color:var(--sb-text-muted);transition:transform 150ms}
+.sidebar-group.open>.sidebar-group-head{color:#fff;font-weight:600}
 .sidebar-group.open>.sidebar-group-head .sidebar-group-arrow{transform:rotate(90deg)}
 .sidebar-group-body{display:none;padding:0 0 0 16px}
 .sidebar-group.open>.sidebar-group-body{display:block}
 .sidebar-group-sub{margin:2px 0}
-.sidebar-group-sub-head{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-tertiary);transition:all 150ms;user-select:none}
-.sidebar-group-sub-head:hover{background:var(--bg-secondary);color:var(--text-secondary)}
+.sidebar-group-sub-head{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--sb-text-muted);transition:all 150ms;user-select:none}
+.sidebar-group-sub-head:hover{background:var(--sb-hover);color:var(--sb-text)}
 .sidebar-group-sub-head .sidebar-group-arrow{margin-left:auto;font-size:10px;transition:transform 150ms}
-.sidebar-group-sub.open>.sidebar-group-sub-head{color:var(--text-secondary);font-weight:600}
+.sidebar-group-sub.open>.sidebar-group-sub-head{color:var(--sb-text);font-weight:600}
 .sidebar-group-sub.open>.sidebar-group-sub-head .sidebar-group-arrow{transform:rotate(90deg)}
 .sidebar-group-sub-body{display:none;padding:0 0 0 12px}
 .sidebar-group-sub.open>.sidebar-group-sub-body{display:block}
-.sidebar-sub-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:13px;color:var(--text-tertiary);border-radius:6px;cursor:pointer;transition:all 150ms;text-decoration:none}
-.sidebar-sub-item:hover{background:var(--bg-secondary);color:var(--text-secondary)}
+.sidebar-sub-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:13px;color:var(--sb-text-muted);border-radius:6px;cursor:pointer;transition:all 150ms;text-decoration:none}
+.sidebar-sub-item:hover{background:var(--sb-hover);color:var(--sb-text)}
 </style>
 </head>
 <body>
@@ -241,23 +248,21 @@ body{font-family:'Inter','Noto Sans SC',sans-serif;background:var(--bg-secondary
       <a class="nav-item" href="./13-ai-performance.html"><span class="nav-icon">🤖</span>AI 绩效</a>
     </div>
     <div class="nav-group">
+      <div class="nav-group-label">行政系统</div>
+      <div class="nav-item"><span class="nav-icon">🖥️</span>工位系统</div>
+      <div class="nav-item"><span class="nav-icon">💸</span>费用报告推送</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">行政制度</div>
+      <div class="nav-item"><span class="nav-icon">📜</span>行政制度</div>
+    </div>
+    <div class="nav-group">
       <div class="nav-group-label">经营复盘</div>
       <a class="nav-item" href="11-admin-review.html"><span class="nav-icon">📈</span>行政经营复盘</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label">分析</div>
       <a class="nav-item" href="./09-data-cockpit.html"><span class="nav-icon">📈</span>数据驾驶舱</a>
-    </div>
-    <div class="nav-group">
-      <div class="nav-group-label">业务模块</div>
-      <div class="nav-sub-label">职场运营</div>
-      <div class="nav-item"><span class="nav-icon">🏢</span>北京职场</div>
-      <div class="nav-item"><span class="nav-icon">🏢</span>武汉职场</div>
-      <div class="nav-item"><span class="nav-icon">🏢</span>异地职场</div>
-      <div class="nav-sub-label">文化运营</div>
-      <div class="nav-sub-label">数字化运营</div>
-      <div class="nav-item"><span class="nav-icon">💻</span>行政服务台</div>
-      <div class="nav-item"><span class="nav-icon">⚙️</span>数字化后台运营</div>
     </div>
   </nav>
 </aside>

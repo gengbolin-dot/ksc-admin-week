@@ -37,12 +37,13 @@
     --shadow-md: 0 4px 6px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.06);
     --shadow-lg: 0 10px 25px rgba(0,0,0,0.06);
     --transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --sb-bg:#0F172A;--sb-border:#1E293B;--sb-text:#CBD5E1;--sb-text-muted:#64748B;--sb-active:#1E293B;--sb-active-text:#FFF;--sb-hover:rgba(255,255,255,.06)
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;
     background: var(--bg-secondary);
     color: var(--text-primary);
     font-size: 14px;
@@ -201,8 +202,8 @@
   }
   .nav-sidebar {
     width: 280px;
-    background: var(--bg);
-    border-right: 1px solid var(--border-light);
+    background: var(--sb-bg);
+    border-right: 1px solid var(--sb-border);
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
@@ -213,13 +214,13 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--sb-border);
     flex-shrink:0;
   }
   .nav-logo-icon {
     width: 30px;
     height: 30px;
-    background: var(--accent);
+    background: #3B82F6;
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -231,14 +232,14 @@
   .nav-logo-text {
     font-size: 16px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #fff;
     letter-spacing: -0.01em;
   }
   .nav-logo-badge {
     font-size: 11px;
     font-weight: 600;
-    background: var(--bg-tertiary);
-    color: var(--text-tertiary);
+    background: rgba(255,255,255,.1);
+    color: var(--sb-text-muted);
     padding: 1px 6px;
     border-radius: 10px;
     margin-left: 4px;
@@ -255,32 +256,32 @@
     transition: background var(--transition);
     flex-shrink:0;
   }
-  .nav-workspace:hover { background: var(--bg-hover); }
+  .nav-workspace:hover { background: var(--sb-hover); }
   .nav-workspace-name {
     font-size: 13px;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: var(--sb-text-muted);
   }
   .nav-workspace-arrow {
     font-size: 11px;
-    color: var(--text-tertiary);
+    color: var(--sb-text-muted);
     margin-left: auto;
   }
 
   /* Module Groups */
   .nav-modules {
     padding: 10px 10px;
-    border-top: 1px solid var(--border-light);
+    border-top: 1px solid var(--sb-border);
   }
   .nav-module-label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--text-tertiary);
+    color: var(--sb-text-muted);
     padding: 8px 8px 4px;
   }
-  .nav-sub-label{font-size:12px;font-weight:700;color:var(--text-tertiary);padding:6px 8px 2px;text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+  .nav-sub-label{font-size:11px;font-weight:700;color:var(--sb-text-muted);padding:6px 8px 2px;text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
   .nav-item {
     display: flex;
     align-items: center;
@@ -291,16 +292,16 @@
     transition: all var(--transition);
     font-size: 14px;
     font-weight: 450;
-    color: var(--text-secondary);
+    color: var(--sb-text);
     position: relative;
   }
   .nav-item:hover {
-    background: var(--bg-hover);
-    color: var(--text-primary);
+    background: var(--sb-hover);
+    color: #fff;
   }
   .nav-item.active {
-    background: var(--accent-light);
-    color: var(--accent);
+    background: var(--sb-active);
+    color: var(--sb-active-text);
     font-weight: 600;
   }
   .nav-item-icon {
@@ -333,8 +334,8 @@
     color: white;
   }
   .nav-item-badge.info {
-    background: var(--accent-light);
-    color: var(--accent);
+    background: rgba(255,255,255,.1);
+    color: var(--sb-text-muted);
   }
 
   /* Sub items */
@@ -350,18 +351,18 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: 400;
-    color: var(--text-tertiary);
+    color: var(--sb-text-muted);
     transition: all var(--transition);
   }
   .nav-sub-item:hover {
-    background: var(--bg-hover);
-    color: var(--text-secondary);
+    background: var(--sb-hover);
+    color: var(--sb-text);
   }
   .nav-sub-dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: var(--border);
+    background: var(--sb-border);
     flex-shrink: 0;
   }
 
@@ -369,7 +370,7 @@
   .nav-bottom {
     margin-top: auto;
     padding: 14px 10px;
-    border-top: 1px solid var(--border-light);
+    border-top: 1px solid var(--sb-border);
   }
   .nav-user {
     display: flex;
@@ -380,12 +381,12 @@
     cursor: pointer;
     transition: background var(--transition);
   }
-  .nav-user:hover { background: var(--bg-hover); }
+  .nav-user:hover { background: var(--sb-hover); }
   .nav-user-avatar {
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg,#3B82F6,#8B5CF6);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -400,15 +401,21 @@
   .nav-user-name {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #fff;
   }
   .nav-user-role {
     font-size: 12px;
-    color: var(--text-tertiary);
+    color: var(--sb-text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  /* Sidebar scrollbar */
+  .nav-sidebar::-webkit-scrollbar{width:4px}
+  .nav-sidebar::-webkit-scrollbar-track{background:transparent}
+  .nav-sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+  .nav-sidebar::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.2)}
+  .nav-sidebar{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
 
   /* Main content area */
   .nav-main {
@@ -675,23 +682,23 @@
 
   /* Sidebar groups */
 .sidebar-group{margin:2px 0}
-.sidebar-group-head{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:450;color:var(--text-secondary);transition:all 150ms;user-select:none}
-.sidebar-group-head:hover{background:var(--bg-hover);color:var(--text-primary)}
-.sidebar-group-arrow{margin-left:auto;font-size:12px;transition:transform 150ms}
-.sidebar-group.open>.sidebar-group-head{color:var(--accent);font-weight:600}
+.sidebar-group-head{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:450;color:var(--sb-text);transition:all 150ms;user-select:none}
+.sidebar-group-head:hover{background:var(--sb-hover);color:#fff}
+.sidebar-group-arrow{margin-left:auto;font-size:12px;color:var(--sb-text-muted);transition:transform 150ms}
+.sidebar-group.open>.sidebar-group-head{color:#fff;font-weight:600}
 .sidebar-group.open>.sidebar-group-head .sidebar-group-arrow{transform:rotate(90deg)}
 .sidebar-group-body{display:none;padding:0 0 0 16px}
 .sidebar-group.open>.sidebar-group-body{display:block}
 .sidebar-group-sub{margin:2px 0}
-.sidebar-group-sub-head{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-tertiary);transition:all 150ms;user-select:none}
-.sidebar-group-sub-head:hover{background:var(--bg-hover);color:var(--text-secondary)}
+.sidebar-group-sub-head{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:var(--sb-text-muted);transition:all 150ms;user-select:none}
+.sidebar-group-sub-head:hover{background:var(--sb-hover);color:var(--sb-text)}
 .sidebar-group-sub-head .sidebar-group-arrow{margin-left:auto;font-size:10px;transition:transform 150ms}
-.sidebar-group-sub.open>.sidebar-group-sub-head{color:var(--text-secondary);font-weight:600}
+.sidebar-group-sub.open>.sidebar-group-sub-head{color:var(--sb-text);font-weight:600}
 .sidebar-group-sub.open>.sidebar-group-sub-head .sidebar-group-arrow{transform:rotate(90deg)}
 .sidebar-group-sub-body{display:none;padding:0 0 0 12px}
 .sidebar-group-sub.open>.sidebar-group-sub-body{display:block}
-.sidebar-sub-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:13px;color:var(--text-tertiary);border-radius:6px;cursor:pointer;transition:all 150ms;text-decoration:none}
-.sidebar-sub-item:hover{background:var(--bg-hover);color:var(--text-secondary)}
+.sidebar-sub-item{display:flex;align-items:center;gap:7px;padding:6px 12px;font-size:13px;color:var(--sb-text-muted);border-radius:6px;cursor:pointer;transition:all 150ms;text-decoration:none}
+.sidebar-sub-item:hover{background:var(--sb-hover);color:var(--sb-text)}
 </style>
 </head>
 <body>
@@ -1023,6 +1030,23 @@
         </div>
 
         <div class="nav-modules">
+          <div class="nav-module-label">行政系统</div>
+          <div class="nav-item">
+            <div class="nav-item-icon">🖥️</div> 工位系统
+          </div>
+          <div class="nav-item">
+            <div class="nav-item-icon">💸</div> 费用报告推送
+          </div>
+        </div>
+
+        <div class="nav-modules">
+          <div class="nav-module-label">行政制度</div>
+          <div class="nav-item">
+            <div class="nav-item-icon">📜</div> 行政制度
+          </div>
+        </div>
+
+        <div class="nav-modules">
           <div class="nav-module-label">经营复盘</div>
           <a class="nav-item" href="11-admin-review.html">
             <div class="nav-item-icon">📈</div> 行政经营复盘
@@ -1037,18 +1061,6 @@
           </div>
         </div>
 
-        <!-- Module Quick Filter -->
-        <div class="nav-modules">
-          <div class="nav-module-label">业务模块</div>
-          <div class="nav-sub-label">职场运营</div>
-          <div class="nav-sub-item"><div class="nav-sub-dot" style="background:#3B5BDB;"></div> 北京职场</div>
-          <div class="nav-sub-item"><div class="nav-sub-dot" style="background:#8B5CF6;"></div> 武汉职场</div>
-          <div class="nav-sub-item"><div class="nav-sub-dot" style="background:#EC4899;"></div> 异地职场</div>
-          <div class="nav-sub-label">文化运营</div>
-          <div class="nav-sub-label">数字化运营</div>
-          <div class="nav-sub-item"><div class="nav-sub-dot" style="background:#06B6D4;"></div> 行政服务台</div>
-          <div class="nav-sub-item"><div class="nav-sub-dot" style="background:#6366F1;"></div> 数字化后台运营</div>
-        </div>
 
         </div>
 
