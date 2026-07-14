@@ -735,11 +735,20 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p09-kpi-dn{background:var(--danL);color:var(--dan)}
 
 /* Data table */
-.p09-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
+/* Data table - fixed column widths for alignment */
+.p09-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;table-layout:fixed}
 .p09-tbl th{background:var(--bg3);padding:8px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);text-align:left;border-bottom:2px solid var(--bd)}
-.p09-tbl td{padding:8px 12px;border-bottom:1px solid var(--bdl)}
+.p09-tbl td{padding:8px 12px;border-bottom:1px solid var(--bdl);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p09-tbl tr:hover td{background:var(--bg2)}
 .p09-tbl .num{text-align:right;font-variant-numeric:tabular-nums}
+.p09-tbl .text-left{text-align:left}
+.p09-tbl .text-center{text-align:center}
+/* Column widths */
+.p09-tbl .col-name{width:20%}
+.p09-tbl .col-area{width:15%;text-align:right;font-variant-numeric:tabular-nums}
+.p09-tbl .col-num{width:15%;text-align:right;font-variant-numeric:tabular-nums}
+.p09-tbl .col-pct{width:12%;text-align:right;font-variant-numeric:tabular-nums}
+.p09-tbl .col-action{width:8%;text-align:center}
 
 /* Progress bar */
 .p09-prog{height:6px;border-radius:3px;background:var(--bg3);overflow:hidden;width:60px;display:inline-block;vertical-align:middle}
@@ -5032,23 +5041,24 @@ function renderP09(){
     if(mod.table && mod.table.length > 0 && mod.id !== 'employee'){
       h += `<table class="p09-tbl"><thead><tr>`;
       const headers = mod.id === 'service' ? ['服务类型','类型','事项数','满意度','响应时长','状态'] :
-                      mod.id === 'workplace' ? ['职场','面积','工位数量','入驻人数','利用率','操作'] :
-                      mod.id === 'travel' ? ['类型','费用','订单量','趋势'] :
-                      mod.id === 'investment' ? ['项目','预算','已用','执行率','状态'] :
-                      mod.id === 'digital' ? ['系统','功能','状态','覆盖用户'] : ['名称','数据'];
-      headers.forEach(th => h += `<th>${th}</th>`);
+                      mod.id === 'workplace' ? [{name:'职场',cls:'col-name'},{name:'面积',cls:'col-area'},{name:'工位数量',cls:'col-num'},{name:'入驻人数',cls:'col-num'},{name:'利用率',cls:'col-pct'},{name:'操作',cls:'col-action'}] :null;
+      if(mod.id === 'workplace'){
+        headers.forEach(th => h += `<th class="${th.cls}">${th.name}</th>`);
+      } else {
+        headers.forEach(th => h += `<th>${th}</th>`);
+      }
       h += `</tr></thead><tbody>`;
 
       mod.table.forEach((row, rowIdx) => {
         h += `<tr>`;
         if(mod.id === 'workplace'){
-          // Editable workplace table with proper alignment
-          h += `<td style="font-weight:600"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="name">${row.name||'新职场'}</span></td>`;
-          h += `<td class="num" style="font-variant-numeric:tabular-nums"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="area">${row.area||'0㎡'}</span></td>`;
-          h += `<td class="num" style="font-variant-numeric:tabular-nums"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="seats">${row.seats||0}</span></td>`;
-          h += `<td class="num" style="font-variant-numeric:tabular-nums"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="people">${row.people||0}</span></td>`;
-          h += `<td class="num" style="font-variant-numeric:tabular-nums;font-weight:600">${row.util||'0%'}</td>`;
-          h += `<td style="text-align:center"><button class="p09-del-btn" onclick="deleteWorkplace(${rowIdx})">🗑</button></td>`;
+          // Editable workplace table with fixed column widths
+          h += `<td class="col-name" style="font-weight:600"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="name">${row.name||'新职场'}</span></td>`;
+          h += `<td class="col-area"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="area">${row.area||'0㎡'}</span></td>`;
+          h += `<td class="col-num"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="seats">${row.seats||0}</span></td>`;
+          h += `<td class="col-num"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="people">${row.people||0}</span></td>`;
+          h += `<td class="col-pct" style="font-weight:600">${row.util||'0%'}</td>`;
+          h += `<td class="col-action"><button class="p09-del-btn" onclick="deleteWorkplace(${rowIdx})">🗑</button></td>`;
         } else {
           Object.values(row).forEach(val => h += `<td>${val}</td>`);
         }
