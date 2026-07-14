@@ -776,7 +776,7 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p09-drawer-input:focus{border-color:var(--ac)}
 
 /* Editable cells and table actions */
-.p09-editable{cursor:pointer;padding:2px 4px;border-radius:4px;transition:background var(--tr)}
+.p09-editable{cursor:pointer;padding:2px 4px;border-radius:4px;transition:background var(--tr);display:inline-block;min-width:30px;min-height:16px}
 .p09-editable:hover{background:var(--bgH)}
 .p09-editable.editing{background:var(--bg);border:1px solid var(--ac);outline:none;min-width:60px;display:inline-block}
 .p09-del-btn{width:24px;height:24px;border-radius:4px;border:none;background:none;color:var(--t3);cursor:pointer;font-size:12px;transition:all var(--tr)}
@@ -5287,7 +5287,7 @@ function addActivity(){
   const empMod = DATA_CENTER.modules.find(m => m.id === 'employee');
   if(!empMod) return;
   if(!empMod.activities) empMod.activities = [];
-  empMod.activities.push({name:'新活动',city:'全员',people:0,satisfaction:'—',desc:''});
+  empMod.activities.push({name:'新活动',city:'全员',people:0,satisfaction:'—',desc:'点击编辑描述'});
   renderP09();
 }
 
