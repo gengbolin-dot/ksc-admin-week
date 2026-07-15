@@ -2763,22 +2763,39 @@ const OKRS = [
 
 /* ══════ TEAM DATA ══════ */
 const TEAM = [
-  {id:'t01',name:'耿博琳',avatar:'耿',color:'#667eea',title:'行政总监',dept:'行政部',role:'职场管理(北京+异地)、行政数字化、文化运营',modules:['职场运营(北京)','职场运营(异地)','数字化运营'],email:'gengbolin@company.com',location:'北京',joinDate:'2020-03',reports:['t02','t03','t04','t05']},
-  {id:'t02',name:'高琳',avatar:'高',color:'#764ba2',title:'文化运营经理',dept:'文化运营',role:'文化运营、行政服务台运营',modules:['文化运营(活动)','文化运营(福利)','数字化运营(行政服务台)'],email:'gaolin@company.com',location:'北京',joinDate:'2021-06',reports:[]},
-  {id:'t03',name:'聂茜茜',avatar:'聂',color:'#f093fb',title:'活动策划主管',dept:'文化运营',role:'文化运营、活动策划',modules:['文化运营(活动)'],email:'nieqianqian@company.com',location:'北京',joinDate:'2022-01',reports:[]},
-  {id:'t04',name:'张灵玉',avatar:'张',color:'#4facfe',title:'北京职场主管',dept:'职场运营',role:'北京职场、文化运营',modules:['职场运营(北京)','文化运营(活动)'],email:'zhanglingyu@company.com',location:'北京',joinDate:'2021-03',reports:[]},
-  {id:'t05',name:'傅中南',avatar:'傅',color:'#a18cd1',title:'异地职场主管',dept:'职场运营',role:'异地职场管理',modules:['职场运营(异地)'],email:'fuzhongnan@company.com',location:'异地',joinDate:'2022-06',reports:['t06']},
-  {id:'t06',name:'胡丽婷',avatar:'胡',color:'#a6c0fe',title:'深圳职场专员',dept:'职场运营',role:'深圳职场',modules:['职场运营(异地)'],email:'huliting@company.com',location:'深圳',joinDate:'2023-03',reports:[]},
-  {id:'t07',name:'程宇亮',avatar:'程',color:'#43e97b',title:'武汉职场主管',dept:'职场运营',role:'武汉职场管理',modules:['职场运营(武汉)'],email:'chengyuliang@company.com',location:'武汉',joinDate:'2021-09',reports:['t08']},
-  {id:'t08',name:'董诗昀',avatar:'董',color:'#fa709a',title:'武汉职场专员',dept:'职场运营',role:'武汉职场',modules:['职场运营(武汉)'],email:'dongshiyun@company.com',location:'武汉',joinDate:'2022-12',reports:[]},
-  {id:'t09',name:'丁玉萍',avatar:'丁',color:'#fbc2eb',title:'数字化运营主管',dept:'数字化运营',role:'行政数字化、后台运营',modules:['数字化运营(后台)'],email:'dingyuping@company.com',location:'北京',joinDate:'2021-06',reports:[]},
-  {id:'t10',name:'王刚',avatar:'王',color:'#ffecd2',title:'行政负责人',dept:'行政部',role:'行政负责人',modules:['职场运营(北京)','文化运营','数字化运营'],email:'wanggang@company.com',location:'北京',joinDate:'2019-01',reports:['t01']},
+  // 部门负责人
+  {id:'t01',name:'郭萌',avatar:'郭',color:'#3B82F6',title:'高级行政总监',dept:'行政部',role:'部门负责人，统筹行政部全局工作',modules:['全部'],email:'guomeng@kingsoft.com',location:'北京',joinDate:'2013-08',reports:['t02','t03','t04','t05','t06','t07','t08','t09','t10','t11','t12']},
+
+  // 公司级行政支持 - 北京
+  {id:'t02',name:'耿博琳',avatar:'耿',color:'#667eea',title:'行政经理',dept:'公司级行政支持',role:'职场管理(北京)、行政数字化、文化运营',modules:['职场运营(北京)','数字化运营'],email:'gengbolin@kingsoft.com',location:'北京',joinDate:'2018-07',reports:[]},
+  {id:'t03',name:'傅中南',avatar:'傅',color:'#a18cd1',title:'行政经理',dept:'公司级行政支持',role:'职场管理(异地)、深圳职场',modules:['职场运营(异地)'],email:'fuzhongnan@kingsoft.com',location:'北京',joinDate:'2019-07',reports:['t09']},
+  {id:'t04',name:'张灵玉',avatar:'张',color:'#4facfe',title:'行政专员',dept:'公司级行政支持',role:'北京职场、文化运营',modules:['职场运营(北京)','文化运营'],email:'zhanglingyu@kingsoft.com',location:'北京',joinDate:'2022-03',reports:[]},
+  {id:'t05',name:'高琳',avatar:'高',color:'#764ba2',title:'行政主管',dept:'公司级行政支持',role:'文化运营、行政服务台运营',modules:['文化运营','数字化运营(行政服务台)'],email:'gaolin@kingsoft.com',location:'北京',joinDate:'2020-05',reports:['t13']},
+  {id:'t06',name:'丁玉萍',avatar:'丁',color:'#fbc2eb',title:'行政专员',dept:'公司级行政支持',role:'数字化运营、后台管理',modules:['数字化运营(后台)'],email:'dingyuping@kingsoft.com',location:'北京',joinDate:'2021-05',reports:[]},
+
+  // 公司级行政支持 - 武汉
+  {id:'t07',name:'程宇亮',avatar:'程',color:'#43e97b',title:'行政经理',dept:'公司级行政支持',role:'武汉职场管理',modules:['职场运营(武汉)'],email:'chengyuliang@kingsoft.com',location:'武汉',joinDate:'2023-09',reports:['t08','t11','t12']},
+  {id:'t08',name:'聂茜茜',avatar:'聂',color:'#f093fb',title:'行政专员',dept:'公司级行政支持',role:'武汉文化运营、活动策划',modules:['文化运营(活动)'],email:'nieqianqian@kingsoft.com',location:'武汉',joinDate:'2024-07',reports:[]},
+  {id:'t11',name:'董诗昀',avatar:'董',color:'#fa709a',title:'行政专员',dept:'公司级行政支持',role:'武汉职场支持',modules:['职场运营(武汉)'],email:'dongshiyun@kingsoft.com',location:'武汉',joinDate:'2025-08',reports:[]},
+
+  // 公司级行政支持 - 深圳
+  {id:'t09',name:'胡丽婷',avatar:'胡',color:'#a6c0fe',title:'行政专员',dept:'公司级行政支持',role:'深圳职场管理',modules:['职场运营(异地)'],email:'huliting@kingsoft.com',location:'深圳',joinDate:'2026-04',reports:[]},
+
+  // 总裁室支持
+  {id:'t10',name:'王琳琳',avatar:'王',color:'#8B5CF6',title:'高级总裁助理',dept:'总裁室支持',role:'总裁室高级助理',modules:['总裁室支持'],email:'wanglinlin@kingsoft.com',location:'北京',joinDate:'2025-09',reports:[]},
+  {id:'t12',name:'王嘉旭',avatar:'王',color:'#06B6D4',title:'总裁助理',dept:'总裁室支持',role:'总裁室助理',modules:['总裁室支持'],email:'wangjiaxu@kingsoft.com',location:'北京',joinDate:'2023-07',reports:[]},
+  {id:'t13',name:'任纪明',avatar:'任',color:'#F59E0B',title:'司机',dept:'总裁室支持',role:'总裁室司机',modules:['总裁室支持'],email:'renjiming@kingsoft.com',location:'北京',joinDate:'2023-01',reports:[]},
+
+  // 实习生
+  {id:'t14',name:'范嘉璐',avatar:'范',color:'#9CA3AF',title:'设计实习生',dept:'公司级行政支持',role:'设计支持',modules:['设计'],email:'fanjialu@kingsoft.com',location:'武汉',joinDate:'2026-03',reports:[]},
+  {id:'t15',name:'王阳',avatar:'王',color:'#9CA3AF',title:'行政实习生',dept:'公司级行政支持',role:'行政支持',modules:['行政综合'],email:'wangyang@kingsoft.com',location:'北京',joinDate:'2026-06',reports:[]},
 ];
 
 const DEPARTMENTS = [
-  {id:'dept-workplace',name:'职场运营',icon:'🏢',color:'#3B5BDB',lead:'t01',members:['t01','t04','t05','t06','t07','t08']},
-  {id:'dept-culture',name:'文化运营',icon:'🎉',color:'#10B981',lead:'t02',members:['t02','t03']},
-  {id:'dept-digital',name:'数字化运营',icon:'💻',color:'#06B6D4',lead:'t09',members:['t09']},
+  {id:'dept-exec',name:'总裁室支持',icon:'👔',color:'#8B5CF6',lead:'t10',members:['t10','t12','t13']},
+  {id:'dept-beijing',name:'公司级行政支持-北京',icon:'🏢',color:'#3B82F6',lead:'t02',members:['t02','t03','t04','t05','t06','t15']},
+  {id:'dept-wuhan',name:'公司级行政支持-武汉',icon:'🏢',color:'#10B981',lead:'t07',members:['t07','t08','t11','t14']},
+  {id:'dept-shenzhen',name:'公司级行政支持-深圳',icon:'🏢',color:'#F59E0B',lead:'t09',members:['t09']},
 ];
 
 const BUDGETS = {
@@ -6011,30 +6028,47 @@ function renderP11Content(){
     <div class="p11-org-title">📊 组织架构</div>
     <div class="p11-org-tree">
       <div class="p11-org-root">
-        <div class="p11-org-root-name">${TEAM.find(t=>t.id==='t10')?.name || '行政负责人'}</div>
-        <div class="p11-org-root-title">行政负责人</div>
+        <div class="p11-org-root-name">郭萌</div>
+        <div class="p11-org-root-title">高级行政总监</div>
       </div>
-      <div class="p11-org-branches">`;
+      <div class="p11-org-branches">
 
-  DEPARTMENTS.forEach(d => {
-    const lead = TEAM.find(t => t.id === d.lead);
-    const members = TEAM.filter(t => d.members.includes(t.id) && t.id !== d.lead);
-
-    h += `<div class="p11-org-branch">
-      <div class="p11-org-branch-head" style="border-color:${d.color}">
-        <div class="p11-org-branch-name">${lead?.name || '—'}</div>
-        <div class="p11-org-branch-title">${d.name}负责人</div>
+      <!-- 公司级行政支持 -->
+      <div class="p11-org-branch" style="flex:2">
+        <div class="p11-org-branch-head" style="border-color:#3B82F6">
+          <div class="p11-org-branch-name">公司级行政支持</div>
+          <div class="p11-org-branch-title">3个城市 · 12人</div>
+        </div>
+        <div class="p11-org-members" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:100%">
+          <div style="background:var(--bg2);border-radius:8px;padding:10px">
+            <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px">🏢 北京</div>
+            <div style="font-size:12px;line-height:1.8">耿博琳<br>傅中南<br>张灵玉<br>高琳<br>丁玉萍</div>
+          </div>
+          <div style="background:var(--bg2);border-radius:8px;padding:10px">
+            <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px">🏢 武汉</div>
+            <div style="font-size:12px;line-height:1.8">程宇亮<br>聂茜茜<br>董诗昀</div>
+          </div>
+          <div style="background:var(--bg2);border-radius:8px;padding:10px">
+            <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px">🏢 深圳</div>
+            <div style="font-size:12px;line-height:1.8">胡丽婷</div>
+          </div>
+        </div>
       </div>
-      <div class="p11-org-members">`;
 
-    members.forEach(m => {
-      h += `<div class="p11-org-member">${m.name}</div>`;
-    });
+      <!-- 总裁室支持 -->
+      <div class="p11-org-branch" style="flex:1">
+        <div class="p11-org-branch-head" style="border-color:#8B5CF6">
+          <div class="p11-org-branch-name">总裁室支持</div>
+          <div class="p11-org-branch-title">3人</div>
+        </div>
+        <div class="p11-org-members">
+          <div class="p11-org-member">王琳琳</div>
+          <div class="p11-org-member">王嘉旭</div>
+          <div class="p11-org-member">任纪明</div>
+        </div>
+      </div>
 
-    h += `</div></div>`;
-  });
-
-  h += `</div></div></div>`;
+      </div></div></div>`;
 
   // Team grid
   h += `<div class="p11-team-grid">`;
