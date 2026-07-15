@@ -1368,6 +1368,17 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p17-item-arrow{font-size:14px;color:var(--t3);flex-shrink:0}
 
 /* ══════ COOL CHARTS ══════ */
+/* Apple-style large color blocks */
+.cool-block{border-radius:20px;padding:32px;margin-bottom:16px;position:relative;overflow:hidden;min-height:180px}
+.cool-block::before{content:'';position:absolute;top:-50%;right:-30%;width:300px;height:300px;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%);border-radius:50%}
+.cool-block-content{position:relative;z-index:2}
+.cool-block-title{font-size:28px;font-weight:900;color:#fff;letter-spacing:-.02em;margin-bottom:8px}
+.cool-block-desc{font-size:14px;color:rgba(255,255,255,.7);max-width:400px;line-height:1.6}
+.cool-block-stat{display:flex;gap:32px;margin-top:20px}
+.cool-block-stat-item{text-align:center}
+.cool-block-stat-val{font-size:32px;font-weight:900;color:#fff}
+.cool-block-stat-label{font-size:11px;color:rgba(255,255,255,.6);margin-top:4px}
+
 /* Animated progress ring */
 .cool-ring{width:80px;height:80px;position:relative;margin:0 auto}
 .cool-ring svg{transform:rotate(-90deg)}
@@ -6611,7 +6622,7 @@ function renderP18(){
   const data = DATA_CENTER;
   let h = '';
 
-  // Hero section with gradient
+  // Hero section
   h += `<div class="p15-hero">
     <div class="p15-hero-content">
       <div class="p15-hero-badge">✨ 数据中心 · 酷炫版</div>
@@ -6620,156 +6631,125 @@ function renderP18(){
     </div>
   </div>`;
 
-  h += `<div class="p15-grid">`;
-
-  // Service module with ring chart
+  // Apple-style large blocks
   const serviceMod = data.modules.find(m => m.id === 'service');
-  if(serviceMod){
-    h += `<div class="p15-card cool-card-hover">
-      <div class="p15-card-header">
-        <div class="p15-card-icon" style="background:${serviceMod.color}18;color:${serviceMod.color}">${serviceMod.icon}</div>
-        <div><div class="p15-card-title">${serviceMod.title}</div><div class="p15-card-sub">${serviceMod.desc}</div></div>
-      </div>
-      <div class="p15-card-body">
-        <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
-          <div class="cool-ring">
-            <svg viewBox="0 0 36 36"><path class="cool-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/><path class="cool-ring-fill" stroke="${serviceMod.color}" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke-dasharray="85, 100"/></svg>
-            <div class="cool-ring-center"><div class="cool-ring-val">85%</div><div class="cool-ring-label">完成率</div></div>
-          </div>
-          <div style="flex:1">`;
-    serviceMod.kpis.forEach(k => {
-      h += `<div class="cool-stat"><div class="cool-stat-icon" style="background:${serviceMod.color}18;color:${serviceMod.color}">📊</div><div class="cool-stat-info"><div class="cool-stat-val">${k.val}</div><div class="cool-stat-label">${k.label}</div></div></div>`;
-    });
-    h += `</div></div></div></div>`;
-  }
-
-  // Workplace module with bar chart
   const workMod = data.modules.find(m => m.id === 'workplace');
-  if(workMod){
-    h += `<div class="p15-card cool-card-hover">
-      <div class="p15-card-header">
-        <div class="p15-card-icon" style="background:${workMod.color}18;color:${workMod.color}">${workMod.icon}</div>
-        <div><div class="p15-card-title">${workMod.title}</div><div class="p15-card-sub">${workMod.desc}</div></div>
-      </div>
-      <div class="p15-card-body">
-        <div class="cool-bars" style="height:120px;margin-bottom:16px">`;
-    const workData = [{label:'北京',val:280},{label:'武汉',val:250},{label:'异地',val:150},{label:'上海',val:50},{label:'深圳',val:40},{label:'厦门',val:35},{label:'杭州',val:20},{label:'珠海',val:30}];
-    const maxSeats = Math.max(...workData.map(d => d.val));
-    workData.forEach(d => {
-      const height = (d.val / maxSeats * 100);
-      h += `<div class="cool-bar-col"><div class="cool-bar" style="height:${height}%;background:${workMod.color}"><div class="cool-bar-val">${d.val}</div></div><div class="cool-bar-label">${d.label}</div></div>`;
-    });
-    h += `</div>
-        <div class="p15-kpi-row">`;
-    workMod.kpis.forEach(k => {
-      h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
-    });
-    h += `</div></div></div>`;
-  }
-
-  // Employee module with donut chart
   const empMod = data.modules.find(m => m.id === 'employee');
-  if(empMod){
-    h += `<div class="p15-card cool-card-hover">
-      <div class="p15-card-header">
-        <div class="p15-card-icon" style="background:${empMod.color}18;color:${empMod.color}">${empMod.icon}</div>
-        <div><div class="p15-card-title">${empMod.title}</div><div class="p15-card-sub">${empMod.desc}</div></div>
-      </div>
-      <div class="p15-card-body">
-        <div style="display:flex;align-items:center;gap:20px;margin-bottom:12px">
-          <div class="cool-donut">
-            <svg viewBox="0 0 36 36"><path class="cool-donut-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/><path class="cool-donut-fill" stroke="${empMod.color}" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke-dasharray="92, 100"/></svg>
-            <div class="cool-donut-center"><div class="cool-donut-val">92%</div><div class="cool-donut-label">满意度</div></div>
-          </div>
-          <div style="flex:1">`;
-    empMod.kpis.forEach(k => {
-      h += `<div class="cool-stat"><div class="cool-stat-icon" style="background:${empMod.color}18;color:${empMod.color}">🎉</div><div class="cool-stat-info"><div class="cool-stat-val">${k.val}</div><div class="cool-stat-label">${k.label}</div></div></div>`;
-    });
-    h += `</div></div>`;
-    // City stats
-    if(empMod.cities && empMod.cities.length > 0){
-      h += `<div style="margin-top:12px">`;
-      empMod.cities.forEach(c => {
-        h += `<div class="p15-status"><div class="cool-pulse" style="background:${empMod.color};color:${empMod.color}"></div><div class="p15-status-name">${c.name}</div><div class="p15-status-val">${c.events}场 · ${c.people}人</div></div>`;
-      });
-      h += `</div>`;
-    }
-    h += `</div></div>`;
-  }
-
-  // Travel module with horizontal bars
   const travMod = data.modules.find(m => m.id === 'travel');
-  if(travMod){
-    h += `<div class="p15-card cool-card-hover">
-      <div class="p15-card-header">
-        <div class="p15-card-icon" style="background:${travMod.color}18;color:${travMod.color}">${travMod.icon}</div>
-        <div><div class="p15-card-title">${travMod.title}</div><div class="p15-card-sub">${travMod.desc}</div></div>
-      </div>
-      <div class="p15-card-body">
-        <div class="cool-hbars">`;
-    const travelData = [{label:'机票',val:325000},{label:'酒店',val:283000},{label:'火车',val:128000},{label:'用车',val:80000}];
-    const maxTravel = Math.max(...travelData.map(d => d.val));
-    travelData.forEach(d => {
-      const pct = (d.val / maxTravel * 100);
-      h += `<div class="cool-hbar-row"><div class="cool-hbar-label">${d.label}</div><div class="cool-hbar-track"><div class="cool-hbar-fill" style="width:${pct}%;background:${travMod.color}"></div></div><div class="cool-hbar-val">¥${(d.val/10000).toFixed(1)}万</div></div>`;
-    });
-    h += `</div></div></div>`;
-  }
-
-  // Investment module with stat cards
   const invMod = data.modules.find(m => m.id === 'investment');
-  if(invMod){
-    h += `<div class="p15-card cool-card-hover">
-      <div class="p15-card-header">
-        <div class="p15-card-icon" style="background:${invMod.color}18;color:${invMod.color}">${invMod.icon}</div>
-        <div><div class="p15-card-title">${invMod.title}</div><div class="p15-card-sub">${invMod.desc}</div></div>
-      </div>
-      <div class="p15-card-body">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">`;
-    invMod.kpis.forEach(k => {
-      h += `<div class="cool-stat"><div class="cool-stat-icon" style="background:${invMod.color}18;color:${invMod.color}">💰</div><div class="cool-stat-info"><div class="cool-stat-val">${k.val}</div><div class="cool-stat-label">${k.label}</div></div></div>`;
-    });
-    h += `</div></div></div>`;
-  }
-
-  // Digital module with counter animation
   const digMod = data.modules.find(m => m.id === 'digital');
+
+  // Service block - Blue gradient
+  if(serviceMod){
+    h += `<div class="cool-block" style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%)">
+      <div class="cool-block-content">
+        <div class="cool-block-title">🛎️ 行政服务台</div>
+        <div class="cool-block-desc">智能化工单管理系统，支持自动派单、AI拦截、满意度追踪</div>
+        <div class="cool-block-stat">
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">537</div><div class="cool-block-stat-label">累计工单</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">100%</div><div class="cool-block-stat-label">拦截率</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">4.5</div><div class="cool-block-stat-label">满意度</div></div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // Workplace + Employee side by side
+  h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">`;
+
+  // Workplace block - Dark blue
+  if(workMod){
+    h += `<div class="cool-block" style="background:linear-gradient(135deg,#0f172a 0%,#1e40af 100%);min-height:160px">
+      <div class="cool-block-content">
+        <div class="cool-block-title">🏢 职场运营</div>
+        <div class="cool-block-desc">8个职场，12,500㎡办公空间</div>
+        <div class="cool-block-stat">
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">850</div><div class="cool-block-stat-label">工位</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">720</div><div class="cool-block-stat-label">入驻</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">85%</div><div class="cool-block-stat-label">利用率</div></div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // Employee block - Amber
+  if(empMod){
+    h += `<div class="cool-block" style="background:linear-gradient(135deg,#78350f 0%,#d97706 100%);min-height:160px">
+      <div class="cool-block-content">
+        <div class="cool-block-title">🎉 员工体验</div>
+        <div class="cool-block-desc">21场活动，6000+参与人次</div>
+        <div class="cool-block-stat">
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">21</div><div class="cool-block-stat-label">年度活动</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">92%</div><div class="cool-block-stat-label">满意度</div></div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  h += `</div>`;
+
+  // Travel + Investment side by side
+  h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">`;
+
+  // Travel block - Cyan
+  if(travMod){
+    h += `<div class="cool-block" style="background:linear-gradient(135deg,#164e63 0%,#0891b2 100%);min-height:160px">
+      <div class="cool-block-content">
+        <div class="cool-block-title">✈️ 差旅运营</div>
+        <div class="cool-block-desc">差旅及用车费用数据追踪</div>
+        <div class="cool-block-stat">
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">¥81.6万</div><div class="cool-block-stat-label">总费用</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">¥32.5万</div><div class="cool-block-stat-label">机票</div></div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // Investment block - Purple
+  if(invMod){
+    h += `<div class="cool-block" style="background:linear-gradient(135deg,#3b0764 0%,#7c3aed 100%);min-height:160px">
+      <div class="cool-block-content">
+        <div class="cool-block-title">💰 行政采购</div>
+        <div class="cool-block-desc">行政重点投入项目管理</div>
+        <div class="cool-block-stat">
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">¥85万</div><div class="cool-block-stat-label">总预算</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">49.4%</div><div class="cool-block-stat-label">执行率</div></div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  h += `</div>`;
+
+  // Digital block - Teal
   if(digMod){
-    h += `<div class="p15-card cool-card-hover">
-      <div class="p15-card-header">
-        <div class="p15-card-icon" style="background:${digMod.color}18;color:${digMod.color}">${digMod.icon}</div>
-        <div><div class="p15-card-title">${digMod.title}</div><div class="p15-card-sub">${digMod.desc}</div></div>
+    h += `<div class="cool-block" style="background:linear-gradient(135deg,#134e4a 0%,#0d9488 100%);margin-bottom:16px">
+      <div class="cool-block-content">
+        <div class="cool-block-title">💻 数字化运营</div>
+        <div class="cool-block-desc">8个系统上线，3个AI应用，15个自动化流程</div>
+        <div class="cool-block-stat">
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">8</div><div class="cool-block-stat-label">上线系统</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">3</div><div class="cool-block-stat-label">AI应用</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val">15</div><div class="cool-block-stat-label">自动化流程</div></div>
+        </div>
       </div>
-      <div class="p15-card-body">
-        <div class="p15-kpi-row">`;
-    digMod.kpis.forEach(k => {
-      h += `<div class="p15-kpi"><div class="cool-counter">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
-    });
-    h += `</div></div></div>`;
+    </div>`;
   }
 
-  // Archive module with timeline style
+  // Archive block - Warm gray
   const archMod = data.modules.find(m => m.id === 'archive');
-  if(archMod && archMod.sections){
-    h += `<div class="p15-card cool-card-hover" style="grid-column:1/-1">
-      <div class="p15-card-header">
-        <div class="p15-card-icon" style="background:${archMod.color}18;color:${archMod.color}">${archMod.icon}</div>
-        <div><div class="p15-card-title">${archMod.title}</div><div class="p15-card-sub">${archMod.desc}</div></div>
-      </div>
-      <div class="p15-card-body">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">`;
+  if(archMod){
+    h += `<div class="cool-block" style="background:linear-gradient(135deg,#44403c 0%,#78716c 100%);margin-bottom:16px">
+      <div class="cool-block-content">
+        <div class="cool-block-title">📁 年度运营档案</div>
+        <div class="cool-block-desc">沉淀行政年度数据资产，支持季度/年度汇报直接引用</div>
+        <div class="cool-block-stat">`;
     archMod.sections.forEach(sec => {
-      h += `<div style="background:var(--bg2);border-radius:10px;padding:14px">
-        <div style="font-size:13px;font-weight:700;margin-bottom:10px">${sec.icon} ${sec.title}</div>`;
-      sec.items.forEach(item => {
-        h += `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bdl);font-size:12px"><span style="color:var(--t2)">${item.label}</span><span style="font-weight:600">${item.val}</span></div>`;
-      });
-      h += `</div>`;
+      h += `<div class="cool-block-stat-item"><div class="cool-block-stat-val">${sec.items.length}</div><div class="cool-block-stat-label">${sec.title}</div></div>`;
     });
     h += `</div></div></div>`;
   }
 
-  h += `</div>`; // end grid
   el.innerHTML = h;
 }
 
