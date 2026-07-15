@@ -734,6 +734,39 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p09-kpi-up{background:var(--sucL);color:var(--suc)}
 .p09-kpi-dn{background:var(--danL);color:var(--dan)}
 
+/* Module card animations */
+.p09-mod{animation:p09-slide-up .5s ease-out both}
+.p09-mod:nth-child(1){animation-delay:.1s}
+.p09-mod:nth-child(2){animation-delay:.2s}
+.p09-mod:nth-child(3){animation-delay:.3s}
+.p09-mod:nth-child(4){animation-delay:.4s}
+.p09-mod:nth-child(5){animation-delay:.5s}
+.p09-mod:nth-child(6){animation-delay:.6s}
+.p09-mod:nth-child(7){animation-delay:.7s}
+@keyframes p09-slide-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.p09-mod{transition:transform .2s ease,box-shadow .2s ease}
+.p09-mod:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+
+/* KPI value animation */
+.p09-kpi-val{transition:all .3s}
+.p09-kpi:hover .p09-kpi-val{transform:scale(1.05);color:var(--ac)}
+
+/* Table row hover */
+.p09-tbl tr{transition:background .15s}
+.p09-tbl tr:hover td{background:var(--acl)}
+
+/* Editable field hover */
+.p09-editable{transition:all .15s}
+.p09-editable:hover{background:var(--acl);color:var(--ac)}
+
+/* Add button pulse */
+.p09-add-btn{transition:all .2s}
+.p09-add-btn:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.1)}
+
+/* Delete button animation */
+.p09-del-btn{transition:all .15s}
+.p09-del-btn:hover{transform:scale(1.1)}
+
 /* Data table */
 /* Data table - fixed column widths for alignment */
 .p09-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;table-layout:fixed}
@@ -5356,9 +5389,44 @@ function renderP09(){
 
   h += `</div>`;
   el.innerHTML = h;
-}
 
-// ══════ SERVICE DATA ACCUMULATION ══════
+  // Animate KPI counters
+  setTimeout(() => {
+    el.querySelectorAll('.p09-kpi-val').forEach(counter => {
+      const text = counter.textContent;
+      const match = text.match(/^([¥￥]?)([\d,.]+)(.*)$/);
+      if(match){
+        const prefix = match[1] || '';
+        const numStr = match[2].replace(/,/g, '');
+        const suffix = match[3] || '';
+        const target = parseFloat(numStr);
+        if(isNaN(target) || target === 0) return;
+
+        let current = 0;
+        const duration = 1200;
+        const step = target / (duration / 16);
+        const timer = setInterval(() => {
+          current += step;
+          if(current >= target){
+            current = target;
+            clearInterval(timer);
+          }
+          let display;
+          if(target >= 10000){
+            display = current.toLocaleString('en-US', {maximumFractionDigits:0});
+          } else if(target >= 100){
+            display = Math.round(current).toString();
+          } else if(target >= 10){
+            display = current.toFixed(1);
+          } else {
+            display = current.toFixed(1);
+          }
+          counter.textContent = prefix + display + suffix;
+        }, 16);
+      }
+    });
+  }, 300);
+}
 // This function is called when new weekly data is available
 // It adds the new week's data to the service module's weeklyHistory
 function addServiceWeekData(weekData){
