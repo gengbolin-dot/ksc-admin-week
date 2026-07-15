@@ -1367,6 +1367,52 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p17-item-meta{font-size:11px;color:var(--t3)}
 .p17-item-arrow{font-size:14px;color:var(--t3);flex-shrink:0}
 
+/* ══════ PANEL 15: COOL DATA CENTER ══════ */
+.p15-hero{padding:32px 40px;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#2d1b69 100%);position:relative;overflow:hidden}
+.p15-hero::before{content:'';position:absolute;top:-50%;right:-20%;width:400px;height:400px;background:radial-gradient(circle,rgba(59,91,219,.15) 0%,transparent 70%);border-radius:50%}
+.p15-hero::after{content:'';position:absolute;bottom:-30%;left:10%;width:300px;height:300px;background:radial-gradient(circle,rgba(139,92,246,.1) 0%,transparent 70%);border-radius:50%}
+.p15-hero-content{position:relative;z-index:2}
+.p15-hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);font-size:11px;color:rgba(255,255,255,.7);margin-bottom:12px}
+.p15-hero-title{font-size:28px;font-weight:900;color:#fff;letter-spacing:-.02em;margin-bottom:8px}
+.p15-hero-desc{font-size:14px;color:rgba(255,255,255,.6);max-width:500px;line-height:1.6}
+
+.p15-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:24px 32px}
+.p15-card{background:var(--bg);border:1px solid var(--bdl);border-radius:16px;overflow:hidden;transition:all .2s}
+.p15-card:hover{box-shadow:0 8px 30px rgba(0,0,0,.08);transform:translateY(-2px)}
+.p15-card-header{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--bdl)}
+.p15-card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.p15-card-title{font-size:14px;font-weight:700;color:var(--t1)}
+.p15-card-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.p15-card-body{padding:16px 20px}
+
+/* Animated progress ring */
+.p15-ring{width:80px;height:80px;position:relative}
+.p15-ring svg{transform:rotate(-90deg)}
+.p15-ring-bg{fill:none;stroke:var(--bg3);stroke-width:6}
+.p15-ring-fill{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 1s ease}
+.p15-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.p15-ring-val{font-size:18px;font-weight:900;color:var(--t1)}
+.p15-ring-label{font-size:9px;color:var(--t3)}
+
+/* KPI cards with gradient */
+.p15-kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.p15-kpi{background:var(--bg2);border-radius:12px;padding:16px;text-align:center;border:1px solid var(--bdl);transition:all .2s}
+.p15-kpi:hover{border-color:var(--ac);box-shadow:0 4px 12px rgba(59,91,219,.1)}
+.p15-kpi-val{font-size:24px;font-weight:900;letter-spacing:-.02em;color:var(--t1)}
+.p15-kpi-label{font-size:10px;color:var(--t3);margin-top:4px}
+
+/* Mini bar chart */
+.p15-mini-bars{display:flex;align-items:flex-end;gap:3px;height:40px}
+.p15-mini-bar{flex:1;border-radius:2px 2px 0 0;background:var(--ac);opacity:.7;transition:all .3s}
+.p15-mini-bar:hover{opacity:1;transform:scaleY(1.1)}
+
+/* Status dots */
+.p15-status{display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid var(--bdl)}
+.p15-status:last-child{border-bottom:none}
+.p15-status-dot{width:8px;height:8px;border-radius:50%}
+.p15-status-name{flex:1;font-size:12px;color:var(--t2)}
+.p15-status-val{font-size:12px;font-weight:600;color:var(--t1)}
+
 /* ══════ TREND CHART ══════ */
 .p09-chart-wrap{margin-top:16px;padding:16px;background:var(--bg);border:1px solid var(--bdl);border-radius:10px}
 .p09-chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
@@ -1517,6 +1563,9 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
     <div class="sb-lbl">分析</div>
     <div class="sb-i" data-panel="p09" onclick="switchPanel('p09',this)">
       <div class="sb-ic">📈</div> 行政运营数据中心
+    </div>
+    <div class="sb-i" data-panel="p18" onclick="switchPanel('p18',this)">
+      <div class="sb-ic">✨</div> 数据中心 <span style="font-size:10px;color:var(--sb-text-muted);margin-left:auto">酷炫版</span>
     </div>
   </div>
 
@@ -2510,6 +2559,12 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
   <div class="content-scroll" id="p17Content"></div>
 </div>
 
+<!-- ══════ PANEL 18: COOL DATA CENTER ══════ -->
+<div class="panel" id="p18">
+  <div class="topbar"><div class="topbar-title">✨ 数据中心 · 酷炫版</div></div>
+  <div class="content-scroll" id="p18Content"></div>
+</div>
+
 </div><!-- end main -->
 </div><!-- end shell -->
 
@@ -3404,6 +3459,7 @@ function switchPanel(id, navEl){
   if(id==='p15'&&!window._p15Rendered){renderP15();window._p15Rendered=true}
   if(id==='p16'&&!window._p16Rendered){renderP16();window._p16Rendered=true}
   if(id==='p17'&&!window._p17Rendered){renderP17();window._p17Rendered=true}
+  if(id==='p18'&&!window._p18Rendered){renderP18();window._p18Rendered=true}
 }
 
 /* ══════ SLIDE-OVER ══════ */
@@ -6490,6 +6546,136 @@ function filterPolicyCat(cat, el){
   items.forEach(item => {
     item.style.display = cat === 'all' || item.dataset.cat === cat ? '' : 'none';
   });
+}
+
+/* ══════ P18: COOL DATA CENTER ══════ */
+function renderP18(){
+  const el = document.getElementById('p18Content');
+  const data = DATA_CENTER;
+  let h = '';
+
+  // Hero section with gradient
+  h += `<div class="p15-hero">
+    <div class="p15-hero-content">
+      <div class="p15-hero-badge">✨ 数据中心 · 酷炫版</div>
+      <div class="p15-hero-title">行政运营数据全景</div>
+      <div class="p15-hero-desc">沉淀行政运营过程中产生的重要数据资产，统一记录、持续沉淀、长期积累。</div>
+    </div>
+  </div>`;
+
+  h += `<div class="p15-grid">`;
+
+  // Service module with animated ring
+  const serviceMod = data.modules.find(m => m.id === 'service');
+  if(serviceMod){
+    h += `<div class="p15-card">
+      <div class="p15-card-header">
+        <div class="p15-card-icon" style="background:${serviceMod.color}18;color:${serviceMod.color}">${serviceMod.icon}</div>
+        <div><div class="p15-card-title">${serviceMod.title}</div><div class="p15-card-sub">${serviceMod.desc}</div></div>
+      </div>
+      <div class="p15-card-body">
+        <div class="p15-kpi-row">`;
+    serviceMod.kpis.forEach(k => {
+      h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
+    });
+    h += `</div></div></div>`;
+  }
+
+  // Workplace module with mini bar chart
+  const workMod = data.modules.find(m => m.id === 'workplace');
+  if(workMod){
+    h += `<div class="p15-card">
+      <div class="p15-card-header">
+        <div class="p15-card-icon" style="background:${workMod.color}18;color:${workMod.color}">${workMod.icon}</div>
+        <div><div class="p15-card-title">${workMod.title}</div><div class="p15-card-sub">${workMod.desc}</div></div>
+      </div>
+      <div class="p15-card-body">
+        <div class="p15-kpi-row">`;
+    workMod.kpis.forEach(k => {
+      h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
+    });
+    h += `</div></div></div>`;
+  }
+
+  // Employee module with activities
+  const empMod = data.modules.find(m => m.id === 'employee');
+  if(empMod){
+    h += `<div class="p15-card">
+      <div class="p15-card-header">
+        <div class="p15-card-icon" style="background:${empMod.color}18;color:${empMod.color}">${empMod.icon}</div>
+        <div><div class="p15-card-title">${empMod.title}</div><div class="p15-card-sub">${empMod.desc}</div></div>
+      </div>
+      <div class="p15-card-body">
+        <div class="p15-kpi-row">`;
+    empMod.kpis.forEach(k => {
+      h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
+    });
+    h += `</div>`;
+    // City stats
+    if(empMod.cities && empMod.cities.length > 0){
+      h += `<div style="margin-top:12px">`;
+      empMod.cities.forEach(c => {
+        h += `<div class="p15-status">
+          <div class="p15-status-dot" style="background:var(--ac)"></div>
+          <div class="p15-status-name">${c.name}</div>
+          <div class="p15-status-val">${c.events}场 · ${c.people}人</div>
+        </div>`;
+      });
+      h += `</div>`;
+    }
+    h += `</div></div>`;
+  }
+
+  // Travel module with mini bars
+  const travMod = data.modules.find(m => m.id === 'travel');
+  if(travMod){
+    h += `<div class="p15-card">
+      <div class="p15-card-header">
+        <div class="p15-card-icon" style="background:${travMod.color}18;color:${travMod.color}">${travMod.icon}</div>
+        <div><div class="p15-card-title">${travMod.title}</div><div class="p15-card-sub">${travMod.desc}</div></div>
+      </div>
+      <div class="p15-card-body">
+        <div class="p15-kpi-row">`;
+    travMod.kpis.forEach(k => {
+      h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
+    });
+    h += `</div></div></div>`;
+  }
+
+  // Investment module
+  const invMod = data.modules.find(m => m.id === 'investment');
+  if(invMod){
+    h += `<div class="p15-card">
+      <div class="p15-card-header">
+        <div class="p15-card-icon" style="background:${invMod.color}18;color:${invMod.color}">${invMod.icon}</div>
+        <div><div class="p15-card-title">${invMod.title}</div><div class="p15-card-sub">${invMod.desc}</div></div>
+      </div>
+      <div class="p15-card-body">
+        <div class="p15-kpi-row">`;
+    invMod.kpis.forEach(k => {
+      h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
+    });
+    h += `</div></div></div>`;
+  }
+
+  // Digital module
+  const digMod = data.modules.find(m => m.id === 'digital');
+  if(digMod){
+    h += `<div class="p15-card">
+      <div class="p15-card-header">
+        <div class="p15-card-icon" style="background:${digMod.color}18;color:${digMod.color}">${digMod.icon}</div>
+        <div><div class="p15-card-title">${digMod.title}</div><div class="p15-card-sub">${digMod.desc}</div></div>
+      </div>
+      <div class="p15-card-body">
+        <div class="p15-kpi-row">`;
+    digMod.kpis.forEach(k => {
+      h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
+    });
+    h += `</div></div></div>`;
+  }
+
+  h += `</div>`; // end grid
+  el.innerHTML = h;
 }
 
 function switchBudgetView(view){
