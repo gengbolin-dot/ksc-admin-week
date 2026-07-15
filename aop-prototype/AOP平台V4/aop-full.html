@@ -1368,25 +1368,69 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p17-item-arrow{font-size:14px;color:var(--t3);flex-shrink:0}
 
 /* ══════ COOL CHARTS ══════ */
-/* Apple-style large color blocks */
-.cool-block{border-radius:20px;padding:32px;margin-bottom:16px;position:relative;overflow:hidden;min-height:180px}
-.cool-block::before{content:'';position:absolute;top:-50%;right:-30%;width:300px;height:300px;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%);border-radius:50%}
+/* Apple-style large color blocks with animations */
+.cool-block{border-radius:20px;padding:32px;margin-bottom:16px;position:relative;overflow:hidden;min-height:180px;transition:transform .3s ease,box-shadow .3s ease}
+.cool-block:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.cool-block::before{content:'';position:absolute;top:-50%;right:-30%;width:300px;height:300px;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%);border-radius:50%;animation:cool-glow 4s ease-in-out infinite}
+.cool-block::after{content:'';position:absolute;bottom:-30%;left:10%;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,.05) 0%,transparent 70%);border-radius:50%;animation:cool-glow 6s ease-in-out infinite reverse}
+@keyframes cool-glow{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-20px) scale(1.1)}}
 .cool-block-content{position:relative;z-index:2}
 .cool-block-title{font-size:28px;font-weight:900;color:#fff;letter-spacing:-.02em;margin-bottom:8px}
 .cool-block-desc{font-size:14px;color:rgba(255,255,255,.7);max-width:400px;line-height:1.6}
 .cool-block-stat{display:flex;gap:32px;margin-top:20px}
 .cool-block-stat-item{text-align:center}
-.cool-block-stat-val{font-size:32px;font-weight:900;color:#fff}
+.cool-block-stat-val{font-size:32px;font-weight:900;color:#fff;transition:all .3s}
+.cool-block-stat-val:hover{transform:scale(1.1);text-shadow:0 0 20px rgba(255,255,255,.3)}
 .cool-block-stat-label{font-size:11px;color:rgba(255,255,255,.6);margin-top:4px}
+
+/* Staggered entrance animation */
+.cool-block:nth-child(1){animation:cool-slide-up .6s ease-out .1s both}
+.cool-block:nth-child(2){animation:cool-slide-up .6s ease-out .2s both}
+.cool-block:nth-child(3){animation:cool-slide-up .6s ease-out .3s both}
+.cool-block:nth-child(4){animation:cool-slide-up .6s ease-out .4s both}
+.cool-block:nth-child(5){animation:cool-slide-up .6s ease-out .5s both}
+.cool-block:nth-child(6){animation:cool-slide-up .6s ease-out .6s both}
+.cool-block:nth-child(7){animation:cool-slide-up .6s ease-out .7s both}
+@keyframes cool-slide-up{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* Gradient animation on hover */
+.cool-block:hover::before{animation:cool-glow-fast 2s ease-in-out infinite}
+@keyframes cool-glow-fast{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-30px) scale(1.2)}}
 
 /* Animated progress ring */
 .cool-ring{width:80px;height:80px;position:relative;margin:0 auto}
 .cool-ring svg{transform:rotate(-90deg)}
 .cool-ring-bg{fill:none;stroke:var(--bg3);stroke-width:6}
-.cool-ring-fill{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 1.5s ease}
+.cool-ring-fill{fill:none;stroke-width:6;stroke-linecap:round;stroke-dashoffset:100;animation:cool-ring-fill 1.5s ease-out forwards}
+@keyframes cool-ring-fill{to{stroke-dashoffset:var(--ring-target)}}
 .cool-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .cool-ring-val{font-size:18px;font-weight:900;color:var(--t1)}
 .cool-ring-label{font-size:9px;color:var(--t3);margin-top:2px}
+
+/* Animated counter */
+.cool-counter{display:inline-block;transition:all .5s}
+.cool-counter:hover{transform:scale(1.05)}
+
+/* Pulse effect */
+.cool-pulse-dot{display:inline-block;width:8px;height:8px;border-radius:50%;position:relative}
+.cool-pulse-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid currentColor;animation:cool-pulse 2s infinite}
+@keyframes cool-pulse{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.5);opacity:0}}
+
+/* Shimmer effect */
+.cool-shimmer{background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.1) 50%,transparent 100%);background-size:200% 100%;animation:cool-shimmer 2s infinite}
+@keyframes cool-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* Fade in animation */
+.cool-fade-in{animation:cool-fade-in .5s ease-out both}
+@keyframes cool-fade-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Scale in animation */
+.cool-scale-in{animation:cool-scale-in .3s ease-out both}
+@keyframes cool-scale-in{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+
+/* Slide in from right */
+.cool-slide-right{animation:cool-slide-right .4s ease-out both}
+@keyframes cool-slide-right{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
 
 /* Vertical bar chart */
 .cool-bars{display:flex;align-items:flex-end;gap:6px;height:100px;padding:0 8px}
@@ -6622,16 +6666,16 @@ function renderP18(){
   const data = DATA_CENTER;
   let h = '';
 
-  // Hero section
+  // Hero section with shimmer effect
   h += `<div class="p15-hero">
-    <div class="p15-hero-content">
+    <div class="p15-hero-content cool-fade-in">
       <div class="p15-hero-badge">✨ 数据中心 · 酷炫版</div>
       <div class="p15-hero-title">行政运营数据全景</div>
       <div class="p15-hero-desc">沉淀行政运营过程中产生的重要数据资产，统一记录、持续沉淀、长期积累。</div>
     </div>
   </div>`;
 
-  // Apple-style large blocks
+  // Apple-style large blocks with animations
   const serviceMod = data.modules.find(m => m.id === 'service');
   const workMod = data.modules.find(m => m.id === 'workplace');
   const empMod = data.modules.find(m => m.id === 'employee');
@@ -6639,48 +6683,48 @@ function renderP18(){
   const invMod = data.modules.find(m => m.id === 'investment');
   const digMod = data.modules.find(m => m.id === 'digital');
 
-  // Service block - Blue gradient
+  // Service block - Blue gradient with shimmer
   if(serviceMod){
-    h += `<div class="cool-block" style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%)">
+    h += `<div class="cool-block cool-shimmer" style="background:linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%)">
       <div class="cool-block-content">
         <div class="cool-block-title">🛎️ 行政服务台</div>
         <div class="cool-block-desc">智能化工单管理系统，支持自动派单、AI拦截、满意度追踪</div>
         <div class="cool-block-stat">
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">537</div><div class="cool-block-stat-label">累计工单</div></div>
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">100%</div><div class="cool-block-stat-label">拦截率</div></div>
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">4.5</div><div class="cool-block-stat-label">满意度</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">537</div><div class="cool-block-stat-label">累计工单</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">100%</div><div class="cool-block-stat-label">拦截率</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">4.5</div><div class="cool-block-stat-label">满意度</div></div>
         </div>
       </div>
     </div>`;
   }
 
-  // Workplace + Employee side by side
+  // Workplace + Employee side by side with animations
   h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">`;
 
-  // Workplace block - Dark blue
+  // Workplace block - Dark blue with pulse
   if(workMod){
     h += `<div class="cool-block" style="background:linear-gradient(135deg,#0f172a 0%,#1e40af 100%);min-height:160px">
       <div class="cool-block-content">
         <div class="cool-block-title">🏢 职场运营</div>
         <div class="cool-block-desc">8个职场，12,500㎡办公空间</div>
         <div class="cool-block-stat">
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">850</div><div class="cool-block-stat-label">工位</div></div>
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">720</div><div class="cool-block-stat-label">入驻</div></div>
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">85%</div><div class="cool-block-stat-label">利用率</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">850</div><div class="cool-block-stat-label">工位</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">720</div><div class="cool-block-stat-label">入驻</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">85%</div><div class="cool-block-stat-label">利用率</div></div>
         </div>
       </div>
     </div>`;
   }
 
-  // Employee block - Amber
+  // Employee block - Amber with pulse dot
   if(empMod){
     h += `<div class="cool-block" style="background:linear-gradient(135deg,#78350f 0%,#d97706 100%);min-height:160px">
       <div class="cool-block-content">
         <div class="cool-block-title">🎉 员工体验</div>
         <div class="cool-block-desc">21场活动，6000+参与人次</div>
         <div class="cool-block-stat">
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">21</div><div class="cool-block-stat-label">年度活动</div></div>
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">92%</div><div class="cool-block-stat-label">满意度</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">21</div><div class="cool-block-stat-label">年度活动</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">92%</div><div class="cool-block-stat-label">满意度</div></div>
         </div>
       </div>
     </div>`;
@@ -6698,8 +6742,8 @@ function renderP18(){
         <div class="cool-block-title">✈️ 差旅运营</div>
         <div class="cool-block-desc">差旅及用车费用数据追踪</div>
         <div class="cool-block-stat">
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">¥81.6万</div><div class="cool-block-stat-label">总费用</div></div>
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">¥32.5万</div><div class="cool-block-stat-label">机票</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">¥81.6万</div><div class="cool-block-stat-label">总费用</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">¥32.5万</div><div class="cool-block-stat-label">机票</div></div>
         </div>
       </div>
     </div>`;
@@ -6712,8 +6756,8 @@ function renderP18(){
         <div class="cool-block-title">💰 行政采购</div>
         <div class="cool-block-desc">行政重点投入项目管理</div>
         <div class="cool-block-stat">
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">¥85万</div><div class="cool-block-stat-label">总预算</div></div>
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">49.4%</div><div class="cool-block-stat-label">执行率</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">¥85万</div><div class="cool-block-stat-label">总预算</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">49.4%</div><div class="cool-block-stat-label">执行率</div></div>
         </div>
       </div>
     </div>`;
@@ -6721,16 +6765,16 @@ function renderP18(){
 
   h += `</div>`;
 
-  // Digital block - Teal
+  // Digital block - Teal with shimmer
   if(digMod){
-    h += `<div class="cool-block" style="background:linear-gradient(135deg,#134e4a 0%,#0d9488 100%);margin-bottom:16px">
+    h += `<div class="cool-block cool-shimmer" style="background:linear-gradient(135deg,#134e4a 0%,#0d9488 100%);margin-bottom:16px">
       <div class="cool-block-content">
         <div class="cool-block-title">💻 数字化运营</div>
         <div class="cool-block-desc">8个系统上线，3个AI应用，15个自动化流程</div>
         <div class="cool-block-stat">
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">8</div><div class="cool-block-stat-label">上线系统</div></div>
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">3</div><div class="cool-block-stat-label">AI应用</div></div>
-          <div class="cool-block-stat-item"><div class="cool-block-stat-val">15</div><div class="cool-block-stat-label">自动化流程</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">8</div><div class="cool-block-stat-label">上线系统</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">3</div><div class="cool-block-stat-label">AI应用</div></div>
+          <div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">15</div><div class="cool-block-stat-label">自动化流程</div></div>
         </div>
       </div>
     </div>`;
@@ -6745,12 +6789,42 @@ function renderP18(){
         <div class="cool-block-desc">沉淀行政年度数据资产，支持季度/年度汇报直接引用</div>
         <div class="cool-block-stat">`;
     archMod.sections.forEach(sec => {
-      h += `<div class="cool-block-stat-item"><div class="cool-block-stat-val">${sec.items.length}</div><div class="cool-block-stat-label">${sec.title}</div></div>`;
+      h += `<div class="cool-block-stat-item"><div class="cool-block-stat-val cool-counter">${sec.items.length}</div><div class="cool-block-stat-label">${sec.title}</div></div>`;
     });
     h += `</div></div></div>`;
   }
 
   el.innerHTML = h;
+
+  // Trigger animations after render
+  setTimeout(() => {
+    // Animate counters
+    document.querySelectorAll('.cool-counter').forEach(counter => {
+      const text = counter.textContent;
+      const match = text.match(/^([\d,.]+)(.*)$/);
+      if(match){
+        const target = parseFloat(match[1].replace(/,/g, ''));
+        const suffix = match[2] || '';
+        let current = 0;
+        const duration = 1500;
+        const step = target / (duration / 16);
+        const timer = setInterval(() => {
+          current += step;
+          if(current >= target){
+            current = target;
+            clearInterval(timer);
+          }
+          if(target >= 1000){
+            counter.textContent = current.toLocaleString('en-US', {maximumFractionDigits:0}) + suffix;
+          } else if(target >= 100){
+            counter.textContent = Math.round(current) + suffix;
+          } else {
+            counter.textContent = current.toFixed(1) + suffix;
+          }
+        }, 16);
+      }
+    });
+  }, 500);
 }
 
 function switchBudgetView(view){
