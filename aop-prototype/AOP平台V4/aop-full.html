@@ -3080,12 +3080,12 @@ const DATA_CENTER = {
           {label:'新增流程',val:'5个'},
           {label:'优化流程',val:'8个'}
         ]},
-        {title:'资源建设',icon:'🏗️',items:[
-          {label:'新增供应商',val:'4家'},
-          {label:'协议酒店数量',val:'12家'},
-          {label:'资产处置数量',val:'3批次'},
-          {label:'办公面积变化',val:'+800㎡'},
-          {label:'工位变化',val:'+50个'}
+        {title:'职场运营',icon:'🏢',items:[
+          {label:'职场数量',val:'8个'},
+          {label:'总面积',val:'12,500㎡'},
+          {label:'工位数量',val:'850个'},
+          {label:'入驻人数',val:'720人'},
+          {label:'平均利用率',val:'85%'}
         ]},
         {title:'数字化建设',icon:'💻',items:[
           {label:'新增系统',val:'2个'},
@@ -5062,15 +5062,17 @@ function renderP09(){
     // Archive sections
     if(mod.sections && mod.sections.length > 0){
       h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">`;
-      mod.sections.forEach(sec => {
+      mod.sections.forEach((sec, secIdx) => {
         h += `<div style="background:var(--bg2);border-radius:10px;padding:14px">
-          <div style="font-size:13px;font-weight:700;margin-bottom:10px">${sec.icon||''} ${sec.title||''}</div>`;
-        (sec.items || []).forEach(item => {
-          h += `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bdl);font-size:12px">
-            <span style="color:var(--t2)">${item.label||''}</span>
-            <span style="font-weight:600">${item.val||'—'}</span>
+          <div style="font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px">${sec.icon||''} ${sec.title||''}</div>`;
+        (sec.items || []).forEach((item, itemIdx) => {
+          h += `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bdl);font-size:12px;align-items:center">
+            <span style="color:var(--t2)"><span class="p09-editable" data-mod="archive" data-sec="${secIdx}" data-row="${itemIdx}" data-field="label">${item.label||''}</span></span>
+            <span style="font-weight:600"><span class="p09-editable" data-mod="archive" data-sec="${secIdx}" data-row="${itemIdx}" data-field="val">${item.val||'—'}</span></span>
+            <button class="p09-del-btn" style="margin-left:4px" onclick="deleteArchiveItem(${secIdx},${itemIdx})">🗑</button>
           </div>`;
         });
+        h += `<button class="p09-add-btn" style="margin-top:8px;font-size:11px" onclick="addArchiveItem(${secIdx})">＋ 添加条目</button>`;
         h += `</div>`;
       });
       h += `</div>`;
@@ -5549,6 +5551,14 @@ document.addEventListener('click', function(e){
           e.target.textContent = newVal;
         }
       }
+      if(modId === 'archive'){
+        const secIdx = parseInt(e.target.dataset.sec);
+        const archMod = DATA_CENTER.modules.find(m => m.id === 'archive');
+        if(archMod && archMod.sections && archMod.sections[secIdx] && archMod.sections[secIdx].items[rowIdx]){
+          archMod.sections[secIdx].items[rowIdx][field] = newVal;
+          e.target.textContent = newVal;
+        }
+      }
     }
 
     e.target.addEventListener('blur', finishEdit, {once:true});
@@ -5642,6 +5652,25 @@ function recalcDigitalKpis(){
   digMod.kpis[0].val = String(digMod.table.length);
   // AI applications and automation count could be calculated from data
 }
+
+// ══════ ARCHIVE SECTION EDITING ══════
+function deleteArchiveItem(secIdx, itemIdx){
+  const archMod = DATA_CENTER.modules.find(m => m.id === 'archive');
+  if(!archMod || !archMod.sections || !archMod.sections[secIdx]) return;
+  if(!confirm('确定删除此条目？')) return;
+  archMod.sections[secIdx].items.splice(itemIdx, 1);
+  renderP09();
+}
+
+function addArchiveItem(secIdx){
+  const archMod = DATA_CENTER.modules.find(m => m.id === 'archive');
+  if(!archMod || !archMod.sections || !archMod.sections[secIdx]) return;
+  archMod.sections[secIdx].items.push({label:'新条目',val:'0'});
+  renderP09();
+}
+
+// Update inline editing to support archive module
+const originalFinishEdit = null;
 
 /* ══════ P10: OKR ══════ */
 function renderP10(){
