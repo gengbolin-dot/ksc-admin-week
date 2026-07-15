@@ -1366,6 +1366,39 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p17-item-name{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:2px}
 .p17-item-meta{font-size:11px;color:var(--t3)}
 .p17-item-arrow{font-size:14px;color:var(--t3);flex-shrink:0}
+
+/* ══════ TREND CHART ══════ */
+.p09-chart-wrap{margin-top:16px;padding:16px;background:var(--bg);border:1px solid var(--bdl);border-radius:10px}
+.p09-chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.p09-chart-title{font-size:14px;font-weight:700;color:var(--t1)}
+.p09-chart-controls{display:flex;gap:4px}
+.p09-chart-ctrl{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr)}
+.p09-chart-ctrl:hover{background:var(--bgH)}
+.p09-chart-ctrl.active{background:var(--acl);border-color:var(--ac);color:var(--ac)}
+.p09-chart-sep{width:1px;height:20px;background:var(--bdl);margin:0 4px}
+.p09-chart-area{position:relative;height:200px;display:flex;align-items:flex-end;gap:4px;padding:0 0 30px 50px}
+.p09-chart-y{position:absolute;left:0;top:0;bottom:30px;width:50px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding-right:8px}
+.p09-chart-y-label{font-size:10px;color:var(--t3)}
+.p09-chart-bars{display:flex;align-items:flex-end;gap:6px;flex:1;height:100%}
+.p09-chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.p09-chart-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .3s;cursor:pointer;position:relative}
+.p09-chart-bar:hover{opacity:.85}
+.p09-chart-bar.current{box-shadow:0 0 0 2px var(--ac)}
+.p09-chart-label{font-size:9px;color:var(--t3);white-space:nowrap}
+.p09-chart-legend{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11px;color:var(--t3)}
+.p09-chart-legend-dot{width:10px;height:10px;border-radius:2px}
+.p09-chart-refline{position:absolute;top:0;bottom:30px;width:1px;border-left:2px dashed var(--ac);z-index:2;pointer-events:none}
+
+/* Tooltip */
+.p09-chart-tooltip{position:absolute;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;box-shadow:var(--shL);z-index:10;pointer-events:none;min-width:160px}
+.p09-chart-tooltip-title{font-size:12px;font-weight:700;color:var(--t1);margin-bottom:6px}
+.p09-chart-tooltip-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2);margin-bottom:3px}
+.p09-chart-tooltip-dot{width:8px;height:8px;border-radius:2px}
+.p09-chart-tooltip-val{font-weight:600;color:var(--t1);margin-left:auto}
+.p09-chart-tooltip-change{font-size:10px;font-weight:600;display:flex;align-items:center;gap:2px}
+.p09-chart-tooltip-up{color:var(--suc)}
+.p09-chart-tooltip-down{color:var(--dan)}
+
 </style>
 </head>
 <body>
@@ -2968,7 +3001,18 @@ const DATA_CENTER = {
         {val: '¥12.8万', label: '火车'},
         {val: '¥8.0万', label: '用车'}
       ],
-      table: []
+      table: [],
+      trend: {
+        monthly: [
+          {month:'2026-01',amount:2012345.67,yoy:47.59,mom:10.12},
+          {month:'2026-02',amount:1123456.78,yoy:32.45,mom:-44.23},
+          {month:'2026-03',amount:1567890.12,yoy:28.67,mom:39.62},
+          {month:'2026-04',amount:2145647.85,yoy:47.59,mom:36.87},
+          {month:'2026-05',amount:1890234.56,yoy:23.45,mom:-11.94},
+          {month:'2026-06',amount:1678901.23,yoy:18.90,mom:-11.20},
+          {month:'2026-07',amount:1541464.56,yoy:15.67,mom:-8.23}
+        ]
+      }
     },
     {
       id: 'investment',
@@ -5033,6 +5077,52 @@ function renderP09(){
       h += `</div>`;
     }
 
+    // Trend chart for travel module
+    if(mod.id === 'travel' && mod.trend && mod.trend.monthly){
+      const data = mod.trend.monthly;
+      const maxVal = Math.max(...data.map(d => d.amount));
+
+      h += `<div class="p09-chart-wrap">
+        <div class="p09-chart-header">
+          <div class="p09-chart-title">整体消费金额趋势</div>
+          <div class="p09-chart-controls">
+            <div class="p09-chart-ctrl active">月</div>
+            <div class="p09-chart-ctrl">季</div>
+            <div class="p09-chart-ctrl">半年</div>
+            <div class="p09-chart-sep"></div>
+            <div class="p09-chart-ctrl active">当期</div>
+            <div class="p09-chart-ctrl">累计</div>
+          </div>
+        </div>
+        <div class="p09-chart-area">
+          <div class="p09-chart-y">
+            <div class="p09-chart-label">${(maxVal/10000).toFixed(0)}万</div>
+            <div class="p09-chart-label">${(maxVal/20000).toFixed(0)}万</div>
+            <div class="p09-chart-label">0</div>
+          </div>
+          <div class="p09-chart-bars" id="p09ChartBars">`;
+
+      data.forEach((d, i) => {
+        const height = maxVal > 0 ? (d.amount / maxVal * 100) : 0;
+        const isCurrent = i === data.length - 2; // Mark second-to-last as current
+        const month = d.month.split('-')[1];
+        h += `<div class="p09-chart-col">
+          <div class="p09-chart-bar${isCurrent ? ' current' : ''}" style="height:${height}%;background:${isCurrent ? 'var(--ac)' : 'var(--ac)'};opacity:${isCurrent ? 1 : 0.7}"
+               data-month="${d.month}" data-amount="${d.amount}" data-yoy="${d.yoy}" data-mom="${d.mom}"
+               onmouseenter="showChartTooltip(event)" onmouseleave="hideChartTooltip()"></div>
+          <div class="p09-chart-label">${month}月</div>
+        </div>`;
+      });
+
+      h += `</div>
+          <div class="p09-chart-refline" style="left:calc(50px + ${((data.length-2)/(data.length-1))*100}% * (1 - 50px/100%))"></div>
+        </div>
+        <div class="p09-chart-legend">
+          <span class="p09-chart-legend-dot" style="background:var(--ac)"></span> 总计
+        </div>
+      </div>`;
+    }
+
     // Generic table for other modules
     if(mod.table && mod.table.length > 0 && mod.id !== 'employee'){
       h += `<table class="p09-tbl"><thead><tr>`;
@@ -5147,6 +5237,56 @@ try {
     }
   }
 } catch(e) {}
+
+// ══════ CHART TOOLTIP ══════
+function showChartTooltip(e){
+  const bar = e.target;
+  const month = bar.dataset.month;
+  const amount = parseFloat(bar.dataset.amount);
+  const yoy = parseFloat(bar.dataset.yoy);
+  const mom = parseFloat(bar.dataset.mom);
+
+  // Remove existing tooltip
+  document.querySelectorAll('.p09-chart-tooltip').forEach(t => t.remove());
+
+  const tooltip = document.createElement('div');
+  tooltip.className = 'p09-chart-tooltip';
+  tooltip.innerHTML = `
+    <div class="p09-chart-tooltip-title">${month}</div>
+    <div class="p09-chart-tooltip-row">
+      <span class="p09-chart-tooltip-dot" style="background:var(--ac)"></span>
+      <span>总计</span>
+      <span class="p09-chart-tooltip-val">${amount.toLocaleString()} 元</span>
+    </div>
+    <div class="p09-chart-tooltip-row">
+      <span class="p09-chart-tooltip-change ${yoy >= 0 ? 'p09-chart-tooltip-up' : 'p09-chart-tooltip-down'}">
+        ${yoy >= 0 ? '↑' : '↓'} ${Math.abs(yoy).toFixed(2)}%
+      </span>
+      <span>同比</span>
+    </div>
+    <div class="p09-chart-tooltip-row">
+      <span class="p09-chart-tooltip-change ${mom >= 0 ? 'p09-chart-tooltip-up' : 'p09-chart-tooltip-down'}">
+        ${mom >= 0 ? '↑' : '↓'} ${Math.abs(mom).toFixed(2)}%
+      </span>
+      <span>环比</span>
+    </div>
+  `;
+
+  // Position tooltip
+  const rect = bar.getBoundingClientRect();
+  const parent = bar.closest('.p09-chart-wrap');
+  const parentRect = parent.getBoundingClientRect();
+  tooltip.style.left = (rect.left - parentRect.left + rect.width/2 - 80) + 'px';
+  tooltip.style.top = (rect.top - parentRect.top - 10) + 'px';
+  tooltip.style.transform = 'translateY(-100%)';
+
+  parent.style.position = 'relative';
+  parent.appendChild(tooltip);
+}
+
+function hideChartTooltip(){
+  document.querySelectorAll('.p09-chart-tooltip').forEach(t => t.remove());
+}
 
 function openDataCenterEdit(moduleId){
   const mod = DATA_CENTER.modules.find(m => m.id === moduleId);
