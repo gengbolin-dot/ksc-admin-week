@@ -3046,16 +3046,15 @@ const DATA_CENTER = {
       owner: '数字化负责人',
       lastUpdate: '2026-07-14',
       kpis: [
-        {val: '8', label: '上线系统', chg: '+2', up: true},
-        {val: '3', label: 'AI应用', chg: '+1', up: true},
-        {val: '15', label: '自动化流程', chg: '+5', up: true},
-        {val: '120h', label: '节约工时', chg: '+40h', up: true}
+        {val: '8', label: '上线系统'},
+        {val: '3', label: 'AI应用'},
+        {val: '15', label: '自动化流程'}
       ],
       table: [
         {name:'AOP平台',func:'行政运营管理',status:'已上线',users:'全员'},
         {name:'工位系统',func:'工位预订管理',status:'对接中',users:'全员'},
         {name:'库存管理',func:'行政物资管理',status:'已上线',users:'行政部'},
-        {name:'数据驾驶舱',func:'KPI数据展示',status:'已上线',users:'管理层'}
+        {name:'费用报告推送系统',func:'差旅用车出行数据推送分析',status:'开发中',users:'管理层'}
       ]
     },
     {
@@ -5134,7 +5133,7 @@ function renderP09(){
       } else if(mod.id === 'investment'){
         ['项目','预算','已用','执行率','状态','操作'].forEach(th => h += `<th>${th}</th>`);
       } else if(mod.id === 'digital'){
-        ['系统','功能','状态','覆盖用户'].forEach(th => h += `<th>${th}</th>`);
+        ['系统','功能','状态','覆盖用户','操作'].forEach(th => h += `<th>${th}</th>`);
       } else {
         ['名称','数据'].forEach(th => h += `<th>${th}</th>`);
       }
@@ -5158,6 +5157,13 @@ function renderP09(){
           h += `<td class="num" style="font-weight:600">${row.rate||'0%'}</td>`;
           h += `<td><span class="p09-editable" data-mod="investment" data-row="${rowIdx}" data-field="status">${row.status||'未开始'}</span></td>`;
           h += `<td style="text-align:center"><button class="p09-del-btn" onclick="deleteInvestment(${rowIdx})">🗑</button></td>`;
+        } else if(mod.id === 'digital'){
+          // Editable digital module table
+          h += `<td style="font-weight:600"><span class="p09-editable" data-mod="digital" data-row="${rowIdx}" data-field="name">${row.name||'新系统'}</span></td>`;
+          h += `<td><span class="p09-editable" data-mod="digital" data-row="${rowIdx}" data-field="func">${row.func||'—'}</span></td>`;
+          h += `<td><span class="p09-editable" data-mod="digital" data-row="${rowIdx}" data-field="status">${row.status||'规划中'}</span></td>`;
+          h += `<td><span class="p09-editable" data-mod="digital" data-row="${rowIdx}" data-field="users">${row.users||'—'}</span></td>`;
+          h += `<td style="text-align:center"><button class="p09-del-btn" onclick="deleteDigitalSystem(${rowIdx})">🗑</button></td>`;
         } else {
           Object.values(row).forEach(val => h += `<td>${val}</td>`);
         }
@@ -5165,11 +5171,13 @@ function renderP09(){
       });
       h += `</tbody></table>`;
 
-      // Add buttons for workplace and investment
+      // Add buttons for workplace, investment, and digital
       if(mod.id === 'workplace'){
         h += `<button class="p09-add-btn" onclick="addWorkplace()">＋ 添加职场</button>`;
       } else if(mod.id === 'investment'){
         h += `<button class="p09-add-btn" onclick="addInvestment()">＋ 添加项目</button>`;
+      } else if(mod.id === 'digital'){
+        h += `<button class="p09-add-btn" onclick="addDigitalSystem()">＋ 添加系统</button>`;
       }
     }
 
@@ -5533,6 +5541,14 @@ document.addEventListener('click', function(e){
           e.target.textContent = newVal;
         }
       }
+      if(modId === 'digital'){
+        const digMod = DATA_CENTER.modules.find(m => m.id === 'digital');
+        if(digMod && digMod.table && digMod.table[rowIdx]){
+          digMod.table[rowIdx][field] = newVal;
+          recalcDigitalKpis();
+          e.target.textContent = newVal;
+        }
+      }
     }
 
     e.target.addEventListener('blur', finishEdit, {once:true});
@@ -5599,6 +5615,32 @@ function recalcInvestmentKpis(){
   invMod.kpis[1].val = '¥' + totalSpent + '万';
   invMod.kpis[2].val = totalBudget > 0 ? (totalSpent / totalBudget * 100).toFixed(1) + '%' : '0%';
   invMod.kpis[3].val = '¥' + (totalBudget - totalSpent) + '万';
+}
+
+// ══════ DIGITAL SYSTEM TABLE EDITING ══════
+function deleteDigitalSystem(rowIdx){
+  const digMod = DATA_CENTER.modules.find(m => m.id === 'digital');
+  if(!digMod || !digMod.table) return;
+  if(!confirm('确定删除此系统？')) return;
+  digMod.table.splice(rowIdx, 1);
+  recalcDigitalKpis();
+  renderP09();
+}
+
+function addDigitalSystem(){
+  const digMod = DATA_CENTER.modules.find(m => m.id === 'digital');
+  if(!digMod) return;
+  if(!digMod.table) digMod.table = [];
+  digMod.table.push({name:'新系统',func:'待定义',status:'规划中',users:'待定'});
+  recalcDigitalKpis();
+  renderP09();
+}
+
+function recalcDigitalKpis(){
+  const digMod = DATA_CENTER.modules.find(m => m.id === 'digital');
+  if(!digMod || !digMod.table) return;
+  digMod.kpis[0].val = String(digMod.table.length);
+  // AI applications and automation count could be calculated from data
 }
 
 /* ══════ P10: OKR ══════ */
