@@ -1367,6 +1367,63 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p17-item-meta{font-size:11px;color:var(--t3)}
 .p17-item-arrow{font-size:14px;color:var(--t3);flex-shrink:0}
 
+/* ══════ COOL CHARTS ══════ */
+/* Animated progress ring */
+.cool-ring{width:80px;height:80px;position:relative;margin:0 auto}
+.cool-ring svg{transform:rotate(-90deg)}
+.cool-ring-bg{fill:none;stroke:var(--bg3);stroke-width:6}
+.cool-ring-fill{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 1.5s ease}
+.cool-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cool-ring-val{font-size:18px;font-weight:900;color:var(--t1)}
+.cool-ring-label{font-size:9px;color:var(--t3);margin-top:2px}
+
+/* Vertical bar chart */
+.cool-bars{display:flex;align-items:flex-end;gap:6px;height:100px;padding:0 8px}
+.cool-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.cool-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .8s ease;position:relative}
+.cool-bar:hover{opacity:.85}
+.cool-bar-label{font-size:9px;color:var(--t3);white-space:nowrap}
+.cool-bar-val{font-size:10px;font-weight:600;color:var(--t1);position:absolute;top:-18px;left:50%;transform:translateX(-50%);white-space:nowrap}
+
+/* Donut chart */
+.cool-donut{width:100px;height:100px;position:relative;margin:0 auto}
+.cool-donut svg{transform:rotate(-90deg)}
+.cool-donut-bg{fill:none;stroke:var(--bg3);stroke-width:8}
+.cool-donut-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1.5s ease}
+.cool-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cool-donut-val{font-size:16px;font-weight:900;color:var(--t1)}
+.cool-donut-label{font-size:9px;color:var(--t3)}
+
+/* Horizontal bar chart */
+.cool-hbars{display:flex;flex-direction:column;gap:8px}
+.cool-hbar-row{display:flex;align-items:center;gap:8px}
+.cool-hbar-label{font-size:11px;color:var(--t2);min-width:80px;text-align:right}
+.cool-hbar-track{flex:1;height:16px;background:var(--bg3);border-radius:8px;overflow:hidden}
+.cool-hbar-fill{height:100%;border-radius:8px;transition:width 1s ease}
+.cool-hbar-val{font-size:11px;font-weight:600;color:var(--t1);min-width:50px}
+
+/* Stat card with icon */
+.cool-stat{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg2);border-radius:10px;border:1px solid var(--bdl)}
+.cool-stat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.cool-stat-info{flex:1}
+.cool-stat-val{font-size:18px;font-weight:900;color:var(--t1)}
+.cool-stat-label{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* Animated counter */
+.cool-counter{font-size:32px;font-weight:900;letter-spacing:-.02em;color:var(--t1);transition:all .5s}
+
+/* Pulse dot */
+.cool-pulse{width:8px;height:8px;border-radius:50%;position:relative}
+.cool-pulse::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid currentColor;animation:cool-pulse 2s infinite}
+@keyframes cool-pulse{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.5);opacity:0}}
+
+/* Card hover effect */
+.cool-card-hover{transition:all .3s ease}
+.cool-card-hover:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.1)}
+
+/* Gradient text */
+.cool-gradient-text{background:linear-gradient(135deg,var(--ac),#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
 /* ══════ PANEL 15: COOL DATA CENTER ══════ */
 .p15-hero{padding:32px 40px;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#2d1b69 100%);position:relative;overflow:hidden}
 .p15-hero::before{content:'';position:absolute;top:-50%;right:-20%;width:400px;height:400px;background:radial-gradient(circle,rgba(59,91,219,.15) 0%,transparent 70%);border-radius:50%}
@@ -6565,31 +6622,44 @@ function renderP18(){
 
   h += `<div class="p15-grid">`;
 
-  // Service module with animated ring
+  // Service module with ring chart
   const serviceMod = data.modules.find(m => m.id === 'service');
   if(serviceMod){
-    h += `<div class="p15-card">
+    h += `<div class="p15-card cool-card-hover">
       <div class="p15-card-header">
         <div class="p15-card-icon" style="background:${serviceMod.color}18;color:${serviceMod.color}">${serviceMod.icon}</div>
         <div><div class="p15-card-title">${serviceMod.title}</div><div class="p15-card-sub">${serviceMod.desc}</div></div>
       </div>
       <div class="p15-card-body">
-        <div class="p15-kpi-row">`;
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
+          <div class="cool-ring">
+            <svg viewBox="0 0 36 36"><path class="cool-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/><path class="cool-ring-fill" stroke="${serviceMod.color}" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke-dasharray="85, 100"/></svg>
+            <div class="cool-ring-center"><div class="cool-ring-val">85%</div><div class="cool-ring-label">完成率</div></div>
+          </div>
+          <div style="flex:1">`;
     serviceMod.kpis.forEach(k => {
-      h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
+      h += `<div class="cool-stat"><div class="cool-stat-icon" style="background:${serviceMod.color}18;color:${serviceMod.color}">📊</div><div class="cool-stat-info"><div class="cool-stat-val">${k.val}</div><div class="cool-stat-label">${k.label}</div></div></div>`;
     });
-    h += `</div></div></div>`;
+    h += `</div></div></div></div>`;
   }
 
-  // Workplace module with mini bar chart
+  // Workplace module with bar chart
   const workMod = data.modules.find(m => m.id === 'workplace');
   if(workMod){
-    h += `<div class="p15-card">
+    h += `<div class="p15-card cool-card-hover">
       <div class="p15-card-header">
         <div class="p15-card-icon" style="background:${workMod.color}18;color:${workMod.color}">${workMod.icon}</div>
         <div><div class="p15-card-title">${workMod.title}</div><div class="p15-card-sub">${workMod.desc}</div></div>
       </div>
       <div class="p15-card-body">
+        <div class="cool-bars" style="height:120px;margin-bottom:16px">`;
+    const workData = [{label:'北京',val:280},{label:'武汉',val:250},{label:'异地',val:150},{label:'上海',val:50},{label:'深圳',val:40},{label:'厦门',val:35},{label:'杭州',val:20},{label:'珠海',val:30}];
+    const maxSeats = Math.max(...workData.map(d => d.val));
+    workData.forEach(d => {
+      const height = (d.val / maxSeats * 100);
+      h += `<div class="cool-bar-col"><div class="cool-bar" style="height:${height}%;background:${workMod.color}"><div class="cool-bar-val">${d.val}</div></div><div class="cool-bar-label">${d.label}</div></div>`;
+    });
+    h += `</div>
         <div class="p15-kpi-row">`;
     workMod.kpis.forEach(k => {
       h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
@@ -6597,71 +6667,75 @@ function renderP18(){
     h += `</div></div></div>`;
   }
 
-  // Employee module with activities
+  // Employee module with donut chart
   const empMod = data.modules.find(m => m.id === 'employee');
   if(empMod){
-    h += `<div class="p15-card">
+    h += `<div class="p15-card cool-card-hover">
       <div class="p15-card-header">
         <div class="p15-card-icon" style="background:${empMod.color}18;color:${empMod.color}">${empMod.icon}</div>
         <div><div class="p15-card-title">${empMod.title}</div><div class="p15-card-sub">${empMod.desc}</div></div>
       </div>
       <div class="p15-card-body">
-        <div class="p15-kpi-row">`;
+        <div style="display:flex;align-items:center;gap:20px;margin-bottom:12px">
+          <div class="cool-donut">
+            <svg viewBox="0 0 36 36"><path class="cool-donut-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/><path class="cool-donut-fill" stroke="${empMod.color}" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" stroke-dasharray="92, 100"/></svg>
+            <div class="cool-donut-center"><div class="cool-donut-val">92%</div><div class="cool-donut-label">满意度</div></div>
+          </div>
+          <div style="flex:1">`;
     empMod.kpis.forEach(k => {
-      h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
+      h += `<div class="cool-stat"><div class="cool-stat-icon" style="background:${empMod.color}18;color:${empMod.color}">🎉</div><div class="cool-stat-info"><div class="cool-stat-val">${k.val}</div><div class="cool-stat-label">${k.label}</div></div></div>`;
     });
-    h += `</div>`;
+    h += `</div></div>`;
     // City stats
     if(empMod.cities && empMod.cities.length > 0){
       h += `<div style="margin-top:12px">`;
       empMod.cities.forEach(c => {
-        h += `<div class="p15-status">
-          <div class="p15-status-dot" style="background:var(--ac)"></div>
-          <div class="p15-status-name">${c.name}</div>
-          <div class="p15-status-val">${c.events}场 · ${c.people}人</div>
-        </div>`;
+        h += `<div class="p15-status"><div class="cool-pulse" style="background:${empMod.color};color:${empMod.color}"></div><div class="p15-status-name">${c.name}</div><div class="p15-status-val">${c.events}场 · ${c.people}人</div></div>`;
       });
       h += `</div>`;
     }
     h += `</div></div>`;
   }
 
-  // Travel module with mini bars
+  // Travel module with horizontal bars
   const travMod = data.modules.find(m => m.id === 'travel');
   if(travMod){
-    h += `<div class="p15-card">
+    h += `<div class="p15-card cool-card-hover">
       <div class="p15-card-header">
         <div class="p15-card-icon" style="background:${travMod.color}18;color:${travMod.color}">${travMod.icon}</div>
         <div><div class="p15-card-title">${travMod.title}</div><div class="p15-card-sub">${travMod.desc}</div></div>
       </div>
       <div class="p15-card-body">
-        <div class="p15-kpi-row">`;
-    travMod.kpis.forEach(k => {
-      h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
+        <div class="cool-hbars">`;
+    const travelData = [{label:'机票',val:325000},{label:'酒店',val:283000},{label:'火车',val:128000},{label:'用车',val:80000}];
+    const maxTravel = Math.max(...travelData.map(d => d.val));
+    travelData.forEach(d => {
+      const pct = (d.val / maxTravel * 100);
+      h += `<div class="cool-hbar-row"><div class="cool-hbar-label">${d.label}</div><div class="cool-hbar-track"><div class="cool-hbar-fill" style="width:${pct}%;background:${travMod.color}"></div></div><div class="cool-hbar-val">¥${(d.val/10000).toFixed(1)}万</div></div>`;
     });
     h += `</div></div></div>`;
   }
 
-  // Investment module
+  // Investment module with stat cards
   const invMod = data.modules.find(m => m.id === 'investment');
   if(invMod){
-    h += `<div class="p15-card">
+    h += `<div class="p15-card cool-card-hover">
       <div class="p15-card-header">
         <div class="p15-card-icon" style="background:${invMod.color}18;color:${invMod.color}">${invMod.icon}</div>
         <div><div class="p15-card-title">${invMod.title}</div><div class="p15-card-sub">${invMod.desc}</div></div>
       </div>
       <div class="p15-card-body">
-        <div class="p15-kpi-row">`;
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">`;
     invMod.kpis.forEach(k => {
-      h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
+      h += `<div class="cool-stat"><div class="cool-stat-icon" style="background:${invMod.color}18;color:${invMod.color}">💰</div><div class="cool-stat-info"><div class="cool-stat-val">${k.val}</div><div class="cool-stat-label">${k.label}</div></div></div>`;
     });
     h += `</div></div></div>`;
   }
 
-  // Digital module
+  // Digital module with counter animation
   const digMod = data.modules.find(m => m.id === 'digital');
   if(digMod){
-    h += `<div class="p15-card">
+    h += `<div class="p15-card cool-card-hover">
       <div class="p15-card-header">
         <div class="p15-card-icon" style="background:${digMod.color}18;color:${digMod.color}">${digMod.icon}</div>
         <div><div class="p15-card-title">${digMod.title}</div><div class="p15-card-sub">${digMod.desc}</div></div>
@@ -6669,7 +6743,28 @@ function renderP18(){
       <div class="p15-card-body">
         <div class="p15-kpi-row">`;
     digMod.kpis.forEach(k => {
-      h += `<div class="p15-kpi"><div class="p15-kpi-val">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
+      h += `<div class="p15-kpi"><div class="cool-counter">${k.val}</div><div class="p15-kpi-label">${k.label}</div></div>`;
+    });
+    h += `</div></div></div>`;
+  }
+
+  // Archive module with timeline style
+  const archMod = data.modules.find(m => m.id === 'archive');
+  if(archMod && archMod.sections){
+    h += `<div class="p15-card cool-card-hover" style="grid-column:1/-1">
+      <div class="p15-card-header">
+        <div class="p15-card-icon" style="background:${archMod.color}18;color:${archMod.color}">${archMod.icon}</div>
+        <div><div class="p15-card-title">${archMod.title}</div><div class="p15-card-sub">${archMod.desc}</div></div>
+      </div>
+      <div class="p15-card-body">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">`;
+    archMod.sections.forEach(sec => {
+      h += `<div style="background:var(--bg2);border-radius:10px;padding:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px">${sec.icon} ${sec.title}</div>`;
+      sec.items.forEach(item => {
+        h += `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bdl);font-size:12px"><span style="color:var(--t2)">${item.label}</span><span style="font-weight:600">${item.val}</span></div>`;
+      });
+      h += `</div>`;
     });
     h += `</div></div></div>`;
   }
