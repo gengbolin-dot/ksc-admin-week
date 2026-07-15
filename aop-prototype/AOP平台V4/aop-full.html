@@ -1379,9 +1379,9 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p09-chart-area{position:relative;height:200px;display:flex;align-items:flex-end;gap:4px;padding:0 0 30px 50px}
 .p09-chart-y{position:absolute;left:0;top:0;bottom:30px;width:50px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding-right:8px}
 .p09-chart-y-label{font-size:10px;color:var(--t3)}
-.p09-chart-bars{display:flex;align-items:flex-end;gap:6px;flex:1;height:100%}
-.p09-chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
-.p09-chart-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .3s;cursor:pointer;position:relative}
+.p09-chart-bars{display:flex;align-items:flex-end;gap:8px;flex:1;height:100%;justify-content:center}
+.p09-chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;max-width:60px}
+.p09-chart-bar{width:28px;border-radius:4px 4px 0 0;min-height:4px;transition:height .3s;cursor:pointer;position:relative}
 .p09-chart-bar:hover{opacity:.85}
 .p09-chart-bar.current{box-shadow:0 0 0 2px var(--ac)}
 .p09-chart-label{font-size:9px;color:var(--t3);white-space:nowrap}
@@ -5082,32 +5082,32 @@ function renderP09(){
       const data = mod.trend.monthly;
       const maxVal = Math.max(...data.map(d => d.amount));
 
-      h += `<div class="p09-chart-wrap">
+      h += `<div class="p09-chart-wrap" data-travel-chart>
         <div class="p09-chart-header">
           <div class="p09-chart-title">整体消费金额趋势</div>
           <div class="p09-chart-controls">
-            <div class="p09-chart-ctrl active">月</div>
-            <div class="p09-chart-ctrl">季</div>
-            <div class="p09-chart-ctrl">半年</div>
+            <div class="p09-chart-ctrl active" onclick="switchChartGranularity('month',this)">月</div>
+            <div class="p09-chart-ctrl" onclick="switchChartGranularity('quarter',this)">季</div>
+            <div class="p09-chart-ctrl" onclick="switchChartGranularity('half',this)">半年</div>
             <div class="p09-chart-sep"></div>
-            <div class="p09-chart-ctrl active">当期</div>
-            <div class="p09-chart-ctrl">累计</div>
+            <div class="p09-chart-ctrl active" onclick="switchChartMode('current',this)">当期</div>
+            <div class="p09-chart-ctrl" onclick="switchChartMode('cumulative',this)">累计</div>
           </div>
         </div>
-        <div class="p09-chart-area">
+        <div class="p09-chart-area" id="p09ChartArea">
           <div class="p09-chart-y">
-            <div class="p09-chart-label">${(maxVal/10000).toFixed(0)}万</div>
-            <div class="p09-chart-label">${(maxVal/20000).toFixed(0)}万</div>
-            <div class="p09-chart-label">0</div>
+            <div class="p09-chart-y-label">${(maxVal/10000).toFixed(0)}万</div>
+            <div class="p09-chart-y-label">${(maxVal/20000).toFixed(0)}万</div>
+            <div class="p09-chart-y-label">0</div>
           </div>
           <div class="p09-chart-bars" id="p09ChartBars">`;
 
       data.forEach((d, i) => {
         const height = maxVal > 0 ? (d.amount / maxVal * 100) : 0;
-        const isCurrent = i === data.length - 2; // Mark second-to-last as current
+        const isCurrent = i === data.length - 2;
         const month = d.month.split('-')[1];
         h += `<div class="p09-chart-col">
-          <div class="p09-chart-bar${isCurrent ? ' current' : ''}" style="height:${height}%;background:${isCurrent ? 'var(--ac)' : 'var(--ac)'};opacity:${isCurrent ? 1 : 0.7}"
+          <div class="p09-chart-bar${isCurrent ? ' current' : ''}" style="height:${height}%;background:var(--ac);opacity:${isCurrent ? 1 : 0.7}"
                data-month="${d.month}" data-amount="${d.amount}" data-yoy="${d.yoy}" data-mom="${d.mom}"
                onmouseenter="showChartTooltip(event)" onmouseleave="hideChartTooltip()"></div>
           <div class="p09-chart-label">${month}月</div>
@@ -5115,7 +5115,6 @@ function renderP09(){
       });
 
       h += `</div>
-          <div class="p09-chart-refline" style="left:calc(50px + ${((data.length-2)/(data.length-1))*100}% * (1 - 50px/100%))"></div>
         </div>
         <div class="p09-chart-legend">
           <span class="p09-chart-legend-dot" style="background:var(--ac)"></span> 总计
@@ -5286,6 +5285,110 @@ function showChartTooltip(e){
 
 function hideChartTooltip(){
   document.querySelectorAll('.p09-chart-tooltip').forEach(t => t.remove());
+}
+
+// Chart granularity and mode switching
+let _chartGranularity = 'month';
+let _chartMode = 'current';
+
+function switchChartGranularity(gran, btn){
+  _chartGranularity = gran;
+  // Update active state
+  const wrap = btn.closest('.p09-chart-wrap');
+  wrap.querySelectorAll('.p09-chart-ctrl').forEach((b, i) => {
+    if(i < 3) b.classList.toggle('active', b === btn);
+  });
+  // Re-render chart with new granularity
+  renderTravelChart();
+}
+
+function switchChartMode(mode, btn){
+  _chartMode = mode;
+  const wrap = btn.closest('.p09-chart-wrap');
+  wrap.querySelectorAll('.p09-chart-ctrl').forEach((b, i) => {
+    if(i >= 4) b.classList.toggle('active', b === btn);
+  });
+  renderTravelChart();
+}
+
+function renderTravelChart(){
+  const travelMod = DATA_CENTER.modules.find(m => m.id === 'travel');
+  if(!travelMod || !travelMod.trend) return;
+
+  const monthly = travelMod.trend.monthly;
+  let data = [];
+
+  if(_chartGranularity === 'month'){
+    data = monthly;
+  } else if(_chartGranularity === 'quarter'){
+    // Aggregate by quarter
+    const quarters = {};
+    monthly.forEach(d => {
+      const q = Math.ceil(parseInt(d.month.split('-')[1]) / 3);
+      const key = d.month.split('-')[0] + '-Q' + q;
+      if(!quarters[key]) quarters[key] = {month:key, amount:0, yoy:0, mom:0, count:0};
+      quarters[key].amount += d.amount;
+      quarters[key].yoy += d.yoy;
+      quarters[key].mom += d.mom;
+      quarters[key].count++;
+    });
+    data = Object.values(quarters).map(q => ({...q, yoy:q.yoy/q.count, mom:q.mom/q.count}));
+  } else if(_chartGranularity === 'half'){
+    // Aggregate by half year
+    const halves = {};
+    monthly.forEach(d => {
+      const m = parseInt(d.month.split('-')[1]);
+      const h = m <= 6 ? 'H1' : 'H2';
+      const key = d.month.split('-')[0] + '-' + h;
+      if(!halves[key]) halves[key] = {month:key, amount:0, yoy:0, mom:0, count:0};
+      halves[key].amount += d.amount;
+      halves[key].yoy += d.yoy;
+      halves[key].mom += d.mom;
+      halves[key].count++;
+    });
+    data = Object.values(halves).map(h => ({...h, yoy:h.yoy/h.count, mom:h.mom/h.count}));
+  }
+
+  // Apply cumulative mode
+  if(_chartMode === 'cumulative'){
+    let cumulative = 0;
+    data = data.map(d => {
+      cumulative += d.amount;
+      return {...d, amount: cumulative};
+    });
+  }
+
+  // Re-render bars
+  const maxVal = Math.max(...data.map(d => d.amount));
+  const barsEl = document.getElementById('p09ChartBars');
+  if(!barsEl) return;
+
+  let h = '';
+  data.forEach((d, i) => {
+    const height = maxVal > 0 ? (d.amount / maxVal * 100) : 0;
+    const isCurrent = i === data.length - 2 && _chartGranularity === 'month';
+    const label = _chartGranularity === 'month' ? d.month.split('-')[1] + '月' :
+                  _chartGranularity === 'quarter' ? d.month.split('-')[1] :
+                  d.month.split('-')[1];
+    h += `<div class="p09-chart-col">
+      <div class="p09-chart-bar${isCurrent ? ' current' : ''}" style="height:${height}%;background:var(--ac);opacity:${isCurrent ? 1 : 0.7}"
+           data-month="${d.month}" data-amount="${d.amount}" data-yoy="${d.yoy}" data-mom="${d.mom}"
+           onmouseenter="showChartTooltip(event)" onmouseleave="hideChartTooltip()"></div>
+      <div class="p09-chart-label">${label}</div>
+    </div>`;
+  });
+  barsEl.innerHTML = h;
+
+  // Update Y axis
+  const area = document.getElementById('p09ChartArea');
+  if(area){
+    const yLabels = area.querySelectorAll('.p09-chart-y-label');
+    if(yLabels.length >= 3){
+      yLabels[0].textContent = (maxVal/10000).toFixed(0) + '万';
+      yLabels[1].textContent = (maxVal/20000).toFixed(0) + '万';
+      yLabels[2].textContent = '0';
+    }
+  }
 }
 
 function openDataCenterEdit(moduleId){
