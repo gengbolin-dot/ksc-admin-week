@@ -3016,7 +3016,7 @@ const DATA_CENTER = {
     },
     {
       id: 'investment',
-      title: '行政投入管理',
+      title: '行政采购管理',
       icon: '💰',
       color: '#8B5CF6',
       desc: '记录行政重点投入项目',
@@ -3024,10 +3024,10 @@ const DATA_CENTER = {
       owner: '行政负责人',
       lastUpdate: '2026-07-14',
       kpis: [
-        {val: '¥85万', label: '年度总预算', chg: '', up: true},
-        {val: '¥42万', label: '实际支出', chg: '', up: true},
-        {val: '49.4%', label: '预算执行率', chg: '', up: true},
-        {val: '¥43万', label: '剩余预算', chg: '', up: true}
+        {val: '¥85万', label: '年度总预算'},
+        {val: '¥42万', label: '实际支出'},
+        {val: '49.4%', label: '预算执行率'},
+        {val: '¥43万', label: '剩余预算'}
       ],
       table: [
         {name:'家庭日活动',budget:'¥8万',spent:'¥6.5万',rate:'81%',status:'已完成'},
@@ -5132,7 +5132,7 @@ function renderP09(){
       } else if(mod.id === 'travel'){
         ['类型','费用','订单量','趋势'].forEach(th => h += `<th>${th}</th>`);
       } else if(mod.id === 'investment'){
-        ['项目','预算','已用','执行率','状态'].forEach(th => h += `<th>${th}</th>`);
+        ['项目','预算','已用','执行率','状态','操作'].forEach(th => h += `<th>${th}</th>`);
       } else if(mod.id === 'digital'){
         ['系统','功能','状态','覆盖用户'].forEach(th => h += `<th>${th}</th>`);
       } else {
@@ -5150,6 +5150,14 @@ function renderP09(){
           h += `<td class="col-num"><span class="p09-editable" data-mod="workplace" data-row="${rowIdx}" data-field="people">${row.people||0}</span></td>`;
           h += `<td class="col-pct" style="font-weight:600">${row.util||'0%'}</td>`;
           h += `<td class="col-action"><button class="p09-del-btn" onclick="deleteWorkplace(${rowIdx})">🗑</button></td>`;
+        } else if(mod.id === 'investment'){
+          // Editable investment table
+          h += `<td style="font-weight:600"><span class="p09-editable" data-mod="investment" data-row="${rowIdx}" data-field="name">${row.name||'新项目'}</span></td>`;
+          h += `<td class="num"><span class="p09-editable" data-mod="investment" data-row="${rowIdx}" data-field="budget">${row.budget||'¥0万'}</span></td>`;
+          h += `<td class="num"><span class="p09-editable" data-mod="investment" data-row="${rowIdx}" data-field="spent">${row.spent||'¥0万'}</span></td>`;
+          h += `<td class="num" style="font-weight:600">${row.rate||'0%'}</td>`;
+          h += `<td><span class="p09-editable" data-mod="investment" data-row="${rowIdx}" data-field="status">${row.status||'未开始'}</span></td>`;
+          h += `<td style="text-align:center"><button class="p09-del-btn" onclick="deleteInvestment(${rowIdx})">🗑</button></td>`;
         } else {
           Object.values(row).forEach(val => h += `<td>${val}</td>`);
         }
@@ -5157,9 +5165,11 @@ function renderP09(){
       });
       h += `</tbody></table>`;
 
-      // Add workplace button
+      // Add buttons for workplace and investment
       if(mod.id === 'workplace'){
         h += `<button class="p09-add-btn" onclick="addWorkplace()">＋ 添加职场</button>`;
+      } else if(mod.id === 'investment'){
+        h += `<button class="p09-add-btn" onclick="addInvestment()">＋ 添加项目</button>`;
       }
     }
 
@@ -5515,6 +5525,14 @@ document.addEventListener('click', function(e){
           e.target.textContent = newVal;
         }
       }
+      if(modId === 'investment'){
+        const invMod = DATA_CENTER.modules.find(m => m.id === 'investment');
+        if(invMod && invMod.table && invMod.table[rowIdx]){
+          invMod.table[rowIdx][field] = newVal;
+          recalcInvestmentKpis();
+          e.target.textContent = newVal;
+        }
+      }
     }
 
     e.target.addEventListener('blur', finishEdit, {once:true});
@@ -5542,6 +5560,45 @@ function addActivity(){
   if(!empMod.activities) empMod.activities = [];
   empMod.activities.push({name:'新活动',city:'全员',people:0,satisfaction:'—',desc:'点击编辑描述'});
   renderP09();
+}
+
+// ══════ INVESTMENT TABLE EDITING ══════
+function deleteInvestment(rowIdx){
+  const invMod = DATA_CENTER.modules.find(m => m.id === 'investment');
+  if(!invMod || !invMod.table) return;
+  if(!confirm('确定删除此项目？')) return;
+  invMod.table.splice(rowIdx, 1);
+  recalcInvestmentKpis();
+  renderP09();
+}
+
+function addInvestment(){
+  const invMod = DATA_CENTER.modules.find(m => m.id === 'investment');
+  if(!invMod) return;
+  if(!invMod.table) invMod.table = [];
+  invMod.table.push({name:'新项目',budget:'¥0万',spent:'¥0万',rate:'0%',status:'未开始'});
+  recalcInvestmentKpis();
+  renderP09();
+}
+
+function recalcInvestmentKpis(){
+  const invMod = DATA_CENTER.modules.find(m => m.id === 'investment');
+  if(!invMod || !invMod.table) return;
+  let totalBudget = 0, totalSpent = 0;
+  invMod.table.forEach(row => {
+    const budgetNum = parseFloat(String(row.budget).replace(/[^\d.]/g,'')) || 0;
+    const spentNum = parseFloat(String(row.spent).replace(/[^\d.]/g,'')) || 0;
+    totalBudget += budgetNum;
+    totalSpent += spentNum;
+    // Recalculate rate
+    if(budgetNum > 0){
+      row.rate = Math.round(spentNum / budgetNum * 100) + '%';
+    }
+  });
+  invMod.kpis[0].val = '¥' + totalBudget + '万';
+  invMod.kpis[1].val = '¥' + totalSpent + '万';
+  invMod.kpis[2].val = totalBudget > 0 ? (totalSpent / totalBudget * 100).toFixed(1) + '%' : '0%';
+  invMod.kpis[3].val = '¥' + (totalBudget - totalSpent) + '万';
 }
 
 /* ══════ P10: OKR ══════ */
