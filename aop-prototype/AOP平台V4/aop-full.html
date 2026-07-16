@@ -1400,6 +1400,25 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p17-item-meta{font-size:11px;color:var(--t3)}
 .p17-item-arrow{font-size:14px;color:var(--t3);flex-shrink:0}
 
+/* ══════ SYSTEM MODULE PANELS (P15-P20) ══════ */
+.sys-panel-header{padding:20px 24px;background:var(--bg);border-bottom:1px solid var(--bdl)}
+.sys-panel-header-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.sys-panel-title{font-size:18px;font-weight:700;color:var(--t1)}
+.sys-panel-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--warnL);color:var(--warn)}
+.sys-panel-desc{font-size:13px;color:var(--t2);line-height:1.6}
+.sys-panel-content{padding:24px;overflow-y:auto}
+.sys-panel-status{background:var(--bg);border:1px solid var(--bdl);border-radius:12px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:16px}
+.sys-panel-status-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.sys-panel-status-info{flex:1}
+.sys-panel-status-name{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:4px}
+.sys-panel-status-desc{font-size:12px;color:var(--t3)}
+.sys-panel-status-badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:8px;flex-shrink:0}
+.sys-panel-features{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.sys-panel-feature{background:var(--bg2);border-radius:10px;padding:14px}
+.sys-panel-feature-icon{font-size:20px;margin-bottom:8px}
+.sys-panel-feature-name{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px}
+.sys-panel-feature-desc{font-size:11px;color:var(--t3);line-height:1.4}
+
 /* ══════ TREND CHART ══════ */
 .p09-chart-wrap{margin-top:16px;padding:16px;background:var(--bg);border:1px solid var(--bdl);border-radius:10px}
 .p09-chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
@@ -1556,10 +1575,19 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
   <div class="sb-sec">
     <div class="sb-lbl">行政系统</div>
     <div class="sb-i" data-panel="p15" onclick="switchPanel('p15',this)">
-      <div class="sb-ic">🖥️</div> 工位系统
+      <div class="sb-ic">🖥️</div> 工位管理
     </div>
     <div class="sb-i" data-panel="p16" onclick="switchPanel('p16',this)">
       <div class="sb-ic">💸</div> 费用报告推送
+    </div>
+    <div class="sb-i" data-panel="p18" onclick="switchPanel('p18',this)">
+      <div class="sb-ic">🏢</div> 职场运营管理
+    </div>
+    <div class="sb-i" data-panel="p19" onclick="switchPanel('p19',this)">
+      <div class="sb-ic">🎁</div> 文化福利活动
+    </div>
+    <div class="sb-i" data-panel="p20" onclick="switchPanel('p20',this)">
+      <div class="sb-ic">📦</div> 库存管理
     </div>
   </div>
 
@@ -2543,6 +2571,24 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
   <div class="content-scroll" id="p17Content"></div>
 </div>
 
+<!-- ══════ PANEL 18: WORKPLACE OPERATIONS ══════ -->
+<div class="panel" id="p18">
+  <div class="topbar"><div class="topbar-title">职场运营管理</div></div>
+  <div class="content-scroll" id="p18Content"></div>
+</div>
+
+<!-- ══════ PANEL 19: CULTURE & BENEFITS ══════ -->
+<div class="panel" id="p19">
+  <div class="topbar"><div class="topbar-title">文化福利活动</div></div>
+  <div class="content-scroll" id="p19Content"></div>
+</div>
+
+<!-- ══════ PANEL 20: INVENTORY ══════ -->
+<div class="panel" id="p20">
+  <div class="topbar"><div class="topbar-title">库存管理</div></div>
+  <div class="content-scroll" id="p20Content"></div>
+</div>
+
 </div><!-- end main -->
 </div><!-- end shell -->
 
@@ -3450,6 +3496,9 @@ function switchPanel(id, navEl){
   if(id==='p15'&&!window._p15Rendered){renderP15();window._p15Rendered=true}
   if(id==='p16'&&!window._p16Rendered){renderP16();window._p16Rendered=true}
   if(id==='p17'&&!window._p17Rendered){renderP17();window._p17Rendered=true}
+  if(id==='p18'&&!window._p18Rendered){renderP18();window._p18Rendered=true}
+  if(id==='p19'&&!window._p19Rendered){renderP19();window._p19Rendered=true}
+  if(id==='p20'&&!window._p20Rendered){renderP20();window._p20Rendered=true}
   }
 
 /* ══════ SLIDE-OVER ══════ */
@@ -6647,6 +6696,93 @@ function filterPolicyCat(cat, el){
   items.forEach(item => {
     item.style.display = cat === 'all' || item.dataset.cat === cat ? '' : 'none';
   });
+}
+
+/* ══════ P18: WORKPLACE OPERATIONS ══════ */
+function renderP18(){
+  const el = document.getElementById('p18Content');
+  el.innerHTML = `
+    <div class="sys-panel-header">
+      <div class="sys-panel-header-top">
+        <div class="sys-panel-title">🏢 职场运营管理</div>
+        <div class="sys-panel-badge">待对接</div>
+      </div>
+      <div class="sys-panel-desc">职场资源管理系统，支持工位预订、会议室管理、办公环境监控等功能。系统对接后可实现职场资源的统一管理和智能调度。</div>
+    </div>
+    <div class="sys-panel-content">
+      <div class="sys-panel-status">
+        <div class="sys-panel-status-icon" style="background:var(--acl);color:var(--ac)">🔌</div>
+        <div class="sys-panel-status-info">
+          <div class="sys-panel-status-name">系统对接状态</div>
+          <div class="sys-panel-status-desc">职场运营管理系统接口已就绪，等待对接配置。支持API集成、数据同步、单点登录等功能。</div>
+        </div>
+        <div class="sys-panel-status-badge" style="background:var(--warnL);color:var(--warn)">待配置</div>
+      </div>
+      <div class="sys-panel-features">
+        <div class="sys-panel-feature"><div class="sys-panel-feature-icon">📅</div><div class="sys-panel-feature-name">工位预订</div><div class="sys-panel-feature-desc">员工可在线预订工位，支持按日期、楼层、区域筛选</div></div>
+        <div class="sys-panel-feature"><div class="sys-panel-feature-icon">🏢</div><div class="sys-panel-feature-name">会议室管理</div><div class="sys-panel-feature-desc">会议室在线预约、使用统计、设备管理</div></div>
+        <div class="sys-panel-feature"><div class="sys-panel-feature-icon">📊</div><div class="sys-panel-feature-name">数据分析</div><div class="sys-panel-feature-desc">工位使用率、会议室占用率、空间利用率统计</div></div>
+        <div class="sys-panel-feature"><div class="sys-panel-feature-icon">🔗</div><div class="sys-panel-feature-name">API对接</div><div class="sys-panel-feature-desc">支持RESTful API对接，数据双向同步</div></div>
+      </div>
+    </div>`;
+}
+
+/* ══════ P19: CULTURE & BENEFITS ══════ */
+function renderP19(){
+  const el = document.getElementById('p19Content');
+  el.innerHTML = `
+    <div class="sys-panel-header">
+      <div class="sys-panel-header-top">
+        <div class="sys-panel-title">🎁 文化福利活动</div>
+        <div class="sys-panel-badge">待对接</div>
+      </div>
+      <div class="sys-panel-desc">员工关怀与福利管理系统，支持活动报名、福利发放、满意度调研等功能。系统对接后可实现员工关怀的数字化管理。</div>
+    </div>
+    <div class="sys-panel-content">
+      <div class="sys-panel-status">
+        <div class="sys-panel-status-icon" style="background:var(--acl);color:var(--ac)">🔌</div>
+        <div class="sys-panel-status-info">
+          <div class="sys-panel-status-name">系统对接状态</div>
+          <div class="sys-panel-status-desc">文化福利活动系统接口已就绪，等待对接配置。支持活动管理、福利发放、数据统计等功能。</div>
+        </div>
+        <div class="sys-panel-status-badge" style="background:var(--warnL);color:var(--warn)">待配置</div>
+      </div>
+      <div class="sys-panel-features">
+        <div class="sys-panel-feature"><div class="sys-panel-feature-icon">🎉</div><div class="sys-panel-feature-name">活动管理</div><div class="sys-panel-feature-desc">活动创建、报名、签到、反馈全流程管理</div></div>
+        <div class="sys-panel-feature"><div class="sys-panel-feature-icon">🎁</div><div class="sys-panel-feature-name">福利发放</div><div class="sys-panel-feature-desc">节日礼品、生日福利、员工关怀等福利管理</div></div>
+        <div class="sys-panel-feature"><div class="sys-panel-feature-icon">📊</div><div class="sys-panel-feature-name">满意度调研</div><div class="sys-panel-feature-desc">活动满意度、福利满意度调研分析</div></div>
+        <div class="sys-panel-feature"><div class="sys-panel-feature-icon">🔗</div><div class="sys-panel-feature-name">API对接</div><div class="sys-panel-feature-desc">支持RESTful API对接，数据双向同步</div></div>
+      </div>
+    </div>`;
+}
+
+/* ══════ P20: INVENTORY ══════ */
+function renderP20(){
+  const el = document.getElementById('p20Content');
+  el.innerHTML = `
+    <div class="sys-panel-header">
+      <div class="sys-panel-header-top">
+        <div class="sys-panel-title">📦 库存管理</div>
+        <div class="sys-panel-badge">待对接</div>
+      </div>
+      <div class="sys-panel-desc">行政物资库存管理系统，支持物资入库、出库、盘点、预警等功能。系统对接后可实现库存的数字化管理。</div>
+    </div>
+    <div class="sys-panel-content">
+      <div class="sys-panel-status">
+        <div class="sys-panel-status-icon" style="background:var(--acl);color:var(--ac)">🔌</div>
+        <div class="sys-panel-status-info">
+          <div class="sys-panel-status-name">系统对接状态</div>
+          <div class="sys-panel-status-desc">库存管理系统接口已就绪，等待对接配置。支持物资管理、库存预警、数据统计等功能。</div>
+        </div>
+        <div class="sys-panel-status-badge" style="background:var(--warnL);color:var(--warn)">待配置</div>
+      </div>
+      <div class="sys-panel-features">
+        <div class="sys-panel-feature"><div class="sys-panel-feature-icon">📥</div><div class="sys-panel-feature-name">入库管理</div><div class="sys-panel-feature-desc">物资入库登记、数量核对、质量检验</div></div>
+        <div class="sys-panel-feature"><div class="sys-panel-feature-icon">📤</div><div class="sys-panel-feature-name">出库管理</div><div class="sys-panel-feature-desc">物资领用申请、审批、发放记录</div></div>
+        <div class="sys-panel-feature"><div class="sys-panel-feature-icon">📊</div><div class="sys-panel-feature-name">库存盘点</div><div class="sys-panel-feature-desc">定期盘点、差异分析、库存预警</div></div>
+        <div class="sys-panel-feature"><div class="sys-panel-feature-icon">🔗</div><div class="sys-panel-feature-name">API对接</div><div class="sys-panel-feature-desc">支持RESTful API对接，数据双向同步</div></div>
+      </div>
+    </div>`;
 }
 
 function switchBudgetView(view){
