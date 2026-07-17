@@ -213,6 +213,24 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .p02-badge-danger{background:var(--danL);color:var(--dan)}
 .p02-badge-success{background:var(--sucL);color:var(--suc)}
 .p02-badge-neutral{background:var(--bg3);color:var(--t3)}
+
+/* New item modal */
+.new-item-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;backdrop-filter:blur(2px)}
+.new-item-overlay.show{display:block}
+.new-item-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:560px;max-height:85vh;background:var(--bg);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.2);z-index:201;display:flex;flex-direction:column;overflow:hidden}
+.new-item-head{padding:20px 24px;border-bottom:1px solid var(--bdl);display:flex;align-items:center;gap:12px}
+.new-item-head-title{font-size:18px;font-weight:700;flex:1}
+.new-item-close{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);transition:all var(--tr);font-size:18px;border:none;background:none}
+.new-item-close:hover{background:var(--bgH);color:var(--t1)}
+.new-item-body{flex:1;overflow-y:auto;padding:24px}
+.new-item-field{margin-bottom:20px}
+.new-item-label{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.new-item-input{width:100%;padding:10px 14px;border:1px solid var(--bd);border-radius:8px;font-size:14px;outline:none;transition:border var(--tr);background:var(--bg)}
+.new-item-input:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(59,91,219,.1)}
+.new-item-textarea{width:100%;padding:10px 14px;border:1px solid var(--bd);border-radius:8px;font-size:14px;outline:none;transition:border var(--tr);background:var(--bg);min-height:80px;resize:vertical;font-family:inherit}
+.new-item-textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(59,91,219,.1)}
+.new-item-select{width:100%;padding:10px 14px;border:1px solid var(--bd);border-radius:8px;font-size:14px;outline:none;background:var(--bg);cursor:pointer}
+.new-item-foot{padding:16px 24px;border-top:1px solid var(--bdl);display:flex;justify-content:flex-end;gap:8px}
 .p02-task-freq{font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px}
 
 /* Orange left border for daily ops */
@@ -1696,7 +1714,7 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
     <div class="p02-breadcrumb">AOP / <strong>我的工作</strong></div>
     <div class="p02-topbar-actions">
       <div class="p02-icon-btn" title="通知"><span>🔔</span><span class="dot"></span></div>
-      <div class="p02-btn p02-btn-primary">＋ 新建事项</div>
+      <div class="p02-btn p02-btn-primary" onclick="openNewItemModal()">＋ 新建事项</div>
     </div>
   </div>
 
@@ -2604,6 +2622,74 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
   <div class="slide-foot">
     <button class="btn btn-ghost" onclick="closeSlide()">取消</button>
     <button class="btn btn-ac" onclick="closeSlide()">保存更新</button>
+  </div>
+</div>
+
+<!-- ══════ NEW ITEM MODAL ══════ -->
+<div class="new-item-overlay" id="newItemOverlay" onclick="closeNewItemModal()"></div>
+<div class="new-item-modal" id="newItemModal">
+  <div class="new-item-head">
+    <div class="new-item-head-title">＋ 新建事项</div>
+    <button class="new-item-close" onclick="closeNewItemModal()">✕</button>
+  </div>
+  <div class="new-item-body">
+    <div class="new-item-field">
+      <div class="new-item-label">事项名称 *</div>
+      <input class="new-item-input" id="newItemName" placeholder="请输入事项名称" required>
+    </div>
+    <div class="new-item-field">
+      <div class="new-item-label">事项类型 *</div>
+      <select class="new-item-select" id="newItemType">
+        <option value="project">专项项目</option>
+        <option value="daily-ops">日常运营</option>
+      </select>
+    </div>
+    <div class="new-item-field">
+      <div class="new-item-label">所属模块</div>
+      <select class="new-item-select" id="newItemModule">
+        <option value="职场运营(北京)">职场运营 - 北京</option>
+        <option value="职场运营(武汉)">职场运营 - 武汉</option>
+        <option value="职场运营(异地)">职场运营 - 异地</option>
+        <option value="文化运营(活动)">文化运营 - 活动</option>
+        <option value="文化运营(福利)">文化运营 - 福利</option>
+        <option value="数字化运营(行政服务台)">数字化运营 - 行政服务台</option>
+        <option value="数字化运营(后台)">数字化运营 - 后台</option>
+      </select>
+    </div>
+    <div class="new-item-field">
+      <div class="new-item-label">负责人</div>
+      <select class="new-item-select" id="newItemOwner">
+        <option value="耿博琳">耿博琳</option>
+        <option value="高琳">高琳</option>
+        <option value="聂茜茜">聂茜茜</option>
+        <option value="张灵玉">张灵玉</option>
+        <option value="丁玉萍">丁玉萍</option>
+        <option value="程宇亮">程宇亮</option>
+        <option value="董诗昀">董诗昀</option>
+        <option value="胡丽婷">胡丽婷</option>
+        <option value="傅中南">傅中南</option>
+      </select>
+    </div>
+    <div class="new-item-field">
+      <div class="new-item-label">截止日期</div>
+      <input class="new-item-input" id="newItemDeadline" type="date">
+    </div>
+    <div class="new-item-field">
+      <div class="new-item-label">优先级</div>
+      <select class="new-item-select" id="newItemPriority">
+        <option value="1">P1 - 紧急</option>
+        <option value="2" selected>P2 - 重要</option>
+        <option value="3">P3 - 一般</option>
+      </select>
+    </div>
+    <div class="new-item-field">
+      <div class="new-item-label">事项描述</div>
+      <textarea class="new-item-textarea" id="newItemDesc" placeholder="请输入事项描述"></textarea>
+    </div>
+  </div>
+  <div class="new-item-foot">
+    <button class="btn btn-ghost" onclick="closeNewItemModal()">取消</button>
+    <button class="btn btn-ac" onclick="createNewItem()">创建事项</button>
   </div>
 </div>
 
@@ -3533,6 +3619,90 @@ function openSlide(itemId){
   document.getElementById('slideBody').innerHTML=h;
 }
 function closeSlide(){document.getElementById('slideOverlay').classList.remove('show');document.getElementById('slidePanel').classList.remove('show')}
+
+// New item modal functions
+function openNewItemModal(){
+  document.getElementById('newItemOverlay').classList.add('show');
+  document.getElementById('newItemModal').style.display = 'flex';
+  // Reset form
+  document.getElementById('newItemName').value = '';
+  document.getElementById('newItemType').value = 'project';
+  document.getElementById('newItemModule').value = '职场运营(北京)';
+  document.getElementById('newItemOwner').value = '耿博琳';
+  document.getElementById('newItemDeadline').value = '';
+  document.getElementById('newItemPriority').value = '2';
+  document.getElementById('newItemDesc').value = '';
+  document.getElementById('newItemName').focus();
+}
+
+function closeNewItemModal(){
+  document.getElementById('newItemOverlay').classList.remove('show');
+  document.getElementById('newItemModal').style.display = 'none';
+}
+
+function createNewItem(){
+  const name = document.getElementById('newItemName').value.trim();
+  if(!name){
+    alert('请输入事项名称');
+    document.getElementById('newItemName').focus();
+    return;
+  }
+
+  const type = document.getElementById('newItemType').value;
+  const module = document.getElementById('newItemModule').value;
+  const owner = document.getElementById('newItemOwner').value;
+  const deadline = document.getElementById('newItemDeadline').value;
+  const priority = parseInt(document.getElementById('newItemPriority').value);
+  const desc = document.getElementById('newItemDesc').value;
+
+  // Generate new ID
+  const newId = ITEMS.length + 1;
+
+  // Get owner color
+  const ownerColors = {'耿博琳':'#667eea','高琳':'#764ba2','聂茜茜':'#f093fb','张灵玉':'#4facfe','丁玉萍':'#fbc2eb','程宇亮':'#43e97b','董诗昀':'#fa709a','胡丽婷':'#a6c0fe','傅中南':'#a18cd1'};
+
+  // Get module color
+  const moduleColors = {'职场运营(北京)':'#3B5BDB','职场运营(武汉)':'#8B5CF6','职场运营(异地)':'#EC4899','文化运营(活动)':'#10B981','文化运营(福利)':'#F59E0B','数字化运营(行政服务台)':'#06B6D4','数字化运营(后台)':'#6366F1'};
+  const moduleBgs = {'职场运营(北京)':'#EBF0FF','职场运营(武汉)':'#F5F3FF','职场运营(异地)':'#FDF2F8','文化运营(活动)':'#ECFDF5','文化运营(福利)':'#FFFBEB','数字化运营(行政服务台)':'#ECFEFF','数字化运营(后台)':'#EEF2FF'};
+
+  // Create new item
+  const newItem = {
+    id: newId,
+    name: name,
+    type: type,
+    module: module,
+    modColor: moduleColors[module] || '#3B5BDB',
+    modBg: moduleBgs[module] || '#EBF0FF',
+    owner: owner,
+    ownerColor: ownerColors[owner] || '#667eea',
+    status: 'not-started',
+    statusLabel: '未开始',
+    pct: 0,
+    updated: '—',
+    priority: priority,
+    deadline: deadline || null,
+    weekUpdate: desc || '',
+    nextWeek: '',
+    risk: null,
+    milestones: []
+  };
+
+  // Add to ITEMS array
+  ITEMS.push(newItem);
+
+  // Close modal
+  closeNewItemModal();
+
+  // Re-render the task list
+  renderP02();
+
+  // Show success message
+  const msg = document.createElement('div');
+  msg.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--suc);color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;z-index:999;box-shadow:var(--shL)';
+  msg.textContent = '✓ 事项「' + name + '」已创建';
+  document.body.appendChild(msg);
+  setTimeout(() => msg.remove(), 3000);
+}
 function field(k,v){return '<div class="field-row"><div class="field-key">'+k+'</div><div class="field-val">'+v+'</div></div>'}
 function priDots(n){let h='<div style="display:flex;gap:3px">';for(let i=0;i<5;i++)h+='<div style="width:8px;height:8px;border-radius:50%;background:'+(i<n?'var(--ac)':'var(--bdl)')+'"></div>';return h+'</div>'}
 function stBg(s){return s==='done'?'var(--sucL)':s==='in-progress'?'var(--acl)':s==='not-started'?'var(--bg3)':'var(--warnL)'}
