@@ -261,6 +261,10 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 .field-row:last-child{border-bottom:none}
 .field-key{width:80px;font-size:12px;color:var(--t3);flex-shrink:0}
 .field-val{flex:1;font-size:13px;font-weight:500}
+.slide-select{padding:6px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;outline:none;background:var(--bg);cursor:pointer;min-width:100px}
+.slide-select:focus{border-color:var(--ac)}
+.slide-input{padding:6px 10px;border:1px solid var(--bd);border-radius:6px;font-size:12px;outline:none;background:var(--bg);transition:border var(--tr)}
+.slide-input:focus{border-color:var(--ac);box-shadow:0 0 0 2px rgba(59,91,219,.1)}
 .prog-ring{width:48px;height:48px;position:relative;margin:8px auto}
 .prog-ring svg{transform:rotate(-90deg)}
 .prog-ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--ac)}
@@ -3590,33 +3594,124 @@ function switchPanel(id, navEl){
 /* ══════ SLIDE-OVER ══════ */
 function openSlide(itemId){
   const it = ITEMS.find(i=>i.id===itemId)||ITEMS[0];
+  if(!it) return;
+
+  window._slideItemId = itemId;
   document.getElementById('slideOverlay').classList.add('show');
   document.getElementById('slidePanel').classList.add('show');
   document.getElementById('slideTitle').textContent=it.name;
   document.getElementById('slideType').innerHTML=it.type==='project'?'<span class="st-dot" style="background:var(--pur)"></span>专项项目':'<span class="st-dot" style="background:var(--suc)"></span>日常运营';
+
   let h='';
+
+  // Editable basic info
   h+='<div class="field-group"><div class="field-group-label">基本信息</div>';
   h+=field('所属模块','<span class="mod-tag" style="background:'+it.modBg+';color:'+it.modColor+'"><span class="mod-dot" style="background:'+it.modColor+'"></span>'+it.module+'</span>');
   h+=field('负责人','<div style="display:flex;align-items:center;gap:6px"><div class="sb-av" style="width:22px;height:22px;font-size:9px;background:'+it.ownerColor+'">'+it.owner[0]+'</div>'+it.owner+'</div>');
-  h+=field('优先级',priDots(it.priority));
-  h+=field('状态','<span class="st-badge" style="background:'+stBg(it.status)+';color:'+stFg(it.status)+'"><span class="st-dot" style="background:'+stFg(it.status)+'"></span>'+it.statusLabel+'</span>');
-  if(it.deadline) h+=field('截止日期',it.deadline);
+
+  // Editable priority
+  h+='<div class="field-row"><div class="field-key">优先级</div><div class="field-val"><select class="slide-select" id="slidePriority" onchange="updateSlideField(\'priority\',this.value)">';
+  for(let p=1;p<=5;p++){
+    h+='<option value="'+p+'"'+(it.priority===p?' selected':'')+'>P'+p+'</option>';
+  }
+  h+='</select></div></div>';
+
+  // Editable status
+  h+='<div class="field-row"><div class="field-key">状态</div><div class="field-val"><select class="slide-select" id="slideStatus" onchange="updateSlideField(\'status\',this.value);updateSlideField(\'statusLabel\',this.options[this.selectedIndex].text)">';
+  const statuses = [{val:'not-started',label:'未开始'},{val:'in-progress',label:'进行中'},{val:'procurement',label:'采购流程中'},{val:'done',label:'已完成'}];
+  statuses.forEach(s => {
+    h+='<option value="'+s.val+'"'+(it.status===s.val?' selected':'')+'>'+s.label+'</option>';
+  });
+  h+='</select></div></div>';
+
+  // Editable deadline
+  h+='<div class="field-row"><div class="field-key">截止日期</div><div class="field-val"><input type="date" class="slide-input" id="slideDeadline" value="'+(it.deadline||'')+'" onchange="updateSlideField(\'deadline\',this.value)"></div></div>';
+
+  // Editable completion
+  h+='<div class="field-row"><div class="field-key">完成度</div><div class="field-val"><input type="number" min="0" max="100" class="slide-input" id="slidePct" value="'+(it.pct||0)+'" onchange="updateSlideField(\'pct\',parseInt(this.value))" style="width:80px"> %</div></div>';
+
   h+='</div>';
+
+  // Progress ring for projects
   if(it.type==='project'){
-    const r=44,c=2*Math.PI*44;const off=c-it.pct/100*c;
-    h+='<div style="text-align:center;margin:10px 0"><div class="prog-ring"><svg width="60" height="60"><circle cx="30" cy="30" r="'+r+'" fill="none" stroke="var(--bdl)" stroke-width="5"/><circle cx="30" cy="30" r="'+r+'" fill="none" stroke="var(--ac)" stroke-width="5" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" stroke-linecap="round"/></svg><div class="pct" style="font-size:14px">'+it.pct+'%</div></div></div>';
-    h+='<div class="field-group"><div class="field-group-label">里程碑</div>';
-    it.milestones.forEach(m=>{h+='<div class="milestone"><div class="ms-dot '+m.status+'"></div><div>'+m.name+'</div></div>';if(m!==it.milestones[it.milestones.length-1])h+='<div class="ms-line" style="margin-left:5px"></div>';});
+    const r=44,c=2*Math.PI*44;const off=c-(it.pct||0)/100*c;
+    h+='<div style="text-align:center;margin:10px 0"><div class="prog-ring"><svg width="60" height="60"><circle cx="30" cy="30" r="'+r+'" fill="none" stroke="var(--bdl)" stroke-width="5"/><circle cx="30" cy="30" r="'+r+'" fill="none" stroke="var(--ac)" stroke-width="5" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" stroke-linecap="round"/></svg><div class="pct" style="font-size:14px">'+(it.pct||0)+'%</div></div></div>';
+
+    // Editable milestones
+    h+='<div class="field-group"><div class="field-group-label">里程碑 <button class="btn btn-ghost" style="font-size:11px;padding:2px 8px;margin-left:8px" onclick="addSlideMilestone()">＋ 添加</button></div>';
+    if(it.milestones && it.milestones.length > 0){
+      it.milestones.forEach((m, mIdx) => {
+        h+='<div class="milestone" style="align-items:center">';
+        h+='<select class="slide-select" style="width:auto;padding:4px 8px;font-size:11px" onchange="updateSlideMilestone('+mIdx+',\'status\',this.value)">';
+        h+='<option value="pending"'+(m.status==='pending'?' selected':'')+'>○ 未开始</option>';
+        h+='<option value="active"'+(m.status==='active'?' selected':'')+'>🔵 进行中</option>';
+        h+='<option value="done"'+(m.status==='done'?' selected':'')+'>✓ 已完成</option>';
+        h+='</select>';
+        h+='<input class="slide-input" style="flex:1;padding:4px 8px;font-size:12px" value="'+m.name+'" onchange="updateSlideMilestone('+mIdx+',\'name\',this.value)">';
+        h+='<button class="btn btn-ghost" style="font-size:10px;padding:2px 6px;color:var(--dan)" onclick="deleteSlideMilestone('+mIdx+')">✕</button>';
+        h+='</div>';
+      });
+    }
     h+='</div>';
   }
+
+  // Daily ops KPI data
   if(it.type==='daily-ops'&&it.kpi){
     h+='<div class="field-group"><div class="field-group-label">本周数据</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-    it.kpi.forEach(k=>{h+='<div class="kpi-card-sm"><div class="kpi-icon-sm" style="background:var(--acl)">'+(k.label==='工单总数'?'🎫':k.label==='人工工单'?'✅':k.label==='机器人拦截'?'⏱':'⭐')+'</div><div><div class="kpi-num-sm">'+k.val+'</div><div class="kpi-lbl-sm">'+k.label+'</div></div></div>';});
+    it.kpi.forEach(k=>{
+      h+='<div class="kpi-card-sm"><div class="kpi-icon-sm" style="background:var(--acl)">'+(k.label==='工单总数'?'🎫':k.label==='人工工单'?'✅':k.label==='机器人拦截'?'⏱':'⭐')+'</div><div><div class="kpi-num-sm" contenteditable="true" onblur="updateSlideKpi(\''+k.label+'\',\'val\',this.textContent)">'+k.val+'</div><div class="kpi-lbl-sm">'+k.label+'</div></div></div>';
+    });
     h+='</div></div>';
   }
-  h+='<div class="field-group"><div class="field-group-label">本周更新</div><div class="editable" contenteditable="true">'+(it.weekUpdate||'待填写…')+'</div></div>';
-  h+='<div class="field-group"><div class="field-group-label">下周重点</div><div class="editable" contenteditable="true">'+(it.nextWeek||'待填写…')+'</div></div>';
+
+  // Editable week update
+  h+='<div class="field-group"><div class="field-group-label">本周更新</div><div class="editable" contenteditable="true" id="slideWeekUpdate">'+(it.weekUpdate||'待填写…')+'</div></div>';
+
+  // Editable next week plan
+  h+='<div class="field-group"><div class="field-group-label">下周重点</div><div class="editable" contenteditable="true" id="slideNextWeek">'+(it.nextWeek||'待填写…')+'</div></div>';
+
   document.getElementById('slideBody').innerHTML=h;
+}
+
+function updateSlideField(field, value){
+  const it = ITEMS.find(i=>i.id===window._slideItemId);
+  if(!it) return;
+  it[field] = value;
+  // Update status label if status changed
+  if(field === 'status'){
+    const labels = {'not-started':'未开始','in-progress':'进行中','procurement':'采购流程中','done':'已完成'};
+    it.statusLabel = labels[value] || value;
+  }
+}
+
+function updateSlideMilestone(mIdx, field, value){
+  const it = ITEMS.find(i=>i.id===window._slideItemId);
+  if(!it || !it.milestones || !it.milestones[mIdx]) return;
+  it.milestones[mIdx][field] = value;
+}
+
+function deleteSlideMilestone(mIdx){
+  const it = ITEMS.find(i=>i.id===window._slideItemId);
+  if(!it || !it.milestones) return;
+  it.milestones.splice(mIdx, 1);
+  openSlide(window._slideItemId);
+}
+
+function addSlideMilestone(){
+  const it = ITEMS.find(i=>i.id===window._slideItemId);
+  if(!it) return;
+  if(!it.milestones) it.milestones = [];
+  const name = prompt('请输入里程碑名称：');
+  if(!name) return;
+  it.milestones.push({name: name, status: 'pending'});
+  openSlide(window._slideItemId);
+}
+
+function updateSlideKpi(label, field, value){
+  const it = ITEMS.find(i=>i.id===window._slideItemId);
+  if(!it || !it.kpi) return;
+  const kpi = it.kpi.find(k => k.label === label);
+  if(kpi) kpi[field] = value;
 }
 function closeSlide(){document.getElementById('slideOverlay').classList.remove('show');document.getElementById('slidePanel').classList.remove('show')}
 
@@ -3705,8 +3800,8 @@ function createNewItem(){
 }
 function field(k,v){return '<div class="field-row"><div class="field-key">'+k+'</div><div class="field-val">'+v+'</div></div>'}
 function priDots(n){let h='<div style="display:flex;gap:3px">';for(let i=0;i<5;i++)h+='<div style="width:8px;height:8px;border-radius:50%;background:'+(i<n?'var(--ac)':'var(--bdl)')+'"></div>';return h+'</div>'}
-function stBg(s){return s==='done'?'var(--sucL)':s==='in-progress'?'var(--acl)':s==='not-started'?'var(--bg3)':'var(--warnL)'}
-function stFg(s){return s==='done'?'var(--suc)':s==='in-progress'?'var(--ac)':s==='not-started'?'var(--t3)':'var(--warn)'}
+function stBg(s){return s==='done'?'var(--sucL)':s==='in-progress'?'var(--acl)':s==='procurement'?'var(--warnL)':s==='not-started'?'var(--bg3)':'var(--bg3)'}
+function stFg(s){return s==='done'?'var(--suc)':s==='in-progress'?'var(--ac)':s==='procurement'?'var(--warn)':s==='not-started'?'var(--t3)':'var(--t3)'}
 
 /* ══════ P04: ADMIN OVERVIEW ══════ */
 function renderP04(){
