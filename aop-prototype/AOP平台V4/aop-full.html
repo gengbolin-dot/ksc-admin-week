@@ -217,7 +217,8 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 /* New item modal */
 .new-item-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;backdrop-filter:blur(2px)}
 .new-item-overlay.show{display:block}
-.new-item-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:560px;max-height:85vh;background:var(--bg);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.2);z-index:201;display:flex;flex-direction:column;overflow:hidden}
+.new-item-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:560px;max-height:85vh;background:var(--bg);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.2);z-index:201;display:none;flex-direction:column;overflow:hidden}
+.new-item-modal.show{display:flex}
 .new-item-head{padding:20px 24px;border-bottom:1px solid var(--bdl);display:flex;align-items:center;gap:12px}
 .new-item-head-title{font-size:18px;font-weight:700;flex:1}
 .new-item-close{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);transition:all var(--tr);font-size:18px;border:none;background:none}
@@ -2681,9 +2682,9 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
     <div class="new-item-field">
       <div class="new-item-label">优先级</div>
       <select class="new-item-select" id="newItemPriority">
-        <option value="1">P1 - 紧急</option>
-        <option value="2" selected>P2 - 重要</option>
-        <option value="3">P3 - 一般</option>
+        <option value="high">高</option>
+        <option value="medium" selected>中</option>
+        <option value="low">低</option>
       </select>
     </div>
     <div class="new-item-field">
@@ -3738,21 +3739,21 @@ function closeSlide(){document.getElementById('slideOverlay').classList.remove('
 // New item modal functions
 function openNewItemModal(){
   document.getElementById('newItemOverlay').classList.add('show');
-  document.getElementById('newItemModal').style.display = 'flex';
+  document.getElementById('newItemModal').classList.add('show');
   // Reset form
   document.getElementById('newItemName').value = '';
   document.getElementById('newItemType').value = 'project';
   document.getElementById('newItemModule').value = '职场运营(北京)';
   document.getElementById('newItemOwner').value = '耿博琳';
   document.getElementById('newItemDeadline').value = '';
-  document.getElementById('newItemPriority').value = '2';
+  document.getElementById('newItemPriority').value = 'medium';
   document.getElementById('newItemDesc').value = '';
   document.getElementById('newItemName').focus();
 }
 
 function closeNewItemModal(){
   document.getElementById('newItemOverlay').classList.remove('show');
-  document.getElementById('newItemModal').style.display = 'none';
+  document.getElementById('newItemModal').classList.remove('show');
 }
 
 function createNewItem(){
