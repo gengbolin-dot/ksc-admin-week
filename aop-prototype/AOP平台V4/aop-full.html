@@ -3332,19 +3332,25 @@ function toggleSidebarSubGroup(el){
 /* ══════ PANEL 02: RENDER ══════ */
 let _p02Filter = 'all';
 
+// Track edits globally
+let _lastEditTime = 0;
+
+function markItemEdited(){
+  _lastEditTime = Date.now();
+  renderWeekPeriod();
+}
+
 // Week period card rendering
 function renderWeekPeriod(){
   const el = document.getElementById('p02PeriodCard');
   if(!el) return;
 
-  // Calculate current week
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const dayOfYear = Math.floor((now - startOfYear) / (24*60*60*1000)) + 1;
   const weekNum = Math.ceil(dayOfYear / 7);
 
-  // Calculate week start (Monday) and end (Sunday)
-  const dayOfWeek = now.getDay() || 7; // Sunday = 7
+  const dayOfWeek = now.getDay() || 7;
   const weekStart = new Date(now);
   weekStart.setDate(now.getDate() - dayOfWeek + 1);
   const weekEnd = new Date(weekStart);
@@ -3352,25 +3358,17 @@ function renderWeekPeriod(){
 
   const formatDate = (d) => `${d.getMonth()+1}月${d.getDate()}日`;
 
-  // Check submit state
   const submitKey = `submitted_${now.getFullYear()}_W${weekNum}`;
-  const snapshotKey = `snapshot_${now.getFullYear()}_W${weekNum}`;
+  const timeKey = `submitTime_${now.getFullYear()}_W${weekNum}`;
   const isSubmitted = localStorage.getItem(submitKey) === 'true';
-  const snapshot = localStorage.getItem(snapshotKey);
+  const submitTime = parseInt(localStorage.getItem(timeKey) || '0');
 
-  // Count updated items
   const updatedCount = ITEMS.filter(i => i.updated && i.updated !== '—').length;
   const totalCount = ITEMS.length;
   const progress = totalCount > 0 ? Math.round(updatedCount / totalCount * 100) : 0;
 
-  // Check if content changed since submission
-  let isModified = false;
-  if(isSubmitted && snapshot){
-    const saved = JSON.parse(snapshot);
-    if(saved.updatedCount !== updatedCount || saved.totalCount !== totalCount){
-      isModified = true;
-    }
-  }
+  // Check if edited after submission
+  const isModified = isSubmitted && _lastEditTime > submitTime;
 
   let h = `
     <div class="p02-week-badge">W${weekNum}</div>
@@ -3385,23 +3383,15 @@ function renderWeekPeriod(){
     <div class="p02-submit-week">`;
 
   if(isSubmitted && isModified){
-    // Submitted but content changed
     h += `<div class="p02-btn" style="background:var(--warn);color:#fff;cursor:pointer" onclick="submitWeek()">⚠️ 已修改，需重新提交</div>`;
   } else if(isSubmitted){
-    // Submitted and unchanged
-    h += `<div class="p02-btn" style="background:var(--suc);color:#fff;cursor:default">✓ 本周已提交</div>`;
+    h += `<div class="p02-btn" style="background:var(--suc);color:#fff;cursor:default;gap:6px"><span>✓</span> 本周已提交</div>`;
   } else {
-    // Not submitted
     h += `<div class="p02-btn p02-btn-primary" onclick="submitWeek()">📤 一键提交本周</div>`;
   }
 
   h += `</div>`;
   el.innerHTML = h;
-}
-
-// Check if items changed (call this when editing items)
-function checkSubmitStatus(){
-  renderWeekPeriod();
 }
 
 function renderP02(){
@@ -3748,34 +3738,36 @@ function updateSlideModule(value){
   const it = ITEMS.find(i=>i.id===window._slideItemId);
   if(!it) return;
   it.module = value;
-  // Update module colors
   const moduleColors = {'职场运营(北京)':'#3B5BDB','职场运营(武汉)':'#8B5CF6','职场运营(异地)':'#EC4899','文化运营(活动)':'#10B981','文化运营(福利)':'#F59E0B','数字化运营(行政服务台)':'#06B6D4','数字化运营(后台)':'#6366F1'};
   const moduleBgs = {'职场运营(北京)':'#EBF0FF','职场运营(武汉)':'#F5F3FF','职场运营(异地)':'#FDF2F8','文化运营(活动)':'#ECFDF5','文化运营(福利)':'#FFFBEB','数字化运营(行政服务台)':'#ECFEFF','数字化运营(后台)':'#EEF2FF'};
   it.modColor = moduleColors[value] || '#3B5BDB';
   it.modBg = moduleBgs[value] || '#EBF0FF';
+  markItemEdited();
 }
 
 function updateSlideField(field, value){
   const it = ITEMS.find(i=>i.id===window._slideItemId);
   if(!it) return;
   it[field] = value;
-  // Update status label if status changed
   if(field === 'status'){
     const labels = {'not-started':'未开始','in-progress':'进行中','procurement':'采购流程中','done':'已完成'};
     it.statusLabel = labels[value] || value;
   }
+  markItemEdited();
 }
 
 function updateSlideMilestone(mIdx, field, value){
   const it = ITEMS.find(i=>i.id===window._slideItemId);
   if(!it || !it.milestones || !it.milestones[mIdx]) return;
   it.milestones[mIdx][field] = value;
+  markItemEdited();
 }
 
 function deleteSlideMilestone(mIdx){
   const it = ITEMS.find(i=>i.id===window._slideItemId);
   if(!it || !it.milestones) return;
   it.milestones.splice(mIdx, 1);
+  markItemEdited();
   openSlide(window._slideItemId);
 }
 
@@ -3786,6 +3778,7 @@ function addSlideMilestone(){
   const name = prompt('请输入里程碑名称：');
   if(!name) return;
   it.milestones.push({name: name, status: 'pending'});
+  markItemEdited();
   openSlide(window._slideItemId);
 }
 
@@ -3794,6 +3787,7 @@ function updateSlideKpi(label, field, value){
   if(!it || !it.kpi) return;
   const kpi = it.kpi.find(k => k.label === label);
   if(kpi) kpi[field] = value;
+  markItemEdited();
 }
 function closeSlide(){document.getElementById('slideOverlay').classList.remove('show');document.getElementById('slidePanel').classList.remove('show')}
 
@@ -6175,29 +6169,24 @@ function submitWeek(){
   const dayOfYear = Math.floor((now - startOfYear) / (24*60*60*1000)) + 1;
   const weekNum = Math.ceil(dayOfYear / 7);
 
-  // Save submitted state
   const submitKey = `submitted_${now.getFullYear()}_W${weekNum}`;
+  const timeKey = `submitTime_${now.getFullYear()}_W${weekNum}`;
+
   localStorage.setItem(submitKey, 'true');
+  localStorage.setItem(timeKey, String(Date.now()));
 
-  // Save snapshot for change detection
-  const snapshotKey = `snapshot_${now.getFullYear()}_W${weekNum}`;
-  const updatedCount = ITEMS.filter(i => i.updated && i.updated !== '—').length;
-  localStorage.setItem(snapshotKey, JSON.stringify({
-    updatedCount: updatedCount,
-    totalCount: ITEMS.length,
-    timestamp: now.toISOString()
-  }));
+  _lastEditTime = 0; // Reset edit tracking
 
-  // Re-render period card to show submitted state
   renderWeekPeriod();
 
-  // Show success message
   const msg = document.createElement('div');
   msg.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--suc);color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;z-index:999;box-shadow:var(--shL)';
   msg.textContent = '✓ 本周已提交，数据已同步至周报模块';
   document.body.appendChild(msg);
   setTimeout(() => msg.remove(), 3000);
 }
+
+/* ══════ P10: OKR ══════ */
 
 /* ══════ TAB SWITCHING ══════ */
 document.querySelectorAll('.tab-item').forEach(t=>t.addEventListener('click',function(){
