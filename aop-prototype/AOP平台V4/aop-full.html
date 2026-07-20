@@ -2856,26 +2856,26 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 <script>
 /* ══════ DATA ══════ */
 const ITEMS = [
-  {id:1,name:'福利关怀',type:'project',module:'职场运营(北京)',modColor:'#3B5BDB',modBg:'#EBF0FF',owner:'耿博琳',ownerColor:'#667eea',status:'in-progress',statusLabel:'进行中',pct:80,updated:'07-06',priority:2,risk:'决赛场地档期可能冲突',deadline:'07-28',
+  {id:1,name:'福利关怀',type:'project',module:'职场运营(北京)',modColor:'#3B5BDB',modBg:'#EBF0FF',owner:'耿博琳',ownerColor:'#667eea',status:'in-progress',statusLabel:'进行中',pct:80,updated:'07-06',priority:'medium',risk:'决赛场地档期可能冲突',deadline:'07-28',
    weekUpdate:'本周完成决赛环节策划方案，已确定7月28日决赛日期和场地',nextWeek:'1. 确认决赛评委名单\n2. 完成物料采购\n3. 场地布置方案定稿',
    milestones:[{name:'初赛完成',status:'done'},{name:'决赛策划',status:'active'},{name:'决赛执行',status:'pending'},{name:'总结复盘',status:'pending'}]},
-  {id:2,name:'家庭日',type:'project',module:'文化运营(活动)',modColor:'#10B981',modBg:'#ECFDF5',owner:'聂茜茜',ownerColor:'#f093fb',status:'in-progress',statusLabel:'进行中',pct:70,updated:'07-07',priority:1,deadline:'08-15',
+  {id:2,name:'家庭日',type:'project',module:'文化运营(活动)',modColor:'#10B981',modBg:'#ECFDF5',owner:'聂茜茜',ownerColor:'#f093fb',status:'in-progress',statusLabel:'进行中',pct:70,updated:'07-07',priority:'high',deadline:'08-15',
    weekUpdate:'场地确认完成，开始发放邀请函，预计参与200+人',nextWeek:'1. 确认参与人数\n2. 活动流程细化\n3. 物料准备',
    milestones:[{name:'方案确认',status:'done'},{name:'场地预订',status:'done'},{name:'物料准备',status:'active'},{name:'活动执行',status:'pending'}]},
-  {id:3,name:'员工体检',type:'project',module:'数字化运营(后台)',modColor:'#6366F1',modBg:'#EEF2FF',owner:'丁玉萍',ownerColor:'#4facfe',status:'not-started',statusLabel:'未开始',pct:0,updated:'—',priority:2,deadline:'10-30',weekUpdate:'',nextWeek:''},
-  {id:4,name:'端午节礼品',type:'project',module:'文化运营(福利)',modColor:'#F59E0B',modBg:'#FFFBEB',owner:'高琳',ownerColor:'#667eea',status:'done',statusLabel:'已完成',pct:100,updated:'05-28',priority:1,deadline:'05-30',weekUpdate:'礼品已全部发放完毕，满意度95%'},
-  {id:5,name:'5楼装修改造',type:'project',module:'职场运营(北京)',modColor:'#3B5BDB',modBg:'#EBF0FF',owner:'耿博琳',ownerColor:'#667eea',status:'in-progress',statusLabel:'进行中',pct:35,updated:'07-05',priority:2,deadline:'09-30',
+  {id:3,name:'员工体检',type:'project',module:'数字化运营(后台)',modColor:'#6366F1',modBg:'#EEF2FF',owner:'丁玉萍',ownerColor:'#4facfe',status:'not-started',statusLabel:'未开始',pct:0,updated:'—',priority:'medium',deadline:'10-30',weekUpdate:'',nextWeek:''},
+  {id:4,name:'端午节礼品',type:'project',module:'文化运营(福利)',modColor:'#F59E0B',modBg:'#FFFBEB',owner:'高琳',ownerColor:'#667eea',status:'done',statusLabel:'已完成',pct:100,updated:'05-28',priority:'high',deadline:'05-30',weekUpdate:'礼品已全部发放完毕，满意度95%'},
+  {id:5,name:'5楼装修改造',type:'project',module:'职场运营(北京)',modColor:'#3B5BDB',modBg:'#EBF0FF',owner:'耿博琳',ownerColor:'#667eea',status:'in-progress',statusLabel:'进行中',pct:35,updated:'07-05',priority:'medium',deadline:'09-30',
    weekUpdate:'设计方案已通过审批，开始招标流程',nextWeek:'1. 完成招标\n2. 确定施工单位\n3. 签订合同',risk:'装修期间可能影响5楼员工办公',
    milestones:[{name:'方案设计',status:'done'},{name:'招标采购',status:'active'},{name:'施工执行',status:'pending'},{name:'验收交付',status:'pending'}]},
-  {id:6,name:'酒店协议续签',type:'project',module:'职场运营(北京)',modColor:'#3B5BDB',modBg:'#EBF0FF',owner:'张灵玉',ownerColor:'#4facfe',status:'in-progress',statusLabel:'进行中',pct:85,updated:'07-04',priority:3,deadline:'07-31',
+  {id:6,name:'酒店协议续签',type:'project',module:'职场运营(北京)',modColor:'#3B5BDB',modBg:'#EBF0FF',owner:'张灵玉',ownerColor:'#4facfe',status:'in-progress',statusLabel:'进行中',pct:85,updated:'07-04',priority:'low',deadline:'07-31',
    weekUpdate:'已与3家酒店完成谈判，协议条款确认中',nextWeek:'1. 签署协议\n2. 上线预定系统',risk:'部分酒店要求涨价15%'},
-  {id:7,name:'行政服务台',type:'daily-ops',module:'数字化运营(行政服务台)',modColor:'#06B6D4',modBg:'#ECFEFF',owner:'高琳',ownerColor:'#667eea',status:'in-progress',statusLabel:'进行中',pct:-1,updated:'07-08',priority:3,
+  {id:7,name:'行政服务台',type:'daily-ops',module:'数字化运营(行政服务台)',modColor:'#06B6D4',modBg:'#ECFEFF',owner:'高琳',ownerColor:'#667eea',status:'in-progress',statusLabel:'进行中',pct:-1,updated:'07-08',priority:'low',
    kpi:[{label:'工单总数',val:57,change:'+100%',up:true},{label:'人工工单',val:19,change:'正常',up:true},{label:'机器人拦截',val:38,change:'100%',up:true},{label:'拦截率',val:'100%',change:'达标',up:true}],
    weekUpdate:'本周创建工单57个，其中人工19，机器人拦截38，拦截率100%',nextWeek:'1. 持续优化拦截规则\n2. 跟进人工工单处理时效'},
-  {id:8,name:'公益内容运营',type:'daily-ops',module:'文化运营(活动)',modColor:'#10B981',modBg:'#ECFDF5',owner:'聂茜茜',ownerColor:'#f093fb',status:'in-progress',statusLabel:'进行中',pct:-1,updated:'07-03',priority:3,
+  {id:8,name:'公益内容运营',type:'daily-ops',module:'文化运营(活动)',modColor:'#10B981',modBg:'#ECFDF5',owner:'聂茜茜',ownerColor:'#f093fb',status:'in-progress',statusLabel:'进行中',pct:-1,updated:'07-03',priority:'low',
    weekUpdate:'完成3篇公益推文发布，阅读量合计1.2万',nextWeek:'1. 策划下期公益主题\n2. 联系公益机构'},
-  {id:9,name:'六一儿童节礼物',type:'project',module:'文化运营(福利)',modColor:'#F59E0B',modBg:'#FFFBEB',owner:'高琳',ownerColor:'#667eea',status:'done',statusLabel:'已完成',pct:100,updated:'06-01',priority:2,deadline:'06-01',weekUpdate:'礼物已发放，员工反馈良好'},
-  {id:10,name:'走廊维修',type:'project',module:'职场运营(北京)',modColor:'#3B5BDB',modBg:'#EBF0FF',owner:'耿博琳',ownerColor:'#667eea',status:'done',statusLabel:'已完成',pct:100,updated:'07-01',priority:3,deadline:'07-01',weekUpdate:'走廊灯管更换完成，已验收'},
+  {id:9,name:'六一儿童节礼物',type:'project',module:'文化运营(福利)',modColor:'#F59E0B',modBg:'#FFFBEB',owner:'高琳',ownerColor:'#667eea',status:'done',statusLabel:'已完成',pct:100,updated:'06-01',priority:'medium',deadline:'06-01',weekUpdate:'礼物已发放，员工反馈良好'},
+  {id:10,name:'走廊维修',type:'project',module:'职场运营(北京)',modColor:'#3B5BDB',modBg:'#EBF0FF',owner:'耿博琳',ownerColor:'#667eea',status:'done',statusLabel:'已完成',pct:100,updated:'07-01',priority:'low',deadline:'07-01',weekUpdate:'走廊灯管更换完成，已验收'},
 ];
 
 const PEOPLE = [
@@ -3606,14 +3606,23 @@ function openSlide(itemId){
 
   // Editable basic info
   h+='<div class="field-group"><div class="field-group-label">基本信息</div>';
-  h+=field('所属模块','<span class="mod-tag" style="background:'+it.modBg+';color:'+it.modColor+'"><span class="mod-dot" style="background:'+it.modColor+'"></span>'+it.module+'</span>');
+
+  // Editable module
+  h+='<div class="field-row"><div class="field-key">所属模块</div><div class="field-val"><select class="slide-select" id="slideModule" onchange="updateSlideModule(this.value)">';
+  const modules = ['职场运营(北京)','职场运营(武汉)','职场运营(异地)','文化运营(活动)','文化运营(福利)','数字化运营(行政服务台)','数字化运营(后台)'];
+  modules.forEach(m => {
+    h+='<option value="'+m+'"'+(it.module===m?' selected':'')+'>'+m+'</option>';
+  });
+  h+='</select></div></div>';
+
   h+=field('负责人','<div style="display:flex;align-items:center;gap:6px"><div class="sb-av" style="width:22px;height:22px;font-size:9px;background:'+it.ownerColor+'">'+it.owner[0]+'</div>'+it.owner+'</div>');
 
-  // Editable priority
+  // Editable priority (高/中/低)
   h+='<div class="field-row"><div class="field-key">优先级</div><div class="field-val"><select class="slide-select" id="slidePriority" onchange="updateSlideField(\'priority\',this.value)">';
-  for(let p=1;p<=5;p++){
-    h+='<option value="'+p+'"'+(it.priority===p?' selected':'')+'>P'+p+'</option>';
-  }
+  const priorities = [{val:'high',label:'高'},{val:'medium',label:'中'},{val:'low',label:'低'}];
+  priorities.forEach(p => {
+    h+='<option value="'+p.val+'"'+(it.priority===p.val?' selected':'')+'>'+p.label+'</option>';
+  });
   h+='</select></div></div>';
 
   // Editable status
@@ -3671,6 +3680,17 @@ function openSlide(itemId){
   h+='<div class="field-group"><div class="field-group-label">下周重点</div><div class="editable" contenteditable="true" id="slideNextWeek">'+(it.nextWeek||'待填写…')+'</div></div>';
 
   document.getElementById('slideBody').innerHTML=h;
+}
+
+function updateSlideModule(value){
+  const it = ITEMS.find(i=>i.id===window._slideItemId);
+  if(!it) return;
+  it.module = value;
+  // Update module colors
+  const moduleColors = {'职场运营(北京)':'#3B5BDB','职场运营(武汉)':'#8B5CF6','职场运营(异地)':'#EC4899','文化运营(活动)':'#10B981','文化运营(福利)':'#F59E0B','数字化运营(行政服务台)':'#06B6D4','数字化运营(后台)':'#6366F1'};
+  const moduleBgs = {'职场运营(北京)':'#EBF0FF','职场运营(武汉)':'#F5F3FF','职场运营(异地)':'#FDF2F8','文化运营(活动)':'#ECFDF5','文化运营(福利)':'#FFFBEB','数字化运营(行政服务台)':'#ECFEFF','数字化运营(后台)':'#EEF2FF'};
+  it.modColor = moduleColors[value] || '#3B5BDB';
+  it.modBg = moduleBgs[value] || '#EBF0FF';
 }
 
 function updateSlideField(field, value){
