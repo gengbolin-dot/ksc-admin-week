@@ -1723,20 +1723,9 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
     </div>
   </div>
 
-  <!-- Week period card -->
-  <div class="p02-period-card">
-    <div class="p02-week-badge">W28</div>
-    <div class="p02-period-info">
-      <div class="p02-period-title">本周填报期 • 2026年7月6日 – 7月12日</div>
-      <div class="p02-period-sub">截止时间：周四 23:59 • 本周已更新 5 / 8 项</div>
-      <div class="p02-progress-row">
-        <div class="p02-progress-bar"><div class="p02-progress-fill" style="width:63%"></div></div>
-        <div class="p02-progress-pct">63%</div>
-      </div>
-    </div>
-    <div class="p02-submit-week">
-      <div class="p02-btn p02-btn-primary" onclick="submitWeek()">📤 一键提交本周</div>
-    </div>
+  <!-- Week period card (dynamic) -->
+  <div class="p02-period-card" id="p02PeriodCard">
+    <!-- Rendered by JS -->
   </div>
 
   <!-- Tabs -->
@@ -3342,6 +3331,59 @@ function toggleSidebarSubGroup(el){
 
 /* ══════ PANEL 02: RENDER ══════ */
 let _p02Filter = 'all';
+
+// Week period card rendering
+function renderWeekPeriod(){
+  const el = document.getElementById('p02PeriodCard');
+  if(!el) return;
+
+  // Calculate current week
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now - startOfYear) / (24*60*60*1000)) + 1;
+  const weekNum = Math.ceil(dayOfYear / 7);
+
+  // Calculate week start (Monday) and end (Sunday)
+  const dayOfWeek = now.getDay() || 7; // Sunday = 7
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - dayOfWeek + 1);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+
+  const formatDate = (d) => `${d.getMonth()+1}月${d.getDate()}日`;
+  const deadlineDay = new Date(weekStart);
+  deadlineDay.setDate(weekStart.getDate() + 3); // Thursday
+
+  // Check if already submitted this week
+  const submitKey = `submitted_${now.getFullYear()}_W${weekNum}`;
+  const isSubmitted = localStorage.getItem(submitKey) === 'true';
+
+  // Count updated items
+  const updatedCount = ITEMS.filter(i => i.updated && i.updated !== '—').length;
+  const totalCount = ITEMS.length;
+  const progress = totalCount > 0 ? Math.round(updatedCount / totalCount * 100) : 0;
+
+  let h = `
+    <div class="p02-week-badge">W${weekNum}</div>
+    <div class="p02-period-info">
+      <div class="p02-period-title">本周填报期 • ${formatDate(weekStart)} – ${formatDate(weekEnd)}</div>
+      <div class="p02-period-sub">截止时间：周四 23:59 • 本周已更新 ${updatedCount} / ${totalCount} 项</div>
+      <div class="p02-progress-row">
+        <div class="p02-progress-bar"><div class="p02-progress-fill" style="width:${progress}%"></div></div>
+        <div class="p02-progress-pct">${progress}%</div>
+      </div>
+    </div>
+    <div class="p02-submit-week">`;
+
+  if(isSubmitted){
+    h += `<div class="p02-btn" style="background:var(--suc);color:#fff;cursor:default">✓ 本周已提交</div>`;
+  } else {
+    h += `<div class="p02-btn p02-btn-primary" onclick="submitWeek()">📤 一键提交本周</div>`;
+  }
+
+  h += `</div>`;
+  el.innerHTML = h;
+}
 
 function renderP02(){
   const el = document.getElementById('p02TaskList');
@@ -6108,7 +6150,25 @@ document.addEventListener('click',e=>{const s=document.querySelector('.p10-perio
 function filterOKR(term){const cards=document.querySelectorAll('.p10-okr-card');cards.forEach(c=>{c.style.display=!term||c.textContent.toLowerCase().includes(term.toLowerCase())?'':'none'})}
 
 /* ══════ SUBMIT ══════ */
-function submitWeek(){const b=document.querySelector('.p02-submit-btn');b.textContent='✓ 已提交';b.style.background='var(--suc)';b.disabled=true;setTimeout(()=>{b.textContent='提交本周更新';b.style.background='';b.disabled=false},2000)}
+function submitWeek(){
+  // Save submitted state
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now - startOfYear) / (24*60*60*1000)) + 1;
+  const weekNum = Math.ceil(dayOfYear / 7);
+  const submitKey = `submitted_${now.getFullYear()}_W${weekNum}`;
+  localStorage.setItem(submitKey, 'true');
+
+  // Re-render period card to show submitted state
+  renderWeekPeriod();
+
+  // Show success message
+  const msg = document.createElement('div');
+  msg.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--suc);color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;z-index:999;box-shadow:var(--shL)';
+  msg.textContent = '✓ 本周已提交，数据已同步至周报模块';
+  document.body.appendChild(msg);
+  setTimeout(() => msg.remove(), 3000);
+}
 
 /* ══════ TAB SWITCHING ══════ */
 document.querySelectorAll('.tab-item').forEach(t=>t.addEventListener('click',function(){
@@ -7280,6 +7340,7 @@ document.addEventListener('click', e => {
 });
 
 /* ══════ INIT ══════ */
+renderWeekPeriod(); // Render week period card
 renderP02(); // Render default panel on load
 </script>
 </body>
