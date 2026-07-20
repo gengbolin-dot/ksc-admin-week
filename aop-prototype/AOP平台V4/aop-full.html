@@ -3351,17 +3351,26 @@ function renderWeekPeriod(){
   weekEnd.setDate(weekStart.getDate() + 6);
 
   const formatDate = (d) => `${d.getMonth()+1}月${d.getDate()}日`;
-  const deadlineDay = new Date(weekStart);
-  deadlineDay.setDate(weekStart.getDate() + 3); // Thursday
 
-  // Check if already submitted this week
+  // Check submit state
   const submitKey = `submitted_${now.getFullYear()}_W${weekNum}`;
+  const snapshotKey = `snapshot_${now.getFullYear()}_W${weekNum}`;
   const isSubmitted = localStorage.getItem(submitKey) === 'true';
+  const snapshot = localStorage.getItem(snapshotKey);
 
   // Count updated items
   const updatedCount = ITEMS.filter(i => i.updated && i.updated !== '—').length;
   const totalCount = ITEMS.length;
   const progress = totalCount > 0 ? Math.round(updatedCount / totalCount * 100) : 0;
+
+  // Check if content changed since submission
+  let isModified = false;
+  if(isSubmitted && snapshot){
+    const saved = JSON.parse(snapshot);
+    if(saved.updatedCount !== updatedCount || saved.totalCount !== totalCount){
+      isModified = true;
+    }
+  }
 
   let h = `
     <div class="p02-week-badge">W${weekNum}</div>
@@ -3375,14 +3384,24 @@ function renderWeekPeriod(){
     </div>
     <div class="p02-submit-week">`;
 
-  if(isSubmitted){
+  if(isSubmitted && isModified){
+    // Submitted but content changed
+    h += `<div class="p02-btn" style="background:var(--warn);color:#fff;cursor:pointer" onclick="submitWeek()">⚠️ 已修改，需重新提交</div>`;
+  } else if(isSubmitted){
+    // Submitted and unchanged
     h += `<div class="p02-btn" style="background:var(--suc);color:#fff;cursor:default">✓ 本周已提交</div>`;
   } else {
+    // Not submitted
     h += `<div class="p02-btn p02-btn-primary" onclick="submitWeek()">📤 一键提交本周</div>`;
   }
 
   h += `</div>`;
   el.innerHTML = h;
+}
+
+// Check if items changed (call this when editing items)
+function checkSubmitStatus(){
+  renderWeekPeriod();
 }
 
 function renderP02(){
@@ -6151,13 +6170,23 @@ function filterOKR(term){const cards=document.querySelectorAll('.p10-okr-card');
 
 /* ══════ SUBMIT ══════ */
 function submitWeek(){
-  // Save submitted state
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 1);
   const dayOfYear = Math.floor((now - startOfYear) / (24*60*60*1000)) + 1;
   const weekNum = Math.ceil(dayOfYear / 7);
+
+  // Save submitted state
   const submitKey = `submitted_${now.getFullYear()}_W${weekNum}`;
   localStorage.setItem(submitKey, 'true');
+
+  // Save snapshot for change detection
+  const snapshotKey = `snapshot_${now.getFullYear()}_W${weekNum}`;
+  const updatedCount = ITEMS.filter(i => i.updated && i.updated !== '—').length;
+  localStorage.setItem(snapshotKey, JSON.stringify({
+    updatedCount: updatedCount,
+    totalCount: ITEMS.length,
+    timestamp: now.toISOString()
+  }));
 
   // Re-render period card to show submitted state
   renderWeekPeriod();
