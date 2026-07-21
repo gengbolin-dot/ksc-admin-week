@@ -1736,14 +1736,17 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
 
   <!-- Filter bar -->
   <div class="p02-filter-bar">
-    <div class="p02-filter-chip active" onclick="filterTasks('all',this)">全部<span class="count">8</span></div>
-    <div class="p02-filter-chip" onclick="filterTasks('project',this)">重点专项<span class="count">5</span></div>
-    <div class="p02-filter-chip" onclick="filterTasks('daily',this)">日常运营<span class="count">3</span></div>
-    <div class="p02-filter-right">已更新 5 / 8</div>
+    <div class="p02-filter-chip active" onclick="filterTasks('all',this)">全部<span class="count" id="countAll">8</span></div>
+    <div class="p02-filter-chip" onclick="filterTasks('project',this)">重点专项<span class="count" id="countProject">5</span></div>
+    <div class="p02-filter-chip" onclick="filterTasks('daily',this)">日常运营<span class="count" id="countDaily">3</span></div>
+    <div class="p02-filter-right" id="p02UpdateStatus">已更新 5 / 8</div>
   </div>
 
-  <!-- Task list -->
+  <!-- Task list (本周工作) -->
   <div class="content-scroll" id="p02TaskList"></div>
+
+  <!-- History tab content (hidden by default) -->
+  <div class="content-scroll" id="p02HistoryList" style="display:none"></div>
 </div>
 
 <!-- ══════ PANEL 04: ADMIN OVERVIEW ══════ -->
@@ -3374,7 +3377,7 @@ function renderWeekPeriod(){
     <div class="p02-week-badge">W${weekNum}</div>
     <div class="p02-period-info">
       <div class="p02-period-title">本周填报期 • ${formatDate(weekStart)} – ${formatDate(weekEnd)}</div>
-      <div class="p02-period-sub">截止时间：周四 23:59 • 本周已更新 ${updatedCount} / ${totalCount} 项</div>
+      <div class="p02-period-sub">本周已更新 ${updatedCount} / ${totalCount} 项</div>
       <div class="p02-progress-row">
         <div class="p02-progress-bar"><div class="p02-progress-fill" style="width:${progress}%"></div></div>
         <div class="p02-progress-pct">${progress}%</div>
@@ -3502,6 +3505,22 @@ function renderP02(){
   }
 
   el.innerHTML = h;
+
+  // Update filter counts
+  const allCount = ITEMS.length;
+  const projCount = ITEMS.filter(i => i.type === 'project').length;
+  const dailyCount = ITEMS.filter(i => i.type === 'daily-ops').length;
+  const updatedCount = ITEMS.filter(i => i.updated && i.updated !== '—').length;
+
+  const countAll = document.getElementById('countAll');
+  const countProject = document.getElementById('countProject');
+  const countDaily = document.getElementById('countDaily');
+  const updateStatus = document.getElementById('p02UpdateStatus');
+
+  if(countAll) countAll.textContent = allCount;
+  if(countProject) countProject.textContent = projCount;
+  if(countDaily) countDaily.textContent = dailyCount;
+  if(updateStatus) updateStatus.textContent = `已更新 ${updatedCount} / ${allCount}`;
 }
 
 function getDueStatus(item){
@@ -3608,13 +3627,100 @@ function removeAttach(attId, taskId){
   });
 }
 
-// Tab switching
+// Tab switching with content toggle
 document.addEventListener('click', function(e){
   if(e.target.classList.contains('p02-tab')){
     document.querySelectorAll('.p02-tab').forEach(t => t.classList.remove('active'));
     e.target.classList.add('active');
+
+    const taskList = document.getElementById('p02TaskList');
+    const historyList = document.getElementById('p02HistoryList');
+    const filterBar = document.querySelector('.p02-filter-bar');
+
+    if(e.target.textContent.includes('本周工作')){
+      if(taskList) taskList.style.display = '';
+      if(historyList) historyList.style.display = 'none';
+      if(filterBar) filterBar.style.display = '';
+    } else if(e.target.textContent.includes('历史周报')){
+      if(taskList) taskList.style.display = 'none';
+      if(historyList) historyList.style.display = '';
+      if(filterBar) filterBar.style.display = 'none';
+      renderHistoryReport();
+    }
   }
 });
+
+// Virtual history report data
+const HISTORY_REPORTS = [
+  {
+    week: 'W27', range: '2026.06.29 – 2026.07.05', submitted: true,
+    items: [
+      {name:'福利关怀',type:'专项',module:'职场运营(北京)',status:'进行中',pct:75,updated:'✓'},
+      {name:'家庭日',type:'专项',module:'文化运营(活动)',status:'进行中',pct:60,updated:'✓'},
+      {name:'员工体检',type:'专项',module:'数字化运营(后台)',status:'未开始',pct:0,updated:'—'},
+      {name:'行政服务台',type:'日常',module:'数字化运营(行政服务台)',status:'进行中',updated:'✓'},
+      {name:'公益内容运营',type:'日常',module:'文化运营(活动)',status:'进行中',updated:'✓'}
+    ]
+  },
+  {
+    week: 'W26', range: '2026.06.22 – 2026.06.28', submitted: true,
+    items: [
+      {name:'福利关怀',type:'专项',module:'职场运营(北京)',status:'进行中',pct:65,updated:'✓'},
+      {name:'家庭日',type:'专项',module:'文化运营(活动)',status:'进行中',pct:45,updated:'✓'},
+      {name:'端午节礼品',type:'专项',module:'文化运营(福利)',status:'已完成',pct:100,updated:'✓'},
+      {name:'行政服务台',type:'日常',module:'数字化运营(行政服务台)',status:'进行中',updated:'✓'},
+      {name:'公益内容运营',type:'日常',module:'文化运营(活动)',status:'进行中',updated:'✓'}
+    ]
+  },
+  {
+    week: 'W25', range: '2026.06.15 – 2026.06.21', submitted: true,
+    items: [
+      {name:'福利关怀',type:'专项',module:'职场运营(北京)',status:'进行中',pct:50,updated:'✓'},
+      {name:'家庭日',type:'专项',module:'文化运营(活动)',status:'进行中',pct:30,updated:'✓'},
+      {name:'行政服务台',type:'日常',module:'数字化运营(行政服务台)',status:'进行中',updated:'✓'},
+      {name:'公益内容运营',type:'日常',module:'文化运营(活动)',status:'进行中',updated:'✓'}
+    ]
+  }
+];
+
+function renderHistoryReport(){
+  const el = document.getElementById('p02HistoryList');
+  if(!el) return;
+
+  let h = '';
+  HISTORY_REPORTS.forEach(report => {
+    const projCount = report.items.filter(i => i.type === '专项').length;
+    const dailyCount = report.items.filter(i => i.type === '日常').length;
+    const updatedCount = report.items.filter(i => i.updated === '✓').length;
+
+    h += `<div style="margin-bottom:24px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:12px 16px;background:var(--bg);border-radius:10px;border:1px solid var(--bdl)">
+        <div style="font-size:18px;font-weight:700;color:var(--t1)">${report.week}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:var(--t1)">填报期 • ${report.range}</div>
+          <div style="font-size:11px;color:var(--t3)">已提交 • ${updatedCount}/${report.items.length} 已更新</div>
+        </div>
+        <div style="font-size:11px;color:var(--suc)">✓ 已提交</div>
+      </div>
+      <div style="padding-left:16px">`;
+
+    report.items.forEach(item => {
+      const isProject = item.type === '专项';
+      h += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdl)">
+        <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:${isProject ? 'var(--purL)' : 'var(--sucL)'};color:${isProject ? 'var(--pur)' : 'var(--suc)'}">${item.type}</span>
+        <span style="font-size:13px;font-weight:600;flex:1">${item.name}</span>
+        <span style="font-size:11px;color:var(--t3)">${item.module}</span>
+        <span style="font-size:11px;color:${item.status === '已完成' ? 'var(--suc)' : item.status === '进行中' ? 'var(--ac)' : 'var(--t3)'}">● ${item.status}</span>
+        ${item.pct !== undefined ? '<span style="font-size:11px;font-weight:600;color:var(--t1)">' + item.pct + '%</span>' : ''}
+        <span style="font-size:11px;color:${item.updated === '✓' ? 'var(--suc)' : 'var(--t3)'}">${item.updated === '✓' ? '✓ 已更新' : '— 未更新'}</span>
+      </div>`;
+    });
+
+    h += `</div></div>`;
+  });
+
+  el.innerHTML = h;
+}
 
 /* ══════ PANEL SWITCH ══════ */
 function switchPanel(id, navEl){
