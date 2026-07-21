@@ -3655,30 +3655,52 @@ const HISTORY_REPORTS = [
   {
     week: 'W27', range: '2026.06.29 – 2026.07.05', submitted: true,
     items: [
-      {name:'福利关怀',type:'专项',module:'职场运营(北京)',status:'进行中',pct:75,updated:'✓'},
-      {name:'家庭日',type:'专项',module:'文化运营(活动)',status:'进行中',pct:60,updated:'✓'},
-      {name:'员工体检',type:'专项',module:'数字化运营(后台)',status:'未开始',pct:0,updated:'—'},
-      {name:'行政服务台',type:'日常',module:'数字化运营(行政服务台)',status:'进行中',updated:'✓'},
-      {name:'公益内容运营',type:'日常',module:'文化运营(活动)',status:'进行中',updated:'✓'}
+      {name:'福利关怀',type:'专项',module:'职场运营(北京)',status:'进行中',pct:75,updated:'✓',
+       weekUpdate:'本周完成决赛环节策划方案初稿，已确定7月28日决赛日期和场地候选方案',nextWeek:'1. 确认决赛评委名单\n2. 完成物料采购清单\n3. 场地布置方案定稿',
+       milestones:[{name:'初赛完成',status:'done'},{name:'决赛策划',status:'active'},{name:'决赛执行',status:'pending'},{name:'总结复盘',status:'pending'}]},
+      {name:'家庭日',type:'专项',module:'文化运营(活动)',status:'进行中',pct:60,updated:'✓',
+       weekUpdate:'场地确认完成，开始发放邀请函，预计参与人数200+人',nextWeek:'1. 确认参与人数\n2. 活动流程细化\n3. 物料准备',
+       milestones:[{name:'方案确认',status:'done'},{name:'场地预订',status:'done'},{name:'物料准备',status:'active'},{name:'活动执行',status:'pending'}]},
+      {name:'员工体检',type:'专项',module:'数字化运营(后台)',status:'未开始',pct:0,updated:'—',
+       weekUpdate:'—',nextWeek:'1. 对接体检供应商\n2. 确定体检方案',
+       milestones:[{name:'供应商对接',status:'pending'},{name:'方案确认',status:'pending'},{name:'员工通知',status:'pending'}]},
+      {name:'行政服务台',type:'日常',module:'数字化运营(行政服务台)',status:'进行中',updated:'✓',
+       weekUpdate:'本周工单57个，人工19个，机器人拦截38个，拦截率100%',nextWeek:'1. 持续优化拦截规则\n2. 跟进人工工单处理时效'},
+      {name:'公益内容运营',type:'日常',module:'文化运营(活动)',status:'进行中',updated:'✓',
+       weekUpdate:'完成3篇公益推文发布，阅读量合计1.2万',nextWeek:'1. 策划下期公益主题\n2. 联系公益机构'}
     ]
   },
   {
     week: 'W26', range: '2026.06.22 – 2026.06.28', submitted: true,
     items: [
-      {name:'福利关怀',type:'专项',module:'职场运营(北京)',status:'进行中',pct:65,updated:'✓'},
-      {name:'家庭日',type:'专项',module:'文化运营(活动)',status:'进行中',pct:45,updated:'✓'},
-      {name:'端午节礼品',type:'专项',module:'文化运营(福利)',status:'已完成',pct:100,updated:'✓'},
-      {name:'行政服务台',type:'日常',module:'数字化运营(行政服务台)',status:'进行中',updated:'✓'},
-      {name:'公益内容运营',type:'日常',module:'文化运营(活动)',status:'进行中',updated:'✓'}
+      {name:'福利关怀',type:'专项',module:'职场运营(北京)',status:'进行中',pct:65,updated:'✓',
+       weekUpdate:'完成初赛评选，确定5支队伍进入决赛',nextWeek:'1. 启动决赛策划\n2. 确定评委嘉宾',
+       milestones:[{name:'初赛完成',status:'done'},{name:'决赛策划',status:'active'},{name:'决赛执行',status:'pending'},{name:'总结复盘',status:'pending'}]},
+      {name:'家庭日',type:'专项',module:'文化运营(活动)',status:'进行中',pct:45,updated:'✓',
+       weekUpdate:'完成活动方案初稿，武汉场地确认',nextWeek:'1. 北京场地确认\n2. 开始物料准备',
+       milestones:[{name:'方案确认',status:'active'},{name:'场地预订',status:'done'},{name:'物料准备',status:'pending'},{name:'活动执行',status:'pending'}]},
+      {name:'端午节礼品',type:'专项',module:'文化运营(福利)',status:'已完成',pct:100,updated:'✓',
+       weekUpdate:'礼品已全部发放完毕，员工满意度95%',nextWeek:'—',
+       milestones:[{name:'方案确定',status:'done'},{name:'采购完成',status:'done'},{name:'发放完成',status:'done'}]},
+      {name:'行政服务台',type:'日常',module:'数字化运营(行政服务台)',status:'进行中',updated:'✓',
+       weekUpdate:'本周工单45个，人工15个，机器人拦截30个',nextWeek:'1. 优化拦截规则'},
+      {name:'公益内容运营',type:'日常',module:'文化运营(活动)',status:'进行中',updated:'✓',
+       weekUpdate:'完成2篇公益推文发布',nextWeek:'1. 策划下期主题'}
     ]
   },
   {
     week: 'W25', range: '2026.06.15 – 2026.06.21', submitted: true,
     items: [
-      {name:'福利关怀',type:'专项',module:'职场运营(北京)',status:'进行中',pct:50,updated:'✓'},
-      {name:'家庭日',type:'专项',module:'文化运营(活动)',status:'进行中',pct:30,updated:'✓'},
-      {name:'行政服务台',type:'日常',module:'数字化运营(行政服务台)',status:'进行中',updated:'✓'},
-      {name:'公益内容运营',type:'日常',module:'文化运营(活动)',status:'进行中',updated:'✓'}
+      {name:'福利关怀',type:'专项',module:'职场运营(北京)',status:'进行中',pct:50,updated:'✓',
+       weekUpdate:'完成参赛队伍报名，共19支战队',nextWeek:'1. 启动初赛评选',
+       milestones:[{name:'初赛完成',status:'active'},{name:'决赛策划',status:'pending'},{name:'决赛执行',status:'pending'},{name:'总结复盘',status:'pending'}]},
+      {name:'家庭日',type:'专项',module:'文化运营(活动)',status:'进行中',pct:30,updated:'✓',
+       weekUpdate:'完成活动方案初稿',nextWeek:'1. 武汉场地确认\n2. 北京场地选址',
+       milestones:[{name:'方案确认',status:'active'},{name:'场地预订',status:'pending'},{name:'物料准备',status:'pending'},{name:'活动执行',status:'pending'}]},
+      {name:'行政服务台',type:'日常',module:'数字化运营(行政服务台)',status:'进行中',updated:'✓',
+       weekUpdate:'本周工单38个，人工12个，机器人拦截26个',nextWeek:'1. 持续优化'},
+      {name:'公益内容运营',type:'日常',module:'文化运营(活动)',status:'进行中',updated:'✓',
+       weekUpdate:'完成1篇公益推文发布',nextWeek:'1. 策划下期主题'}
     ]
   }
 ];
@@ -3688,7 +3710,7 @@ function renderHistoryReport(){
   if(!el) return;
 
   let h = '';
-  HISTORY_REPORTS.forEach(report => {
+  HISTORY_REPORTS.forEach((report, rIdx) => {
     const projCount = report.items.filter(i => i.type === '专项').length;
     const dailyCount = report.items.filter(i => i.type === '日常').length;
     const updatedCount = report.items.filter(i => i.updated === '✓').length;
@@ -3701,25 +3723,72 @@ function renderHistoryReport(){
           <div style="font-size:11px;color:var(--t3)">已提交 • ${updatedCount}/${report.items.length} 已更新</div>
         </div>
         <div style="font-size:11px;color:var(--suc)">✓ 已提交</div>
-      </div>
-      <div style="padding-left:16px">`;
-
-    report.items.forEach(item => {
-      const isProject = item.type === '专项';
-      h += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdl)">
-        <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:${isProject ? 'var(--purL)' : 'var(--sucL)'};color:${isProject ? 'var(--pur)' : 'var(--suc)'}">${item.type}</span>
-        <span style="font-size:13px;font-weight:600;flex:1">${item.name}</span>
-        <span style="font-size:11px;color:var(--t3)">${item.module}</span>
-        <span style="font-size:11px;color:${item.status === '已完成' ? 'var(--suc)' : item.status === '进行中' ? 'var(--ac)' : 'var(--t3)'}">● ${item.status}</span>
-        ${item.pct !== undefined ? '<span style="font-size:11px;font-weight:600;color:var(--t1)">' + item.pct + '%</span>' : ''}
-        <span style="font-size:11px;color:${item.updated === '✓' ? 'var(--suc)' : 'var(--t3)'}">${item.updated === '✓' ? '✓ 已更新' : '— 未更新'}</span>
       </div>`;
+
+    report.items.forEach((item, iIdx) => {
+      const isProject = item.type === '专项';
+      const detailId = `history-detail-${rIdx}-${iIdx}`;
+
+      h += `<div style="background:var(--bg);border:1px solid var(--bdl);border-radius:10px;margin-bottom:8px;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer" onclick="toggleHistoryDetail('${detailId}')">
+          <span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:${isProject ? 'var(--purL)' : 'var(--sucL)'};color:${isProject ? 'var(--pur)' : 'var(--suc)'}">${item.type}</span>
+          <span style="font-size:14px;font-weight:600;flex:1">${item.name}</span>
+          <span style="font-size:11px;color:var(--t3)">${item.module}</span>
+          <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;background:${item.status === '已完成' ? 'var(--sucL)' : item.status === '进行中' ? 'var(--acl)' : 'var(--bg3)'};color:${item.status === '已完成' ? 'var(--suc)' : item.status === '进行中' ? 'var(--ac)' : 'var(--t3)'}">● ${item.status}</span>
+          ${item.pct !== undefined ? '<span style="font-size:12px;font-weight:700;color:var(--t1)">' + item.pct + '%</span>' : ''}
+          <span style="font-size:16px;color:var(--t3);margin-left:4px">▸</span>
+        </div>
+        <div id="${detailId}" style="display:none;padding:0 16px 16px;border-top:1px solid var(--bdl)">`;
+
+      // Week update
+      if(item.weekUpdate){
+        h += `<div style="margin-top:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;margin-bottom:6px">本周更新</div>
+          <div style="font-size:13px;color:var(--t2);line-height:1.6;padding:8px 12px;background:var(--bg2);border-radius:8px">${item.weekUpdate}</div>
+        </div>`;
+      }
+
+      // Next week plan
+      if(item.nextWeek && item.nextWeek !== '—'){
+        h += `<div style="margin-top:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;margin-bottom:6px">下周重点</div>
+          <div style="font-size:13px;color:var(--t2);line-height:1.6;padding:8px 12px;background:var(--bg2);border-radius:8px;white-space:pre-line">${item.nextWeek}</div>
+        </div>`;
+      }
+
+      // Milestones
+      if(item.milestones && item.milestones.length > 0){
+        h += `<div style="margin-top:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;margin-bottom:8px">里程碑</div>`;
+        item.milestones.forEach(m => {
+          const dotColor = m.status === 'done' ? 'var(--suc)' : m.status === 'active' ? 'var(--ac)' : 'var(--bdl)';
+          h += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+            <div style="width:10px;height:10px;border-radius:50%;background:${dotColor};flex-shrink:0"></div>
+            <span style="font-size:13px;color:var(--t1);flex:1">${m.name}</span>
+            <span style="font-size:11px;color:${m.status === 'done' ? 'var(--suc)' : m.status === 'active' ? 'var(--ac)' : 'var(--t3)'}">${m.status === 'done' ? '✓ 已完成' : m.status === 'active' ? '● 进行中' : '○ 未开始'}</span>
+          </div>`;
+        });
+        h += `</div>`;
+      }
+
+      h += `</div></div>`;
     });
 
-    h += `</div></div>`;
+    h += `</div>`;
   });
 
   el.innerHTML = h;
+}
+
+function toggleHistoryDetail(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+
+  // Toggle arrow
+  const parent = el.parentElement;
+  const arrow = parent.querySelector('[style*="margin-left:4px"]');
+  if(arrow) arrow.textContent = el.style.display === 'none' ? '▸' : '▾';
 }
 
 /* ══════ PANEL SWITCH ══════ */
