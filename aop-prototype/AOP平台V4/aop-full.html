@@ -1718,7 +1718,7 @@ body{font-family:'Microsoft YaHei','微软雅黑',-apple-system,sans-serif;backg
   <div class="p02-topbar">
     <div class="p02-breadcrumb">AOP / <strong>我的工作</strong></div>
     <div class="p02-topbar-actions">
-      <div class="p02-icon-btn" title="通知"><span>🔔</span><span class="dot"></span></div>
+      <div class="p02-icon-btn" title="通知" onclick="showNotifications()"><span>🔔</span><span class="dot" style="display:none"></span></div>
       <div class="p02-btn p02-btn-primary" onclick="openNewItemModal()">＋ 新建事项</div>
     </div>
   </div>
@@ -5462,10 +5462,57 @@ function toggleViewP06(v){
 
 /* ══════ P07: WEEKLY MEETING ══════ */
 let _p07Idx=0;
+// Submission tracking
+const _submittedPeople = {};
+
 function renderP07(){
+  // Calculate current week
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now - startOfYear) / (24*60*60*1000)) + 1;
+  const weekNum = Math.ceil(dayOfYear / 7);
+  const dayOfWeek = now.getDay() || 7;
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - dayOfWeek + 1);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  const formatDate = (d) => `${d.getMonth()+1}月${d.getDate()}日`;
+
+  // Update period display
+  const periodEl = document.querySelector('.p07-period');
+  if(periodEl){
+    periodEl.innerHTML = `
+      <div class="p07-period-label">📅 覆盖范围</div>
+      <div class="p07-period-range">${formatDate(weekStart)} — ${formatDate(weekEnd)}</div>
+      <div class="p07-period-dots">
+        <div class="p07-dot covered"></div>
+        <div class="p07-dot covered"></div>
+        <div class="p07-dot current"></div>
+      </div>`;
+  }
+
+  // Count submitted people
+  const submittedCount = Object.values(_submittedPeople).filter(v => v).length;
+  const totalCount = PEOPLE.length;
+
+  // Update submit board
+  const boardEl = document.querySelector('.p07-submit-board');
+  if(boardEl){
+    boardEl.innerHTML = `
+      <div class="p07-submit-title">提交进度</div>
+      <div class="p07-submit-bar"><div class="p07-submit-fill" style="width:${totalCount > 0 ? Math.round(submittedCount/totalCount*100) : 0}%"></div></div>
+      <div class="p07-submit-count">${submittedCount}/${totalCount} 已提交</div>
+      <button class="p07-remind-btn" onclick="sendRemind()">🔔 催更未提交</button>`;
+  }
+
+  // Render people list
   let ph='';
   PEOPLE.forEach((p,i)=>{
-    const badgs=(i===1?'<div class="p07-person-badge" style="background:var(--warnL);color:var(--warn)">1</div>':'')+(i===3?'<div class="p07-person-badge" style="background:var(--danL);color:var(--dan)">2</div>':'');
+    const isSubmitted = _submittedPeople[p.name] || false;
+    const statusBadge = isSubmitted ?
+      '<div class="p07-person-badge" style="background:var(--sucL);color:var(--suc)">✓</div>' :
+      '<div class="p07-person-badge" style="background:var(--warnL);color:var(--warn)">⏳</div>';
+    const badgs = statusBadge;
     ph+='<div class="p07-person'+(i===0?' act':'')+'" onclick="pickPerson('+i+',this)"><div class="p07-person-av" style="background:'+p.color+'">'+p.name[0]+'</div><div><div class="p07-person-name">'+p.name+'</div><div class="p07-person-role">'+p.role+'</div></div><div class="p07-person-badges">'+badgs+'</div></div>';
   });
   document.getElementById('p07PeopleList').innerHTML=ph;
@@ -5483,7 +5530,102 @@ function pickPerson(idx,el){
   });
   document.getElementById('p07ItemsPanel').innerHTML=h;
 }
-function sendRemind(){const b=document.querySelector('.p07-remind-btn');b.textContent='✓ 已发送';b.style.background='var(--ac)';b.style.color='#fff';b.disabled=true;setTimeout(()=>{b.innerHTML='🔔 催更未提交 →';b.style.background='';b.style.color='';b.disabled=false},2000)}
+// Notification system
+const _notifications = [];
+
+function updateNotificationBadge(){
+  const badge = document.querySelector('.p02-icon-btn .dot');
+  if(badge){
+    const unread = _notifications.filter(n => !n.read).length;
+    badge.style.display = unread > 0 ? 'block' : 'none';
+  }
+}
+
+function showNotifications(){
+  const overlay = document.createElement('div');
+  overlay.className = 'new-item-overlay show';
+  overlay.onclick = function(){ overlay.remove(); panel.remove(); };
+
+  const panel = document.createElement('div');
+  panel.className = 'new-item-modal show';
+  panel.style.cssText = 'width:400px;max-height:500px;';
+
+  let h = `<div class="new-item-head">
+    <div class="new-item-head-title">🔔 通知</div>
+    <button class="new-item-close" onclick="this.closest('.new-item-modal').remove();document.querySelector('.new-item-overlay.show').remove()">✕</button>
+  </div>`;
+  h += `<div class="new-item-body" style="padding:12px">`;
+
+  if(_notifications.length === 0){
+    h += `<div style="text-align:center;padding:40px;color:var(--t3)">
+      <div style="font-size:32px;margin-bottom:12px">🔔</div>
+      <div>暂无通知</div>
+    </div>`;
+  } else {
+    _notifications.forEach((n, idx) => {
+      h += `<div style="display:flex;gap:10px;padding:12px;border-bottom:1px solid var(--bdl);${n.read ? 'opacity:0.6' : ''}" onclick="markNotificationRead(${idx})">
+        <div style="width:8px;height:8px;border-radius:50%;background:${n.read ? 'var(--bdl)' : 'var(--ac)'};margin-top:6px;flex-shrink:0"></div>
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--t1);line-height:1.5">${n.message}</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:4px">${n.time}</div>
+        </div>
+      </div>`;
+    });
+  }
+
+  h += `</div>`;
+  panel.innerHTML = h;
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(panel);
+}
+
+function markNotificationRead(idx){
+  if(_notifications[idx]){
+    _notifications[idx].read = true;
+    updateNotificationBadge();
+  }
+}
+
+// Initialize notification badge click handler
+document.querySelector('.p02-icon-btn')?.addEventListener('click', showNotifications);
+
+function sendRemind(){
+  const unsubmitted = PEOPLE.filter(p => !_submittedPeople[p.name]);
+  if(unsubmitted.length === 0){
+    alert('所有人都已提交！');
+    return;
+  }
+
+  // Create notification
+  const now = new Date();
+  const weekNum = Math.ceil((Math.floor((now - new Date(now.getFullYear(), 0, 1)) / (24*60*60*1000)) + 1) / 7);
+
+  const notification = {
+    id: Date.now(),
+    type: 'remind',
+    message: `您有${unsubmitted.length}位同事尚未提交W${weekNum}周报`,
+    people: unsubmitted.map(p => p.name),
+    time: now.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'}),
+    read: false
+  };
+
+  _notifications.unshift(notification);
+  updateNotificationBadge();
+
+  // Show success message
+  const b = document.querySelector('.p07-remind-btn');
+  b.textContent = '✓ 已发送';
+  b.style.background = 'var(--ac)';
+  b.style.color = '#fff';
+  b.disabled = true;
+  setTimeout(() => {
+    b.innerHTML = '🔔 催更未提交';
+    b.style.background = '';
+    b.style.color = '';
+    b.disabled = false;
+  }, 2000);
+}
 function showPPT(){_showPPTIdx(_p07Idx)}
 let _pptIdx=0;
 function _showPPTIdx(idx){
