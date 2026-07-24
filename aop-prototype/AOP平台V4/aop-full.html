@@ -5462,8 +5462,52 @@ function toggleViewP06(v){
 
 /* ══════ P07: WEEKLY MEETING ══════ */
 let _p07Idx=0;
-// Submission tracking
+// Submission tracking - load from localStorage
 const _submittedPeople = {};
+
+function loadSubmissionState(){
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now - startOfYear) / (24*60*60*1000)) + 1;
+  const weekNum = Math.ceil(dayOfYear / 7);
+  const key = `meeting_submitted_${now.getFullYear()}_W${weekNum}`;
+
+  try {
+    const saved = localStorage.getItem(key);
+    if(saved){
+      const data = JSON.parse(saved);
+      Object.assign(_submittedPeople, data);
+    }
+  } catch(e){}
+
+  // Initialize default state for demo (some submitted, some not)
+  if(Object.keys(_submittedPeople).length === 0){
+    PEOPLE.forEach((p, i) => {
+      _submittedPeople[p.name] = i < 5; // First 5 people submitted
+    });
+    saveSubmissionState();
+  }
+}
+
+function saveSubmissionState(){
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now - startOfYear) / (24*60*60*1000)) + 1;
+  const weekNum = Math.ceil(dayOfYear / 7);
+  const key = `meeting_submitted_${now.getFullYear()}_W${weekNum}`;
+  localStorage.setItem(key, JSON.stringify(_submittedPeople));
+}
+
+// Load on init
+loadSubmissionState();
+
+function togglePersonSubmit(idx){
+  const p = PEOPLE[idx];
+  if(!p) return;
+  _submittedPeople[p.name] = !_submittedPeople[p.name];
+  saveSubmissionState();
+  renderP07();
+}
 
 function renderP07(){
   // Calculate current week
@@ -5510,10 +5554,9 @@ function renderP07(){
   PEOPLE.forEach((p,i)=>{
     const isSubmitted = _submittedPeople[p.name] || false;
     const statusBadge = isSubmitted ?
-      '<div class="p07-person-badge" style="background:var(--sucL);color:var(--suc)">✓</div>' :
-      '<div class="p07-person-badge" style="background:var(--warnL);color:var(--warn)">⏳</div>';
-    const badgs = statusBadge;
-    ph+='<div class="p07-person'+(i===0?' act':'')+'" onclick="pickPerson('+i+',this)"><div class="p07-person-av" style="background:'+p.color+'">'+p.name[0]+'</div><div><div class="p07-person-name">'+p.name+'</div><div class="p07-person-role">'+p.role+'</div></div><div class="p07-person-badges">'+badgs+'</div></div>';
+      '<div class="p07-person-badge" style="background:var(--sucL);color:var(--suc)">✓ 已提交</div>' :
+      '<div class="p07-person-badge" style="background:var(--warnL);color:#92400E">⏳ 未提交</div>';
+    ph+='<div class="p07-person'+(i===0?' act':'')+'" onclick="pickPerson('+i+',this)"><div class="p07-person-av" style="background:'+p.color+'">'+p.name[0]+'</div><div style="flex:1;min-width:0"><div class="p07-person-name">'+p.name+'</div><div class="p07-person-role">'+p.role+'</div></div><div class="p07-person-badges">'+statusBadge+'</div></div>';
   });
   document.getElementById('p07PeopleList').innerHTML=ph;
   pickPerson(0,document.querySelector('.p07-person'));
@@ -5597,34 +5640,45 @@ function sendRemind(){
     return;
   }
 
-  // Create notification
+  // Create targeted notifications for unsubmitted people only
   const now = new Date();
   const weekNum = Math.ceil((Math.floor((now - new Date(now.getFullYear(), 0, 1)) / (24*60*60*1000)) + 1) / 7);
 
-  const notification = {
-    id: Date.now(),
-    type: 'remind',
-    message: `您有${unsubmitted.length}位同事尚未提交W${weekNum}周报`,
-    people: unsubmitted.map(p => p.name),
-    time: now.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'}),
-    read: false
-  };
+  unsubmitted.forEach(p => {
+    const notification = {
+      id: Date.now() + Math.random(),
+      type: 'remind',
+      target: p.name,
+      message: `${p.name}，您本周(W${weekNum})的周报尚未提交，请尽快完成`,
+      time: now.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'}),
+      read: false
+    };
+    _notifications.unshift(notification);
+  });
 
-  _notifications.unshift(notification);
   updateNotificationBadge();
 
-  // Show success message
+  // Show success message with names
+  const names = unsubmitted.map(p => p.name).join('、');
   const b = document.querySelector('.p07-remind-btn');
   b.textContent = '✓ 已发送';
   b.style.background = 'var(--ac)';
   b.style.color = '#fff';
   b.disabled = true;
+
+  // Show toast
+  const msg = document.createElement('div');
+  msg.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--ac);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:999;box-shadow:var(--shL);max-width:350px';
+  msg.textContent = '✓ 已发送催更通知给：' + names;
+  document.body.appendChild(msg);
+  setTimeout(() => msg.remove(), 3000);
+
   setTimeout(() => {
     b.innerHTML = '🔔 催更未提交';
     b.style.background = '';
     b.style.color = '';
     b.disabled = false;
-  }, 2000);
+  }, 3000);
 }
 function showPPT(){_showPPTIdx(_p07Idx)}
 let _pptIdx=0;
