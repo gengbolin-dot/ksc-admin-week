@@ -3248,7 +3248,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
   <div class="slide-foot">
     <button class="btn" style="color:var(--dan);border:1px solid var(--dan);background:var(--bg);margin-right:auto" onclick="deleteItem()">🗑 删除事项</button>
     <button class="btn btn-ghost" onclick="closeSlide()">取消</button>
-    <button class="btn btn-ac" onclick="closeSlide()">保存更新</button>
+    <button class="btn btn-ac" onclick="saveSlide()">保存更新</button>
   </div>
 </div>
 
@@ -4872,10 +4872,10 @@ function openSlide(itemId){
   }
 
   // Editable week update
-  h+='<div class="field-group"><div class="field-group-label">本周更新</div><div class="editable" contenteditable="true" id="slideWeekUpdate">'+(it.weekUpdate||'待填写…')+'</div></div>';
+  h+='<div class="field-group"><div class="field-group-label">本周更新</div><div class="editable" contenteditable="true" id="slideWeekUpdate" onblur="saveEditable(this,\'weekUpdate\')">'+(it.weekUpdate||'待填写…')+'</div></div>';
 
   // Editable next week plan
-  h+='<div class="field-group"><div class="field-group-label">下周重点</div><div class="editable" contenteditable="true" id="slideNextWeek">'+(it.nextWeek||'待填写…')+'</div></div>';
+  h+='<div class="field-group"><div class="field-group-label">下周重点</div><div class="editable" contenteditable="true" id="slideNextWeek" onblur="saveEditable(this,\'nextWeek\')">'+(it.nextWeek||'待填写…')+'</div></div>';
 
   document.getElementById('slideBody').innerHTML=h;
 }
@@ -4965,6 +4965,65 @@ function updateSlideKpi(label, field, value){
   markItemEdited();
 }
 function closeSlide(){document.getElementById('slideOverlay').classList.remove('show');document.getElementById('slidePanel').classList.remove('show')}
+// Helper: save contenteditable field on blur
+function saveEditable(el, field){
+  const it = ITEMS.find(i=>i.id===window._slideItemId);
+  if(!it) return;
+  it[field] = el.textContent.trim();
+  markItemEdited();
+}
+// Save all editable fields from slide-over panel
+function saveSlide(){
+  const it = ITEMS.find(i=>i.id===window._slideItemId);
+  if(!it) return;
+
+  // Read contenteditable fields
+  const wuEl = document.getElementById('slideWeekUpdate');
+  const nwEl = document.getElementById('slideNextWeek');
+  if(wuEl) it.weekUpdate = wuEl.textContent.trim();
+  if(nwEl) it.nextWeek = nwEl.textContent.trim();
+
+  // Read select/input fields (in case onchange hasn't fired)
+  const typeSel = document.getElementById('slideTypeSelect');
+  const modSel = document.getElementById('slideModule');
+  const priSel = document.getElementById('slidePriority');
+  const statusSel = document.getElementById('slideStatus');
+  const dlInput = document.getElementById('slideDeadline');
+  const pctInput = document.getElementById('slidePct');
+
+  if(typeSel) it.type = typeSel.value;
+  if(modSel && modSel.value && modSel.value !== '__custom__') it.module = modSel.value;
+  if(priSel) it.priority = parseInt(priSel.value);
+  if(statusSel){
+    it.status = statusSel.value;
+    const labels = {'not-started':'未开始','in-progress':'进行中','procurement':'采购流程中','done':'已完成'};
+    it.statusLabel = labels[statusSel.value] || statusSel.value;
+  }
+  if(dlInput) it.deadline = dlInput.value;
+  if(pctInput) it.pct = parseInt(pctInput.value) || 0;
+
+  // Mark as updated
+  it.updated = new Date().toISOString().slice(5,10).replace('-','-');
+
+  // Update module color
+  const moduleColors = {'职场运营(北京)':'#3B5BDB','职场运营(武汉)':'#8B5CF6','职场运营(异地)':'#EC4899','文化运营(活动)':'#10B981','文化运营(福利)':'#F59E0B','数字化运营(行政服务台)':'#06B6D4','数字化运营(后台)':'#6366F1','总裁室支持':'#8B5CF6'};
+  if(it.module) it.modColor = moduleColors[it.module] || '#6366F1';
+  if(it.module){
+    const modBgs = {'职场运营(北京)':'#EBF0FF','职场运营(武汉)':'#F5F3FF','职场运营(异地)':'#FCE7F3','文化运营(活动)':'#ECFDF5','文化运营(福利)':'#FFFBEB','数字化运营(行政服务台)':'#ECFEFF','数字化运营(后台)':'#EEF0FE','总裁室支持':'#F5F3FF'};
+    it.modBg = modBgs[it.module] || '#EEF0FE';
+  }
+
+  // Trigger sync
+  markItemEdited();
+
+  // Re-render task list
+  renderP02();
+
+  // Close panel
+  closeSlide();
+
+  showToast('✓ 已保存「' + it.name + '」的更新');
+}
 // Delete item from ITEMS array
 function deleteItem(){
   const id = window._slideItemId;
