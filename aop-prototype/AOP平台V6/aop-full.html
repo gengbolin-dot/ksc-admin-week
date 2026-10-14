@@ -3246,6 +3246,7 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
   </div>
   <div class="slide-body" id="slideBody"></div>
   <div class="slide-foot">
+    <button class="btn" style="color:var(--dan);border:1px solid var(--dan);background:var(--bg);margin-right:auto" onclick="deleteItem()">🗑 删除事项</button>
     <button class="btn btn-ghost" onclick="closeSlide()">取消</button>
     <button class="btn btn-ac" onclick="closeSlide()">保存更新</button>
   </div>
@@ -4964,6 +4965,19 @@ function updateSlideKpi(label, field, value){
   markItemEdited();
 }
 function closeSlide(){document.getElementById('slideOverlay').classList.remove('show');document.getElementById('slidePanel').classList.remove('show')}
+// Delete item from ITEMS array
+function deleteItem(){
+  const id = window._slideItemId;
+  if(!id) return;
+  const it = ITEMS.find(i=>i.id===id);
+  if(!it) return;
+  if(!confirm('确定要删除「' + it.name + '」吗？此操作不可撤销。')) return;
+  const idx = ITEMS.findIndex(i=>i.id===id);
+  if(idx >= 0) ITEMS.splice(idx, 1);
+  closeSlide();
+  renderP02();
+  showToast('✓ 已删除「' + it.name + '」');
+}
 
 // New item modal functions
 function handleNewItemModule(select){
