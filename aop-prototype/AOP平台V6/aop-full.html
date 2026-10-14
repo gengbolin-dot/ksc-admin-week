@@ -201,13 +201,13 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
 .p02-tab.active{background:var(--t1);color:#fff;font-weight:700;border-color:var(--t1);box-shadow:0 2px 8px rgba(17,24,39,.15),0 1px 2px rgba(17,24,39,.08)}
 
 /* Filter bar */
-.p02-filter-bar{display:flex;align-items:center;gap:8px;padding:10px 40px 12px;background:var(--bg2);border-bottom:1px solid var(--bdl);flex-shrink:0}
+.p02-filter-bar{display:flex;align-items:center;gap:8px;padding:6px 40px 14px;background:transparent;border-bottom:none;flex-shrink:0}
 .p02-filter-chip{padding:5px 13px;border-radius:99px;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr);box-shadow:0 1px 2px rgba(17,24,39,.03)}
 .p02-filter-chip:hover{background:var(--bgH);border-color:var(--acl);color:var(--ac)}
 .p02-filter-chip.active{background:var(--acl);color:var(--ac);border-color:var(--acl);font-weight:700;box-shadow:0 2px 6px rgba(79,70,229,.12)}
 .p02-filter-chip .count{font-size:11px;color:var(--t3);margin-left:4px;font-variant-numeric:tabular-nums}
 .p02-filter-chip.active .count{color:var(--ac)}
-.p02-filter-right{margin-left:auto;font-size:12.5px;color:var(--t3)}
+.p02-filter-right{margin-left:auto;font-size:12px;color:var(--t3);font-weight:500;padding:5px 12px;border-radius:99px;background:var(--bg2)}
 
 /* Attachment area */
 .p02-attachments{margin-top:10px;padding-top:10px;border-top:1px solid var(--bdl)}
@@ -2197,14 +2197,6 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
   <div class="p02-tabs">
     <div class="p02-tab active">本周工作</div>
     <div class="p02-tab">历史周报</div>
-  </div>
-
-  <!-- Filter bar -->
-  <div class="p02-filter-bar">
-    <div class="p02-filter-chip active" onclick="filterTasks('all',this)">全部<span class="count" id="countAll">8</span></div>
-    <div class="p02-filter-chip" onclick="filterTasks('project',this)">重点专项<span class="count" id="countProject">5</span></div>
-    <div class="p02-filter-chip" onclick="filterTasks('daily',this)">日常运营<span class="count" id="countDaily">3</span></div>
-    <div class="p02-filter-right" id="p02UpdateStatus">已更新 5 / 8</div>
   </div>
 
   <!-- Task list (本周工作) — 内含 hero + bento + 任务，统一滚动 -->
@@ -4291,6 +4283,14 @@ function renderP02(){
   const dailyFiltered = filtered.filter(i => i.type === 'daily-ops');
 
   let h = '';
+
+  // Filter bar (inline, scrolls with content)
+  h += `<div class="p02-filter-bar">
+    <div class="p02-filter-chip ${_p02Filter==='all'?'active':''}" onclick="filterTasks('all',this)">全部<span class="count" id="countAll">${ITEMS.length}</span></div>
+    <div class="p02-filter-chip ${_p02Filter==='project'?'active':''}" onclick="filterTasks('project',this)">重点专项<span class="count" id="countProject">${ITEMS.filter(i=>i.type==='project').length}</span></div>
+    <div class="p02-filter-chip ${_p02Filter==='daily'?'active':''}" onclick="filterTasks('daily',this)">日常运营<span class="count" id="countDaily">${ITEMS.filter(i=>i.type==='daily-ops').length}</span></div>
+    <div class="p02-filter-right" id="p02UpdateStatus">已更新 ${ITEMS.filter(i=>i.updated&&i.updated!=='—').length} / ${ITEMS.length}</div>
+  </div>`;
 
   // 重点专项 group
   if(projFiltered.length > 0){
