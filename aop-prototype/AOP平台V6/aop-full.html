@@ -1953,6 +1953,66 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
 .iframe-error{text-align:center;padding:60px 20px;color:var(--dan)}
 .iframe-empty{text-align:center;padding:100px 20px;color:var(--t3)}
 
+/* ══════ P25: 总裁办文档 ══════ */
+.p25-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:var(--bg);border-bottom:1px solid var(--bdl);flex-shrink:0}
+.p25-topbar-left{display:flex;align-items:center;gap:12px}
+.p25-topbar-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#EEF0FE,#DDD6FE);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.p25-topbar-title{font-size:15px;font-weight:700;color:var(--t1);letter-spacing:-.01em}
+.p25-topbar-sub{font-size:11px;color:var(--t3);margin-top:1px}
+.p25-topbar-right{display:flex;gap:8px;align-items:center}
+.p25-tb-btn{font-size:12px;padding:6px 14px;border-radius:8px}
+.p25-scroll{padding:24px 32px;background:var(--bg2)}
+
+/* Doc module card */
+.p25-doc{background:var(--bg);border:1px solid var(--bdl);border-radius:14px;overflow:hidden;margin-bottom:16px;box-shadow:0 1px 3px rgba(17,24,39,.04),0 1px 2px rgba(17,24,39,.03);transition:box-shadow .2s}
+.p25-doc:hover{box-shadow:0 4px 12px rgba(17,24,39,.06),0 1px 4px rgba(17,24,39,.04)}
+.p25-doc-head{display:flex;align-items:center;gap:12px;padding:16px 20px;background:linear-gradient(135deg,var(--bg2),var(--bg));border-bottom:1px solid var(--bdl)}
+.p25-doc-icon{width:36px;height:36px;border-radius:9px;background:var(--acl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.p25-doc-title{font-size:15px;font-weight:700;color:var(--t1);letter-spacing:-.01em;flex:1}
+.p25-doc-actions{display:flex;gap:6px}
+.p25-doc-act{font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--bg);color:var(--t2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.p25-doc-act:hover{background:var(--bgH);color:var(--t1)}
+.p25-doc-act.danger{color:var(--dan)}
+.p25-doc-act.danger:hover{background:var(--danL);color:var(--dan)}
+
+/* Doc section (accordion) */
+.p25-sec{border-bottom:1px solid var(--bdl);transition:background .15s}
+.p25-sec:last-child{border-bottom:none}
+.p25-sec-head{display:flex;align-items:center;gap:10px;padding:12px 20px;cursor:pointer;transition:background .15s}
+.p25-sec-head:hover{background:var(--bg2)}
+.p25-sec-arrow{font-size:11px;color:var(--t3);transition:transform .2s;flex-shrink:0;width:14px;text-align:center}
+.p25-sec-arrow.open{transform:rotate(90deg)}
+.p25-sec-num{font-size:11px;font-weight:700;color:var(--ac);min-width:24px}
+.p25-sec-title{flex:1;font-size:13.5px;font-weight:600;color:var(--t1)}
+.p25-sec-actions{display:flex;gap:4px;opacity:0;transition:opacity .15s}
+.p25-sec-head:hover .p25-sec-actions{opacity:1}
+.p25-sec-act{font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid var(--bd);background:var(--bg);color:var(--t2);cursor:pointer;transition:all .15s}
+.p25-sec-act:hover{background:var(--bgH);color:var(--ac)}
+.p25-sec-act.danger{color:var(--dan)}
+.p25-sec-act.danger:hover{background:var(--danL)}
+.p25-sec-body{display:none;padding:4px 20px 20px}
+.p25-sec-body.open{display:block}
+
+/* Section content view */
+.p25-content{padding:16px 18px;background:var(--bg2);border-radius:10px;border:1px solid var(--bdl);font-size:13px;line-height:1.8;color:var(--t1);min-height:50px}
+.p25-content p{margin-bottom:8px}
+.p25-content p:last-child{margin-bottom:0}
+.p25-content:empty::before{content:'点击编辑添加内容...';color:var(--t3)}
+
+/* Section editor */
+.p25-edit-title{width:100%;padding:8px 12px;border:1px solid var(--ac);border-radius:8px;font-size:13px;font-weight:600;background:var(--bg);outline:none;margin-bottom:10px}
+.p25-edit-body{min-height:150px;padding:14px 16px;background:var(--bg);border:1px solid var(--ac);border-radius:10px;font-size:13px;line-height:1.8;color:var(--t1);outline:none}
+.p25-edit-bar{display:flex;gap:6px;padding:8px 0 12px;border-bottom:1px solid var(--bdl);margin-bottom:12px}
+.p25-edit-tool{font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--bg);color:var(--t2);cursor:pointer;transition:all .15s}
+.p25-edit-tool:hover{background:var(--bgH);color:var(--ac)}
+.p25-edit-foot{display:flex;gap:8px;justify-content:flex-end;padding-top:12px}
+
+/* Empty state */
+.p25-empty{text-align:center;padding:80px 20px}
+.p25-empty-icon{font-size:56px;margin-bottom:16px;opacity:.3}
+.p25-empty-title{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:8px}
+.p25-empty-desc{font-size:13px;color:var(--t3);margin-bottom:24px}
+
 </style>
 </head>
 <body>
@@ -3230,16 +3290,21 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
 
 <!-- ══════ PANEL 25: 总裁办文档管理 ══════ -->
 <div class="panel" id="p25">
-  <div class="topbar">
-    <div class="topbar-title">👔 总裁办 · 制度标准</div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button class="btn btn-ac" onclick="addDocModule()" style="font-size:12px;padding:4px 12px">＋ 添加模块</button>
-      <button class="btn btn-ghost" onclick="importDocContent()" style="font-size:12px;padding:4px 12px">📥 导入文档</button>
-      <button class="btn btn-ghost" onclick="exportDocContent()" style="font-size:12px;padding:4px 12px">📤 导出备份</button>
+  <div class="p25-topbar">
+    <div class="p25-topbar-left">
+      <div class="p25-topbar-icon">👔</div>
+      <div>
+        <div class="p25-topbar-title">总裁办 · 制度标准</div>
+        <div class="p25-topbar-sub">在线文档管理 · 支持自由编辑</div>
+      </div>
+    </div>
+    <div class="p25-topbar-right">
+      <button class="btn btn-ghost p25-tb-btn" onclick="importDocContent()">📥 导入</button>
+      <button class="btn btn-ghost p25-tb-btn" onclick="exportDocContent()">📤 导出</button>
+      <button class="btn btn-ac p25-tb-btn" onclick="addDocModule()">＋ 添加文档</button>
     </div>
   </div>
-  <div class="content-scroll" style="padding:24px" id="p25Content">
-    <!-- Document modules will be rendered here -->
+  <div class="content-scroll p25-scroll" id="p25Content">
   </div>
 </div>
 
@@ -15547,106 +15612,83 @@ function renderP25(){
   let h = '';
 
   if(_docModules.length === 0){
-    h = `<div style="text-align:center;padding:80px 20px;color:var(--t3)">
-      <div style="font-size:64px;margin-bottom:20px">📄</div>
-      <div style="font-size:18px;font-weight:600;color:var(--t1);margin-bottom:12px">暂无制度文档</div>
-      <div style="font-size:14px;margin-bottom:24px">点击"添加模块"创建新的制度文档，或导入现有文档</div>
-      <div style="display:flex;gap:12px;justify-content:center">
-        <button class="btn btn-ac" onclick="addDocModule()">＋ 添加模块</button>
-        <button class="btn btn-ghost" onclick="importDocContent()">📥 导入文档</button>
-      </div>
-    </div>`;
+    h = '<div class="p25-empty"><div class="p25-empty-icon">📄</div><div class="p25-empty-title">暂无制度文档</div><div class="p25-empty-desc">点击"添加文档"创建新的制度文档，或导入现有文档</div><div style="display:flex;gap:12px;justify-content:center"><button class="btn btn-ac" onclick="addDocModule()">＋ 添加文档</button><button class="btn btn-ghost" onclick="importDocContent()">📥 导入文档</button></div></div>';
   } else {
-    _docModules.forEach((doc, docIdx) => {
-      h += `<div class="doc-module" id="docModule${docIdx}" style="margin-bottom:24px;background:var(--bg);border:1px solid var(--bdl);border-radius:12px;overflow:hidden">`;
+    _docModules.forEach(function(doc, docIdx){
+      h += '<div class="p25-doc" id="docModule' + docIdx + '">';
       // Module header
-      h += `<div style="display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--bg2);border-bottom:1px solid var(--bdl)">`;
-      h += `<div style="font-size:24px">${doc.icon}</div>`;
-      h += `<div style="flex:1"><div style="font-size:16px;font-weight:700;color:var(--t1)">${doc.title}</div></div>`;
-      h += `<div style="display:flex;gap:6px">`;
-      h += `<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px" onclick="editDocTitle(${docIdx})">✏️ 编辑标题</button>`;
-      h += `<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px" onclick="addDocSection(${docIdx})">＋ 添加章节</button>`;
-      h += `<button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;color:var(--dan)" onclick="deleteDocModule(${docIdx})">🗑️ 删除模块</button>`;
-      h += `</div></div>`;
+      h += '<div class="p25-doc-head"><div class="p25-doc-icon">' + doc.icon + '</div><div class="p25-doc-title">' + doc.title + '</div><div class="p25-doc-actions">';
+      h += '<button class="p25-doc-act" onclick="editDocTitle(' + docIdx + ')">✏️ 编辑标题</button>';
+      h += '<button class="p25-doc-act" onclick="addDocSection(' + docIdx + ')">＋ 添加章节</button>';
+      h += '<button class="p25-doc-act danger" onclick="deleteDocModule(' + docIdx + ')">🗑️ 删除</button>';
+      h += '</div></div>';
 
       // Sections
-      doc.sections.forEach((sec, secIdx) => {
-        const isEditing = _editingSection && _editingSection.docIdx === docIdx && _editingSection.secIdx === secIdx;
-        const secId = `docSec${docIdx}_${secIdx}`;
+      doc.sections.forEach(function(sec, secIdx){
+        var isEditing = _editingSection && _editingSection.docIdx === docIdx && _editingSection.secIdx === secIdx;
+        var secId = 'docSec' + docIdx + '_' + secIdx;
 
-        h += `<div class="doc-section" id="${secId}" style="border-bottom:1px solid var(--bdl)">`;
+        h += '<div class="p25-sec" id="' + secId + '">';
         // Section header
-        h += `<div style="display:flex;align-items:center;gap:8px;padding:12px 20px;background:var(--bg);cursor:pointer" onclick="toggleDocSection(this)">`;
-        h += `<div style="font-size:12px;color:var(--t3);transition:transform .2s" class="doc-arrow">▸</div>`;
-        h += `<div style="flex:1;font-size:14px;font-weight:600;color:var(--t1)">${sec.title}</div>`;
-        h += `<div style="display:flex;gap:4px">`;
+        h += '<div class="p25-sec-head" onclick="toggleDocSection(this)"><div class="p25-sec-arrow">▸</div><div class="p25-sec-num">' + (secIdx+1) + '</div><div class="p25-sec-title">' + sec.title + '</div><div class="p25-sec-actions">';
         if(!isEditing){
-          h += `<button class="btn btn-ghost" style="font-size:11px;padding:2px 8px" onclick="event.stopPropagation();startEditSection(${docIdx},${secIdx})">✏️ 编辑</button>`;
+          h += '<button class="p25-sec-act" onclick="event.stopPropagation();startEditSection(' + docIdx + ',' + secIdx + ')">✏️ 编辑</button>';
         }
-        h += `<button class="btn btn-ghost" style="font-size:11px;padding:2px 8px;color:var(--dan)" onclick="event.stopPropagation();deleteDocSection(${docIdx},${secIdx})">✕ 删除</button>`;
-        h += `</div></div>`;
+        h += '<button class="p25-sec-act danger" onclick="event.stopPropagation();deleteDocSection(' + docIdx + ',' + secIdx + ')">✕ 删除</button>';
+        h += '</div></div>';
 
         // Section body
-        h += `<div class="doc-section-body" style="display:none;padding:0 20px 16px">`;
+        h += '<div class="p25-sec-body">';
         if(isEditing){
-          // Edit mode
-          h += `<div style="margin-bottom:8px">`;
-          h += `<label style="font-size:12px;color:var(--t3);display:block;margin-bottom:4px">章节标题</label>`;
-          h += `<input class="new-item-input" id="secTitleInput" value="${sec.title}" style="font-weight:600" placeholder="章节标题">`;
-          h += `</div>`;
-          h += `<div style="margin-bottom:8px">`;
-          h += `<label style="font-size:12px;color:var(--t3);display:block;margin-bottom:4px">章节内容</label>`;
-          h += `<div class="doc-editor" id="secEditor" contenteditable="true" style="min-height:150px;padding:12px;background:var(--bg);border:1px solid var(--ac);border-radius:8px;font-size:13px;line-height:1.8;color:var(--t1);outline:none">${sec.content}</div>`;
-          h += `</div>`;
-          h += `<div style="display:flex;gap:8px;justify-content:flex-end;padding-top:12px;border-top:1px solid var(--bdl)">`;
-          h += `<button class="btn btn-ghost" onclick="cancelEditSection()">取消</button>`;
-          h += `<button class="btn btn-ac" onclick="saveDocSection()">💾 保存</button>`;
-          h += `</div>`;
+          h += '<input class="p25-edit-title" id="secTitleInput" value="' + sec.title.split('"').join('&quot;') + '" placeholder="章节标题">';
+          h += '<div class="p25-edit-bar">';
+          h += '<button class="p25-edit-tool" onclick="document.execCommand(\'bold\')"><b>B</b></button>';
+          h += '<button class="p25-edit-tool" onclick="document.execCommand(\'underline\')"><u>U</u></button>';
+          h += '<button class="p25-edit-tool" onclick="document.execCommand(\'insertUnorderedList\')">• 列表</button>';
+          h += '<button class="p25-edit-tool" onclick="document.execCommand(\'insertOrderedList\')">1. 序号</button>';
+          h += '</div>';
+          h += '<div class="p25-edit-body" id="secEditor" contenteditable="true">' + sec.content + '</div>';
+          h += '<div class="p25-edit-foot"><button class="btn btn-ghost" onclick="cancelEditSection()">取消</button><button class="btn btn-ac" onclick="saveDocSection()">💾 保存</button></div>';
         } else {
-          // View mode
-          h += `<div class="doc-view" style="padding:16px;background:var(--bg);border:1px solid var(--bdl);border-radius:8px;font-size:13px;line-height:1.8;color:var(--t1);min-height:60px">${sec.content}</div>`;
+          h += '<div class="p25-content">' + sec.content + '</div>';
         }
-        h += `</div></div>`;
+        h += '</div></div>';
       });
 
-      h += `</div>`;
+      h += '</div>';
     });
   }
 
   el.innerHTML = h;
-  // Bind click handler to pending pill (more reliable than inline onclick)
-  var pp = el.querySelector('.p02-update-pill.pending');
-  if(pp) pp.addEventListener('click', scrollToPending);
 
-  // Auto expand section being edited or first section
+  // Auto expand section being edited or first section of first doc
   if(_editingSection){
-    const secId = `docSec${_editingSection.docIdx}_${_editingSection.secIdx}`;
-    const section = document.getElementById(secId);
+    var secId = 'docSec' + _editingSection.docIdx + '_' + _editingSection.secIdx;
+    var section = document.getElementById(secId);
     if(section){
-      const body = section.querySelector('.doc-section-body');
-      const arrow = section.querySelector('.doc-arrow');
-      if(body) body.style.display = 'block';
-      if(arrow) arrow.style.transform = 'rotate(90deg)';
+      var body = section.querySelector('.p25-sec-body');
+      var arrow = section.querySelector('.p25-sec-arrow');
+      if(body) body.classList.add('open');
+      if(arrow) arrow.classList.add('open');
     }
   } else {
-    const firstSection = el.querySelector('.doc-section-body');
-    if(firstSection){
-      firstSection.style.display = 'block';
-      const arrow = firstSection.parentElement.querySelector('.doc-arrow');
-      if(arrow) arrow.style.transform = 'rotate(90deg)';
+    var firstBody = el.querySelector('.p25-sec-body');
+    if(firstBody){
+      firstBody.classList.add('open');
+      var arrow = firstBody.parentElement.querySelector('.p25-sec-arrow');
+      if(arrow) arrow.classList.add('open');
     }
   }
 }
-
 function toggleDocSection(header){
-  const body = header.nextElementSibling;
-  const arrow = header.querySelector('.doc-arrow');
-  if(body.style.display === 'none'){
-    body.style.display = 'block';
-    if(arrow) arrow.style.transform = 'rotate(90deg)';
+  var body = header.nextElementSibling;
+  var arrow = header.querySelector('.p25-sec-arrow');
+  if(body.classList.contains('open')){
+    body.classList.remove('open');
+    if(arrow) arrow.classList.remove('open');
   } else {
-    body.style.display = 'none';
-    if(arrow) arrow.style.transform = '';
+    body.classList.add('open');
+    if(arrow) arrow.classList.add('open');
   }
 }
 
