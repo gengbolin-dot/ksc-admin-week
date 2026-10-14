@@ -207,7 +207,11 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
 .p02-filter-chip.active{background:var(--acl);color:var(--ac);border-color:var(--acl);font-weight:700;box-shadow:0 2px 6px rgba(79,70,229,.12)}
 .p02-filter-chip .count{font-size:11px;color:var(--t3);margin-left:4px;font-variant-numeric:tabular-nums}
 .p02-filter-chip.active .count{color:var(--ac)}
-.p02-filter-right{margin-left:auto;font-size:12px;color:var(--t3);font-weight:500;padding:5px 12px;border-radius:99px;background:var(--bg2)}
+.p02-update-pills{margin-left:auto;display:flex;align-items:center;gap:6px}
+.p02-update-pill{font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:99px;display:inline-flex;align-items:center;gap:4px;transition:all var(--tr)}
+.p02-update-pill.done{background:var(--sucL);color:var(--suc)}
+.p02-update-pill.pending{background:var(--warnL);color:#B45309;cursor:pointer;border:1px solid transparent}
+.p02-update-pill.pending:hover{background:#FDE68A;border-color:#F59E0B;box-shadow:0 2px 6px rgba(245,158,11,.2);transform:translateY(-1px)}
 
 /* Attachment area */
 .p02-attachments{margin-top:10px;padding-top:10px;border-top:1px solid var(--bdl);max-height:0;overflow:hidden;opacity:0;transition:all .3s ease}
@@ -4293,7 +4297,7 @@ function renderP02(){
     <div class="p02-filter-chip ${_p02Filter==='all'?'active':''}" onclick="filterTasks('all',this)">全部<span class="count" id="countAll">${ITEMS.length}</span></div>
     <div class="p02-filter-chip ${_p02Filter==='project'?'active':''}" onclick="filterTasks('project',this)">重点专项<span class="count" id="countProject">${ITEMS.filter(i=>i.type==='project').length}</span></div>
     <div class="p02-filter-chip ${_p02Filter==='daily'?'active':''}" onclick="filterTasks('daily',this)">日常运营<span class="count" id="countDaily">${ITEMS.filter(i=>i.type==='daily-ops').length}</span></div>
-    <div class="p02-filter-right" id="p02UpdateStatus">已更新 ${ITEMS.filter(i=>i.updated&&i.updated!=='—').length} / ${ITEMS.length}</div>
+    <div class="<div class="p02-update-pills"><span class="p02-update-pill done">✓ 已更新 <span id="updDone">${ITEMS.filter(i=>i.updated&&i.updated!=='—').length}</span></span><span class="p02-update-pill pending" onclick="scrollToPending()">⚠️ 待更新 <span id="updPending">${ITEMS.filter(i=>!i.updated||i.updated==='—').length}</span></span></div>
   </div>`;
 
   // 重点专项 group
@@ -4408,7 +4412,11 @@ function renderP02(){
   if(countAll) countAll.textContent = allCount;
   if(countProject) countProject.textContent = projCount;
   if(countDaily) countDaily.textContent = dailyCount;
-  if(updateStatus) updateStatus.textContent = `已更新 ${updatedCount} / ${allCount}`;
+  // Update pills handled in render HTML
+  const updDone = document.getElementById('updDone');
+  const updPending = document.getElementById('updPending');
+  if(updDone) updDone.textContent = updatedCount;
+  if(updPending) updPending.textContent = allCount - updatedCount;
 }
 
 function getDueStatus(item){
@@ -4435,7 +4443,50 @@ function filterTasks(type, el){
 }
 
 // Attachment handling
-const _attachments = {}; // Store attachments per task
+const _attachments = {}
+// Scroll to first pending (not updated) task and highlight it
+function scrollToPending(){
+  const pending = ITEMS.filter(i => !i.updated || i.updated === '—');
+  if(pending.length === 0){
+    showToast('✓ 本周全部事项已更新');
+    return;
+  }
+
+  // Find the first pending task card in DOM
+  const cards = document.querySelectorAll('.p02-task-card');
+  let targetCard = null;
+  let pendingNames = [];
+
+  cards.forEach(card => {
+    const titleEl = card.querySelector('.p02-task-title');
+    if(!titleEl) return;
+    const name = titleEl.textContent.trim();
+    const item = ITEMS.find(i => i.name === name);
+    if(item && (!item.updated || item.updated === '—')){
+      if(!targetCard) targetCard = card;
+      pendingNames.push(name);
+    }
+  });
+
+  if(targetCard){
+    // Scroll into view
+    targetCard.scrollIntoView({behavior:'smooth', block:'center'});
+    // Highlight with pulse animation
+    targetCard.style.transition = 'all .3s';
+    targetCard.style.boxShadow = '0 0 0 3px var(--warn), 0 8px 24px rgba(245,158,11,.15)';
+    targetCard.style.borderColor = 'var(--warn)';
+    setTimeout(() => {
+      targetCard.style.boxShadow = '';
+      targetCard.style.borderColor = '';
+    }, 2500);
+
+    // Show toast with pending list
+    const names = pendingNames.length <= 3
+      ? pendingNames.join('、')
+      : pendingNames.slice(0,3).join('、') + ' 等' + pendingNames.length + '项';
+    showToast('⚠️ 待更新 ' + pendingNames.length + ' 项：' + names);
+  }
+}; // Store attachments per task
 
 // Load attachments from localStorage on page load
 function loadAllAttachments(){
