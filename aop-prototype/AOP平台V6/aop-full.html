@@ -138,25 +138,25 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
 .content-scroll{flex:1;overflow-y:auto;overflow-x:auto;background:var(--bg2);min-height:0}
 
 /* ══════ PANEL 02: MY WORK (redesigned) ══════ */
-.p02-topbar{display:flex;align-items:center;gap:14px;padding:12px 40px;background:rgba(30,27,58,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;position:sticky;top:0;z-index:10}
-.p02-breadcrumb{font-size:13px;color:rgba(255,255,255,.55);font-weight:500}
-.p02-breadcrumb strong{color:#fff;font-weight:700}
+.p02-topbar{display:flex;align-items:center;gap:14px;padding:12px 40px;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--bdl);flex-shrink:0;position:sticky;top:0;z-index:10}
+.p02-breadcrumb{font-size:13px;color:var(--t3);font-weight:500}
+.p02-breadcrumb strong{color:var(--t1);font-weight:700}
 .p02-topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
-.p02-icon-btn{width:32px;height:32px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:rgba(255,255,255,.8);transition:all var(--tr);position:relative}
-.p02-icon-btn:hover{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.2)}
-.p02-icon-btn .dot{position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:#F87171;box-shadow:0 0 0 2px #1E1B3A}
+.p02-icon-btn{width:32px;height:32px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--t2);transition:all var(--tr);position:relative}
+.p02-icon-btn:hover{background:var(--bgH);color:var(--ac);border-color:var(--acl)}
+.p02-icon-btn .dot{position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:#F87171;box-shadow:0 0 0 2px var(--bg)}
 .p02-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all var(--tr);white-space:nowrap}
-.p02-btn-ghost{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.85)}
-.p02-btn-ghost:hover{background:rgba(255,255,255,.12);color:#fff}
-.p02-btn-primary{background:#fff;color:#4F46E5;box-shadow:0 4px 12px rgba(0,0,0,.25),0 1px 3px rgba(0,0,0,.1)}
-.p02-btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.p02-btn-ghost{background:var(--bg);border-color:var(--bd);color:var(--t2)}
+.p02-btn-ghost:hover{background:var(--bgH);color:var(--ac);border-color:var(--acl)}
+.p02-btn-primary{background:linear-gradient(135deg,#4F46E5,#6366F1);color:#fff;box-shadow:0 2px 8px rgba(79,70,229,.25),0 1px 2px rgba(79,70,229,.15)}
+.p02-btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(79,70,229,.3),0 1px 3px rgba(79,70,229,.2)}
 
 /* Week period card */
 .p02-period-card{margin:0;padding:0;background:transparent;border:none;border-radius:0;display:block;flex-shrink:0}
 /* Hero 欢迎区 — 深 indigo 实色 + 网格质感（非渐变） */
-.p02-hero{position:relative;padding:28px 40px 24px;background:#1E1B3A;overflow:hidden;flex-shrink:0}
-.p02-hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:32px 32px;mask-image:radial-gradient(ellipse 85% 65% at 70% 25%,#000 30%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse 85% 65% at 70% 25%,#000 30%,transparent 75%)}
-.p02-hero::after{content:'';position:absolute;top:-40%;right:-8%;width:440px;height:440px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,.3) 0%,rgba(79,70,229,.1) 45%,transparent 70%);pointer-events:none;filter:blur(20px)}
+.p02-hero{position:relative;padding:32px 40px 28px;background:linear-gradient(135deg,#1E1B3A 0%,#312E81 45%,#3730A3 100%);overflow:hidden;flex-shrink:0;border-radius:0 0 20px 20px;margin:0 0 14px}
+.p02-hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:40px 40px;mask-image:radial-gradient(ellipse 80% 60% at 65% 20%,#000 20%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse 80% 60% at 65% 20%,#000 20%,transparent 70%)}
+.p02-hero::after{content:'';position:absolute;top:-50%;right:-10%;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(129,140,248,.25) 0%,rgba(99,102,241,.08) 50%,transparent 75%);pointer-events:none;filter:blur(30px)}
 .p02-hero-content{position:relative;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;width:100%}
 .p02-hero-left{flex:1;min-width:280px}
 .p02-hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:600;color:rgba(255,255,255,.75);letter-spacing:.1em;margin-bottom:10px;padding:4px 11px;border-radius:99px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}
