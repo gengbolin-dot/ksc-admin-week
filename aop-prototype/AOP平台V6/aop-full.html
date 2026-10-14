@@ -4452,7 +4452,7 @@ function scrollToPending(){
     return;
   }
 
-  // Find the first pending task card in DOM
+  // Find all pending task cards in DOM
   const cards = document.querySelectorAll('.p02-task-card');
   let targetCard = null;
   let pendingNames = [];
@@ -4469,16 +4469,28 @@ function scrollToPending(){
   });
 
   if(targetCard){
-    // Scroll into view
-    targetCard.scrollIntoView({behavior:'smooth', block:'center'});
+    // Scroll the content container (not the browser window)
+    const scrollContainer = document.getElementById('p02TaskList');
+    if(scrollContainer){
+      // Calculate offset relative to scroll container
+      let offset = 0;
+      let el = targetCard;
+      while(el && el !== scrollContainer){
+        offset += el.offsetTop;
+        el = el.offsetParent;
+        if(!el) break;
+      }
+      scrollContainer.scrollTo({top: Math.max(0, offset - 80), behavior:'smooth'});
+    }
+
     // Highlight with pulse animation
     targetCard.style.transition = 'all .3s';
-    targetCard.style.boxShadow = '0 0 0 3px var(--warn), 0 8px 24px rgba(245,158,11,.15)';
-    targetCard.style.borderColor = 'var(--warn)';
+    targetCard.style.boxShadow = '0 0 0 3px #F59E0B, 0 8px 24px rgba(245,158,11,.2)';
+    targetCard.style.borderColor = '#F59E0B';
     setTimeout(() => {
       targetCard.style.boxShadow = '';
       targetCard.style.borderColor = '';
-    }, 2500);
+    }, 3000);
 
     // Show toast with pending list
     const names = pendingNames.length <= 3
