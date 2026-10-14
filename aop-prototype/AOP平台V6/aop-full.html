@@ -4446,57 +4446,57 @@ function filterTasks(type, el){
 const _attachments = {}
 // Scroll to first pending (not updated) task and highlight it
 function scrollToPending(){
-  const pending = ITEMS.filter(i => !i.updated || i.updated === '—');
-  if(pending.length === 0){
-    showToast('✓ 本周全部事项已更新');
-    return;
-  }
-
-  // Find all pending task cards in DOM
-  const cards = document.querySelectorAll('.p02-task-card');
-  let targetCard = null;
-  let pendingNames = [];
-
-  cards.forEach(card => {
-    const titleEl = card.querySelector('.p02-task-title');
-    if(!titleEl) return;
-    const name = titleEl.textContent.trim();
-    const item = ITEMS.find(i => i.name === name);
-    if(item && (!item.updated || item.updated === '—')){
-      if(!targetCard) targetCard = card;
-      pendingNames.push(name);
+  try {
+    const pending = ITEMS.filter(i => !i.updated || i.updated === '—');
+    if(pending.length === 0){
+      showToast('✓ 本周全部事项已更新');
+      return;
     }
-  });
 
-  if(targetCard){
-    // Scroll the content container (not the browser window)
-    const scrollContainer = document.getElementById('p02TaskList');
-    if(scrollContainer){
-      // Calculate offset relative to scroll container
-      let offset = 0;
-      let el = targetCard;
-      while(el && el !== scrollContainer){
-        offset += el.offsetTop;
-        el = el.offsetParent;
-        if(!el) break;
+    // Find all pending task cards in DOM
+    const cards = document.querySelectorAll('.p02-task-card');
+    let targetCard = null;
+    let pendingNames = [];
+
+    cards.forEach(card => {
+      const titleEl = card.querySelector('.p02-task-title');
+      if(!titleEl) return;
+      const name = titleEl.textContent.trim();
+      const item = ITEMS.find(i => i.name === name);
+      if(item && (!item.updated || item.updated === '—')){
+        if(!targetCard) targetCard = card;
+        pendingNames.push(name);
       }
-      scrollContainer.scrollTo({top: Math.max(0, offset - 80), behavior:'smooth'});
+    });
+
+    if(targetCard){
+      // Use getBoundingClientRect to find position relative to scroll container
+      const scrollContainer = document.getElementById('p02TaskList');
+      if(scrollContainer){
+        const containerRect = scrollContainer.getBoundingClientRect();
+        const cardRect = targetCard.getBoundingClientRect();
+        const relativeTop = cardRect.top - containerRect.top + scrollContainer.scrollTop;
+        // Direct set scrollTop for reliability
+        scrollContainer.scrollTop = Math.max(0, relativeTop - 80);
+      }
+
+      // Highlight with pulse animation
+      targetCard.style.transition = 'box-shadow .3s, border-color .3s';
+      targetCard.style.boxShadow = '0 0 0 3px #F59E0B, 0 8px 24px rgba(245,158,11,.2)';
+      targetCard.style.borderColor = '#F59E0B';
+      setTimeout(() => {
+        targetCard.style.boxShadow = '';
+        targetCard.style.borderColor = '';
+      }, 3000);
+
+      // Show toast with pending list
+      const names = pendingNames.length <= 3
+        ? pendingNames.join('、')
+        : pendingNames.slice(0,3).join('、') + ' 等' + pendingNames.length + '项';
+      showToast('⚠️ 待更新 ' + pendingNames.length + ' 项：' + names);
     }
-
-    // Highlight with pulse animation
-    targetCard.style.transition = 'all .3s';
-    targetCard.style.boxShadow = '0 0 0 3px #F59E0B, 0 8px 24px rgba(245,158,11,.2)';
-    targetCard.style.borderColor = '#F59E0B';
-    setTimeout(() => {
-      targetCard.style.boxShadow = '';
-      targetCard.style.borderColor = '';
-    }, 3000);
-
-    // Show toast with pending list
-    const names = pendingNames.length <= 3
-      ? pendingNames.join('、')
-      : pendingNames.slice(0,3).join('、') + ' 等' + pendingNames.length + '项';
-    showToast('⚠️ 待更新 ' + pendingNames.length + ' 项：' + names);
+  } catch(e) {
+    console.error('scrollToPending error:', e);
   }
 }; // Store attachments per task
 
@@ -15837,6 +15837,30 @@ function exportDocContent(){
   document.body.appendChild(msg);
   setTimeout(() => msg.remove(), 2000);
 }
+
+/* ══════ WEEK RESET: 每周自动重置更新状态 ══════ */
+(function(){
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now - startOfYear) / (24*60*60*1000)) + 1;
+  const weekNum = Math.ceil(dayOfYear / 7);
+  const weekKey = 'current_week_' + now.getFullYear();
+
+  // Check if we are in a new week
+  const storedWeek = localStorage.getItem(weekKey);
+  const currentWeekStr = String(weekNum);
+
+  if(storedWeek !== currentWeekStr){
+    // New week detected: reset all items to pending (updated='—')
+    // But preserve completed/archived items
+    ITEMS.forEach(item => {
+      if(item.status !== 'done'){
+        item.updated = '—';
+      }
+    });
+    localStorage.setItem(weekKey, currentWeekStr);
+  }
+})();
 
 /* ══════ INIT ══════ */
 mountSidebarIcons(); // 把侧栏 data-ic 占位替换为统一描线 SVG 图标
