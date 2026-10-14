@@ -4434,18 +4434,29 @@ function renderP02(){
 
 function getDueStatus(item){
   if(!item.deadline || item.status === 'done') return {text:'已完成', class:''};
-  // Simulate some statuses for demo
-  if(item.id === 2) return {text:'今日截止', class:'today'};
-  if(item.id === 5) return {text:'逾期3天', class:'overdue'};
+  var parts = item.deadline.split('-');
+  if(parts.length < 2) return {text:'', class:''};
+  var dlDate = new Date(new Date().getFullYear(), parseInt(parts[0])-1, parseInt(parts[1]));
+  var now = new Date();
+  now.setHours(0,0,0,0);
+  dlDate.setHours(0,0,0,0);
+  var diff = Math.round((dlDate - now) / (24*60*60*1000));
+  if(diff < 0) return {text:'逾期'+(-diff)+'天', class:'overdue'};
+  if(diff === 0) return {text:'今日截止', class:'today'};
+  if(diff === 1) return {text:'明日截止', class:'today'};
   return {text:'', class:''};
 }
 
 function getStatusBadge(item){
   if(item.status === 'done') return '<div class="p02-task-badge p02-badge-success">✓ 已归档</div>';
-  if(item.id === 2) return '<div class="p02-task-badge p02-badge-warn">⚠️ 本周未更新</div>';
-  if(item.id === 5) return '<div class="p02-task-badge p02-badge-danger">📌 已逾期</div>';
+  var isUpdated = item.updated && item.updated !== '—';
+  if(!isUpdated){
+    if(item.deadline && item.status !== 'done'){var parts=item.deadline.split('-');var dlDate=new Date(new Date().getFullYear(),parseInt(parts[0])-1,parseInt(parts[1]));var now=new Date();now.setHours(0,0,0,0);if(dlDate<now) return '<div class="p02-task-badge p02-badge-danger">📌 已逾期</div>';}
+    if(item.risk) return '<div class="p02-task-badge p02-badge-warn">⚠️ 风险</div>';
+    return '<div class="p02-task-badge p02-badge-warn">⚠️ 本周未更新</div>';
+  }
   if(item.risk) return '<div class="p02-task-badge p02-badge-warn">⚠️ 风险</div>';
-  return '<div class="p02-task-badge p02-badge-neutral">本周未更新</div>';
+  return '<div class="p02-task-badge p02-badge-success">✓ 本周已更新</div>';
 }
 
 function filterTasks(type, el){
