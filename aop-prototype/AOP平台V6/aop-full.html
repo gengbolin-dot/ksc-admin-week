@@ -212,6 +212,9 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
 .p02-update-pill.done{background:var(--sucL);color:var(--suc)}
 .p02-update-pill.pending{background:var(--warnL);color:#B45309;cursor:pointer;border:1px solid transparent}
 .p02-update-pill.pending:hover{background:#FDE68A;border-color:#F59E0B;box-shadow:0 2px 6px rgba(245,158,11,.2);transform:translateY(-1px)}
+.p02-pending-highlight{animation:p02pulse 1s ease-in-out 2;border:2px solid #F59E0B !important;box-shadow:0 0 0 4px rgba(245,158,11,.2),0 8px 24px rgba(245,158,11,.15) !important}
+@keyframes p02pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.01)}}
+
 
 /* Attachment area */
 .p02-attachments{margin-top:10px;padding-top:10px;border-top:1px solid var(--bdl);max-height:0;overflow:hidden;opacity:0;transition:all .3s ease}
@@ -4273,6 +4276,13 @@ function renderWeekPeriod(){
   });
   h += `</div>`;
   el.innerHTML = h;
+  // Make bento '待更新' card clickable
+  var bentoPending = el.querySelector('.p02-bento-amber');
+  if(bentoPending) bentoPending.addEventListener('click', scrollToPending);
+  if(bentoPending) bentoPending.style.cursor = 'pointer';
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 }
 
 function renderP02(){
@@ -4394,6 +4404,9 @@ function renderP02(){
   }
 
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 
   // 将 periodCard（hero+bento）插回任务列表顶部，与任务一起滚动
   if(periodCard){ el.insertBefore(periodCard, el.firstChild); renderWeekPeriod(); }
@@ -4446,58 +4459,52 @@ function filterTasks(type, el){
 const _attachments = {}
 // Scroll to first pending (not updated) task and highlight it
 function scrollToPending(){
-  try {
-    const pending = ITEMS.filter(i => !i.updated || i.updated === '—');
-    if(pending.length === 0){
-      showToast('✓ 本周全部事项已更新');
-      return;
-    }
-
-    // Find all pending task cards in DOM
-    const cards = document.querySelectorAll('.p02-task-card');
-    let targetCard = null;
-    let pendingNames = [];
-
-    cards.forEach(card => {
-      const titleEl = card.querySelector('.p02-task-title');
-      if(!titleEl) return;
-      const name = titleEl.textContent.trim();
-      const item = ITEMS.find(i => i.name === name);
-      if(item && (!item.updated || item.updated === '—')){
-        if(!targetCard) targetCard = card;
-        pendingNames.push(name);
-      }
-    });
-
-    if(targetCard){
-      // Use getBoundingClientRect to find position relative to scroll container
-      const scrollContainer = document.getElementById('p02TaskList');
-      if(scrollContainer){
-        const containerRect = scrollContainer.getBoundingClientRect();
-        const cardRect = targetCard.getBoundingClientRect();
-        const relativeTop = cardRect.top - containerRect.top + scrollContainer.scrollTop;
-        // Direct set scrollTop for reliability
-        scrollContainer.scrollTop = Math.max(0, relativeTop - 80);
-      }
-
-      // Highlight with pulse animation
-      targetCard.style.transition = 'box-shadow .3s, border-color .3s';
-      targetCard.style.boxShadow = '0 0 0 3px #F59E0B, 0 8px 24px rgba(245,158,11,.2)';
-      targetCard.style.borderColor = '#F59E0B';
-      setTimeout(() => {
-        targetCard.style.boxShadow = '';
-        targetCard.style.borderColor = '';
-      }, 3000);
-
-      // Show toast with pending list
-      const names = pendingNames.length <= 3
-        ? pendingNames.join('、')
-        : pendingNames.slice(0,3).join('、') + ' 等' + pendingNames.length + '项';
-      showToast('⚠️ 待更新 ' + pendingNames.length + ' 项：' + names);
-    }
-  } catch(e) {
-    console.error('scrollToPending error:', e);
+  var pending = ITEMS.filter(function(i){ return !i.updated || i.updated === '—'; });
+  if(pending.length === 0){
+    showToast('✓ 本周全部事项已更新');
+    return;
   }
+
+  var cards = document.querySelectorAll('.p02-task-card');
+  var targetCard = null;
+  var pendingNames = [];
+
+  cards.forEach(function(card){
+    var titleEl = card.querySelector('.p02-task-title');
+    if(!titleEl) return;
+    var name = titleEl.textContent.trim();
+    var item = ITEMS.find(function(i){ return i.name === name; });
+    if(item && (!item.updated || item.updated === '—')){
+      if(!targetCard) targetCard = card;
+      pendingNames.push(name);
+    }
+  });
+
+  if(!targetCard){
+    showToast('⚠️ 未找到待更新事项');
+    return;
+  }
+
+  // Scroll: only use direct scrollTop, no conflicting methods
+  var scrollContainer = document.getElementById('p02TaskList');
+  if(scrollContainer){
+    var containerRect = scrollContainer.getBoundingClientRect();
+    var cardRect = targetCard.getBoundingClientRect();
+    var relativeTop = cardRect.top - containerRect.top + scrollContainer.scrollTop;
+    scrollContainer.scrollTop = Math.max(0, relativeTop - 80);
+  }
+
+  // Highlight: add visible class
+  targetCard.classList.add('p02-pending-highlight');
+  setTimeout(function(){
+    targetCard.classList.remove('p02-pending-highlight');
+  }, 3000);
+
+  // Show toast
+  var names = pendingNames.length <= 3
+    ? pendingNames.join('、')
+    : pendingNames.slice(0,3).join('、') + ' 等' + pendingNames.length + '项';
+  showToast('⚠️ 待更新 ' + pendingNames.length + ' 项：' + names);
 }; // Store attachments per task
 
 // Load attachments from localStorage on page load
@@ -4793,6 +4800,9 @@ function renderHistoryReport(){
   });
 
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 }
 
 function toggleHistoryDetail(id){
@@ -5633,6 +5643,9 @@ function renderP05(){
 
   h += `</div>`;
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 
   // Restore uploaded images after DOM is ready
   setTimeout(applyProjectImages, 200);
@@ -6170,6 +6183,9 @@ function renderProjDoc(){
   </div>`;
 
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 
   // Initialize image resize handles
   initAllImageResize();
@@ -8224,6 +8240,9 @@ function renderP09(){
 
   h += `</div>`;
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 
   // Animate KPI counters
   setTimeout(() => {
@@ -9007,6 +9026,9 @@ function renderP10(){
   }
 
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 }
 
 // 渲染周期选择器
@@ -11853,6 +11875,9 @@ function renderP11Depts(){
   });
 
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 }
 
 function renderP11Content(){
@@ -12052,6 +12077,9 @@ function renderP11Content(){
 
   h += `</div>`;
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 }
 
 function filterDept(deptId){
@@ -12573,6 +12601,9 @@ function renderP13(){
   let h = `<div class="p13-dept-title">🏛️ ${dept}预算</div>`;
   h += renderP13DeptBlock(dept);
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 }
 
 // 渲染单个部门的概览区块（四卡 + 分类 + 月度图表），返回 HTML 字符串
@@ -12709,6 +12740,9 @@ function renderP13Detail(){
   let h = `<div class="p13-dept-title">🏛️ ${dept}预算</div>`;
   h += renderP13DeptDetailBlock(dept);
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 }
 
 // 渲染单个部门的详细数据区块，返回 HTML
@@ -13144,6 +13178,9 @@ function renderP14(){
   h += `<div style="text-align:center;padding:14px"><span class="p14-act" onclick="addP14Goal()" style="font-size:13px;padding:8px 20px">+ 添加目标</span></div>`;
   h += `</div>`;
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 }
 
 // 编辑头部字段（周期/更新时间）
@@ -13244,6 +13281,9 @@ function renderP15(){
   </div></div>`;
 
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 }
 
 /* ══════ P16: EXPENSE REPORT PUSH ══════ */
@@ -13277,6 +13317,9 @@ function renderP16(){
   </div></div>`;
 
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 }
 
 /* ══════ P17: ADMIN POLICIES ══════ */
@@ -13358,6 +13401,9 @@ function renderP17(){
   h += `<div class="p17-list" id="p17List"></div>`;
   h += `</div>`;
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
   renderP17List();
 }
 
@@ -15554,6 +15600,9 @@ function renderP25(){
   }
 
   el.innerHTML = h;
+  // Bind click handler to pending pill (more reliable than inline onclick)
+  var pp = el.querySelector('.p02-update-pill.pending');
+  if(pp) pp.addEventListener('click', scrollToPending);
 
   // Auto expand section being edited or first section
   if(_editingSection){
