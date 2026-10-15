@@ -728,76 +728,76 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
 .stacked-seg{height:100%;transition:width .5s}
 
 /* ══════ PANEL 07: WEEKLY MEETING ══════ */
+.p07-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:var(--bg);border-bottom:1px solid var(--bdl);flex-shrink:0}
+.p07-topbar-left{display:flex;align-items:center;gap:12px}
+.p07-topbar-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#EEF0FE,#DDD6FE);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.p07-topbar-title{font-size:15px;font-weight:700;color:var(--t1);letter-spacing:-.01em}
+.p07-topbar-sub{font-size:11px;color:var(--t3);margin-top:1px}
+.p07-topbar-right{display:flex;gap:8px;align-items:center}
 .p07-layout{display:flex;flex:1;overflow:hidden}
-.p07-people{width:280px;background:var(--bg);border-right:1px solid var(--bdl);display:flex;flex-direction:column;overflow:hidden}
-.p07-people-head{padding:14px 16px;border-bottom:1px solid var(--bdl);display:flex;align-items:center;gap:8px}
-.p07-people-title{font-size:14px;font-weight:700}
-.p07-mode-btns{margin-left:auto;display:flex;gap:4px}
-.p07-mode-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr)}
-.p07-mode-btn.act{background:var(--acl);border-color:var(--ac);color:var(--ac)}
-.p07-period{padding:10px 14px;border-bottom:1px solid var(--bdl);background:var(--acl)}
-.p07-period-label{font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:flex;align-items:center;gap:5px}
-.p07-period-range{font-size:13px;font-weight:600;color:var(--t1)}
-.p07-period-dots{display:flex;gap:4px;margin-top:6px;align-items:center}
-.p07-dot{width:20px;height:6px;border-radius:3px}
-.p07-dot.covered{background:var(--ac)}
-.p07-dot.current{background:var(--warn)}
-.p07-dot.future{background:var(--bdl)}
-.p07-submit-board{padding:10px 14px;border-bottom:1px solid var(--bdl);background:var(--acl)}
-.p07-submit-title{font-size:11px;font-weight:700;color:var(--ac);margin-bottom:8px}
-.p07-submit-bar{height:6px;border-radius:3px;background:var(--bdl);margin-bottom:6px;overflow:hidden}
-.p07-submit-fill{height:100%;border-radius:3px;background:var(--ac)}
-.p07-submit-count{font-size:11px;font-weight:600;color:var(--t1);margin-bottom:6px}
-.p07-submit-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
-.p07-submit-status{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 6px;border-radius:5px}
+.p07-people{width:300px;background:var(--bg);border-right:1px solid var(--bdl);display:flex;flex-direction:column;overflow:hidden}
+.p07-mode-btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all .15s}
+.p07-mode-btn.act{background:linear-gradient(135deg,#4F46E5,#6366F1);border-color:transparent;color:#fff;box-shadow:0 2px 8px rgba(79,70,229,.2)}
+.p07-mode-btn:hover{background:var(--bgH);color:var(--ac)}
+.p07-mode-btn.act:hover{background:linear-gradient(135deg,#4338CA,#4F46E5)}
+.p07-submit-board{padding:16px 16px 14px;border-bottom:1px solid var(--bdl);background:var(--bg2)}
+.p07-submit-title{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.p07-submit-bar{height:7px;border-radius:99px;background:var(--bdl);margin-bottom:8px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.06)}
+.p07-submit-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#6366F1,#818CF8);box-shadow:0 0 8px rgba(99,102,241,.4)}
+.p07-submit-count{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:8px}
+.p07-submit-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px}
+.p07-submit-status{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 7px;border-radius:6px}
 .p07-submit-status.done{color:var(--suc);background:var(--sucL)}
 .p07-submit-status.pending{color:#C2410C;background:#FFF7ED}
 .p07-submit-dot{width:5px;height:5px;border-radius:50%}
-.p07-remind-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--ac);background:var(--bg);color:var(--ac);transition:all var(--tr)}
-.p07-remind-btn:hover{background:var(--ac);color:#fff}
+.p07-remind-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid var(--ac);background:var(--bg);color:var(--ac);transition:all .15s;width:100%;justify-content:center}
+.p07-remind-btn:hover{background:var(--ac);color:#fff;box-shadow:0 2px 8px rgba(79,70,229,.2)}
 .p07-people-list{flex:1;overflow-y:auto;padding:6px}
-.p07-person{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:all var(--tr);margin-bottom:2px}
-.p07-person:hover{background:var(--bgH)}
-.p07-person.act{background:var(--acl)}
-.p07-person-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;flex-shrink:0}
+.p07-person{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;transition:all .15s;margin-bottom:2px}
+.p07-person:hover{background:var(--bg2)}
+.p07-person.act{background:var(--acl);box-shadow:inset 0 0 0 1px rgba(79,70,229,.1)}
+.p07-person-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.08)}
 .p07-person-name{font-size:13px;font-weight:600}
 .p07-person.act .p07-person-name{color:var(--ac)}
 .p07-person-role{font-size:10px;color:var(--t3)}
 .p07-person-badges{display:flex;gap:4px;margin-left:auto;flex-shrink:0}
-.p07-person-badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px}
-.p07-items{flex:1;overflow-y:auto;background:var(--bg2);padding:20px 24px}
-.p07-items-head{margin-bottom:16px;display:flex;align-items:center;gap:14px}
-.p07-items-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:600}
-.p07-items-name{font-size:20px;font-weight:700}
+.p07-person-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px}
+.p07-items{flex:1;overflow-y:auto;background:var(--bg2);padding:24px 32px}
+.p07-items-head{margin-bottom:20px;display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--bdl)}
+.p07-items-av{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.p07-items-name{font-size:20px;font-weight:700;letter-spacing:-.02em}
 .p07-items-sub{font-size:12px;color:var(--t3)}
-.p07-item{background:var(--bg);border:1px solid var(--bdl);border-radius:var(--r);padding:14px 18px;margin-bottom:8px;cursor:pointer;transition:all var(--tr)}
-.p07-item:hover{box-shadow:var(--sh);border-color:var(--bd)}
-.p07-item-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.p07-item-name{font-size:14px;font-weight:700;flex:1}
-.p07-item-update{font-size:12.5px;color:var(--t2);line-height:1.6;margin-bottom:6px}
-.p07-item-next{font-size:12px;color:var(--t3);line-height:1.5}
-.p07-item-attachments{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.p07-item-img{max-width:120px;max-height:80px;border-radius:6px;border:1px solid var(--bd);object-fit:cover;cursor:pointer;transition:transform var(--tr)}
+.p07-item{background:var(--bg);border:1px solid var(--bdl);border-radius:12px;padding:16px 20px;margin-bottom:10px;cursor:pointer;transition:all .15s;box-shadow:0 1px 3px rgba(17,24,39,.04),0 1px 2px rgba(17,24,39,.03)}
+.p07-item:hover{box-shadow:0 4px 12px rgba(17,24,39,.06);border-color:var(--bd);transform:translateY(-1px)}
+.p07-item-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.p07-item-name{font-size:14px;font-weight:700;flex:1;letter-spacing:-.01em}
+.p07-item-update{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:8px}
+.p07-item-next{font-size:12px;color:var(--t3);line-height:1.6;background:var(--bg2);padding:8px 12px;border-radius:8px;border-left:3px solid var(--ac)}
+.p07-item-attachments{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.p07-item-img{max-width:120px;max-height:80px;border-radius:8px;border:1px solid var(--bdl);object-fit:cover;cursor:pointer;transition:transform .15s}
 .p07-item-img:hover{transform:scale(1.05)}
-.p07-item-file{font-size:11px;color:var(--t3);background:var(--bg2);padding:2px 6px;border-radius:4px;display:flex;align-items:center;gap:3px}
+.p07-item-file{font-size:11px;color:var(--t3);background:var(--bg2);padding:3px 8px;border-radius:6px;display:flex;align-items:center;gap:3px}
+.p07-empty{padding:60px 20px;text-align:center;color:var(--t3);font-size:13px}
 
 /* PPT Mode */
-.ppt-overlay{position:fixed;inset:0;background:var(--bg);z-index:200;display:none;flex-direction:column;padding:40px 60px}
+.ppt-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#F8F9FB 0%,#F1F2F5 100%);z-index:200;display:none;flex-direction:column;padding:48px 64px}
 .ppt-overlay.show{display:flex}
-.ppt-head{display:flex;align-items:center;gap:14px;margin-bottom:30px}
-.ppt-av{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:600}
-.ppt-name{font-size:28px;font-weight:700}
+.ppt-head{display:flex;align-items:center;gap:16px;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--bdl)}
+.ppt-av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.ppt-name{font-size:28px;font-weight:800;letter-spacing:-.02em}
 .ppt-sub{font-size:14px;color:var(--t3)}
-.ppt-items{flex:1;overflow-y:auto}
-.ppt-card{background:var(--bg2);border:1px solid var(--bdl);border-radius:12px;padding:20px 24px;margin-bottom:14px}
-.ppt-card-name{font-size:20px;font-weight:700;margin-bottom:8px}
-.ppt-card-update{font-size:16px;color:var(--t2);line-height:1.7;margin-bottom:8px}
-.ppt-card-next{font-size:14px;color:var(--t3);line-height:1.6}
-.ppt-nav{padding:16px 0;display:flex;align-items:center;justify-content:center;gap:20px}
-.ppt-nav-btn{padding:8px 18px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all var(--tr)}
-.ppt-nav-btn:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
-.ppt-close{position:absolute;top:20px;right:24px;font-size:20px;cursor:pointer;color:var(--t2);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:background var(--tr);border:none;background:none}
-.ppt-close:hover{background:var(--bgH)}
+.ppt-items{flex:1;overflow-y:auto;padding-right:8px}
+.ppt-card{background:var(--bg);border:1px solid var(--bdl);border-radius:16px;padding:24px 28px;margin-bottom:16px;box-shadow:0 2px 8px rgba(17,24,39,.04),0 1px 3px rgba(17,24,39,.03);transition:all .2s}
+.ppt-card:hover{box-shadow:0 8px 24px rgba(17,24,39,.06),0 2px 8px rgba(17,24,39,.04);transform:translateY(-2px)}
+.ppt-card-name{font-size:20px;font-weight:800;margin-bottom:10px;letter-spacing:-.015em;color:var(--t1)}
+.ppt-card-update{font-size:16px;color:var(--t2);line-height:1.8;margin-bottom:10px}
+.ppt-card-next{font-size:14px;color:var(--t3);line-height:1.7;background:var(--bg2);padding:12px 16px;border-radius:10px;border-left:3px solid var(--ac)}
+.ppt-nav{padding:20px 0;display:flex;align-items:center;justify-content:center;gap:16px}
+.ppt-nav-btn{padding:10px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:var(--bg);color:var(--t2);transition:all .15s;box-shadow:0 2px 6px rgba(17,24,39,.04)}
+.ppt-nav-btn:hover{background:linear-gradient(135deg,#4F46E5,#6366F1);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(79,70,229,.25)}
+.ppt-nav-info{font-size:14px;font-weight:600;color:var(--t3);min-width:80px;text-align:center}
+.ppt-close{position:absolute;top:24px;right:28px;font-size:22px;cursor:pointer;color:var(--t2);width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;transition:all .15s;border:none;background:var(--bg);box-shadow:0 2px 6px rgba(17,24,39,.06)}
+.ppt-close:hover{background:var(--bgH);color:var(--t1)}
 
 /* ══════ PANEL 08: WEEKLY REPORT ══════ */
 .p08-top-bar{display:flex;align-items:center;gap:12px;padding:16px 24px;background:var(--bg);border-bottom:1px solid var(--bdl)}
@@ -2399,26 +2399,26 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
 
 <!-- ══════ PANEL 07: WEEKLY MEETING ══════ -->
 <div class="panel" id="p07">
-  <div class="topbar"><div class="topbar-title">周会视图</div></div>
+  <div class="p07-topbar">
+    <div class="p07-topbar-left">
+      <div class="p07-topbar-icon">📽</div>
+      <div>
+        <div class="p07-topbar-title">周会视图</div>
+        <div class="p07-topbar-sub">全员周报汇报演示 · 实时同步「我的工作」</div>
+      </div>
+    </div>
+    <div class="p07-topbar-right">
+      <div class="p07-mode-btn" onclick="viewWeeklyHistory()">📋 历史周报</div>
+      <div class="p07-mode-btn act" onclick="showPPT()">📽 演示模式</div>
+    </div>
+  </div>
   <div class="p07-layout">
     <div class="p07-people">
-      <div class="p07-people-head">
-        <div class="p07-people-title">周报</div>
-        <div class="p07-mode-btns">
-          <div class="p07-mode-btn" onclick="showPPT()">📽 演示</div>
-          <div class="p07-mode-btn" onclick="showPPT()">📊 PPT</div>
-          <div class="p07-mode-btn" onclick="viewWeeklyHistory()">📋 历史周报</div>
-        </div>
-      </div>
-      <div class="p07-period">
-        <div class="p07-period-label">📅 覆盖范围</div>
-        <div class="p07-period-range">06.23 — 07.12</div>
-        <div class="p07-period-dots"><div class="p07-dot covered"></div><div class="p07-dot covered"></div><div class="p07-dot current"></div></div>
-      </div>
       <div class="p07-submit-board">
-        <div class="p07-submit-title">提交进度</div>
+        <div class="p07-submit-title">📝 本周提交进度</div>
         <div class="p07-submit-bar"><div class="p07-submit-fill" style="width:70%"></div></div>
         <div class="p07-submit-count">7/10 已提交</div>
+        <div class="p07-submit-grid" id="p07SubmitGrid"></div>
         <div class="p07-remind-btn" onclick="sendRemind()">🔔 催更未提交 →</div>
       </div>
       <div class="p07-people-list" id="p07PeopleList"></div>
