@@ -16028,6 +16028,110 @@ function exportDocContent(){
   setTimeout(() => msg.remove(), 2000);
 }
 
+/* ══════ DEMO: 历史周报示例数据 ══════ */
+(function(){
+  // Only seed if no history exists
+  var hasHistory = false;
+  for(var i=0;i<localStorage.length;i++){
+    if(localStorage.key(i).indexOf('weekly_report_')===0){ hasHistory=true; break; }
+  }
+  if(hasHistory) return;
+
+  var demoWeeks = {
+    'weekly_report_2026_W41': {
+      '耿博琳': {
+        submitTime: '2026-10-11T18:30:00.000Z',
+        weekRange: '10月6日-10月12日',
+        items: [
+          {name:'福利关怀',type:'project',module:'职场运营(北京)',status:'in-progress',statusLabel:'进行中',pct:80,weekUpdate:'决赛环节策划方案完成，已确定9月28日决赛日期和场地',nextWeek:'1. 确认决赛评委名单\n2. 完成物料采购\n3. 场地布置方案定稿',risk:'决赛场地档期可能冲突'},
+          {name:'5楼装修改造',type:'project',module:'职场运营(北京)',status:'in-progress',statusLabel:'进行中',pct:35,weekUpdate:'设计方案已通过审批，开始招标流程',nextWeek:'1. 完成招标\n2. 确定施工单位\n3. 签订合同',risk:'装修期间可能影响5楼员工办公'},
+          {name:'走廊维修',type:'project',module:'职场运营(北京)',status:'done',statusLabel:'已完成',pct:100,weekUpdate:'走廊灯管更换完成，已验收',nextWeek:'',risk:''}
+        ]
+      },
+      '高琳': {
+        submitTime: '2026-10-11T17:00:00.000Z',
+        weekRange: '10月6日-10月12日',
+        items: [
+          {name:'端午节礼品',type:'project',module:'文化运营(福利)',status:'done',statusLabel:'已完成',pct:100,weekUpdate:'礼品已全部发放完毕，满意度95%',nextWeek:'',risk:''},
+          {name:'行政服务台',type:'daily-ops',module:'数字化运营(行政服务台)',status:'in-progress',statusLabel:'进行中',pct:-1,weekUpdate:'本周创建工单57个，其中人工19，机器人拦截38，拦截率100%',nextWeek:'1. 持续优化拦截规则\n2. 跟进人工工单处理时效',risk:''},
+          {name:'六一儿童节礼物',type:'project',module:'文化运营(福利)',status:'done',statusLabel:'已完成',pct:100,weekUpdate:'礼物已发放，员工反馈良好',nextWeek:'',risk:''}
+        ]
+      },
+      '聂茜茜': {
+        submitTime: '2026-10-11T19:00:00.000Z',
+        weekRange: '10月6日-10月12日',
+        items: [
+          {name:'家庭日',type:'project',module:'文化运营(活动)',status:'in-progress',statusLabel:'进行中',pct:70,weekUpdate:'场地确认完成，开始发放邀请函，预计参与200+人',nextWeek:'1. 确认参与人数\n2. 活动流程细化\n3. 物料准备',risk:''},
+          {name:'公益内容运营',type:'daily-ops',module:'文化运营(活动)',status:'in-progress',statusLabel:'进行中',pct:-1,weekUpdate:'完成3篇公益推文发布，阅读量合计1.2万',nextWeek:'1. 策划下期公益主题\n2. 联系公益机构',risk:''},
+          {name:'Q3团建活动',type:'project',module:'文化运营(活动)',status:'not-started',statusLabel:'未开始',pct:0,weekUpdate:'',nextWeek:'1. 确定活动方案\n2. 预订场地',risk:''}
+        ]
+      },
+      '张灵玉': {
+        submitTime: '2026-10-11T16:30:00.000Z',
+        weekRange: '10月6日-10月12日',
+        items: [
+          {name:'酒店协议续签',type:'project',module:'职场运营(北京)',status:'in-progress',statusLabel:'进行中',pct:85,weekUpdate:'已与3家酒店完成谈判，协议条款确认中',nextWeek:'1. 签署协议\n2. 上线预定系统',risk:''},
+          {name:'办公用品采购',type:'daily-ops',module:'职场运营(北京)',status:'done',statusLabel:'已完成',pct:100,weekUpdate:'本月办公用品采购完成，共花费2.3万元',nextWeek:'',risk:''}
+        ]
+      },
+      '丁玉萍': {
+        submitTime: '2026-10-11T20:00:00.000Z',
+        weekRange: '10月6日-10月12日',
+        items: [
+          {name:'员工体检',type:'project',module:'数字化运营(后台)',status:'not-started',statusLabel:'未开始',pct:0,weekUpdate:'体检机构比价中，已收到3家报价',nextWeek:'1. 确认体检机构\n2. 发布体检通知',risk:''}
+        ]
+      },
+      '程宇亮': {
+        submitTime: '2026-10-11T17:30:00.000Z',
+        weekRange: '10月6日-10月12日',
+        items: [
+          {name:'武汉职场运营',type:'daily-ops',module:'职场运营(武汉)',status:'in-progress',statusLabel:'进行中',pct:-1,weekUpdate:'武汉办公区日常运营正常，本周处理报修12件',nextWeek:'1. 5楼会议室设备检修\n2. 跟进物业合同续签',risk:''}
+        ]
+      }
+    },
+    'weekly_report_2026_W40': {
+      '耿博琳': {
+        submitTime: '2026-10-04T18:00:00.000Z',
+        weekRange: '9月29日-10月5日',
+        items: [
+          {name:'福利关怀',type:'project',module:'职场运营(北京)',status:'in-progress',statusLabel:'进行中',pct:60,weekUpdate:'初赛环节完成，25人进入复赛',nextWeek:'1. 复赛场地确认\n2. 评委邀请',risk:''},
+          {name:'5楼装修改造',type:'project',module:'职场运营(北京)',status:'in-progress',statusLabel:'进行中',pct:20,weekUpdate:'设计方案初稿完成，内部评审中',nextWeek:'1. 方案定稿\n2. 启动招标流程',risk:''},
+          {name:'走廊维修',type:'project',module:'职场运营(北京)',status:'in-progress',statusLabel:'进行中',pct:50,weekUpdate:'灯管采购完成，开始安装',nextWeek:'1. 完成安装\n2. 验收',risk:''}
+        ]
+      },
+      '高琳': {
+        submitTime: '2026-10-04T17:00:00.000Z',
+        weekRange: '9月29日-10月5日',
+        items: [
+          {name:'行政服务台',type:'daily-ops',module:'数字化运营(行政服务台)',status:'in-progress',statusLabel:'进行中',pct:-1,weekUpdate:'本周创建工单45个，人工15，机器人拦截30，拦截率100%',nextWeek:'1. 拦截规则优化',risk:''},
+          {name:'端午节礼品',type:'project',module:'文化运营(福利)',status:'done',statusLabel:'已完成',pct:100,weekUpdate:'满意度调研完成，95%满意',nextWeek:'',risk:''}
+        ]
+      },
+      '聂茜茜': {
+        submitTime: '2026-10-04T19:00:00.000Z',
+        weekRange: '9月29日-10月5日',
+        items: [
+          {name:'家庭日',type:'project',module:'文化运营(活动)',status:'in-progress',statusLabel:'进行中',pct:50,weekUpdate:'场地已确认，开始物料设计',nextWeek:'1. 邀请函制作\n2. 流程彩排',risk:''},
+          {name:'公益内容运营',type:'daily-ops',module:'文化运营(活动)',status:'in-progress',statusLabel:'进行中',pct:-1,weekUpdate:'发布2篇公益推文，阅读量8000+',nextWeek:'1. 下期主题策划',risk:''}
+        ]
+      },
+      '张灵玉': {
+        submitTime: '2026-10-04T16:30:00.000Z',
+        weekRange: '9月29日-10月5日',
+        items: [
+          {name:'酒店协议续签',type:'project',module:'职场运营(北京)',status:'in-progress',statusLabel:'进行中',pct:60,weekUpdate:'已联系5家酒店，收到3家报价',nextWeek:'1. 完成谈判\n2. 条款确认',risk:''},
+          {name:'办公用品采购',type:'daily-ops',module:'职场运营(北京)',status:'in-progress',statusLabel:'进行中',pct:50,weekUpdate:'本月采购清单确认中',nextWeek:'1. 完成采购\n2. 入库登记',risk:''}
+        ]
+      }
+    }
+  };
+
+  Object.keys(demoWeeks).forEach(function(key){
+    if(!localStorage.getItem(key)){
+      localStorage.setItem(key, JSON.stringify(demoWeeks[key]));
+    }
+  });
+})();
 /* ══════ WEEK RESET: 每周自动重置更新状态 ══════ */
 (function(){
   const now = new Date();
