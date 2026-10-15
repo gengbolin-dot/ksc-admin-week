@@ -9906,46 +9906,51 @@ function getWeeklyReportWeeks(){
 
 // 查看历史周报
 function viewWeeklyHistory(){
-  const weeks = getWeeklyReportWeeks();
-  const allMembers = JSON.parse(localStorage.getItem('aop_team_members') || '[]');
-
-  const modal = document.createElement('div');
+  var weeks = getWeeklyReportWeeks();
+  var allMembers = JSON.parse(localStorage.getItem('aop_team_members') || '[]');
+  
+  // Also add current week from live data
+  var currentWeekKey = getWeekKey();
+  if(weeks.indexOf(currentWeekKey) < 0){
+    weeks.unshift(currentWeekKey);
+  }
+  
+  var modal = document.createElement('div');
   modal.id = 'weeklyHistoryModal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:flex;align-items:center;justify-content:center';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:10000;display:flex;align-items:center;justify-content:center';
 
-  let content = `
-    <div style="background:var(--bg);border-radius:16px;width:800px;max-width:90vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:var(--shL)">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px;border-bottom:1px solid var(--bdl)">
-        <div style="font-size:18px;font-weight:700">📋 历史周报</div>
-        <button class="btn btn-ghost" onclick="document.getElementById('weeklyHistoryModal').remove()">✕</button>
-      </div>
-      <div style="display:flex;flex:1;overflow:hidden">
-        <div style="width:200px;border-right:1px solid var(--bdl);overflow-y:auto;padding:12px" id="historyWeekList">`;
+  var content = '<div style="background:var(--bg);border-radius:16px;width:860px;max-width:90vw;max-height:82vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden">' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--bdl);flex-shrink:0">' +
+    '<div style="font-size:17px;font-weight:700;color:var(--t1)">📋 历史周报</div>' +
+    '<button class="btn btn-ghost" onclick="document.getElementById(\'weeklyHistoryModal\').remove()" style="padding:4px 12px">✕ 关闭</button>' +
+    '</div>' +
+    '<div style="display:flex;flex:1;overflow:hidden">' +
+    '<div style="width:200px;border-right:1px solid var(--bdl);overflow-y:auto;padding:12px;flex-shrink:0" id="historyWeekList">';
 
   if(weeks.length === 0){
     content += '<div style="color:var(--t3);font-size:13px;padding:20px;text-align:center">暂无历史周报</div>';
   } else {
-    weeks.forEach((week, idx) => {
-      content += `<div class="p07-person${idx===0?' act':''}" onclick="loadWeekReport('${week}',this)" style="padding:8px 12px;cursor:pointer;border-radius:6px;margin-bottom:4px;font-size:13px">
-        ${week.replace('_', ' ')}
-      </div>`;
+    weeks.forEach(function(week, idx){
+      var label = week.replace('_', ' ');
+      var isCurrent = (week === currentWeekKey);
+      content += '<div class="p07-person' + (idx===0?' act':'') + '" onclick="loadWeekReport(\'' + week + '\',this)" style="padding:8px 12px;cursor:pointer;border-radius:8px;margin-bottom:4px;font-size:13px">' + label + (isCurrent?'<span style="font-size:10px;color:var(--ac);margin-left:6px">本周</span>':'') + '</div>';
     });
   }
 
-  content += `</div>
-        <div style="flex:1;overflow-y:auto;padding:16px" id="historyContent">
-          <div style="color:var(--t3);text-align:center;padding:40px">选择左侧周数查看周报</div>
-        </div>
-      </div>
-    </div>`;
+  content += '</div>' +
+    '<div style="flex:1;overflow-y:auto;padding:20px 24px" id="historyContent">' +
+    '<div style="color:var(--t3);text-align:center;padding:40px">选择左侧周数查看周报</div>' +
+    '</div>' +
+    '</div>' +
+    '</div>';
 
   modal.innerHTML = content;
   document.body.appendChild(modal);
 
-  // 自动加载第一周
+  // Auto load first week
   if(weeks.length > 0){
-    setTimeout(() => {
-      const firstWeekEl = document.querySelector('#historyWeekList .p07-person');
+    setTimeout(function(){
+      var firstWeekEl = document.querySelector('#historyWeekList .p07-person');
       if(firstWeekEl) loadWeekReport(weeks[0], firstWeekEl);
     }, 100);
   }
@@ -9953,53 +9958,101 @@ function viewWeeklyHistory(){
 
 // 加载指定周的周报
 function loadWeekReport(weekKey, el){
-  // 更新选中状态
-  document.querySelectorAll('#historyWeekList .p07-person').forEach(p => p.classList.remove('act'));
+  document.querySelectorAll('#historyWeekList .p07-person').forEach(function(p){ p.classList.remove('act'); });
   if(el) el.classList.add('act');
 
-  const history = getWeeklyReportHistory(weekKey);
-  const contentEl = document.getElementById('historyContent');
+  var history = getWeeklyReportHistory(weekKey);
+  var contentEl = document.getElementById('historyContent');
   if(!contentEl) return;
 
-  const allMembers = JSON.parse(localStorage.getItem('aop_team_members') || '[]');
-  const weekRange = Object.values(history)[0]?.weekRange || '';
+  var currentWeekKey = getWeekKey();
+  var isCurrentWeek = (weekKey === currentWeekKey);
+  var allMembers = JSON.parse(localStorage.getItem('aop_team_members') || '[]');
+  
+  // For current week, use live ITEMS data as fallback
+  var weekRange = '';
+  if(isCurrentWeek){
+    weekRange = getWeekDateRange();
+  } else {
+    weekRange = Object.values(history)[0] ? (Object.values(history)[0]).weekRange || '' : '';
+  }
 
-  let h = `<div style="margin-bottom:16px">
-    <div style="font-size:16px;font-weight:700">${weekKey.replace('_', ' ')}</div>
-    <div style="font-size:13px;color:var(--t3)">${weekRange}</div>
-  </div>`;
+  var h = '<div style="margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--bdl)">' +
+    '<div style="font-size:17px;font-weight:700;color:var(--t1)">' + weekKey.replace('_', ' ') + (isCurrentWeek?' <span style="font-size:12px;color:var(--ac);font-weight:600">本周</span>':'') + '</div>' +
+    '<div style="font-size:13px;color:var(--t3);margin-top:4px">' + (weekRange || '') + '</div>' +
+    '</div>';
 
-  // 显示所有成员（含已删除）的提交状态
-  allMembers.forEach(member => {
-    const report = history[member.name];
-    const isActive = member.active !== false;
-    const statusStyle = report ? 'var(--suc)' : (isActive ? 'var(--warn)' : 'var(--t3)');
-    const statusText = report ? '✓ 已提交' : (isActive ? '⏳ 未提交' : '— 已离职');
+  if(isCurrentWeek && Object.keys(history).length === 0){
+    // No submitted history for current week, show live data
+    h += '<div style="font-size:12px;color:var(--t3);margin-bottom:12px;padding:8px 12px;background:var(--bg2);border-radius:8px">📌 本周数据来自「我的工作」实时状态，点击「一键提交本周」可保存为历史周报</div>';
+    
+    // Group items by person
+    var peopleMap = {};
+    ITEMS.forEach(function(item){
+      var owner = item.owner || '未分配';
+      if(!peopleMap[owner]) peopleMap[owner] = [];
+      peopleMap[owner].push(item);
+    });
 
-    h += `<div style="padding:12px;margin-bottom:8px;background:var(--bg2);border-radius:8px;${!isActive?'opacity:0.6':''}">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:${report?'8px':'0'}">
-        <div style="width:32px;height:32px;border-radius:50%;background:${member.color};display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600">${member.name[0]}</div>
-        <div style="flex:1">
-          <div style="font-size:14px;font-weight:600">${member.name}</div>
-          <div style="font-size:12px;color:var(--t3)">${member.role || ''}</div>
-        </div>
-        <div style="font-size:12px;color:${statusStyle};font-weight:600">${statusText}</div>
-      </div>`;
-
-    if(report && report.items){
-      h += `<div style="padding-left:42px">`;
-      report.items.forEach(item => {
-        h += `<div style="font-size:12px;margin-bottom:6px;padding:6px 8px;background:var(--bg);border-radius:4px">
-          <div style="font-weight:600;margin-bottom:2px">${item.name} <span style="color:var(--t3);font-weight:400">${item.module}</span></div>
-          ${item.weekUpdate ? `<div style="color:var(--t2)">${item.weekUpdate}</div>` : ''}
-          ${item.nextWeek ? `<div style="color:var(--t3);margin-top:2px">下周：${item.nextWeek.substring(0,50)}${item.nextWeek.length>50?'...':''}</div>` : ''}
-        </div>`;
+    var peopleNames = Object.keys(peopleMap);
+    if(peopleNames.length === 0){
+      h += '<div style="color:var(--t3);text-align:center;padding:40px">暂无本周工作数据</div>';
+    } else {
+      peopleNames.forEach(function(name){
+        var items = peopleMap[name];
+        var person = TEAM.find(function(t){ return t.name === name; }) || {color:'#6B7280', role:''};
+        h += '<div style="padding:14px;margin-bottom:8px;background:var(--bg);border:1px solid var(--bdl);border-radius:12px">' +
+          '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">' +
+          '<div style="width:34px;height:34px;border-radius:50%;background:' + (person.color||'#6B7280') + ';display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">' + name[0] + '</div>' +
+          '<div style="font-size:14px;font-weight:700;color:var(--t1)">' + name + '</div>' +
+          '<div style="font-size:11px;color:var(--t3)">' + (items.length) + ' 项</div>' +
+          '</div>';
+        items.forEach(function(it){
+          h += '<div style="padding:10px 0;border-top:1px solid var(--bdl)">' +
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+            '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:' + (it.type==='project'?'var(--purL)':'var(--sucL)') + ';color:' + (it.type==='project'?'var(--pur)':'var(--suc)') + '">' + (it.type==='project'?'专项':'日常') + '</span>' +
+            '<span style="font-size:13px;font-weight:600;color:var(--t1)">' + it.name + '</span>' +
+            '<span style="font-size:11px;color:var(--t3);margin-left:auto">' + it.statusLabel + (it.pct>=0?' · '+it.pct+'%':'') + '</span>' +
+            '</div>' +
+            (it.weekUpdate ? '<div style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:4px">' + it.weekUpdate + '</div>' : '') +
+            (it.nextWeek ? '<div style="font-size:12px;color:var(--t3);line-height:1.6;padding:6px 10px;background:var(--bg2);border-radius:6px;border-left:3px solid var(--ac)">下周：' + it.nextWeek.replace(/\\n/g,' ') + '</div>' : '') +
+            '</div>';
+        });
+        h += '</div>';
       });
-      h += `</div>`;
     }
-
-    h += `</div>`;
-  });
+  } else if(Object.keys(history).length === 0){
+    // Not current week and no history
+    h += '<div style="color:var(--t3);text-align:center;padding:40px">该周暂无周报数据</div>';
+  } else {
+    // Show saved history
+    var memberNames = Object.keys(history);
+    memberNames.forEach(function(memberName){
+      var report = history[memberName];
+      h += '<div style="padding:14px;margin-bottom:8px;background:var(--bg);border:1px solid var(--bdl);border-radius:12px">' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">' +
+        '<div style="width:34px;height:34px;border-radius:50%;background:#6B7280;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">' + memberName[0] + '</div>' +
+        '<div style="font-size:14px;font-weight:700;color:var(--t1)">' + memberName + '</div>' +
+        '<div style="font-size:11px;color:var(--suc);margin-left:auto">✓ 已提交</div>' +
+        '</div>';
+      if(report.items && report.items.length > 0){
+        report.items.forEach(function(it){
+          h += '<div style="padding:10px 0;border-top:1px solid var(--bdl)">' +
+            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+            '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:' + (it.type==='project'?'var(--purL)':'var(--sucL)') + ';color:' + (it.type==='project'?'var(--pur)':'var(--suc)') + '">' + (it.type==='project'?'专项':'日常') + '</span>' +
+            '<span style="font-size:13px;font-weight:600;color:var(--t1)">' + it.name + '</span>' +
+            '<span style="font-size:11px;color:var(--t3);margin-left:auto">' + (it.statusLabel||'') + (it.pct>=0?' · '+it.pct+'%':'') + '</span>' +
+            '</div>' +
+            (it.weekUpdate ? '<div style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:4px">' + it.weekUpdate + '</div>' : '') +
+            (it.nextWeek ? '<div style="font-size:12px;color:var(--t3);line-height:1.6;padding:6px 10px;background:var(--bg2);border-radius:6px;border-left:3px solid var(--ac)">下周：' + (it.nextWeek||'').replace(/\\n/g,' ') + '</div>' : '') +
+            '</div>';
+        });
+      } else {
+        h += '<div style="font-size:12px;color:var(--t3);padding:8px 0">暂无事项</div>';
+      }
+      h += '</div>';
+    });
+  }
 
   contentEl.innerHTML = h;
 }
