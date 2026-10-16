@@ -13605,7 +13605,7 @@ function renderP30(){
   var standards = POLICIES.filter(function(p){ return p.cat === '标准规范'; });
   var h = '';
   if(standards.length === 0){
-    h = '<div style="text-align:center;padding:80px 20px;color:var(--t3)"><div style="font-size:48px;margin-bottom:16px;opacity:.3">📐</div><div style="font-size:17px;font-weight:700;color:var(--t1);margin-bottom:8px">暂无标准规范</div><div style="font-size:13px;margin-bottom:24px">点击「导入」上传标准规范文档，或「新建」创建新规范</div><div style="display:flex;gap:12px;justify-content:center"><button class="btn btn-ac" onclick="importPolicyFile()">📥 导入</button><button class="btn btn-ghost" onclick="openPolicyEditor(null,\'标准规范\')">＋ 新建规范</button></div></div>';
+    h = '<div style="text-align:center;padding:80px 20px;color:var(--t3)"><div style="font-size:48px;margin-bottom:16px;opacity:.3">📐</div><div style="font-size:17px;font-weight:700;color:var(--t1);margin-bottom:8px">暂无标准规范</div><div style="font-size:13px;margin-bottom:24px">点击「导入」上传标准规范文档，或「新建」创建新规范</div><div style="display:flex;gap:12px;justify-content:center"><button class="btn btn-ac" onclick="importPolicyFile(&#39;行政制度&#39;)">📥 导入</button><button class="btn btn-ghost" onclick="openPolicyEditor(null,\'标准规范\')">＋ 新建规范</button></div></div>';
   } else {
     h = '<div style="padding:24px 32px">';
     standards.forEach(function(p){
@@ -13613,7 +13613,7 @@ function renderP30(){
       h += '<div class="p17-item" data-cat="' + p.cat + '" onclick="openPolicyDetail(\'' + p.id + '\')"><div class="p17-item-icon" style="background:var(--acl);color:var(--ac)">' + (p.icon||'📐') + '</div><div class="p17-item-info"><div class="p17-item-name">' + escHtml(p.name) + '</div><div class="p17-item-meta">' + p.date + ' · ' + p.status + ' · <span class="p17-src-badge">' + srcBadge + '</span></div></div><div class="p17-item-del" onclick="event.stopPropagation();confirmDeletePolicy(\'' + p.id + '\')" title="删除">🗑</div><div class="p17-item-arrow">→</div></div>';
     });
     h += '</div>';
-    h += '<div style="padding:0 32px 24px"><button class="btn btn-ac" onclick="importPolicyFile()">📥 导入规范</button> <button class="btn btn-ghost" onclick="openPolicyEditor(null,\'标准规范\')">＋ 新建规范</button></div>';
+    h += '<div style="padding:0 32px 24px"><button class="btn btn-ac" onclick="importPolicyFile(&#39;标准规范&#39;)">📥 导入规范</button> <button class="btn btn-ghost" onclick="openPolicyEditor(null,\'标准规范\')">＋ 新建规范</button></div>';
   }
   el.innerHTML = h;
 }
@@ -13657,6 +13657,17 @@ function filterPolicyCat(cat, el){
 }
 
 /* —— 导入制度（Word/PDF 上传 + 前端解析）—— */
+// Trigger file picker for policy import
+function importPolicyFile(cat){
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.docx,.pdf';
+  input.onchange = function(){
+    window._importPolicyCat = cat || 'general';
+    importPolicy(input);
+  };
+  input.click();
+}
 function importPolicy(input){
   const file = input.files[0];
   if(!file) return;
@@ -13690,9 +13701,12 @@ function buildPolicyEntry(dataUrl, fname, ftype, htmlContent, pageCount){
   const name = fname.replace(/\.(docx|pdf)$/i,'');
   const icon = ftype==='pdf' ? '📕' : '📄';
   const today = new Date().toISOString().slice(0,10);
-  POLICIES.unshift({ id:newPolicyId(), name, cat:'general', icon, date:today, status:'已发布', sourceType:'import', updateTime:today, fileData:dataUrl, fileName:fname, fileType:ftype, pageCount:pageCount||null, htmlContent });
+  var importCat = window._importPolicyCat || 'general';
+  window._importPolicyCat = null;
+  POLICIES.unshift({ id:newPolicyId(), name, cat:importCat, icon, date:today, status:'已发布', sourceType:'import', updateTime:today, fileData:dataUrl, fileName:fname, fileType:ftype, pageCount:pageCount||null, htmlContent });
   savePolicies();
   renderP17();
+  renderP30();
   showToast('✓ 已导入：'+name);
 }
 
