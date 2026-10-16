@@ -13843,7 +13843,7 @@ function openPolicyDetail(id){
       </div>
       <div style="padding:16px 22px;flex:1;overflow-y:auto">
         ${toolHtml}
-        <div class="p17-detail-body">${p.htmlContent||'<p style="color:var(--t3)">暂无内容</p>'}</div>
+        <div class="p17-detail-body">${p.fileType==='pdf' && p.fileData ? '<iframe src="'+p.fileData+'" style="width:100%;height:600px;border:1px solid var(--bdl);border-radius:10px" allowfullscreen></iframe>' : (p.htmlContent||'<p style="color:var(--t3)">暂无内容</p>')}</div>
       </div>
     </div>`;
   document.body.appendChild(overlay);
