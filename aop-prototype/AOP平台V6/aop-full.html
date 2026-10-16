@@ -13733,7 +13733,7 @@ function openPolicyEditor(id){
           <div>
             <label class="p17-edit-lbl">分类</label>
             <select class="p17-edit-cat" id="polEditCat">
-              ${POLICY_CATS.map(c=>`<option value="${c.key}" ${edit&&edit.cat===c.key?'selected':''}>${c.name}</option>`).join('')}
+              ${POLICY_CATS.map(c=>`<option value="${c.key}" ${(edit&&edit.cat===c.key)||(!edit&&defaultCat===c.key)?'selected':''}>${c.name}</option>`).join('')}
             </select>
           </div>
           <div>
@@ -13790,6 +13790,7 @@ function savePolicyFromEditor(id){
   savePolicies();
   closePolicyEditor();
   renderP17();
+  renderP30();
 }
 
 /* —— 制度详情查看 + 文件管理 —— */
@@ -13860,7 +13861,7 @@ function confirmDeletePolicy(id){
   const p = POLICIES.find(x=>x.id===id); if(!p) return;
   confirmDialog('确定删除制度「'+escHtml(p.name)+'」？'+(p.sourceType==='import' ? '（原文件将一并删除）':''), ()=>{
     POLICIES = POLICIES.filter(x=>x.id!==id);
-    savePolicies(); closePolicyDetail(); renderP17();
+    savePolicies(); closePolicyDetail(); renderP17(); renderP30();
     showToast('✓ 已删除');
   }, '删除');
 }
