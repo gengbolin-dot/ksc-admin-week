@@ -2187,9 +2187,12 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
   </div>
 
   <div class="sb-sec">
-    <div class="sb-lbl">行政制度</div>
+    <div class="sb-lbl">制度与知识</div>
     <div class="sb-i" data-panel="p17" onclick="switchPanel('p17',this)">
-      <div class="sb-ic" data-ic="file-text"></div> 制度管理
+      <div class="sb-ic" data-ic="file-text"></div> 行政制度
+    </div>
+    <div class="sb-i" data-panel="p30" onclick="switchPanel('p30',this)">
+      <div class="sb-ic" data-ic="book"></div> 标准规范
     </div>
   </div>
   </div>
@@ -3188,8 +3191,29 @@ body{font-family:'Plus Jakarta Sans','Noto Sans SC','Microsoft YaHei',-apple-sys
 
 <!-- ══════ PANEL 17: ADMIN POLICIES ══════ -->
 <div class="panel" id="p17">
-  <div class="topbar"><div class="topbar-title">行政制度</div></div>
+  <div class="p25-topbar">
+    <div class="p25-topbar-left">
+      <div class="p25-topbar-icon">📋</div>
+      <div>
+        <div class="p25-topbar-title">行政制度</div>
+        <div class="p25-topbar-sub">制度文档管理 · 支持导入与在线编辑</div>
+      </div>
+    </div>
+  </div>
   <div class="content-scroll" id="p17Content"></div>
+</div>
+
+<div class="panel" id="p30">
+  <div class="p25-topbar">
+    <div class="p25-topbar-left">
+      <div class="p25-topbar-icon">📐</div>
+      <div>
+        <div class="p25-topbar-title">标准规范</div>
+        <div class="p25-topbar-sub">标准规范文档管理 · 支持导入与在线编辑</div>
+      </div>
+    </div>
+  </div>
+  <div class="content-scroll" id="p30Content"></div>
 </div>
 
 <!-- ══════ PANEL 18: WORKPLACE OPERATIONS ══════ -->
@@ -4950,6 +4974,7 @@ function switchPanel(id, navEl){
   if(id==='p15'&&!window._p15Rendered){renderP15();window._p15Rendered=true}
   if(id==='p16'&&!window._p16Rendered){renderP16();window._p16Rendered=true}
   if(id==='p17'&&!window._p17Rendered){renderP17();window._p17Rendered=true}
+  if(id==='p30'&&!window._p30Rendered){renderP30();window._p30Rendered=true}
   if(id==='p18'&&!window._p18Rendered){renderP18();window._p18Rendered=true}
   if(id==='p19'&&!window._p19Rendered){renderP19();window._p19Rendered=true}
   if(id==='p20'&&!window._p20Rendered){renderP20();window._p20Rendered=true}
@@ -13569,6 +13594,28 @@ function renderP17(){
   var pp = el.querySelector('.p02-update-pill.pending');
   if(pp) pp.addEventListener('click', scrollToPending);
   renderP17List();
+}
+// Render P30 (标准规范) - reuses policy system with category filter
+function renderP30(){
+  var el = document.getElementById('p30Content');
+  if(!el) return;
+  // Reuse p17 rendering but filter for '标准规范' category
+  // For now, render a similar interface
+  loadPolicies();
+  var standards = POLICIES.filter(function(p){ return p.cat === '标准规范'; });
+  var h = '';
+  if(standards.length === 0){
+    h = '<div style="text-align:center;padding:80px 20px;color:var(--t3)"><div style="font-size:48px;margin-bottom:16px;opacity:.3">📐</div><div style="font-size:17px;font-weight:700;color:var(--t1);margin-bottom:8px">暂无标准规范</div><div style="font-size:13px;margin-bottom:24px">点击「导入」上传标准规范文档，或「新建」创建新规范</div><div style="display:flex;gap:12px;justify-content:center"><button class="btn btn-ac" onclick="importPolicyFile()">📥 导入</button><button class="btn btn-ghost" onclick="openPolicyEditor(null,\'标准规范\')">＋ 新建规范</button></div></div>';
+  } else {
+    h = '<div style="padding:24px 32px">';
+    standards.forEach(function(p){
+      var srcBadge = p.source === 'import' ? '导入' : p.source === 'manual' ? '新建' : '预设';
+      h += '<div class="p17-item" data-cat="' + p.cat + '" onclick="openPolicyDetail(\'' + p.id + '\')"><div class="p17-item-icon" style="background:var(--acl);color:var(--ac)">' + (p.icon||'📐') + '</div><div class="p17-item-info"><div class="p17-item-name">' + escHtml(p.name) + '</div><div class="p17-item-meta">' + p.date + ' · ' + p.status + ' · <span class="p17-src-badge">' + srcBadge + '</span></div></div><div class="p17-item-del" onclick="event.stopPropagation();confirmDeletePolicy(\'' + p.id + '\')" title="删除">🗑</div><div class="p17-item-arrow">→</div></div>';
+    });
+    h += '</div>';
+    h += '<div style="padding:0 32px 24px"><button class="btn btn-ac" onclick="importPolicyFile()">📥 导入规范</button> <button class="btn btn-ghost" onclick="openPolicyEditor(null,\'标准规范\')">＋ 新建规范</button></div>';
+  }
+  el.innerHTML = h;
 }
 
 function renderP17List(){
