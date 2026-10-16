@@ -13705,8 +13705,7 @@ function buildPolicyEntry(dataUrl, fname, ftype, htmlContent, pageCount){
   window._importPolicyCat = null;
   POLICIES.unshift({ id:newPolicyId(), name, cat:importCat, icon, date:today, status:'已发布', sourceType:'import', updateTime:today, fileData:dataUrl, fileName:fname, fileType:ftype, pageCount:pageCount||null, htmlContent });
   savePolicies();
-  renderP17();
-  renderP30();
+  if(importCat === '标准规范'){ renderP30(); } else { renderP17(); }
   showToast('✓ 已导入：'+name);
 }
 
@@ -13789,8 +13788,7 @@ function savePolicyFromEditor(id){
   }
   savePolicies();
   closePolicyEditor();
-  renderP17();
-  renderP30();
+  if(cat === '标准规范'){ renderP30(); } else { renderP17(); }
 }
 
 /* —— 制度详情查看 + 文件管理 —— */
@@ -13860,8 +13858,10 @@ function downloadPolicyFile(id){
 function confirmDeletePolicy(id){
   const p = POLICIES.find(x=>x.id===id); if(!p) return;
   confirmDialog('确定删除制度「'+escHtml(p.name)+'」？'+(p.sourceType==='import' ? '（原文件将一并删除）':''), ()=>{
+    var deletedCat = p.cat;
     POLICIES = POLICIES.filter(x=>x.id!==id);
-    savePolicies(); closePolicyDetail(); renderP17(); renderP30();
+    savePolicies(); closePolicyDetail();
+    if(deletedCat === '标准规范'){ renderP30(); } else { renderP17(); }
     showToast('✓ 已删除');
   }, '删除');
 }
