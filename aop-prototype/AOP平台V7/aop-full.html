@@ -6905,13 +6905,22 @@ tr:hover .p09-del-btn{opacity:1}
     </div>
   </div>
 
-  <div class="sb-sec">
+  <div class="sb-sec" id="sbReviewSec">
     <div class="sb-lbl">经营复盘</div>
-    <div class="sb-i" data-panel="p12" onclick="enterReviewView('manage',this)">
-      <div class="sb-ic" data-ic="trend-up"></div> 行政经营复盘
+    <div class="sb-group open">
+      <div class="sb-group-head" onclick="toggleSidebarGroup(this)">
+        <span class="sb-ic" data-ic="trend-up"></span> 行政经营复盘
+        <span class="sb-group-arrow">▸</span>
+      </div>
+      <div class="sb-group-body">
+        <div class="sb-sub-item" data-p12-view="manage" onclick="enterReviewView('manage',this)">
+          <div class="sb-dot" style="background:var(--ac)"></div> 复盘管理
+        </div>
+        <div class="sb-sub-item" data-p12-view="archive" onclick="enterReviewView('archive',this)">
+          <div class="sb-dot" style="background:var(--t3)"></div> 历史归档
+        </div>
+      </div>
     </div>
-    <a class="sb-sub" data-p12-view="manage" onclick="enterReviewView('manage',this)"><div class="sb-dot" style="background:var(--ac)"></div>复盘管理</a>
-    <a class="sb-sub" data-p12-view="archive" onclick="enterReviewView('archive',this)"><div class="sb-dot" style="background:var(--t3)"></div>历史归档</a>
   </div>
 
   <div class="sb-sec">
@@ -25267,6 +25276,9 @@ function startReview(period,seq){selectReview(period,seq);}
 function enterReviewView(view, el){
   _p12View = view;
   switchPanel('p12');
+  // 子项高亮：复盘管理 / 历史归档
+  document.querySelectorAll('#sbReviewSec .sb-sub-item').forEach(function(n){ n.classList.remove('active'); });
+  if(el && el.classList && el.classList.contains('sb-sub-item')) el.classList.add('active');
   renderP12();
   renderReviewNavStatus();
 }
