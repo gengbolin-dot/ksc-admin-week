@@ -6706,6 +6706,111 @@ tr:hover .p09-del-btn{opacity:1}
   .auth-pick-foot span{display:none}
 }
 
+/* ══════ P31 · 系统管理（准入名单 / 例外授权 / 操作审计） ══════ */
+#p31{background:linear-gradient(180deg,#f7f7ff 0%,#f2f3fb 100%)}
+#p31 .p31-head{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px;padding:0 28px;
+  background:rgba(255,255,255,.94);border-bottom:1px solid #e9e9f6;backdrop-filter:saturate(180%) blur(14px);
+  box-sizing:border-box;flex-shrink:0}
+#p31 .p31-head-left{display:flex;align-items:center;gap:12px;min-width:0}
+#p31 .p31-head-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  color:#fff;flex:0 0 auto;background:linear-gradient(135deg,#6161ff,#a25ddc);box-shadow:0 4px 12px rgba(97,97,255,.24)}
+#p31 .p31-head-title{font-size:17px;font-weight:700;color:#181b34;line-height:1.25;letter-spacing:-.01em}
+#p31 .p31-head-sub{font-size:11.5px;color:#8a8fa3;line-height:1.5;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#p31 .p31-head-actions{display:flex;gap:8px;align-items:center;flex:0 0 auto}
+#p31 .p31-btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:10px;
+  border:1px solid #e2e4f0;background:#fff;color:#535768;font-size:12.5px;font-weight:500;font-family:inherit;
+  cursor:pointer;transition:all .16s;white-space:nowrap}
+#p31 .p31-btn:hover{background:#f7f7ff;border-color:#d5d6ea;color:#181b34}
+#p31 .p31-btn.primary{background:#5d53d2;border-color:#5d53d2;color:#fff;box-shadow:0 4px 12px rgba(93,83,210,.24)}
+#p31 .p31-btn.primary:hover{background:#4b41be;border-color:#4b41be}
+#p31 .p31-scroll{flex:1;overflow-y:auto;padding:20px 28px 44px;min-height:0}
+
+/* 概览卡 */
+#p31 .p31-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+#p31 .p31-stat{background:#fff;border:1px solid #ececf8;border-radius:14px;padding:15px 17px;box-shadow:0 1px 2px rgba(24,27,53,.04)}
+#p31 .p31-stat-label{font-size:11.5px;color:#8a8fa3;font-weight:500;display:flex;align-items:center;gap:7px}
+#p31 .p31-stat-dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+#p31 .p31-stat-num{font-size:26px;font-weight:700;color:#181b34;letter-spacing:-.02em;margin-top:7px;line-height:1.1}
+#p31 .p31-stat-num small{font-size:11.5px;font-weight:500;color:#a8adc0;margin-left:6px;letter-spacing:0}
+
+/* 标签页 */
+#p31 .p31-tabs{display:inline-flex;gap:4px;padding:4px;background:#fff;border:1px solid #ececf8;border-radius:12px;margin-bottom:16px}
+#p31 .p31-tab{padding:7px 15px;border-radius:9px;font-size:12.5px;font-weight:500;color:#676879;cursor:pointer;
+  transition:all .16s;display:flex;align-items:center;gap:7px;user-select:none;white-space:nowrap}
+#p31 .p31-tab:hover{background:#f7f7ff;color:#181b34}
+#p31 .p31-tab.active{background:#5d53d2;color:#fff;box-shadow:0 4px 12px rgba(93,83,210,.22)}
+#p31 .p31-tab-count{font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:100px;
+  background:#f0f1f8;color:#8a8fa3;min-width:18px;text-align:center}
+#p31 .p31-tab.active .p31-tab-count{background:rgba(255,255,255,.26);color:#fff}
+
+/* 工具条 */
+#p31 .p31-toolbar{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+#p31 .p31-search{flex:1;height:38px;padding:0 14px;border-radius:10px;border:1px solid #e4e6f2;background:#fff;
+  font-size:13px;color:#323338;font-family:inherit;outline:none;box-sizing:border-box;
+  transition:border-color .16s,box-shadow .16s}
+#p31 .p31-search::placeholder{color:#b3b7c6}
+#p31 .p31-search:focus{border-color:#a9a4f0;box-shadow:0 0 0 3px rgba(93,83,210,.10)}
+#p31 .p31-count{font-size:12px;color:#a8adc0;white-space:nowrap;flex:0 0 auto}
+
+/* 表格 */
+#p31 table.p31-table{width:100%;background:#fff;border:1px solid #ececf8;border-radius:14px;overflow:hidden;
+  border-collapse:separate;border-spacing:0;box-shadow:0 1px 2px rgba(24,27,53,.04)}
+#p31 .p31-table th{text-align:left;font-size:10.5px;font-weight:600;color:#8a8fa3;text-transform:uppercase;
+  letter-spacing:.05em;padding:11px 16px;background:#fafbff;border-bottom:1px solid #ececf8;white-space:nowrap}
+#p31 .p31-table td{padding:12px 16px;font-size:12.5px;color:#535768;border-bottom:1px solid #f4f5fb;vertical-align:middle}
+#p31 .p31-table tbody tr:last-child td{border-bottom:none}
+#p31 .p31-table tbody tr:hover{background:#fafbff}
+#p31 .p31-user{display:flex;align-items:center;gap:10px}
+#p31 .p31-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:12.5px;font-weight:600;flex:0 0 auto}
+#p31 .p31-uname{font-size:13px;font-weight:600;color:#181b34;line-height:1.3}
+#p31 .p31-uid{font-size:10.5px;color:#a8adc0;margin-top:1px;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+
+/* 徽章 */
+#p31 .p31-badge{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;
+  padding:2px 8px;border-radius:6px;white-space:nowrap;line-height:1.5}
+#p31 .p31-badge.ok{background:#E8FBEE;color:#12a150}
+#p31 .p31-badge.off{background:#F3F5FB;color:#8a8fa3}
+#p31 .p31-badge.warn{background:#FFF6E3;color:#b7791f}
+#p31 .p31-badge.dan{background:#FFEBE9;color:#d1304f}
+#p31 .p31-badge.pur{background:#F5F3FF;color:#5d53d2}
+
+/* 行内操作 */
+#p31 .p31-link{background:none;border:none;padding:2px 7px;font-size:12px;font-weight:500;font-family:inherit;
+  color:#5d53d2;cursor:pointer;border-radius:6px;transition:background .14s}
+#p31 .p31-link:hover{background:#f5f3ff}
+#p31 .p31-link.dan{color:#d1304f}
+#p31 .p31-link.dan:hover{background:#ffebee}
+
+/* 空状态 */
+#p31 .p31-empty{background:#fff;border:1px dashed #dfe2f0;border-radius:14px;padding:52px 24px;text-align:center}
+#p31 .p31-empty-ic{width:52px;height:52px;border-radius:50%;background:#f5f3ff;color:#8f8fff;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+#p31 .p31-empty-t{font-size:14px;font-weight:600;color:#535768;margin-bottom:6px}
+#p31 .p31-empty-s{font-size:12px;color:#a8adc0;line-height:1.75}
+
+/* 授权弹窗 */
+#p31GrantModal{position:fixed;inset:0;background:rgba(15,16,35,.5);backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);z-index:10002;display:flex;align-items:center;justify-content:center;padding:24px}
+#p31GrantModal .p31-modal{width:520px;max-width:100%;background:#fff;border-radius:18px;
+  box-shadow:0 30px 80px rgba(10,10,40,.35);display:flex;flex-direction:column;max-height:82vh;overflow:hidden}
+#p31GrantModal .p31-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+  padding:22px 24px 16px;flex-shrink:0}
+#p31GrantModal .p31-modal-title{font-size:16px;font-weight:600;color:#181b34}
+#p31GrantModal .p31-modal-sub{font-size:12px;color:#8a8fa3;margin-top:5px;line-height:1.6}
+#p31GrantModal .p31-modal-x{width:28px;height:28px;flex:0 0 auto;border:none;border-radius:8px;background:transparent;
+  color:#a8adc0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .14s}
+#p31GrantModal .p31-modal-x:hover{background:#f3f5fb;color:#535768}
+#p31GrantModal .p31-modal-x svg{width:16px;height:16px}
+#p31GrantModal .p31-modal-body{padding:0 24px 20px;overflow-y:auto;min-height:0;display:flex;flex-direction:column;gap:10px}
+#p31GrantModal .p31-grant-list{border:1px solid #ececf8;border-radius:12px;overflow-y:auto;max-height:340px;padding:6px}
+#p31GrantModal .p31-grant-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;transition:background .14s}
+#p31GrantModal .p31-grant-item:hover{background:#f7f7ff}
+@media (max-width:1100px){
+  #p31 .p31-stats{grid-template-columns:repeat(2,1fr)}
+}
+
+
 
 </style>
 <link rel="stylesheet" href="aop-kanban-palette.css">
@@ -6827,6 +6932,13 @@ tr:hover .p09-del-btn{opacity:1}
     <div class="sb-i" data-panel="p30" onclick="switchPanel('p30',this)">
       <div class="sb-ic" data-ic="book"></div> 标准规范
     </div>
+
+  <div class="sb-sec" id="sbAdminSec" style="display:none">
+    <div class="sb-lbl">系统管理</div>
+    <div class="sb-i" data-panel="p31" onclick="switchPanel('p31',this)">
+      <div class="sb-ic" data-ic="settings"></div> 系统管理
+    </div>
+  </div>
   </div>
   </div>
 
@@ -7964,6 +8076,23 @@ html body #p13 .p13-detail-table td.col-rate,html body #p13 .p13-detail-table th
   </div>
 </div>
 
+<!-- ══════ PANEL 31: SYSTEM ADMIN ══════ -->
+<div class="panel" id="p31">
+  <div class="p31-head">
+    <div class="p31-head-left">
+      <div class="p31-head-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+      <div style="min-width:0">
+        <div class="p31-head-title">系统管理</div>
+        <div class="p31-head-sub">准入名单 · 例外授权 · 操作审计</div>
+      </div>
+    </div>
+    <div class="p31-head-actions">
+      <button class="p31-btn" type="button" onclick="p31Refresh()">刷新</button>
+      <button class="p31-btn primary" type="button" onclick="p31OpenGrant()">＋ 新增例外</button>
+    </div>
+  </div>
+  <div class="p31-scroll" id="p31Scroll"></div>
+</div>
 </div><!-- end main -->
 </div><!-- end shell -->
 
@@ -10429,6 +10558,7 @@ function switchPanel(id, navEl){
   if(id==='p23'){loadSavedUrl('p23')}
   if(id==='p24'){loadSavedUrl('p24')}
   if(id==='p25'){renderP25()}
+  if(id==='p31'){renderP31()}
   }
 
 /* ══════ SLIDE-OVER ══════ */
@@ -24392,7 +24522,9 @@ function authDeptLabel(u){
 function authIsAllowed(u){
   if(!u) return false;
   var top = (u.deptPath && u.deptPath[0]) || u.dept || '';
-  return AUTH_ALLOWED_DEPTS.some(function(d){ return top === d; });
+  if(AUTH_ALLOWED_DEPTS.some(function(d){ return top === d; })) return true;
+  // 部门外例外授权
+  return p31Overrides().some(function(o){ return o.uid === u.uid && o.status === 'active'; });
 }
 
 function authApplyUser(u){
@@ -24402,6 +24534,8 @@ function authApplyUser(u){
   if(av){ av.textContent = (u.name || '?').charAt(0); av.style.background = u.color || '#5d53d2'; }
   if(nm) nm.textContent = u.name || '';
   if(rl) rl.textContent = [u.title, u.workplace].filter(Boolean).join(' · ');
+  var _adm = document.getElementById('sbAdminSec');
+  if(_adm) _adm.style.display = (u && u.admin) ? '' : 'none';
 }
 
 function authShowStep(step){
@@ -24452,7 +24586,8 @@ function authRenderPicker(kw){
       + '<div class="auth-pick-av" style="background:' + col + '">' + (u.name || '?').charAt(0) + '</div>'
       + '<div class="auth-pick-main">'
       +   '<div class="auth-pick-name">' + u.name
-      +     '<span class="auth-pick-tag ' + (ok ? 'ok' : 'no') + '">' + (ok ? '行政部' : '非行政部') + '</span>'
+      +     '<span class="auth-pick-tag ' + (ok ? 'ok' : 'no') + '">'
+      +       (((u.deptPath || [])[0] === '行政部') ? '行政部' : (ok ? '例外授权' : '非行政部')) + '</span>'
       +   '</div>'
       +   '<div class="auth-pick-meta">' + authDeptLabel(u) + ' · ' + u.title + ' · ' + u.workplace + '</div>'
       + '</div>'
@@ -24470,6 +24605,7 @@ function authLogin(uid){
     if(av){ av.textContent = (u.name || '?').charAt(0); av.style.background = u.color || '#6B7280'; }
     if(nm) nm.textContent = u.name + '（' + u.uid + '）';
     if(mt) mt.textContent = authDeptLabel(u) + ' · ' + u.title;
+    accessLog('denied', u);
     authShowStep('authStepDenied');
     return;
   }
@@ -24482,11 +24618,13 @@ function authLogin(uid){
   authHideGate();
   if(typeof renderWeekPeriod === 'function') renderWeekPeriod();
   if(typeof renderP02 === 'function') renderP02();
+  accessLog('login', u);
   showToast('✓ 已登录：' + u.name);
 }
 
 function authLogout(){
   if(!confirm('确认退出登录？')) return;
+  accessLog('logout', authSession());
   localStorage.removeItem(AUTH_SESSION_KEY);
   location.reload();
 }
@@ -24500,6 +24638,352 @@ function authBoot(){
   }
   authShowGate();
   authShowStep('authStepLogin');
+}
+
+/* ══════ P31 · 系统管理（准入名单 / 例外授权 / 操作审计） ══════ */
+var P31_OVERRIDE_KEY = 'aop_access_overrides';
+var P31_LOG_KEY = 'aop_access_logs';
+var p31State = { tab: 'members', kw: '' };
+
+function p31Read(key, def){
+  try { var v = JSON.parse(localStorage.getItem(key) || 'null'); return (v === null || v === undefined) ? def : v; }
+  catch(e) { return def; }
+}
+function p31Write(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
+
+function p31Overrides(){ return p31Read(P31_OVERRIDE_KEY, []); }
+function p31Logs(){ return p31Read(P31_LOG_KEY, []); }
+
+function p31Esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function p31Pad(n){ return n < 10 ? '0' + n : '' + n; }
+function p31FmtTime(iso){
+  if(!iso) return '—';
+  var d = new Date(iso);
+  if(isNaN(d.getTime())) return '—';
+  return d.getFullYear() + '-' + p31Pad(d.getMonth()+1) + '-' + p31Pad(d.getDate())
+    + ' ' + p31Pad(d.getHours()) + ':' + p31Pad(d.getMinutes());
+}
+
+// 统一审计写入：最多保留 200 条
+function accessLog(action, user){
+  var logs = p31Logs();
+  logs.unshift({
+    id: 'L' + Date.now() + Math.floor(Math.random() * 1000),
+    at: new Date().toISOString(),
+    uid: user ? (user.uid || '') : '',
+    name: user ? (user.name || '') : '',
+    dept: user ? ((user.deptPath || []).join(' / ') || user.dept || '') : '',
+    action: action
+  });
+  if(logs.length > 200) logs.length = 200;
+  p31Write(P31_LOG_KEY, logs);
+}
+
+function p31IsDeptUser(u){ return ((u.deptPath || [])[0] || u.dept || '') === '行政部'; }
+
+/* ── 渲染入口 ── */
+function renderP31(){
+  var scroll = document.getElementById('p31Scroll');
+  if(!scroll) return;
+  var s = authSession();
+  if(!s || !s.admin){
+    scroll.innerHTML = '<div class="p31-empty">'
+      + '<div class="p31-empty-ic">' + sbIcon('settings', 24) + '</div>'
+      + '<div class="p31-empty-t">无访问权限</div>'
+      + '<div class="p31-empty-s">系统管理仅对管理员开放。</div>'
+      + '</div>';
+    return;
+  }
+  scroll.innerHTML = '<div class="p31-stats" id="p31Stats"></div>'
+    + '<div class="p31-tabs" id="p31Tabs"></div>'
+    + '<div id="p31Body"></div>';
+  p31RenderStats();
+  p31RenderTabs();
+  p31RenderBody();
+}
+
+function p31Stat(label, num, color, sub){
+  return '<div class="p31-stat">'
+    + '<div class="p31-stat-label"><span class="p31-stat-dot" style="background:' + color + '"></span>' + label + '</div>'
+    + '<div class="p31-stat-num">' + num + '<small>' + sub + '</small></div>'
+    + '</div>';
+}
+
+function p31RenderStats(){
+  var el = document.getElementById('p31Stats'); if(!el) return;
+  var members = AUTH_DIRECTORY.filter(p31IsDeptUser);
+  var ovActive = p31Overrides().filter(function(o){ return o.status === 'active'; });
+  var logs = p31Logs();
+  var today = new Date().toISOString().slice(0, 10);
+  var deniedToday = logs.filter(function(l){
+    return l.action === 'denied' && String(l.at || '').slice(0, 10) === today;
+  }).length;
+
+  el.innerHTML =
+      p31Stat('可访问成员', members.length + ovActive.length, '#12a150', '总人数')
+    + p31Stat('行政部账号', members.length, '#5d53d2', '自动放行')
+    + p31Stat('例外授权', ovActive.length, '#eea935', '部门外')
+    + p31Stat('今日拦截', deniedToday, '#e0005c', '准入拒绝');
+}
+
+function p31RenderTabs(){
+  var el = document.getElementById('p31Tabs'); if(!el) return;
+  var members = AUTH_DIRECTORY.filter(p31IsDeptUser);
+  var ovActive = p31Overrides().filter(function(o){ return o.status === 'active'; });
+  var tabs = [
+    { k: 'members',   n: '成员列表', c: members.length },
+    { k: 'overrides', n: '例外名单', c: ovActive.length },
+    { k: 'logs',      n: '准入日志', c: p31Logs().length }
+  ];
+  el.innerHTML = tabs.map(function(t){
+    return '<div class="p31-tab' + (p31State.tab === t.k ? ' active' : '') + '" onclick="p31SetTab(&quot;' + t.k + '&quot;)">'
+      + t.n + '<span class="p31-tab-count">' + t.c + '</span></div>';
+  }).join('');
+}
+
+function p31SetTab(tab){
+  p31State.tab = tab;
+  p31RenderTabs();
+  p31RenderBody();
+}
+
+function p31Refresh(){
+  p31State.kw = '';
+  renderP31();
+  showToast('已刷新');
+}
+
+function p31RenderBody(){
+  var el = document.getElementById('p31Body'); if(!el) return;
+  if(p31State.tab === 'overrides'){ el.innerHTML = p31OverridesHtml(); return; }
+  if(p31State.tab === 'logs'){ el.innerHTML = p31LogsHtml(); return; }
+  el.innerHTML = '<div class="p31-toolbar">'
+    + '<input class="p31-search" id="p31SearchInput" type="text" autocomplete="off" placeholder="搜索姓名 / 工号 / 邮箱 / 职位" value="' + p31Esc(p31State.kw) + '" oninput="p31Search(this.value)">'
+    + '<span class="p31-count" id="p31MemberCount"></span>'
+    + '</div><div id="p31MemberTable"></div>';
+  p31RenderMemberTable();
+}
+
+function p31Search(v){
+  p31State.kw = v;
+  p31RenderMemberTable();
+}
+
+function p31RenderMemberTable(){
+  var el = document.getElementById('p31MemberTable'); if(!el) return;
+  var q = (p31State.kw || '').trim().toLowerCase();
+  var list = AUTH_DIRECTORY.filter(p31IsDeptUser);
+  if(q){
+    list = list.filter(function(u){
+      return (u.name + ' ' + u.uid + ' ' + u.email + ' ' + u.title + ' ' + u.workplace + ' ' + (u.deptPath || []).join(' '))
+        .toLowerCase().indexOf(q) >= 0;
+    });
+  }
+  var cnt = document.getElementById('p31MemberCount');
+  if(cnt) cnt.textContent = '共 ' + list.length + ' 人';
+
+  var rows = list.map(function(u){
+    return '<tr>'
+      + '<td><div class="p31-user">'
+      +   '<div class="p31-av" style="background:' + (u.color || '#6B7280') + '">' + p31Esc((u.name || '?').charAt(0)) + '</div>'
+      +   '<div><div class="p31-uname">' + p31Esc(u.name) + '</div><div class="p31-uid">' + p31Esc(u.uid) + '</div></div>'
+      + '</div></td>'
+      + '<td>' + p31Esc(u.email) + '</td>'
+      + '<td>' + p31Esc((u.deptPath || []).join(' / ')) + '</td>'
+      + '<td>' + p31Esc(u.title) + '</td>'
+      + '<td>' + p31Esc(u.workplace) + '</td>'
+      + '<td><span class="p31-badge ok">自动放行</span></td>'
+      + '</tr>';
+  }).join('');
+
+  el.innerHTML = '<table class="p31-table"><thead><tr>'
+    + '<th>成员</th><th>邮箱</th><th>部门</th><th>职位</th><th>职场</th><th>准入方式</th>'
+    + '</tr></thead><tbody>'
+    + (rows || '<tr><td colspan="6" style="text-align:center;color:#a8adc0;padding:44px 0">未找到匹配的成员</td></tr>')
+    + '</tbody></table>';
+}
+
+function p31OverridesHtml(){
+  var list = p31Overrides();
+  if(!list.length){
+    return '<div class="p31-empty">'
+      + '<div class="p31-empty-ic">' + sbIcon('users', 24) + '</div>'
+      + '<div class="p31-empty-t">暂无例外授权</div>'
+      + '<div class="p31-empty-s">行政部成员默认自动放行，无需配置。<br>如需为部门外人员单独开通访问权限，点击右上角「新增例外」。</div>'
+      + '</div>';
+  }
+  var rows = list.map(function(o){
+    var active = o.status === 'active';
+    return '<tr>'
+      + '<td><div class="p31-user">'
+      +   '<div class="p31-av" style="background:' + (o.color || '#6B7280') + '">' + p31Esc((o.name || '?').charAt(0)) + '</div>'
+      +   '<div><div class="p31-uname">' + p31Esc(o.name) + '</div><div class="p31-uid">' + p31Esc(o.uid) + '</div></div>'
+      + '</div></td>'
+      + '<td>' + p31Esc((o.deptPath || []).join(' / ')) + '</td>'
+      + '<td>' + p31Esc(o.title) + '</td>'
+      + '<td>' + p31Esc(o.reason || '—') + '</td>'
+      + '<td style="white-space:nowrap;font-variant-numeric:tabular-nums">' + p31FmtTime(o.grantedAt) + '</td>'
+      + '<td><span class="p31-badge ' + (active ? 'ok' : 'off') + '">' + (active ? '生效中' : '已停用') + '</span></td>'
+      + '<td style="text-align:right;white-space:nowrap">'
+      +   '<button class="p31-link" type="button" onclick="p31ToggleOverride(&quot;' + p31Esc(o.uid) + '&quot;)">' + (active ? '停用' : '恢复') + '</button>'
+      +   '<button class="p31-link dan" type="button" onclick="p31RemoveOverride(&quot;' + p31Esc(o.uid) + '&quot;)">删除</button>'
+      + '</td></tr>';
+  }).join('');
+
+  return '<table class="p31-table"><thead><tr>'
+    + '<th>成员</th><th>部门</th><th>职位</th><th>授权原因</th><th>授权时间</th><th>状态</th><th></th>'
+    + '</tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+function p31LogsHtml(){
+  var logs = p31Logs();
+  if(!logs.length){
+    return '<div class="p31-empty">'
+      + '<div class="p31-empty-ic">' + sbIcon('file-text', 24) + '</div>'
+      + '<div class="p31-empty-t">暂无准入日志</div>'
+      + '<div class="p31-empty-s">成员登录、被拦截、退出登录都会记录在这里。</div>'
+      + '</div>';
+  }
+  var map = {
+    login:  { t: '登录成功', c: 'ok' },
+    denied: { t: '准入拦截', c: 'dan' },
+    logout: { t: '退出登录', c: 'off' },
+    grant:  { t: '新增授权', c: 'pur' },
+    revoke: { t: '停用授权', c: 'warn' }
+  };
+  var rows = logs.slice(0, 100).map(function(l){
+    var m = map[l.action] || { t: l.action || '—', c: 'off' };
+    return '<tr>'
+      + '<td style="white-space:nowrap;font-variant-numeric:tabular-nums;color:#8a8fa3">' + p31FmtTime(l.at) + '</td>'
+      + '<td>' + p31Esc(l.name || '—')
+      +   (l.uid ? '<span style="color:#c2c6d4;font-size:11px;margin-left:7px;font-variant-numeric:tabular-nums">' + p31Esc(l.uid) + '</span>' : '')
+      + '</td>'
+      + '<td>' + p31Esc(l.dept || '—') + '</td>'
+      + '<td><span class="p31-badge ' + m.c + '">' + m.t + '</span></td>'
+      + '</tr>';
+  }).join('');
+
+  return '<table class="p31-table"><thead><tr>'
+    + '<th>时间</th><th>账号</th><th>部门</th><th>结果</th>'
+    + '</tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+/* ── 新增例外弹窗 ── */
+function p31OpenGrant(){
+  var old = document.getElementById('p31GrantModal');
+  if(old) old.remove();
+
+  var m = document.createElement('div');
+  m.id = 'p31GrantModal';
+  m.addEventListener('click', function(e){ if(e.target === m) m.remove(); });
+  m.innerHTML = '<div class="p31-modal" role="dialog" aria-modal="true">'
+    + '<div class="p31-modal-head">'
+    +   '<div><div class="p31-modal-title">新增例外授权</div>'
+    +     '<div class="p31-modal-sub">为行政部之外的人员单独开通 AOP 访问权限</div></div>'
+    +   '<button class="p31-modal-x" type="button" title="关闭" onclick="document.getElementById(&quot;p31GrantModal&quot;).remove()">'
+    +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>'
+    +   '</button>'
+    + '</div>'
+    + '<div class="p31-modal-body">'
+    +   '<input class="p31-search" id="p31GrantReason" type="text" autocomplete="off" placeholder="授权原因（可选，默认：部门外特批）">'
+    +   '<input class="p31-search" id="p31GrantSearch" type="text" autocomplete="off" placeholder="搜索姓名 / 工号 / 部门" oninput="p31RenderGrantList(this.value)">'
+    +   '<div class="p31-grant-list" id="p31GrantList"></div>'
+    + '</div>'
+    + '</div>';
+  document.body.appendChild(m);
+  p31RenderGrantList('');
+  var s = document.getElementById('p31GrantSearch');
+  if(s) setTimeout(function(){ s.focus(); }, 60);
+}
+
+function p31RenderGrantList(kw){
+  var box = document.getElementById('p31GrantList'); if(!box) return;
+  var q = (kw || '').trim().toLowerCase();
+  var ovMap = {};
+  p31Overrides().forEach(function(o){ ovMap[o.uid] = o; });
+
+  var list = AUTH_DIRECTORY.filter(function(u){
+    if(p31IsDeptUser(u)) return false;              // 行政部默认放行，不需要例外
+    if(!q) return true;
+    return (u.name + ' ' + u.uid + ' ' + u.email + ' ' + u.title + ' ' + (u.deptPath || []).join(' '))
+      .toLowerCase().indexOf(q) >= 0;
+  });
+
+  if(!list.length){
+    box.innerHTML = '<div style="text-align:center;color:#a8adc0;font-size:12.5px;padding:32px 0">没有可授权的人员</div>';
+    return;
+  }
+
+  box.innerHTML = list.map(function(u){
+    var o = ovMap[u.uid];
+    var active = o && o.status === 'active';
+    return '<div class="p31-grant-item">'
+      + '<div class="p31-av" style="background:' + (u.color || '#6B7280') + '">' + p31Esc((u.name || '?').charAt(0)) + '</div>'
+      + '<div style="min-width:0;flex:1">'
+      +   '<div class="p31-uname">' + p31Esc(u.name) + '</div>'
+      +   '<div class="p31-uid">' + p31Esc((u.deptPath || []).join(' / ')) + ' · ' + p31Esc(u.title) + '</div>'
+      + '</div>'
+      + (active
+          ? '<span class="p31-badge ok">已授权</span>'
+          : '<button class="p31-link" type="button" onclick="p31Grant(&quot;' + p31Esc(u.uid) + '&quot;)">授权</button>')
+      + '</div>';
+  }).join('');
+}
+
+function p31Grant(uid){
+  var u = AUTH_DIRECTORY.filter(function(x){ return x.uid === uid; })[0];
+  if(!u) return;
+  var reasonEl = document.getElementById('p31GrantReason');
+  var reason = (reasonEl && reasonEl.value.trim()) || '部门外特批';
+  var s = authSession();
+  var list = p31Overrides();
+  var exist = list.filter(function(o){ return o.uid === uid; })[0];
+
+  if(exist){
+    exist.status = 'active';
+    exist.reason = reason;
+    exist.grantedAt = new Date().toISOString();
+    exist.grantedBy = s ? s.name : '';
+  } else {
+    list.push({
+      uid: u.uid, name: u.name, email: u.email,
+      deptPath: (u.deptPath || []).slice(), workplace: u.workplace,
+      title: u.title, color: u.color, reason: reason, status: 'active',
+      grantedAt: new Date().toISOString(), grantedBy: s ? s.name : ''
+    });
+  }
+  p31Write(P31_OVERRIDE_KEY, list);
+  accessLog('grant', u);
+
+  var m = document.getElementById('p31GrantModal');
+  if(m) m.remove();
+  renderP31();
+  showToast('✓ 已授权：' + u.name);
+}
+
+function p31ToggleOverride(uid){
+  var list = p31Overrides();
+  var o = list.filter(function(x){ return x.uid === uid; })[0];
+  if(!o) return;
+  o.status = (o.status === 'active') ? 'inactive' : 'active';
+  p31Write(P31_OVERRIDE_KEY, list);
+  accessLog(o.status === 'active' ? 'grant' : 'revoke', o);
+  renderP31();
+  showToast(o.status === 'active' ? '✓ 已恢复授权' : '已停用授权');
+}
+
+function p31RemoveOverride(uid){
+  var list = p31Overrides();
+  var o = list.filter(function(x){ return x.uid === uid; })[0];
+  if(!o) return;
+  if(!confirm('确认删除「' + o.name + '」的例外授权？\n删除后该账号将无法再访问本平台。')) return;
+  p31Write(P31_OVERRIDE_KEY, list.filter(function(x){ return x.uid !== uid; }));
+  accessLog('revoke', o);
+  renderP31();
+  showToast('已删除授权');
 }
 
 /* ══════ INIT ══════ */
