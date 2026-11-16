@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body>
+<iframe id="f" src="aop-full.html" style="width:1440px;height:1000px;border:0"></iframe>
+<pre id="out">pending</pre>
+<script>
+const f = document.getElementById('f'), out = document.getElementById('out');
+f.onload = function(){
+  const w = f.contentWindow, d = w.document;
+  setTimeout(function(){
+    const nav = d.querySelector('[data-panel="p11"]');
+    if(nav) w.switchPanel('p11', nav);
+    setTimeout(function(){
+      const names = [...d.querySelectorAll('#p11 .p11-dept-name')].map(function(el){
+        const cs = w.getComputedStyle(el);
+        return {
+          text: el.textContent.trim(),
+          ws: cs.whiteSpace,
+          wb: cs.wordBreak,
+          ow: cs.overflowWrap,
+          cw: el.clientWidth,
+          sw: el.scrollWidth,
+          ch: el.clientHeight,
+          sh: el.scrollHeight
+        };
+      });
+      const add = d.querySelector('#p11 .p11-card-module-add');
+      const addCS = add ? w.getComputedStyle(add) : null;
+      const stat = d.querySelector('#p11 .p11-stat');
+      const statCS = stat ? w.getComputedStyle(stat) : null;
+      out.textContent = 'RESULT ' + JSON.stringify({
+        names: names.slice(0, 8),
+        add: addCS ? { fontSize: addCS.fontSize, opacity: addCS.opacity, width: addCS.width, height: addCS.height, bg: addCS.backgroundColor, color: addCS.color } : null,
+        stat: statCS ? { bg: statCS.backgroundImage.slice(0, 40), color: statCS.color, padding: statCS.padding } : null
+      });
+    }, 1200);
+  }, 1500);
+};
+</script>
+</body></html>

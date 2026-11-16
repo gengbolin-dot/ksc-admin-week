@@ -1,0 +1,48 @@
+/* ══════════════════════════════════════════════════════════════════
+   AOP · monday.com Kanban 色板覆盖层
+   取值来源：monday.com/features/kanban（官方页面 CSS）
+   - 品牌蓝 #0085ff / 悬停 #0068c9 / 浅底 #e8f3ff
+   - 绿 #00ca72 · 橙 #fdab3d · 红 #fb275d · 紫 #a358df · 靛 #597bfc · 青 #00d2d2
+   - 文字 #323338 / #535768 / #676879；分割线 #d0d4e4 / #e6e9ef；底色 #f7f8fa
+   加载顺序：必须在页面内联 <style> 之后，以覆盖原有 #6161FF 体系。
+   ══════════════════════════════════════════════════════════════════ */
+
+:root{
+  --ac:#0085ff;
+  --ach:#0068c9;
+  --acl:#e8f3ff;
+  --bgH:#e8f3ff;
+  --m-purple:#0085ff;
+  --m-purple-hover:#0068c9;
+  --m-purple-base:#0085ff;
+  --m-light:#e8f3ff;
+  --m-primary-lighter:#f4f9ff;
+  --m-bright-purple:#597bfc;
+  --m-purple-status:#a358df;
+  --m-red:#fb275d;
+  --m-border:#d0d4e4;
+  --m-border-light:#e6e9ef;
+}
+
+/* 侧边栏 */
+.sb-i.act{background:#e8f3ff!important;color:#0085ff!important}
+.sb-i.act .sb-ic,.sb-i.act svg,.sb-i.act span{color:#0085ff!important}
+.sb-i:hover{background:#f4f9ff}
+
+/* 顶栏与主操作按钮 */
+.btn-ac,.btn-primary,[class*="-new-btn"],[class*="-add-btn"]{
+  background:#0085ff!important;border-color:#0085ff!important;color:#fff!important;
+}
+.btn-ac:hover,.btn-primary:hover,[class*="-new-btn"]:hover,[class*="-add-btn"]:hover{
+  background:#0068c9!important;border-color:#0068c9!important;
+}
+.p05-foot-btn.primary:hover{background:#0068c9!important;border-color:#0068c9!important}
+.p12-mgr-new-btn:hover{background:#0068c9!important}
+.p09v-entry-btn:hover{background:#0068c9!important}
+a:hover{color:#0068c9}
+
+/* 头像渐变：去掉紫粉渐变，改为 monday 蓝 */
+.sb-av,.topbar-avatar{
+  background:#0085ff!important;
+  background-image:linear-gradient(135deg,#0085ff,#597bfc)!important;
+}

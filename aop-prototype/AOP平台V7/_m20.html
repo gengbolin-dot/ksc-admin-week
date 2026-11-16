@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body>
+<iframe id="f" src="aop-full.html" style="width:1440px;height:1000px;border:0"></iframe>
+<pre id="out">pending</pre>
+<script>
+const f = document.getElementById('f'), out = document.getElementById('out');
+f.onload = function(){
+  const w = f.contentWindow, d = w.document;
+  const nav = d.querySelector('[data-panel="p05"]');
+  if(nav && typeof w.switchPanel === 'function') w.switchPanel('p05', nav);
+  setTimeout(function(){
+    const btn = d.querySelector('#p05 .kp-foot-ic');
+    w.toggleP05Menu(0, btn);
+    const menu = d.querySelector('#p05 .kp-menu.open');
+    const before = [...d.querySelectorAll('#p05 .kp-card .kp-card-title')].slice(0,4).map(function(el){ return el.textContent.trim(); });
+    w.moveP05ToTop(2);
+    setTimeout(function(){
+      const after = [...d.querySelectorAll('#p05 .kp-card .kp-card-title')].slice(0,4).map(function(el){ return el.textContent.trim(); });
+      out.textContent = 'RESULT ' + JSON.stringify({ menu: menu ? menu.textContent.replace(/\s+/g, '|') : 'none', before: before, after: after });
+    }, 600);
+  }, 1800);
+};
+</script>
+</body></html>

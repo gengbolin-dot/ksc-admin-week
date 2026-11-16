@@ -1,0 +1,108 @@
+/* ══════════════════════════════════════════════════════════════════
+   AOP · 截图取色色板（v3 · 强度提层级）
+
+   取色来源（逐像素提取，非目测）：
+   - 图一 Company KPIs：主色 #5D53D2，图表 绿 #4BE272 黄 #F4D200
+     橙 #EEA935 品红 #E0005C 玫红 #CD2D58 蓝 #3EA4FB 浅蓝 #7ED4FE 靛 #699EFA
+     深色文字 #2C304C
+   - 图二 Team planning：底 #F0F3FE，卡片 #FFFFFF，文字 #181B35，
+     列头 #2D74EF / #6662FF / #F6A92F / #F659C6 / #F9CA00 / #40CA6D
+
+   本版重点：对比度提一档，让白卡在浅紫底上“浮”起来，
+   标题/正文/辅助文字三级层次拉开。
+   ══════════════════════════════════════════════════════════════════ */
+
+:root{
+  /* 主色 */
+  --ac:#5d53d2;
+  --ach:#463cb8;
+  --acl:#edebfb;
+  --bgH:#f1effd;
+
+  /* 图表 / 状态 */
+  --v-green:#4be272;
+  --v-lime:#40ca6d;
+  --v-yellow:#f4d200;
+  --v-orange:#eea935;
+  --v-magenta:#e0005c;
+  --v-rose:#cd2d58;
+  --v-blue:#3ea4fb;
+  --v-sky:#7ed4fe;
+  --v-indigo:#699efa;
+  --v-pink:#f659c6;
+
+  /* 中性 */
+  --v-ink:#181b35;
+  --v-ink2:#2c304c;
+  --v-text:#4b4f66;
+  --v-muted:#7c8093;
+  --v-bg:#f0f3fe;
+  --v-card:#ffffff;
+  --v-line:#d8dbec;
+  --v-line2:#e4e6f2;
+}
+
+/* ---------- 底色与画布：浅紫底 + 纯白卡片 ---------- */
+body,.panel,.main,.shell,.content-scroll{background:#eef1fd!important}
+
+/* ---------- 侧边栏：白底但边界更清晰 ---------- */
+.sb{background:#fff!important;border-right:1px solid var(--v-line)!important}
+.sb-lbl,.sb-grp{color:#6d7189!important}
+.sb-i,.sb-group-head{color:#2c304c!important}
+.sb-i.act,.sb-sub-item.active{
+  background:#edebfb!important;color:#5d53d2!important;font-weight:600!important;
+  box-shadow:inset 0 0 0 1px rgba(93,83,210,.16)!important;
+}
+.sb-i.act::before,.sb-sub-item.active::before{background:#5d53d2!important}
+.sb-i.act .sb-ic,.sb-i.act svg,.sb-i.act span{color:#5d53d2!important}
+.sb-i:hover,.sb-group-head:hover,.sb-sub-item:hover{background:#f3f1fd!important}
+.sb-sub-item{color:#4b4f66!important}
+
+/* ---------- 卡片：白底 + 更实的描边 + 极轻投影 ---------- */
+.card,.p09-mod,.p06-card,.p13-card,.p05-card,[class$="-card"]{
+  background:#fff!important;
+  border-color:var(--v-line)!important;
+  box-shadow:0 1px 2px rgba(24,27,53,.06)!important;
+}
+.card:hover,.p09-mod:hover{box-shadow:0 6px 20px rgba(24,27,53,.09)!important}
+
+/* ---------- 标题层级：拉开字重与色差 ---------- */
+.panel-header h1,.page-header h1,.p02-header-title,.p05-header-title{
+  font-weight:600!important;color:#181b35!important;letter-spacing:-.022em!important;
+}
+.panel-header p,.page-header p,.p02-header-sub,.p05-header-sub{color:#4b4f66!important}
+.topbar-title{font-weight:600!important;color:#181b35!important}
+
+/* ---------- 按钮 ---------- */
+.btn-ac,.btn-primary,[class*="-new-btn"],[class*="-add-btn"]{
+  background:#5d53d2!important;border-color:#5d53d2!important;color:#fff!important;
+  box-shadow:0 1px 2px rgba(93,83,210,.24)!important;
+}
+.btn-ac:hover,.btn-primary:hover,[class*="-new-btn"]:hover,[class*="-add-btn"]:hover{
+  background:#463cb8!important;border-color:#463cb8!important;
+}
+.topbar-search:focus{box-shadow:0 0 0 4px rgba(93,83,210,.14)!important}
+
+/* 头像：靛蓝 → 蓝 */
+.sb-av,.topbar-avatar{background:#5d53d2!important;background-image:linear-gradient(135deg,#6662ff,#3ea4fb)!important}
+
+/* ---------- 数据中心图表 ---------- */
+.pz-head svg{color:#5d53d2!important}
+.pz-title{color:#181b35!important;font-weight:700!important}
+.pz-meta,.pz-note{color:#7c8093!important}
+.pz-bar-track,.pz-col-track{background:#e7e9f5!important}
+.pz-ring-c b{color:#181b35!important}
+.pz-tile::before{background:#5d53d2!important}
+.pz-tile-num{color:#181b35!important}
+.pz-tile-lbl{color:#7c8093!important}
+.pz-entry{background:#f7f7fd!important;border-color:var(--v-line)!important}
+.pz-entry-ic{background:#edebfb!important;color:#5d53d2!important}
+.pz-entry-btn{background:#5d53d2!important}
+.pz-entry-btn:hover{background:#463cb8!important}
+.pz-pill{border-color:var(--v-line)!important;color:#4b4f66!important;background:#fff!important}
+.pz-pill b{color:#181b35!important}
+.pz-legend-row{border-bottom-color:#eef0f8!important;color:#4b4f66!important}
+.pz-legend-row b{color:#181b35!important}
+.pz-legend-row em{color:#7c8093!important}
+.pz-bar-name,.pz-col-lbls span{color:#4b4f66!important}
+.pz-bar-val,.pz-col-val{color:#181b35!important}

@@ -1,0 +1,87 @@
+/* ══════════════════════════════════════════════════════════════════
+   运营看板 · 顶部「事项状态分布」
+   要点：
+   - 按类型拆成「重点项目 / 日常运营」两张卡片，避免混在一起看不出重点
+   - 每张卡内用一条堆叠状态条 + 图例，状态色与看板列头一致
+   - 每类给出「占比」和「完成率」两个小结论，而不只是罗列数量
+   仅作用于 #p06。
+   ══════════════════════════════════════════════════════════════════ */
+
+#p06 .aop-chart-block{
+  margin:0 28px 14px!important;
+  padding:18px 20px 20px!important;
+  background:#fff!important;
+  border:1px solid var(--kb-line,#d8dbec)!important;
+  border-radius:14px!important;
+}
+#p06 .aop-chart-title{
+  font-size:12.5px!important;color:#7c8093!important;font-weight:400!important;
+  margin-bottom:14px!important;
+}
+
+/* 两张卡并排 */
+#p06 .p06-dist{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+}
+@media (max-width:1080px){#p06 .p06-dist{grid-template-columns:1fr}}
+
+#p06 .p06-dist-card{
+  border:1px solid #e4e6f2;border-radius:12px;padding:14px 16px 16px;background:#fbfbfe;
+  display:flex;flex-direction:column;gap:12px;
+  transition:border-color .22s ease,box-shadow .22s ease;
+}
+#p06 .p06-dist-card:hover{border-color:#c5c9ea;box-shadow:0 6px 18px rgba(24,27,53,.07)}
+
+/* 卡头：类型名 + 数量 + 完成率 */
+#p06 .p06-dist-head{display:flex;align-items:center;gap:8px}
+#p06 .p06-dist-dot{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+#p06 .p06-dist-name{font-size:13px;font-weight:700;color:#181b35}
+#p06 .p06-dist-count{
+  font-size:11.5px;color:#7c8093;background:#eef0f8;border-radius:100px;
+  padding:1px 8px;font-variant-numeric:tabular-nums;
+}
+#p06 .p06-dist-rate{
+  margin-left:auto;font-size:11.5px;color:#1d8f47;font-weight:600;
+  background:#e8faee;border-radius:6px;padding:3px 8px;font-variant-numeric:tabular-nums;
+}
+#p06 .p06-dist-rate.low{color:#a2621a;background:#fff4e3}
+
+/* 堆叠状态条 */
+#p06 .p06-dist-bar{
+  display:flex;height:12px;border-radius:100px;overflow:hidden;background:#eef0f8;gap:2px;
+}
+#p06 .p06-dist-seg{height:100%;transition:width .7s cubic-bezier(.22,.61,.36,1)}
+#p06 .p06-dist-seg:first-child{border-radius:100px 0 0 100px}
+#p06 .p06-dist-seg:last-child{border-radius:0 100px 100px 0}
+#p06 .p06-dist-seg:only-child{border-radius:100px}
+
+/* 图例：每格显示 状态 / 数量 / 占比 */
+#p06 .p06-dist-legend{
+  display:flex;flex-wrap:wrap;gap:10px 18px;
+}
+#p06 .p06-dist-li{
+  display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#4b4f66;
+}
+#p06 .p06-dist-li i{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+#p06 .p06-dist-li b{
+  color:#181b35;font-weight:700;font-variant-numeric:tabular-nums;
+  margin-left:2px;
+}
+#p06 .p06-dist-li em{
+  font-style:normal;color:#7c8093;font-variant-numeric:tabular-nums;
+  padding-left:6px;margin-left:2px;border-left:1px solid #e4e6f2;
+}
+
+/* 空类型提示 */
+#p06 .p06-dist-empty{
+  font-size:11.5px;color:#7c8093;padding:8px 0 2px;
+}
+
+/* 入场动画 */
+@keyframes p06DistIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+#p06 .p06-dist-card{animation:p06DistIn .45s cubic-bezier(.22,.61,.36,1) both}
+#p06 .p06-dist-card:nth-child(2){animation-delay:.08s}
+
+@media (prefers-reduced-motion: reduce){
+  #p06 .p06-dist-card{animation:none}
+}

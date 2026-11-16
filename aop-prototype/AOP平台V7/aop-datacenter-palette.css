@@ -1,0 +1,285 @@
+/* ══════════════════════════════════════════════════════════════════
+   行政运营数据中心 · 图标 / 图表配色（仅作用于 #p09）
+
+   色板取自用户提供的 Company KPIs 看板截图（逐像素提取）：
+   靛 #5d53d2 · 蓝 #3ea4fb · 浅蓝 #7ed4fe · 绿 #4be272 · 青绿 #40ca6d
+   黄 #f4d200 · 橙 #eea935 · 品红 #e0005c · 玫红 #cd2d58
+   深色文字 #181b35 · 次级文字 #7c8093 · 轨道 #e7e9f5
+
+   图标按模块语义取色，与图表色保持同一套：
+   服务台=靛 · 职场=蓝 · 员工体验=黄 · 差旅=橙 · 采购=绿 · 数字化=品红 · 档案=浅蓝
+   ══════════════════════════════════════════════════════════════════ */
+
+#p09{
+  --dc-indigo:#5d53d2;
+  --dc-blue:#3ea4fb;
+  --dc-sky:#7ed4fe;
+  --dc-green:#4be272;
+  --dc-lime:#40ca6d;
+  --dc-yellow:#f4d200;
+  --dc-orange:#eea935;
+  --dc-magenta:#e0005c;
+  --dc-rose:#cd2d58;
+  --dc-ink:#181b35;
+  --dc-text:#4b4f66;
+  --dc-muted:#7c8093;
+  --dc-track:#e7e9f5;
+  --dc-line:#d8dbec;
+}
+
+/* ---------- 模块头部图标：按板块取色 ---------- */
+/* 图标色块：饱和实色 + 白色描线，七个板块各一色，形成醒目色带 */
+#p09 .p09-mod-icon{
+  background:#5d53d2!important;
+  color:#fff!important;
+  width:42px!important;height:42px!important;
+  border-radius:12px!important;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 12px rgba(93,83,210,.32)!important;
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+#p09 .p09-mod:hover .p09-mod-icon{transform:translateY(-1px)}
+#p09 .p09-mod-icon .ic-inline,
+#p09 .p09-mod-icon svg{width:20px!important;height:20px!important;stroke-width:1.9!important}
+#p09 .p09-mod-icon .ic-inline,
+#p09 .p09-mod-icon svg{
+  stroke:currentColor!important;
+  color:inherit!important;
+  stroke-width:1.6!important;
+}
+#p09 .p09-mod:nth-of-type(1) .p09-mod-icon{background:#5d53d2!important;box-shadow:0 4px 12px rgba(93,83,210,.32)!important}
+#p09 .p09-mod:nth-of-type(2) .p09-mod-icon{background:#3ea4fb!important;box-shadow:0 4px 12px rgba(62,164,251,.34)!important}
+#p09 .p09-mod:nth-of-type(3) .p09-mod-icon{background:#f4d200!important;color:#181b35!important;box-shadow:0 4px 12px rgba(244,210,0,.38)!important}
+#p09 .p09-mod:nth-of-type(4) .p09-mod-icon{background:#eea935!important;box-shadow:0 4px 12px rgba(238,169,53,.36)!important}
+#p09 .p09-mod:nth-of-type(5) .p09-mod-icon{background:#4be272!important;color:#0f3d22!important;box-shadow:0 4px 12px rgba(75,226,114,.36)!important}
+#p09 .p09-mod:nth-of-type(6) .p09-mod-icon{background:#e0005c!important;box-shadow:0 4px 12px rgba(224,0,92,.32)!important}
+#p09 .p09-mod:nth-of-type(7) .p09-mod-icon{background:#7ed4fe!important;color:#0b3d5e!important;box-shadow:0 4px 12px rgba(126,212,254,.40)!important}
+
+/* 板块顶部一条同色细带，呼应图标，强化识别 */
+#p09 .p09-mod{position:relative}
+#p09 .p09-mod::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--dc-indigo);opacity:.9;
+}
+#p09 .p09-mod:nth-of-type(1)::before{background:#5d53d2}
+#p09 .p09-mod:nth-of-type(2)::before{background:#3ea4fb}
+#p09 .p09-mod:nth-of-type(3)::before{background:#f4d200}
+#p09 .p09-mod:nth-of-type(4)::before{background:#eea935}
+#p09 .p09-mod:nth-of-type(5)::before{background:#4be272}
+#p09 .p09-mod:nth-of-type(6)::before{background:#e0005c}
+#p09 .p09-mod:nth-of-type(7)::before{background:#7ed4fe}
+
+/* 头部操作图标（编辑 / 刷新 / 删除） */
+#p09 .p09-mod-edit{color:var(--dc-muted)!important}
+#p09 .p09-mod-edit:hover{color:var(--dc-indigo)!important;background:rgba(93,83,210,.08)!important}
+#p09 .p09-mod-edit svg{stroke:currentColor!important}
+
+/* ---------- 模块标题与说明 ---------- */
+#p09 .p09-mod-title{color:var(--dc-ink)!important;font-weight:700!important}
+#p09 .p09-mod-desc{color:var(--dc-muted)!important}
+#p09 .p09-mod-meta,#p09 .p09-sync-period,#p09 .p09-sync-time,#p09 .p09-mod-owner{color:var(--dc-muted)!important}
+
+/* 来源徽章：靛蓝底，配截图的主色 */
+#p09 .p09-src-badge{
+  background:rgba(93,83,210,.10)!important;
+  color:var(--dc-indigo)!important;
+  border-radius:4px!important;
+  font-weight:500!important;
+}
+#p09 .p09-src-dot{background:var(--dc-indigo)!important}
+#p09 .p09-src-system{background:rgba(62,164,251,.12)!important;color:#1a7fc4!important}
+#p09 .p09-src-system .p09-src-dot{background:var(--dc-blue)!important}
+#p09 .p09-src-manual{background:rgba(238,169,53,.16)!important;color:#96631a!important}
+#p09 .p09-src-manual .p09-src-dot{background:var(--dc-orange)!important}
+
+/* 同步状态标签 */
+#p09 .p09-sync-tag{background:rgba(75,226,114,.16)!important;color:#1d8f47!important;border-radius:4px!important}
+#p09 .p09-sync-timer{background:rgba(244,210,0,.20)!important;color:#8a7200!important;border-radius:4px!important}
+#p09 .p09-sync-pending{background:rgba(224,0,92,.10)!important;color:var(--dc-magenta)!important;border-radius:4px!important}
+
+/* ---------- 图表标题行图标 ---------- */
+#p09 .pz-head svg{color:var(--dc-indigo)!important;stroke-width:1.8!important;width:17px;height:17px}
+#p09 .pz-head .pz-title{color:var(--dc-ink)!important}
+#p09 .pz-title{color:var(--dc-ink)!important}
+#p09 .pz-meta,#p09 .pz-note{color:var(--dc-muted)!important}
+#p09 .pz-meta i{background:var(--dc-line)!important}
+
+/* ---------- 环形图 ---------- */
+#p09 .pz-ring-c b{color:var(--dc-ink)!important}
+#p09 .pz-ring-c span{color:var(--dc-muted)!important}
+
+/* ---------- 横向条形 ---------- */
+#p09 .pz-bar-name{color:var(--dc-text)!important}
+#p09 .pz-bar-track{background:var(--dc-track)!important}
+#p09 .pz-bar-val{color:var(--dc-ink)!important}
+
+/* ---------- 竖向柱 ---------- */
+#p09 .pz-cols{border-bottom-color:var(--dc-line)!important}
+#p09 .pz-col-val{color:var(--dc-ink)!important}
+#p09 .pz-col-lbls span{color:var(--dc-text)!important}
+
+/* ---------- 分段条 ---------- */
+#p09 .pz-seg{background:var(--dc-track)!important}
+
+/* ---------- 状态胶囊 ---------- */
+#p09 .pz-pill{background:#fff!important;border-color:var(--dc-line)!important;color:var(--dc-text)!important}
+#p09 .pz-pill b{color:var(--dc-ink)!important}
+
+/* ---------- 图例 ---------- */
+#p09 .pz-legend-row{color:var(--dc-text)!important;border-bottom-color:#f0f1f8!important}
+#p09 .pz-legend-row b{color:var(--dc-ink)!important}
+#p09 .pz-legend-row em{color:var(--dc-muted)!important}
+#p09 .pz-legend-row.is-total{color:var(--dc-muted)!important;border-top-color:var(--dc-line)!important}
+
+/* ---------- 外部入口卡 ---------- */
+#p09 .pz-entry{background:#f7f7fd!important;border-color:var(--dc-line)!important}
+#p09 .pz-entry-ic{background:rgba(93,83,210,.10)!important;color:var(--dc-indigo)!important}
+#p09 .pz-entry-ic svg{stroke:currentColor!important}
+#p09 .pz-entry-txt b{color:var(--dc-ink)!important}
+#p09 .pz-entry-txt span{color:var(--dc-muted)!important}
+#p09 .pz-entry-btn{background:var(--dc-indigo)!important}
+#p09 .pz-entry-btn:hover{background:#463cb8!important}
+#p09 .pz-entry-btn svg{stroke:#fff!important}
+
+/* ---------- 指标卡 ---------- */
+#p09 .pz-tile{border-color:var(--dc-line)!important}
+
+/* ══════ 职场运营：环形矩阵（替代横条） ══════ */
+#p09 .pz-stats{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px;
+}
+#p09 .pz-stat{
+  background:#f8f9fe;border:1px solid var(--dc-line);border-radius:12px;
+  padding:14px 16px 15px;display:flex;flex-direction:column;gap:4px;
+}
+#p09 .pz-stat-lbl{font-size:11.5px;color:var(--dc-muted)}
+#p09 .pz-stat-num{
+  font-size:26px;font-weight:700;color:var(--dc-ink);line-height:1.15;
+  letter-spacing:-.03em;font-variant-numeric:tabular-nums;
+}
+#p09 .pz-stat-num small{font-size:12px;font-weight:500;color:var(--dc-muted);margin-left:3px;letter-spacing:0}
+#p09 .pz-stat-sub{font-size:11.5px;color:var(--dc-muted);font-variant-numeric:tabular-nums}
+
+#p09 .pz-gauges{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:10px;
+}
+#p09 .pz-gauge{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:16px 8px 14px;border:1px solid var(--dc-line);border-radius:12px;
+  background:#fff;transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+}
+#p09 .pz-gauge:hover{
+  border-color:#c5c9ea;box-shadow:0 6px 18px rgba(24,27,53,.08);transform:translateY(-2px);
+}
+#p09 .pz-gauge-ring{position:relative;width:84px;height:84px}
+#p09 .pz-gauge-ring svg{width:84px;height:84px;display:block}
+#p09 .pz-gauge-ring svg circle{transition:stroke-width .2s ease}
+#p09 .pz-gauge:hover .pz-gauge-ring svg circle:nth-child(2){stroke-width:10}
+#p09 .pz-gauge-c{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:700;color:var(--dc-ink);letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+}
+#p09 .pz-gauge-c i{font-style:normal;font-size:10.5px;font-weight:600;color:var(--dc-muted);margin-left:1px}
+#p09 .pz-gauge-name{
+  font-size:12.5px;font-weight:600;color:var(--dc-ink);text-align:center;
+  line-height:1.35;max-width:100%;word-break:break-word;
+}
+#p09 .pz-gauge-sub{font-size:11px;color:var(--dc-muted);font-variant-numeric:tabular-nums}
+
+@media (max-width:900px){
+  #p09 .pz-stats{grid-template-columns:1fr}
+  #p09 .pz-gauges{grid-template-columns:repeat(auto-fit,minmax(96px,1fr))}
+}
+
+/* ---------- 指标卡 ---------- */
+#p09 .pz-tile{border-color:var(--dc-line)!important}
+#p09 .pz-tile-lbl{color:var(--dc-muted)!important}
+#p09 .pz-tile-num{color:var(--dc-ink)!important}
+
+/* ══════════════════════════════════════════════════════════════════
+   员工体验数据 · 两条横条刻意用两套不同色系
+   - 上：城市统计 → 蓝系（体量/规模）  #3ea4fb  底 #e8f3fe
+   - 下：活动满意度 → 绿系（质量/体验） #40ca6d  底 #e8faee
+   另外把「城市」和「满意度」两个小标题分别加上同色圆点，
+   让人一眼看出两块数据是两只不同的指标。
+   ══════════════════════════════════════════════════════════════════ */
+
+/* 城市统计：蓝 */
+#p09 .p09-city-bar{background:#e8f3fe!important}
+#p09 .p09-city-fill{background:linear-gradient(90deg,#7ed4fe,#3ea4fb)!important}
+#p09 .p09-city-name{color:#181b35!important;font-weight:600!important}
+#p09 .p09-city-val{color:#7c8093!important}
+
+/* 活动满意度：绿（定制条 sat-* 与表格自动条 aop-bar-* 两套类名都要覆盖） */
+#p09 .sat-track{background:#e8faee!important}
+#p09 .sat-fill{background:linear-gradient(90deg,#7ee39a,#40ca6d)!important}
+#p09 .sat-num{color:#1d8f47!important;font-weight:700!important}
+#p09 .p09-sat-cell .aop-bar-track{background:#e8faee!important}
+#p09 .p09-sat-cell .aop-bar-fill{background:linear-gradient(90deg,#7ee39a,#40ca6d)!important}
+#p09 .p09-sat-cell .aop-bar-val{color:#1d8f47!important;font-weight:700!important}
+
+/* 两个小标题前的色点，分别标识蓝/绿两条指标 */
+#p09 .p09-city-title,
+#p09 .p09-sat-title{
+  display:flex;align-items:center;gap:7px;
+  font-size:12.5px!important;font-weight:600!important;color:#181b35!important;
+}
+#p09 .p09-city-title::before,
+#p09 .p09-sat-title::before{
+  content:'';width:8px;height:8px;border-radius:2px;flex:0 0 auto;
+}
+#p09 .p09-city-title::before{background:#3ea4fb}
+#p09 .p09-act-title{
+  display:flex;align-items:center;gap:7px;
+  font-size:12.5px!important;font-weight:600!important;color:#181b35!important;
+}
+#p09 .p09-act-title::before{
+  content:'';width:8px;height:8px;border-radius:2px;flex:0 0 auto;background:#40ca6d;
+}
+#p09 .p09-act-title svg{color:#40ca6d!important}
+#p09 .p09-sat-title::before{background:#40ca6d}
+#p09 .p09-city-title svg{color:#3ea4fb!important;stroke:currentColor}
+#p09 .p09-sat-title svg{color:#40ca6d!important;stroke:currentColor}
+
+/* 表格里满意度列的数值配色，与绿条呼应 */
+#p09 .p09-sat-cell .sat-num{color:#1d8f47}
+
+/* ---------- 表格内百分比 / 状态 ---------- */
+/* ══════ 员工体验：活动满意度柱状图 ══════ */
+#p09 .pz-cols{position:relative}
+
+/* 柱底活动名：完整显示，最多换两行，居中 */
+#p09 .pz-col-lbls{
+  display:flex;gap:14px;margin-top:10px;padding:0 2px;align-items:flex-start;
+}
+#p09 .pz-col-lbls span{
+  flex:1 1 0;min-width:0;text-align:center;
+  font-size:11.5px;color:var(--dc-text)!important;
+  white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+  word-break:break-word;line-height:1.4;
+}
+
+/* 柱顶数值更有分量 */
+#p09 .pz-col-val{font-size:12.5px;font-weight:700;color:var(--dc-ink)!important}
+
+#p09 .pz-cols{
+  display:flex;align-items:flex-end;gap:14px;height:168px;padding:0 2px;
+  border-bottom:1px solid var(--dc-line);
+}
+
+/* 说明：不再画均值虚线（柱高是按数据百分比缩放的，均值线的像素位置无法可靠对应） */
+#p09 .pz-col-track{position:relative}
+
+/* 高于均值：饱和绿；低于均值：明显更浅的蓝，两者一眼可分 */
+#p09 .pz-col-bar{box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+
+/* 图例：高于/低于均值用小方块，色差明显 */
+#p09 .pz-note b i{width:10px;height:10px;border-radius:3px}
+
+#p09 .p09-pct-track,.p09 .p09-pct-track{background:var(--dc-track)!important}
+#p09 .p09-pct-fill{background:var(--dc-indigo)!important}
+#p09 th{color:var(--dc-text)!important}
+#p09 td{color:#2c304c!important}
+#p09 tbody tr:hover{background:#f7f7fd!important}

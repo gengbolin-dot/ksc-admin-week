@@ -1,0 +1,103 @@
+/* ══════════════════════════════════════════════════════════════════
+   行政运营数据中心 · 看板动效样式
+   仅服务于 #p09，不影响其他页面。
+   动效原则：入场轻、时长短、不位移数值、可被系统「减少动态效果」关闭。
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ---------- 1. 模块入场：淡入上浮 ---------- */
+@keyframes dcCardIn{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+/* 入场动画由 JS 在滚动进入视口时才写入，这里不再默认播放 */
+/* 动画结束后由 JS 清除 inline animation；这里不再长期占用合成层，避免滚动卡顿 */
+#p09 .p09-mod{
+  animation-fill-mode:both;
+}
+#p09 .p09-mod:not([data-dc-played]){
+  animation:none!important;
+}
+/* 尚未播放的板块保持完全不透明，避免看不到内容 */
+#p09 .p09-mod:not([data-dc-played]){opacity:1;transform:none}
+
+/* ---------- 2. 卡片悬停：轻微抬起 + 描边提亮 ---------- */
+#p09 .p09-mod{
+  transition:box-shadow .28s cubic-bezier(.22,.61,.36,1),
+             border-color .28s cubic-bezier(.22,.61,.36,1),
+             transform .28s cubic-bezier(.22,.61,.36,1);
+}
+#p09 .p09-mod:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 26px rgba(24,27,53,.10);
+  border-color:#c9cde8;
+}
+
+/* ---------- 3. 数据元素：统一缓动，生长更顺 ---------- */
+/* 生长过渡：播放时由 JS 添加 .dc-grow，播完自动移除，避免干扰悬停交互 */
+#p09 .pz-bar-fill.dc-grow{transition:width .85s cubic-bezier(.22,.61,.36,1)}
+#p09 .pz-col-bar.dc-grow{transition:height .85s cubic-bezier(.22,.61,.36,1)}
+#p09 .pz-arc{transition:opacity .5s ease}
+#p09 .pz-seg.dc-grow{transition:transform .8s cubic-bezier(.22,.61,.36,1)}
+#p09 .pz-ring svg circle.dc-grow,#p09 .pz-gauge-ring svg circle.dc-grow{transition:stroke-dashoffset .95s cubic-bezier(.22,.61,.36,1)}
+/* ---------- 4. 悬停联动：同组其它项淡化 ---------- */
+#p09 .pz-gauges>.pz-gauge,
+#p09 .pz-cols>.pz-col,
+#p09 .pz-bars>.pz-bar-row{
+  transition:opacity .2s ease,transform .2s ease;
+}
+#p09 .pz-gauges>.pz-gauge:hover,
+#p09 .pz-cols>.pz-col:hover{
+  transform:translateY(-2px);
+}
+
+/* ---------- 5. 指标卡：数值入场 ---------- */
+#p09 .pz-tile{
+  transition:border-color .25s ease,box-shadow .25s ease,transform .25s ease;
+}
+#p09 .pz-tile:hover{
+  transform:translateY(-2px);
+  border-color:#c9cde8;
+  box-shadow:0 8px 20px rgba(24,27,53,.08);
+}
+#p09 .pz-tile-num,
+#p09 .pz-ring-c b,
+#p09 .pz-gauge-c{
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- 6. 图例与说明：轻微延迟淡入 ---------- */
+@keyframes dcFadeIn{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+/* 图例/说明的淡入也跟随滚动触发，未播放前保持可见 */
+#p09 .p09-mod[data-dc-played] .pz-note,
+#p09 .p09-mod[data-dc-played] .pz-legend,
+#p09 .p09-mod[data-dc-played] .pz-col-lbls{
+  animation:dcFadeIn .5s cubic-bezier(.22,.61,.36,1) .35s both;
+}
+
+/* ---------- 7. 尊重系统设置 ---------- */
+@media (prefers-reduced-motion: reduce){
+  #p09 .p09-mod,
+  #p09 .pz-note,
+  #p09 .pz-legend,
+  #p09 .pz-col-lbls{
+    animation:none!important;
+    transition:none!important;
+  }
+  #p09 .p09-mod:hover,
+  #p09 .pz-tile:hover,
+  #p09 .pz-gauges>.pz-gauge:hover,
+  #p09 .pz-cols>.pz-col:hover{
+    transform:none!important;
+  }
+  #p09 .pz-bar-fill,
+  #p09 .pz-col-bar,
+  #p09 .pz-seg,
+  #p09 .pz-ring svg circle{
+    transition:none!important;
+    transform:none!important;
+    opacity:1!important;
+  }
+}

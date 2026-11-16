@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body>
+<iframe id="f" src="aop-full.html" style="width:1440px;height:1000px;border:0"></iframe>
+<pre id="out">pending</pre>
+<script>
+const f = document.getElementById('f'), out = document.getElementById('out');
+f.onload = function(){
+  const w = f.contentWindow, d = w.document;
+  const errs = [];
+  w.addEventListener('error', function(e){ errs.push(e.message); });
+  setTimeout(function(){
+    const nav = d.querySelector('[data-panel="p11"]');
+    if(nav) w.switchPanel('p11', nav);
+    setTimeout(function(){
+      const before = d.querySelectorAll('#p11 .p11-card').length;
+      const input = d.querySelector('#p11 .p11-search');
+      const teamInfo = w.eval("TEAM.map(t => ({name:t.name, hasTitle: typeof t.title === 'string', hasRole: typeof t.role === 'string', hasModules: Array.isArray(t.modules)}))");
+      input.value = '聂';
+      input.dispatchEvent(new w.Event('input', { bubbles: true }));
+      setTimeout(function(){
+        const after = d.querySelectorAll('#p11 .p11-card').length;
+        const names = [...d.querySelectorAll('#p11 .p11-card .p11-card-name')].map(function(el){ return el.textContent.trim(); });
+        const contentText = d.querySelector('#p11Content') ? d.querySelector('#p11Content').textContent.trim().slice(0, 80) : 'none';
+        out.textContent = 'RESULT ' + JSON.stringify({ before: before, after: after, names: names, contentText: contentText, errs: errs, teamInfo: teamInfo.slice(0, 5) });
+      }, 800);
+    }, 1200);
+  }, 1500);
+};
+</script>
+</body></html>

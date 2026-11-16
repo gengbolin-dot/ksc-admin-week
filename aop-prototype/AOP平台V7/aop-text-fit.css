@@ -1,0 +1,136 @@
+/* ══════════════════════════════════════════════════════════════════
+   AOP · 名称完整显示（禁止单行截断）
+
+   问题：多处名称用 nowrap + ellipsis / line-clamp 截断，
+   长名称（如「第五届黑马大赛」在窄列下）会被裁掉或显示省略号。
+
+   原则：凡是“名称 / 标题 / 描述 / 文件名”类文本，一律允许换行，
+   不出现省略号、不裁字；只有装饰性短标签保留单行。
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ---------- 1. 表格单元格：内容完整换行，不裁切 ---------- */
+.p09-tbl tbody td,
+.p09-act-tbl tbody td,
+.p06-table tbody td,
+.p15-panel table tbody td,
+.p15-tbl tbody td,
+.p13-data-group table tbody td,
+.p13-detail-table tbody td,
+.data-table tbody td{
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+}
+.p09-tbl tbody td > *,
+.p09-act-tbl tbody td > *{
+  max-width:100%;
+}
+
+/* 可编辑文本单元：跟随单元格宽度换行 */
+.p09-editable{
+  white-space:normal!important;
+  text-overflow:clip!important;
+  overflow:visible!important;
+  word-break:break-word;
+}
+
+/* 表头也不截断 */
+.p09-tbl thead th,
+.p09-act-tbl thead th,
+.p06-table thead th,
+.p15-panel table thead th,
+.data-table thead th{
+  white-space:normal!important;
+  word-break:break-word;
+}
+
+/* ---------- 2. 数据中心活动表：让名称列拿到足够宽度 ---------- */
+#p09 .p09-act-tbl{table-layout:auto!important}
+#p09 .p09-act-tbl thead th:first-child,
+#p09 .p09-act-tbl tbody td:first-child{
+  min-width:150px;
+  width:18%;
+}
+#p09 .p09-act-tbl thead th:nth-child(5),
+#p09 .p09-act-tbl tbody td:nth-child(5){min-width:150px}
+#p09 .p09-act-tbl thead th:nth-child(2),
+#p09 .p09-act-tbl tbody td:nth-child(2){min-width:84px}
+
+/* ---------- 3. 图表与卡片里的名称：换行显示，不再省略 ---------- */
+.pz-bar-name,
+.pz-row-name,
+.pz-tile-lbl,
+.pz-legend-row span,
+.pz-col-lbls span,
+.pz-entry-txt b,
+.pz-entry-txt span,
+.pz-pill,
+.pz-title,
+.pz-note b{
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+}
+/* 条形图左侧名称列允许两行 */
+.pz-bars .pz-bar-row,
+#p09 .pz-bar-row{grid-template-columns:minmax(72px,116px) minmax(0,1fr) 52px}
+.pz-bar-name{line-height:1.35}
+
+/* 旧版图表名称 */
+.p09v-bar-name,.p09v-gauge-name,.p09u-name,.p13-tm-bar-name,.aop-donut-sub,
+.p09-city-name,.p09-city-val{
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  word-break:break-word;
+}
+
+/* ---------- 4. 卡片 / 侧栏 / 文档类标题 ---------- */
+.p02-attach-name{max-width:none!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:break-word}
+.p07-person-name-row .p07-person-name,
+.p07-item-name,
+.p11-dept-name,
+.p11-org-branch-name,
+.p11-org-member-name,
+.p11-card-name,
+.p05-card-title,
+.sys-panel-title,
+.pd-res-sub,
+.proj-outline-item,
+.slide-title,
+.p15-api-val{
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  word-break:break-word;
+  -webkit-line-clamp:unset!important;
+  -webkit-box-orient:unset!important;
+  display:block;
+}
+/* 侧栏个人说明保持两行以内，宽度固定不误伤布局 */
+.sb-ur{-webkit-line-clamp:unset!important;display:block!important;overflow:visible!important}
+
+/* ---------- 5. 重点专项时间轴单元格 ---------- */
+.p13-tm-cell-name,.p13-tm-cell-val{
+  white-space:normal!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  -webkit-line-clamp:unset!important;
+  word-break:break-word;
+}
+
+/* ---------- 6. 周会视图：成员职责允许完整换行 ---------- */
+.p07-person-role-wrap{min-width:0}
+.p07-person-role-wrap .p07-person-role{
+  display:block!important;
+  -webkit-line-clamp:unset!important;
+  -webkit-box-orient:unset!important;
+  overflow:visible!important;
+  white-space:normal!important;
+  word-break:break-word;
+  line-height:1.5;
+}

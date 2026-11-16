@@ -38,3 +38,5 @@ backend/backend.log
 # 本地调试脚本（不随产品发布）
 backend/scripts/
 .worktrees/
+
+aop-prototype/AOP平台V7/_edge_p17p30_editor/

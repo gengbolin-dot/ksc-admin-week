@@ -1,0 +1,206 @@
+﻿@charset "UTF-8";
+/* 周会视图 P07 · monday 风格看板 */
+#p07{
+  --p7-ink:#1c1f2a; --p7-ink2:#535768; --p7-mute:#8a8fa3; --p7-line:#e8eaf1;
+  --p7-line2:#f1f3f8; --p7-bg:#f6f7fb; --p7-card:#fff; --p7-brand:#5d53d2;
+  background:var(--p7-bg); color:var(--p7-ink);
+  display:none;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden;
+}
+#p07.active{display:flex}
+#p07 div,#p07 span,#p07 button{box-sizing:border-box}
+
+/* 顶部 */
+#p07 .p07-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;background:var(--p7-bg);border-bottom:1px solid var(--p7-line);flex:0 0 auto}
+#p07 .p07-top-l{display:flex;align-items:baseline;gap:12px;min-width:0}
+#p07 .p07-top-title{font-size:21px;font-weight:600;letter-spacing:-.02em;color:var(--p7-ink);white-space:nowrap}
+#p07 .p07-top-meta{font-size:12.5px;color:var(--p7-mute);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#p07 .p07-top-meta b{font-weight:500;color:var(--p7-ink2)}
+#p07 .p07-top-meta .sep{width:3px;height:3px;border-radius:50%;background:#c7cad8;display:inline-block}
+#p07 .p07-top-r{display:flex;align-items:center;gap:10px}
+#p07 .p07-seg{display:inline-flex;padding:2px;background:#eceef5;border-radius:8px}
+#p07 .p07-seg-btn{height:28px;padding:0 12px;border:none;background:transparent;border-radius:6px;font:inherit;font-size:12.5px;font-weight:500;color:#6b7089;cursor:pointer}
+#p07 .p07-seg-btn.active{background:#fff;color:var(--p7-ink);box-shadow:0 1px 2px rgba(16,24,40,.08)}
+#p07 .p07-ghost{height:32px;padding:0 12px;display:inline-flex;align-items:center;gap:6px;border:1px solid #e0e3ec;border-radius:8px;background:#fff;color:#4c5166;font:inherit;font-size:12.5px;font-weight:500;cursor:pointer}
+#p07 .p07-ghost svg{width:14px;height:14px}
+#p07 .p07-ghost:hover{background:#fbfbfe;border-color:#cfd3e0}
+
+/* 主体 */
+#p07 .p07-layout{display:flex;flex:1 1 auto;min-height:0;gap:16px;padding:16px 24px 20px}
+#p07 .p07-side{width:296px;flex:0 0 296px;display:flex;flex-direction:column;min-height:0;background:#fff;border:1px solid var(--p7-line);border-radius:12px;overflow:hidden}
+#p07 .p07-side-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px}
+#p07 .p07-side-title{font-size:13px;font-weight:600;color:var(--p7-ink);letter-spacing:.01em}
+#p07 .p07-side-count{font-size:11.5px;font-weight:500;color:var(--p7-mute)}
+#p07 .p07-side-count b{color:#0d7a5c}
+#p07 .p07-progress{padding:0 16px 12px;border-bottom:1px solid var(--p7-line2)}
+#p07 .p07-progress-bar{height:6px;border-radius:99px;background:#eef0f7;overflow:hidden;margin-bottom:8px}
+#p07 .p07-progress-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#5d53d2,#8b7cf6)}
+#p07 .p07-progress-txt{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--p7-mute)}
+#p07 .p07-progress-txt b{font-size:14px;font-weight:600;color:var(--p7-ink);font-family:Poppins,Arial,sans-serif}
+#p07 .p07-progress-txt em{font-style:normal;color:#0d7a5c;font-weight:500}
+#p07 .p07-people-list{flex:1 1 auto;overflow-y:auto;padding:6px}
+#p07 .p07-person{display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;position:relative;transition:background .12s}
+#p07 .p07-person:hover{background:#f7f8fc}
+#p07 .p07-person.act{background:#f2f0ff;box-shadow:inset 0 0 0 1px #ddd8fb}
+#p07 .p07-person-order{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex:0 0 auto;background:#f2f4f9;color:#8a8fa3;margin-top:3px;font-family:Poppins,Arial,sans-serif}
+#p07 .p07-person.act .p07-person-order{background:#5d53d2;color:#fff}
+#p07 .p07-person-av{width:30px;height:30px;border-radius:50%;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:0 0 auto;margin-top:1px}
+#p07 .p07-person-name-row{display:flex;align-items:center;gap:6px;min-width:0}
+#p07 .p07-person-name{font-size:13.5px;font-weight:500;color:var(--p7-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#p07 .p07-person.act .p07-person-name{color:#3b339c;font-weight:600}
+#p07 .p07-person-badges{margin-left:auto;flex:0 0 auto}
+#p07 .p07-person-badge{font-size:10.5px;font-weight:500;padding:1px 6px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+#p07 .p07-person-badge.done{background:#e7f7f0;color:#0d7a5c}
+#p07 .p07-person-badge.pending{background:#fff4e3;color:#9a5b0b}
+#p07 .p07-person-role-wrap{display:flex;align-items:flex-start;gap:5px;min-width:0;margin-top:2px}
+#p07 .p07-person-role{font-size:11.5px;color:var(--p7-mute);line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}
+#p07 .p07-person-controls{display:flex;flex-direction:column;gap:1px;flex:0 0 auto;opacity:0;transition:opacity .15s}
+#p07 .p07-person:hover .p07-person-controls{opacity:1}
+#p07 .p07-person-move{width:18px;height:13px;border:none;background:transparent;color:#9aa0b4;display:flex;align-items:center;justify-content:center;border-radius:3px;cursor:pointer;padding:0}
+#p07 .p07-person-move:hover{background:#ecebfb;color:#4f46c8}
+#p07 .p07-person-move:disabled{opacity:.25;cursor:default}
+#p07 .p07-person-move svg{width:10px;height:10px}
+#p07 .p07-side-foot{padding:10px 12px;border-top:1px solid var(--p7-line2)}
+#p07 .p07-remind{width:100%;height:32px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid #e0e3ec;border-radius:8px;background:#fff;color:#4c5166;font:inherit;font-size:12.5px;font-weight:500;cursor:pointer}
+#p07 .p07-remind:hover{background:#fbfbfe;color:#4f46c8;border-color:#d3d0f8}
+#p07 .p07-remind svg{width:14px;height:14px}
+
+/* 右侧工作台 */
+#p07 .p07-main{flex:1 1 auto;min-width:0;overflow-y:auto;background:#fff;border:1px solid var(--p7-line);border-radius:12px;padding:20px 22px 24px}
+#p07 .p07-empty-main{display:flex;align-items:center;justify-content:center;height:100%;color:var(--p7-mute);font-size:13px}
+#p07 .p07-hero{display:flex;align-items:flex-start;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--p7-line2)}
+#p07 .p07-hero-av{width:44px;height:44px;border-radius:12px;color:#fff;font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+#p07 .p07-hero-main{flex:1 1 auto;min-width:0}
+#p07 .p07-hero-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#p07 .p07-hero-name{font-size:18px;font-weight:600;letter-spacing:-.01em;color:var(--p7-ink)}
+#p07 .p07-hero-chip{font-size:11px;font-weight:500;color:#3b339c;background:#eeecfb;border-radius:4px;padding:2px 7px}
+#p07 .p07-hero-role{font-size:12.5px;color:var(--p7-mute);margin-top:3px;line-height:1.5;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#p07 .p07-role-edit{height:22px;padding:0 8px;border:1px solid #e3e5ee;border-radius:6px;background:#fff;color:#6b7089;font:inherit;font-size:11px;font-weight:500;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+#p07 .p07-role-edit:hover{background:#f7f6ff;border-color:#d8d3fb;color:#4f46c8}
+#p07 .p07-role-edit svg{width:11px;height:11px}
+#p07 .p07-hero-stats{display:flex;gap:18px;margin-top:10px;flex-wrap:wrap}
+#p07 .p07-hero-stat{font-size:12px;color:var(--p7-mute);display:flex;align-items:baseline;gap:5px}
+#p07 .p07-hero-stat b{font-size:15px;font-weight:600;color:var(--p7-ink);font-family:Poppins,Arial,sans-serif}
+#p07 .p07-hero-nav{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+#p07 .p07-nav-btn{width:30px;height:30px;border:1px solid #e0e3ec;border-radius:8px;background:#fff;color:#6b7089;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+#p07 .p07-nav-btn:hover{background:#f7f8fc;color:#4f46c8}
+#p07 .p07-nav-btn:disabled{opacity:.4;cursor:default}
+#p07 .p07-nav-btn svg{width:14px;height:14px}
+#p07 .p07-hero-idx{font-size:12px;color:var(--p7-mute);min-width:44px;text-align:center;font-family:Poppins,Arial,sans-serif}
+#p07 .p07-list-head{display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px}
+#p07 .p07-list-title{font-size:13px;font-weight:600;color:var(--p7-ink)}
+#p07 .p07-list-title span{font-weight:400;color:var(--p7-mute);margin-left:6px;font-size:12px}
+#p07 .p07-card{border:1px solid var(--p7-line);border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fff;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+#p07 .p07-card:hover{border-color:#d6d9e6;box-shadow:0 4px 14px rgba(28,31,42,.05)}
+#p07 .p07-card.risk{border-left:3px solid #e0005c}
+#p07 .p07-card-head{display:flex;align-items:center;gap:8px;min-width:0}
+#p07 .p07-card-type{font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:4px;flex:0 0 auto}
+#p07 .p07-card-type.p{background:#f0eeff;color:#5448cf}
+#p07 .p07-card-type.d{background:#e8f7f1;color:#0d7a5c}
+#p07 .p07-card-name{font-size:14px;font-weight:600;color:var(--p7-ink);flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#p07 .p07-card-status{font-size:11px;font-weight:500;padding:2px 7px;border-radius:4px;white-space:nowrap;flex:0 0 auto}
+#p07 .p07-card-edit{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:5px;border:1px solid #e3e5ee;background:#fff;color:#6b7089;font-size:11.5px;font-weight:500;cursor:pointer;flex:0 0 auto}
+#p07 .p07-card-edit:hover{background:#f7f6ff;border-color:#d8d3fb;color:#4f46c8}
+#p07 .p07-card-edit svg{width:12px;height:12px}
+#p07 .p07-card-meta{display:flex;align-items:center;gap:9px;margin-top:7px;font-size:11.5px;color:var(--p7-mute);flex-wrap:nowrap;min-width:0}
+#p07 .p07-card-due{white-space:nowrap;color:#9aa0b4}
+#p07 .p07-card-module{background:#f4f5fa;color:#5b6076;border-radius:4px;padding:1px 6px}
+#p07 .p07-card-mini{display:flex;align-items:center;gap:7px;flex:1 1 140px;max-width:220px;min-width:110px}
+#p07 .p07-card-mini-bar{flex:1 1 auto;height:5px;border-radius:99px;background:#eef0f7;overflow:hidden}
+#p07 .p07-card-mini-bar i{display:block;height:100%;border-radius:99px}
+#p07 .p07-card-mini span{font-size:11px;color:#8a8fa3;font-variant-numeric:tabular-nums}
+#p07 .p07-flow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+#p07 .p07-flow-block{border-radius:8px;padding:9px 11px;min-width:0}
+#p07 .p07-flow-block.update{background:#f7f8fc}
+#p07 .p07-flow-block.next{background:#f8f7ff}
+#p07 .p07-flow-lbl{font-size:10.5px;font-weight:600;letter-spacing:.04em;color:#8a8fa3;display:flex;align-items:center;gap:5px;margin-bottom:4px}
+#p07 .p07-flow-lbl svg{width:12px;height:12px}
+#p07 .p07-flow-tx{font-size:12.5px;line-height:1.65;color:#40455a;white-space:pre-wrap;word-break:break-word}
+#p07 .p07-flow-tx.empty{color:#b0b4c4}
+#p07 .p07-risk{display:flex;align-items:flex-start;gap:6px;margin-top:10px;padding:7px 10px;border-radius:7px;background:#fdeef4;color:#a4144f;font-size:12px;font-weight:500;line-height:1.5}
+#p07 .p07-risk svg{width:13px;height:13px;flex:0 0 auto;margin-top:2px}
+#p07 .p07-atts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+#p07 .p07-att-img{max-width:112px;max-height:74px;border-radius:6px;border:1px solid var(--p7-line);object-fit:cover;cursor:pointer}
+#p07 .p07-att-file{font-size:11.5px;color:#5b6076;background:#f4f5fa;border-radius:5px;padding:3px 8px;display:inline-flex;align-items:center;gap:4px}
+#p07 .p07-foot-hint{margin-top:6px;font-size:11.5px;color:#a3a8ba;display:flex;align-items:center;gap:6px}
+#p07 .p07-foot-hint svg{width:12px;height:12px}
+
+@media (max-width:1320px){
+  #p07 .p07-side{width:260px;flex-basis:260px}
+  #p07 .p07-flow{grid-template-columns:1fr}
+}
+
+/* 演示模式：与看板一致的浅色卡片 */
+#pptOverlay{background:#f6f7fb;padding:36px 56px}
+#pptOverlay .ppt-head{border-bottom:1px solid #e8eaf1;margin-bottom:20px;padding-bottom:16px}
+#pptOverlay .ppt-name{font-size:24px;font-weight:600;color:#1c1f2a;display:flex;align-items:center;gap:10px}
+#pptOverlay .ppt-sub{font-size:13px;color:#8a8fa3;margin-top:2px}
+#pptOverlay .ppt-card{background:#fff;border:1px solid #e8eaf1;border-radius:12px;padding:20px 22px;margin-bottom:14px}
+#pptOverlay .ppt-card-name{font-size:17px;font-weight:600;color:#1c1f2a;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+#pptOverlay .ppt-card-update{font-size:14.5px;line-height:1.75;color:#40455a;margin-bottom:8px}
+#pptOverlay .ppt-card-next{font-size:13px;line-height:1.7;color:#535768;background:#f8f7ff;padding:10px 14px;border-radius:8px;border-left:2px solid #5d53d2;margin-top:6px}
+#pptOverlay .ppt-card-risk{font-size:12.5px;color:#a4144f;background:#fdeef4;border-radius:6px;padding:6px 10px;margin-top:8px;font-weight:500}
+#pptOverlay .ppt-nav{border-top:1px solid #e8eaf1;padding-top:16px}
+#pptOverlay .ppt-nav-btn{height:34px;padding:0 16px;border-radius:8px;border:1px solid #e0e3ec;background:#fff;color:#4c5166;font-size:13px;font-weight:500;display:inline-flex;align-items:center;cursor:pointer}
+#pptOverlay .ppt-nav-btn:hover{background:#f7f6ff;border-color:#d8d3fb;color:#4f46c8}
+#pptOverlay .ppt-close{background:#fff;border:1px solid #e0e3ec;box-shadow:0 1px 2px rgba(16,24,40,.06)}
+#pptOverlay .p07-person-badge.pending{background:#fff4e3;color:#9a5b0b;font-size:11px;padding:2px 7px;border-radius:4px;font-weight:500}
+#pptOverlay .p07-person-badge.done{background:#e7f7f0;color:#0d7a5c;font-size:11px;padding:2px 7px;border-radius:4px;font-weight:500}
+
+/* 会议进行中提示 */
+#p07 .p07-live-dot{width:8px;height:8px;border-radius:50%;background:#2fbf8f;flex:0 0 auto;box-shadow:0 0 0 0 rgba(47,191,143,.55);animation:p07live 2s infinite}
+@keyframes p07live{0%{box-shadow:0 0 0 0 rgba(47,191,143,.5)}70%{box-shadow:0 0 0 7px rgba(47,191,143,0)}100%{box-shadow:0 0 0 0 rgba(47,191,143,0)}}
+#p07 .p07-person.act{position:relative}
+#p07 .p07-person.act::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:2px;background:#5d53d2}
+/* 卡片细节：更轻的描边与更柔和的圆角 */
+#p07 .p07-side,#p07 .p07-main{border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.03)}
+#p07 .p07-card{border-radius:12px}
+#p07 .p07-flow-block{border-radius:8px}
+#p07 .p07-person.act .p07-person-role{color:#7c78c6}
+#p07 .p07-main::-webkit-scrollbar,#p07 .p07-people-list::-webkit-scrollbar{width:8px}
+#p07 .p07-main::-webkit-scrollbar-thumb,#p07 .p07-people-list::-webkit-scrollbar-thumb{background:#dfe2ec;border-radius:8px}
+#p07 .p07-main::-webkit-scrollbar-track,#p07 .p07-people-list::-webkit-scrollbar-track{background:transparent}
+
+/* 无关联事项的空状态 */
+#p07 .p07-empty-card{margin-top:4px;padding:26px 22px;border:1px dashed #e3e5ee;border-radius:12px;background:#fbfbfe;text-align:center}
+#p07 .p07-empty-t{font-size:14px;font-weight:600;color:#3a3f52}
+#p07 .p07-empty-d{font-size:12.5px;color:#8a8fa3;line-height:1.7;margin:6px auto 14px;max-width:420px}
+#p07 .p07-empty-a{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+#p07 .p07-empty-a .p07-role-edit{height:30px;padding:0 12px;font-size:12px}
+#p07 .p07-empty-a .p07-ghost{height:30px;font-size:12px}
+
+/* 编辑抽屉：汇报附件 */
+#slidePanel .slide-attach-group .field-group-label{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+#slidePanel .slide-attach-drop{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;padding:12px;border:1px dashed #dfe2ec;border-radius:10px;background:#fbfbfe}
+#slidePanel .slide-attach-add{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;background:#5d53d2;color:#fff;font-size:12.5px;font-weight:500;cursor:pointer}
+#slidePanel .slide-attach-add:hover{background:#4f46c8}
+#slidePanel .slide-attach-tip{font-size:11.5px;color:#9aa0b4}
+#slidePanel .slide-attach-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#slidePanel .slide-attach-item{position:relative;display:flex;gap:10px;padding:9px;border:1px solid #e8eaf1;border-radius:10px;background:#fff;min-width:0}
+#slidePanel .slide-attach-thumb{width:56px;height:44px;border-radius:6px;overflow:hidden;background:#f2f4f9;display:flex;align-items:center;justify-content:center;color:#8a8fa3;flex:0 0 auto;position:relative}
+#slidePanel .slide-attach-thumb img,#slidePanel .slide-attach-thumb video{width:100%;height:100%;object-fit:cover;display:block}
+#slidePanel .slide-attach-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);color:#fff;cursor:pointer}
+#slidePanel .slide-attach-meta{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto;padding-right:34px}
+#slidePanel .slide-attach-name{font-size:12px;color:#3a3f52;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#slidePanel .slide-attach-size{font-size:11px;color:#9aa0b4}
+#slidePanel .slide-attach-remove{position:absolute;right:6px;top:6px;height:22px;padding:0 6px;border:none;border-radius:5px;background:#f5f6fa;color:#8a8fa3;font-size:11px;display:inline-flex;align-items:center;gap:3px;cursor:pointer}
+#slidePanel .slide-attach-remove:hover{background:#fdeef4;color:#a4144f}
+#slidePanel .slide-attach-empty{font-size:11.5px;color:#a3a8ba;padding:2px 0}
+/* 视频播放浮层 */
+.p07-video-overlay{position:fixed;inset:0;z-index:12000;background:rgba(16,18,28,.72);display:flex;align-items:center;justify-content:center;padding:40px}
+.p07-video-box{background:#0f1120;border-radius:14px;overflow:hidden;max-width:min(960px,90vw);width:100%;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.p07-video-box video{width:100%;max-height:min(70vh,620px);display:block;background:#000}
+.p07-video-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;color:#dfe2ec;font-size:12.5px}
+.p07-video-bar button{height:28px;padding:0 12px;border-radius:7px;border:1px solid rgba(255,255,255,.22);background:transparent;color:#fff;font-size:12px;cursor:pointer}
+/* 演示模式视频卡 */
+#pptOverlay .ppt-video{display:inline-flex;flex-direction:column;gap:4px;margin:8px 8px 0 0;vertical-align:top}
+#pptOverlay .ppt-video video{max-width:280px;max-height:170px;border-radius:8px;border:1px solid #e0e3ec;background:#000}
+#pptOverlay .ppt-video-n{font-size:11px;color:#8a8fa3;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 卡片上的附件快捷上传 */
+#p07 .p07-card-add{width:24px;height:24px;border:1px solid #e3e5ee;border-radius:5px;background:#fff;color:#8a8fa3;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
+#p07 .p07-card-add svg{width:12px;height:12px}
+#p07 .p07-card-add:hover{border-color:#d8d3fb;background:#f7f6ff;color:#4f46c8}
+#p07 .p07-card-add input{display:none}
+#p07 .p07-att-video{cursor:pointer;color:#4f46c8;background:#f4f3ff}
+#p07 .p07-att-video:hover{background:#ecebfd}
+#p07 .p07-att-video svg{width:12px;height:12px}
