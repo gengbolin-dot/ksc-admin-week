@@ -10234,7 +10234,7 @@ function renderHistoryReport(){
         h += `</div>`;
       }
 
-      const _lastHistory = (proj.statusHistory || []).slice(-1)[0];
+      const _lastHistory = (item.statusHistory || []).slice(-1)[0];
     if(_lastHistory){
       const _from = P05_STATUS[_lastHistory.from] || P05_STATUS.active;
       const _to = P05_STATUS[_lastHistory.to] || P05_STATUS.active;
