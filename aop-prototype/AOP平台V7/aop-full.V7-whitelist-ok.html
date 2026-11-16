@@ -8092,12 +8092,11 @@ html body #p13 .p13-detail-table td.col-rate,html body #p13 .p13-detail-table th
       <div class="p31-head-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
       <div style="min-width:0">
         <div class="p31-head-title">系统管理</div>
-        <div class="p31-head-sub">成员白名单 · 部门外特批 · 操作审计</div>
+        <div class="p31-head-sub">成员白名单 · 操作审计</div>
       </div>
     </div>
     <div class="p31-head-actions">
       <button class="p31-btn" type="button" onclick="p31Refresh()">刷新</button>
-      <button class="p31-btn" type="button" onclick="p31OpenGrant()">＋ 新增例外</button>
       <button class="p31-btn primary" type="button" onclick="p31OpenAddMember()">＋ 添加成员</button>
     </div>
   </div>
@@ -24651,10 +24650,10 @@ function authBoot(){
   authShowStep('authStepLogin');
 }
 
-/* ══════ P31 · 系统管理（成员白名单 / 部门外例外 / 操作审计） ══════ */
+/* ══════ P31 · 系统管理（成员白名单 / 操作审计） ══════ */
 var P31_WHITELIST_KEY = 'aop_access_whitelist';
-var P31_OVERRIDE_KEY  = 'aop_access_overrides';
-var P31_LOG_KEY       = 'aop_access_logs';
+var P31_LEGACY_OVERRIDE_KEY = 'aop_access_overrides';   // 仅用于一次性迁移
+var P31_LOG_KEY = 'aop_access_logs';
 var p31State = { tab: 'members', kw: '' };
 
 function p31Read(key, def){
@@ -24677,37 +24676,50 @@ function p31SeedWhitelist(){
     };
   });
 }
-// 首次访问时用行政部成员种子化，之后完全手动维护
+
+// 首次访问时用行政部成员种子化；并一次性迁移旧「部门外特批」数据
 function p31Whitelist(){
   var raw = localStorage.getItem(P31_WHITELIST_KEY);
+  var list;
   if(raw === null){
-    var seed = p31SeedWhitelist();
-    p31Write(P31_WHITELIST_KEY, seed);
-    return seed;
+    list = p31SeedWhitelist();
+    p31Write(P31_WHITELIST_KEY, list);
+  } else {
+    try { list = JSON.parse(raw) || []; } catch(e) { list = []; }
   }
-  try { return JSON.parse(raw) || []; } catch(e) { return []; }
+
+  var legacyRaw = localStorage.getItem(P31_LEGACY_OVERRIDE_KEY);
+  if(legacyRaw !== null){
+    try {
+      var legacy = JSON.parse(legacyRaw) || [];
+      legacy.forEach(function(o){
+        if(!o || o.status !== 'active') return;
+        if(list.some(function(w){ return w.uid === o.uid; })) return;
+        list.push({
+          uid: o.uid, name: o.name, email: o.email,
+          deptPath: (o.deptPath || []).slice(), workplace: o.workplace,
+          title: o.title, color: o.color, status: 'active',
+          addedAt: o.grantedAt || new Date().toISOString(),
+          addedBy: o.grantedBy || '系统迁移'
+        });
+      });
+      p31Write(P31_WHITELIST_KEY, list);
+    } catch(e) {}
+    localStorage.removeItem(P31_LEGACY_OVERRIDE_KEY);
+  }
+
+  return list;
 }
-function p31FindWhitelist(uid){
-  return p31Whitelist().filter(function(w){ return w.uid === uid; })[0] || null;
-}
+
 function p31IsWhitelisted(u){
   if(!u) return false;
   return p31Whitelist().some(function(w){ return w.uid === u.uid && w.status === 'active'; });
 }
 
-/* ── 部门外例外 ── */
-function p31Overrides(){ return p31Read(P31_OVERRIDE_KEY, []); }
-function p31IsOverridden(u){
-  if(!u) return false;
-  return p31Overrides().some(function(o){ return o.uid === u.uid && o.status === 'active'; });
-}
-
-/* ── 准入判定：白名单 或 例外 ── */
+/* ── 准入判定：只认白名单 ── */
 function p31AccessOf(u){
   if(!u) return 'none';
-  if(p31IsWhitelisted(u)) return 'whitelist';
-  if(p31IsOverridden(u)) return 'override';
-  return 'none';
+  return p31IsWhitelisted(u) ? 'whitelist' : 'none';
 }
 
 function p31Logs(){ return p31Read(P31_LOG_KEY, []); }
@@ -24772,29 +24784,26 @@ function p31Stat(label, num, color, sub){
 
 function p31RenderStats(){
   var el = document.getElementById('p31Stats'); if(!el) return;
-  var white = p31Whitelist().filter(function(w){ return w.status === 'active'; });
-  var ov = p31Overrides().filter(function(o){ return o.status === 'active'; });
-  var dept = white.filter(p31IsDeptUser).length;
+  var list = p31Whitelist().filter(function(w){ return w.status === 'active'; });
+  var dept = list.filter(p31IsDeptUser).length;
   var today = p31Now().slice(0, 10);
   var deniedToday = p31Logs().filter(function(l){
     return l.action === 'denied' && String(l.at || '').slice(0, 10) === today;
   }).length;
 
   el.innerHTML =
-      p31Stat('可访问成员', white.length + ov.length, '#12a150', '总人数')
-    + p31Stat('行政部成员', dept, '#5d53d2', '白名单')
-    + p31Stat('部门外特批', ov.length, '#eea935', '例外')
+      p31Stat('可访问成员', list.length, '#12a150', '总人数')
+    + p31Stat('行政部成员', dept, '#5d53d2', '部门内')
+    + p31Stat('部门外成员', list.length - dept, '#eea935', '特批加入')
     + p31Stat('今日拦截', deniedToday, '#e0005c', '准入拒绝');
 }
 
 function p31RenderTabs(){
   var el = document.getElementById('p31Tabs'); if(!el) return;
-  var white = p31Whitelist().filter(function(w){ return w.status === 'active'; });
-  var ov = p31Overrides().filter(function(o){ return o.status === 'active'; });
+  var list = p31Whitelist().filter(function(w){ return w.status === 'active'; });
   var tabs = [
-    { k: 'members',   n: '成员列表', c: white.length },
-    { k: 'overrides', n: '例外名单', c: ov.length },
-    { k: 'logs',      n: '准入日志', c: p31Logs().length }
+    { k: 'members', n: '成员列表', c: list.length },
+    { k: 'logs',    n: '准入日志', c: p31Logs().length }
   ];
   el.innerHTML = tabs.map(function(t){
     return '<div class="p31-tab' + (p31State.tab === t.k ? ' active' : '') + '" onclick="p31SetTab(&quot;' + t.k + '&quot;)">'
@@ -24816,7 +24825,6 @@ function p31Refresh(){
 
 function p31RenderBody(){
   var el = document.getElementById('p31Body'); if(!el) return;
-  if(p31State.tab === 'overrides'){ el.innerHTML = p31OverridesHtml(); return; }
   if(p31State.tab === 'logs'){ el.innerHTML = p31LogsHtml(); return; }
   el.innerHTML = '<div class="p31-toolbar">'
     + '<input class="p31-search" id="p31SearchInput" type="text" autocomplete="off" placeholder="搜索姓名 / 工号 / 邮箱 / 职位" value="' + p31Esc(p31State.kw) + '" oninput="p31Search(this.value)">'
@@ -24854,7 +24862,7 @@ function p31RenderMemberTable(){
       + '<td>' + p31Esc((u.deptPath || []).join(' / ')) + '</td>'
       + '<td>' + p31Esc(u.title) + '</td>'
       + '<td>' + p31Esc(u.workplace) + '</td>'
-      + '<td><span class="p31-badge ' + (isDept ? 'ok' : 'pur') + '">' + (isDept ? '行政部' : '特批成员') + '</span></td>'
+      + '<td><span class="p31-badge ' + (isDept ? 'ok' : 'pur') + '">' + (isDept ? '行政部' : '部门外') + '</span></td>'
       + '<td style="text-align:right;white-space:nowrap">'
       +   '<button class="p31-link dan" type="button" onclick="p31RemoveMember(&quot;' + p31Esc(u.uid) + '&quot;)">移除</button>'
       + '</td></tr>';
@@ -24867,38 +24875,6 @@ function p31RenderMemberTable(){
     + '</tbody></table>';
 }
 
-function p31OverridesHtml(){
-  var list = p31Overrides();
-  if(!list.length){
-    return '<div class="p31-empty">'
-      + '<div class="p31-empty-ic">' + sbIcon('users', 24) + '</div>'
-      + '<div class="p31-empty-t">暂无部门外特批</div>'
-      + '<div class="p31-empty-s">行政部成员请直接加入「成员列表」白名单。<br>此处仅用于给部门外人员（如分管领导、协作同事）临时开通访问。</div>'
-      + '</div>';
-  }
-  var rows = list.map(function(o){
-    var active = o.status === 'active';
-    return '<tr>'
-      + '<td><div class="p31-user">'
-      +   '<div class="p31-av" style="background:' + (o.color || '#6B7280') + '">' + p31Esc((o.name || '?').charAt(0)) + '</div>'
-      +   '<div><div class="p31-uname">' + p31Esc(o.name) + '</div><div class="p31-uid">' + p31Esc(o.uid) + '</div></div>'
-      + '</div></td>'
-      + '<td>' + p31Esc((o.deptPath || []).join(' / ')) + '</td>'
-      + '<td>' + p31Esc(o.title) + '</td>'
-      + '<td>' + p31Esc(o.reason || '—') + '</td>'
-      + '<td style="white-space:nowrap;font-variant-numeric:tabular-nums">' + p31FmtTime(o.grantedAt) + '</td>'
-      + '<td><span class="p31-badge ' + (active ? 'ok' : 'off') + '">' + (active ? '生效中' : '已停用') + '</span></td>'
-      + '<td style="text-align:right;white-space:nowrap">'
-      +   '<button class="p31-link" type="button" onclick="p31ToggleOverride(&quot;' + p31Esc(o.uid) + '&quot;)">' + (active ? '停用' : '恢复') + '</button>'
-      +   '<button class="p31-link dan" type="button" onclick="p31RemoveOverride(&quot;' + p31Esc(o.uid) + '&quot;)">删除</button>'
-      + '</td></tr>';
-  }).join('');
-
-  return '<table class="p31-table"><thead><tr>'
-    + '<th>成员</th><th>部门</th><th>职位</th><th>特批原因</th><th>授权时间</th><th>状态</th><th></th>'
-    + '</tr></thead><tbody>' + rows + '</tbody></table>';
-}
-
 function p31LogsHtml(){
   var logs = p31Logs();
   if(!logs.length){
@@ -24909,13 +24885,11 @@ function p31LogsHtml(){
       + '</div>';
   }
   var map = {
-    login:   { t: '登录成功', c: 'ok' },
-    denied:  { t: '准入拦截', c: 'dan' },
-    logout:  { t: '退出登录', c: 'off' },
-    grant:   { t: '新增特批', c: 'pur' },
-    revoke:  { t: '停用特批', c: 'warn' },
-    add:     { t: '加入白名单', c: 'ok' },
-    remove:  { t: '移出白名单', c: 'dan' }
+    login:  { t: '登录成功', c: 'ok' },
+    denied: { t: '准入拦截', c: 'dan' },
+    logout: { t: '退出登录', c: 'off' },
+    add:    { t: '加入白名单', c: 'ok' },
+    remove: { t: '移出白名单', c: 'dan' }
   };
   var rows = logs.slice(0, 100).map(function(l){
     var m = map[l.action] || { t: l.action || '—', c: 'off' };
@@ -24941,7 +24915,6 @@ function p31OpenAddMember(){
 
   var m = document.createElement('div');
   m.id = 'p31AddMemberModal';
-  m.className = 'p31-modal-mask';
   m.addEventListener('click', function(e){ if(e.target === m) m.remove(); });
   m.innerHTML = '<div class="p31-modal" role="dialog" aria-modal="true">'
     + '<div class="p31-modal-head">'
@@ -24969,7 +24942,7 @@ function p31RenderAddList(kw){
   p31Whitelist().forEach(function(w){ whiteMap[w.uid] = w; });
 
   var list = AUTH_DIRECTORY.filter(function(u){
-    if(whiteMap[u.uid] && whiteMap[u.uid].status === 'active') return false;   // 已在白名单
+    if(whiteMap[u.uid] && whiteMap[u.uid].status === 'active') return false;
     if(!q) return true;
     return (u.name + ' ' + u.uid + ' ' + u.email + ' ' + u.title + ' ' + (u.deptPath || []).join(' '))
       .toLowerCase().indexOf(q) >= 0;
@@ -25030,120 +25003,6 @@ function p31RemoveMember(uid){
   accessLog('remove', w);
   renderP31();
   showToast('已移出白名单：' + w.name);
-}
-
-/* ── 新增部门外例外 ── */
-function p31OpenGrant(){
-  var old = document.getElementById('p31GrantModal');
-  if(old) old.remove();
-
-  var m = document.createElement('div');
-  m.id = 'p31GrantModal';
-  m.addEventListener('click', function(e){ if(e.target === m) m.remove(); });
-  m.innerHTML = '<div class="p31-modal" role="dialog" aria-modal="true">'
-    + '<div class="p31-modal-head">'
-    +   '<div><div class="p31-modal-title">新增部门外特批</div>'
-    +     '<div class="p31-modal-sub">为行政部之外的人员单独开通 AOP 访问权限</div></div>'
-    +   '<button class="p31-modal-x" type="button" title="关闭" onclick="document.getElementById(&quot;p31GrantModal&quot;).remove()">'
-    +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>'
-    +   '</button>'
-    + '</div>'
-    + '<div class="p31-modal-body">'
-    +   '<input class="p31-search" id="p31GrantReason" type="text" autocomplete="off" placeholder="特批原因（可选，默认：部门外特批）">'
-    +   '<input class="p31-search" id="p31GrantSearch" type="text" autocomplete="off" placeholder="搜索姓名 / 工号 / 部门" oninput="p31RenderGrantList(this.value)">'
-    +   '<div class="p31-grant-list" id="p31GrantList"></div>'
-    + '</div>'
-    + '</div>';
-  document.body.appendChild(m);
-  p31RenderGrantList('');
-  var s = document.getElementById('p31GrantSearch');
-  if(s) setTimeout(function(){ s.focus(); }, 60);
-}
-
-function p31RenderGrantList(kw){
-  var box = document.getElementById('p31GrantList'); if(!box) return;
-  var q = (kw || '').trim().toLowerCase();
-  var ovMap = {};
-  p31Overrides().forEach(function(o){ ovMap[o.uid] = o; });
-
-  var list = AUTH_DIRECTORY.filter(function(u){
-    if(p31IsDeptUser(u)) return false;              // 行政部走白名单，不需要特批
-    if(!q) return true;
-    return (u.name + ' ' + u.uid + ' ' + u.email + ' ' + u.title + ' ' + (u.deptPath || []).join(' '))
-      .toLowerCase().indexOf(q) >= 0;
-  });
-
-  if(!list.length){
-    box.innerHTML = '<div style="text-align:center;color:#a8adc0;font-size:12.5px;padding:32px 0">没有可特批的人员</div>';
-    return;
-  }
-
-  box.innerHTML = list.map(function(u){
-    var o = ovMap[u.uid];
-    var active = o && o.status === 'active';
-    return '<div class="p31-grant-item">'
-      + '<div class="p31-av" style="background:' + (u.color || '#6B7280') + '">' + p31Esc((u.name || '?').charAt(0)) + '</div>'
-      + '<div style="min-width:0;flex:1">'
-      +   '<div class="p31-uname">' + p31Esc(u.name) + '</div>'
-      +   '<div class="p31-uid">' + p31Esc((u.deptPath || []).join(' / ')) + ' · ' + p31Esc(u.title) + '</div>'
-      + '</div>'
-      + (active
-          ? '<span class="p31-badge ok">已特批</span>'
-          : '<button class="p31-link" type="button" onclick="p31Grant(&quot;' + p31Esc(u.uid) + '&quot;)">特批</button>')
-      + '</div>';
-  }).join('');
-}
-
-function p31Grant(uid){
-  var u = AUTH_DIRECTORY.filter(function(x){ return x.uid === uid; })[0];
-  if(!u) return;
-  var reasonEl = document.getElementById('p31GrantReason');
-  var reason = (reasonEl && reasonEl.value.trim()) || '部门外特批';
-  var list = p31Overrides();
-  var exist = list.filter(function(o){ return o.uid === uid; })[0];
-
-  if(exist){
-    exist.status = 'active';
-    exist.reason = reason;
-    exist.grantedAt = p31Now();
-    exist.grantedBy = p31Me();
-  } else {
-    list.push({
-      uid: u.uid, name: u.name, email: u.email,
-      deptPath: (u.deptPath || []).slice(), workplace: u.workplace,
-      title: u.title, color: u.color, reason: reason, status: 'active',
-      grantedAt: p31Now(), grantedBy: p31Me()
-    });
-  }
-  p31Write(P31_OVERRIDE_KEY, list);
-  accessLog('grant', u);
-
-  var m = document.getElementById('p31GrantModal');
-  if(m) m.remove();
-  renderP31();
-  showToast('✓ 已特批：' + u.name);
-}
-
-function p31ToggleOverride(uid){
-  var list = p31Overrides();
-  var o = list.filter(function(x){ return x.uid === uid; })[0];
-  if(!o) return;
-  o.status = (o.status === 'active') ? 'inactive' : 'active';
-  p31Write(P31_OVERRIDE_KEY, list);
-  accessLog(o.status === 'active' ? 'grant' : 'revoke', o);
-  renderP31();
-  showToast(o.status === 'active' ? '✓ 已恢复特批' : '已停用特批');
-}
-
-function p31RemoveOverride(uid){
-  var list = p31Overrides();
-  var o = list.filter(function(x){ return x.uid === uid; })[0];
-  if(!o) return;
-  if(!confirm('确认删除「' + o.name + '」的部门外特批？\n删除后该账号将无法再访问本平台。')) return;
-  p31Write(P31_OVERRIDE_KEY, list.filter(function(x){ return x.uid !== uid; }));
-  accessLog('revoke', o);
-  renderP31();
-  showToast('已删除特批');
 }
 
 /* ══════ INIT ══════ */
