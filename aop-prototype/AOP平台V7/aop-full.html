@@ -6623,6 +6623,90 @@ tr:hover .p09-del-btn{opacity:1}
 #p07 .p07-manage-btn2.primary{background:#5d53d2;border-color:#5d53d2;color:#fff}
 #p07 .p07-manage-btn2.primary:hover{background:#4b41be}
 
+/* ══════ AUTH GATE · 模拟金山协作单点登录 ══════ */
+#authGate{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(900px 520px at 50% -8%,#3b348f 0%,#241f5c 38%,#14142e 100%)}
+#authGate.show{display:flex}
+#authGate::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(620px 420px at 10% 92%,rgba(93,83,210,.30),transparent 70%),
+             radial-gradient(620px 420px at 90% 6%,rgba(102,98,255,.22),transparent 70%)}
+.auth-card{position:relative;width:432px;max-width:100%;background:#fff;border-radius:22px;padding:40px 36px 30px;
+  box-shadow:0 40px 100px rgba(8,6,42,.5),0 2px 8px rgba(8,6,42,.14);text-align:center;
+  animation:authIn .32s cubic-bezier(.2,.9,.25,1)}
+@keyframes authIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+.auth-logo{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:26px}
+.auth-logo .sb-logo-i{width:42px;height:42px;box-shadow:0 10px 24px rgba(93,83,210,.32)}
+.auth-logo-t{font-size:23px;font-weight:700;color:#181b34;letter-spacing:-.02em}
+.auth-logo-badge{font-size:10.5px;font-weight:600;background:#edebfb;color:#5d53d2;border-radius:6px;padding:2px 7px;letter-spacing:.02em}
+.auth-title{font-size:19px;font-weight:600;color:#181b34;letter-spacing:-.01em;margin-bottom:8px}
+.auth-sub{font-size:13px;color:#8a8fa3;line-height:1.75;margin-bottom:28px}
+.auth-sub b{color:#5d53d2;font-weight:600}
+.auth-btn{width:100%;height:48px;border:none;border-radius:13px;font-family:inherit;
+  background:linear-gradient(135deg,#6161ff,#5d53d2);color:#fff;font-size:14.5px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  box-shadow:0 8px 22px rgba(93,83,210,.32);transition:transform .16s,box-shadow .16s,filter .16s}
+.auth-btn:hover{filter:brightness(1.07);box-shadow:0 12px 28px rgba(93,83,210,.4);transform:translateY(-1px)}
+.auth-btn:active{transform:translateY(0)}
+.auth-btn svg{width:18px;height:18px;flex:0 0 auto}
+.auth-foot{margin-top:20px;font-size:11.5px;color:#a8adc0;line-height:1.8}
+.auth-foot b{color:#5d53d2;font-weight:600}
+
+/* 模拟授权页 */
+.auth-card-wide{width:524px;padding:30px 30px 24px;text-align:left}
+.auth-pick-head{margin-bottom:16px}
+.auth-pick-title{font-size:16px;font-weight:600;color:#181b34;display:flex;align-items:center;gap:8px}
+.auth-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex:0 0 auto;box-shadow:0 0 0 3px rgba(34,197,94,.14)}
+.auth-pick-sub{font-size:12px;color:#8a8fa3;margin-top:7px;line-height:1.65}
+.auth-pick-search{margin-bottom:12px}
+.auth-pick-search input{width:100%;height:38px;padding:0 13px;border:1px solid #e4e6f2;border-radius:10px;
+  background:#fafbff;font-size:13px;font-family:inherit;color:#323338;outline:none;box-sizing:border-box;
+  transition:border-color .16s,box-shadow .16s,background .16s}
+.auth-pick-search input::placeholder{color:#b3b7c6}
+.auth-pick-search input:focus{border-color:#a9a4f0;box-shadow:0 0 0 3px rgba(93,83,210,.10);background:#fff}
+.auth-pick-list{max-height:322px;overflow-y:auto;margin:0 -6px;padding:0 6px}
+.auth-pick-list::-webkit-scrollbar{width:5px}
+.auth-pick-list::-webkit-scrollbar-thumb{background:#e2e4f0;border-radius:4px}
+.auth-pick{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:11px;cursor:pointer;
+  border:1px solid transparent;transition:background .14s,border-color .14s}
+.auth-pick:hover{background:#f7f7ff;border-color:#efedfd}
+.auth-pick-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:13px;font-weight:600;flex:0 0 auto}
+.auth-pick-main{min-width:0;flex:1}
+.auth-pick-name{font-size:13.5px;font-weight:600;color:#181b34;display:flex;align-items:center;gap:6px}
+.auth-pick-meta{font-size:11.5px;color:#8a8fa3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.auth-pick-tag{font-size:10px;font-weight:600;padding:1px 6px;border-radius:5px;flex:0 0 auto}
+.auth-pick-tag.ok{background:#E8FBEE;color:#12a150}
+.auth-pick-tag.no{background:#FFEBE9;color:#d1304f}
+.auth-pick-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-top:14px;padding-top:14px;border-top:1px solid #f0f1f8;font-size:11px;color:#a8adc0}
+.auth-link{background:none;border:none;color:#5d53d2;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;padding:0}
+.auth-link:hover{text-decoration:underline}
+
+/* 无权限页 */
+.auth-deny-ic{width:64px;height:64px;border-radius:50%;background:#FFEBE9;color:#e0005c;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.auth-deny-ic svg{width:30px;height:30px}
+.auth-deny-user{background:#fafbff;border:1px solid #eef0fa;border-radius:12px;padding:12px 14px;
+  margin:18px 0 20px;text-align:left;display:flex;align-items:center;gap:10px}
+.auth-deny-user .auth-pick-av{width:32px;height:32px}
+.auth-deny-name{font-size:13px;font-weight:600;color:#181b34}
+.auth-deny-meta{font-size:11.5px;color:#8a8fa3;margin-top:2px}
+
+/* 侧边栏退出按钮 */
+.sb-logout{width:26px;height:26px;flex:0 0 auto;border:none;border-radius:8px;background:transparent;
+  color:var(--sb-text-muted,#ffffff85);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  opacity:.42;transition:opacity .16s,background .16s,color .16s}
+.sb-u:hover .sb-logout{opacity:1}
+.sb-logout:hover{background:#ffffff24;color:#fff}
+.sb-logout svg{width:15px;height:15px}
+
+@media (max-width:560px){
+  .auth-card{padding:30px 22px 24px;border-radius:18px}
+  .auth-card-wide{width:100%}
+  .auth-pick-foot span{display:none}
+}
+
+
 </style>
 <link rel="stylesheet" href="aop-kanban-palette.css">
 <link rel="stylesheet" href="aop-datacenter-palette.css">
@@ -6748,11 +6832,12 @@ tr:hover .p09-del-btn{opacity:1}
 
   <div class="sb-bt">
     <div class="sb-u">
-      <div class="sb-av">耿</div>
-      <div style="min-width:0">
-        <div class="sb-un">耿博琳</div>
-        <div class="sb-ur">职场管理(北京+异地)、行政数字化、文化运营</div>
+      <div class="sb-av" id="sbUserAvatar">耿</div>
+      <div style="min-width:0;flex:1">
+        <div class="sb-un" id="sbUserName">耿博琳</div>
+        <div class="sb-ur" id="sbUserRole">行政经理 · 北京</div>
       </div>
+      <button class="sb-logout" type="button" title="退出登录" onclick="authLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button>
     </div>
   </div>
 </div>
@@ -8097,6 +8182,55 @@ html body #p13 .p13-detail-table td.col-rate,html body #p13 .p13-detail-table th
   <div class="p07-lb-thumbs" id="imgLbThumbs" onclick="event.stopPropagation()"></div>
   <div class="p07-lb-actions">
     <button class="p07-lb-btn" type="button" onclick="downloadImg(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>下载原图</button>
+  </div>
+</div>
+
+<!-- ══════ AUTH GATE · 模拟金山协作单点登录 ══════ -->
+<div id="authGate">
+  <!-- ① 登录入口 -->
+  <div class="auth-card" id="authStepLogin">
+    <div class="auth-logo">
+      <div class="sb-logo-i" aria-hidden="true"><span class="v7-b1"></span><span class="v7-b2"></span></div>
+      <div class="auth-logo-t">AOP</div>
+      <div class="auth-logo-badge">Beta</div>
+    </div>
+    <div class="auth-title">行政运营管理平台</div>
+    <div class="auth-sub">本平台仅限行政部内部使用<br>请使用公司金山协作账号登录</div>
+    <button class="auth-btn" type="button" onclick="authGotoAuthorize()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/></svg>
+      使用金山协作账号登录
+    </button>
+    <div class="auth-foot">登录即表示你已阅读并同意公司信息安全规范<br>需要开通权限，请联系<b>行政部 耿博琳</b></div>
+  </div>
+
+  <!-- ② 模拟授权页 -->
+  <div class="auth-card auth-card-wide" id="authStepPick" style="display:none">
+    <div class="auth-pick-head">
+      <div class="auth-pick-title"><span class="auth-dot"></span>金山协作 · 授权登录</div>
+      <div class="auth-pick-sub">「AOP 行政运营管理平台」申请获取你的账号信息（姓名、工号、部门、职位）</div>
+    </div>
+    <div class="auth-pick-search"><input id="authSearch" type="text" placeholder="搜索姓名 / 工号 / 部门" autocomplete="off" oninput="authRenderPicker(this.value)"></div>
+    <div class="auth-pick-list" id="authPickList"></div>
+    <div class="auth-pick-foot">
+      <button class="auth-link" type="button" onclick="authBackToLogin()">← 返回</button>
+      <span>原型模拟授权页 · 正式环境将跳转金山协作</span>
+    </div>
+  </div>
+
+  <!-- ③ 无访问权限 -->
+  <div class="auth-card" id="authStepDenied" style="display:none">
+    <div class="auth-deny-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+    <div class="auth-title">无访问权限</div>
+    <div class="auth-sub">本平台仅向<b>行政部</b>成员开放<br>你的账号不在准入范围内</div>
+    <div class="auth-deny-user">
+      <div class="auth-pick-av" id="authDenyAv">?</div>
+      <div style="min-width:0">
+        <div class="auth-deny-name" id="authDenyName">—</div>
+        <div class="auth-deny-meta" id="authDenyMeta">—</div>
+      </div>
+    </div>
+    <button class="auth-btn" type="button" onclick="authBackToLogin()">更换账号</button>
+    <div class="auth-foot">如需开通，请联系<b>行政部 耿博琳</b><br>gengbolin@kingsoft.com</div>
   </div>
 </div>
 
@@ -9688,7 +9822,7 @@ function renderWeekPeriod(){
       <div class="p02-hero-content">
         <div class="p02-hero-left">
           <div class="p02-hero-eyebrow">W${weekNum} · ${formatDate(weekStart)} – ${formatDate(weekEnd)} · ${now.getFullYear()}年</div>
-          <div class="p02-hero-hi"><span class="p02-greet-text">${greeting}</span>，耿博琳 <span class="p02-hero-wave">${greetIcon(hour)}</span></div>
+          <div class="p02-hero-hi"><span class="p02-greet-text">${greeting}</span>，${(authSession()||{}).name||'同事'} <span class="p02-hero-wave">${greetIcon(hour)}</span></div>
           <div class="p02-hero-sub">本周已更新 <strong>${updatedCount}</strong> / ${totalCount} 项，整体进度 ${progress}%</div>
           <div class="p02-hero-prog"><div class="p02-hero-prog-bar"><div class="p02-hero-prog-fill" style="width:${progress}%"></div></div></div>
         </div>
@@ -10775,7 +10909,7 @@ function openNewItemModal(){
   document.getElementById('newItemName').value = '';
   document.getElementById('newItemType').value = 'project';
   document.getElementById('newItemModule').value = '职场运营(北京)';
-  document.getElementById('newItemOwner').value = '耿博琳';
+  (function(){var _os=document.getElementById('newItemOwner');_os.value=(authSession()||{}).name;if(!_os.value)_os.value='耿博琳';})();
   document.getElementById('newItemDeadline').value = '';
   document.getElementById('newItemPriority').value = 'medium';
   document.getElementById('newItemDesc').value = '';
@@ -24218,11 +24352,162 @@ function showToast(message){
   }
 })();
 
+/* ══════ AUTH · 模拟金山协作单点登录 + 部门准入 ══════ */
+// 说明：正式环境由后端完成 OAuth2 授权码交换，前端只拿会话；
+// 此处用 AUTH_DIRECTORY 模拟金山协作通讯录返回值，接口契约保持一致。
+var AUTH_SESSION_KEY = 'aop_auth_session';
+var AUTH_ALLOWED_DEPTS = ['行政部'];   // 准入部门白名单（按部门树首级匹配）
+
+var AUTH_DIRECTORY = [
+  { uid:'31784',     name:'耿博琳', email:'gengbolin@kingsoft.com',    deptPath:['行政部','综合组'],  workplace:'北京', title:'行政经理',     color:'#5d53d2', admin:true  },
+  { uid:'9471',      name:'郭萌',   email:'guomeng@kingsoft.com',      deptPath:['行政部','管理组'],  workplace:'北京', title:'高级行政总监', color:'#6662ff', admin:true  },
+  { uid:'37010',     name:'傅中南', email:'fuzhongnan@kingsoft.com',   deptPath:['行政部','综合组'],  workplace:'北京', title:'行政经理',     color:'#3ea4fb', admin:false },
+  { uid:'40085',     name:'高琳',   email:'gaolin@kingsoft.com',       deptPath:['行政部','综合组'],  workplace:'北京', title:'行政主管',     color:'#12a150', admin:false },
+  { uid:'45400',     name:'丁玉萍', email:'dingyuping@kingsoft.com',   deptPath:['行政部','综合组'],  workplace:'北京', title:'行政专员',     color:'#eea935', admin:false },
+  { uid:'50015',     name:'程宇亮', email:'chengyuliang@kingsoft.com', deptPath:['行政部','武汉组'],  workplace:'武汉', title:'行政经理',     color:'#e0005c', admin:false },
+  { uid:'52427',     name:'任纪明', email:'renjiming@kingsoft.com',    deptPath:['行政部','司机组'],  workplace:'北京', title:'司机',         color:'#8a8fa3', admin:false },
+  { uid:'55035',     name:'王嘉旭', email:'wangjiaxu@kingsoft.com',    deptPath:['行政部','总裁办'],  workplace:'北京', title:'总裁助理',     color:'#a25ddc', admin:false },
+  { uid:'58463',     name:'聂茜茜', email:'niexixi@kingsoft.com',      deptPath:['行政部','武汉组'],  workplace:'武汉', title:'行政专员',     color:'#00a9ff', admin:false },
+  { uid:'64354',     name:'王琳琳', email:'wanglinlin@kingsoft.com',   deptPath:['行政部','总裁办'],  workplace:'北京', title:'高级总裁助理', color:'#6161ff', admin:false },
+  { uid:'90869',     name:'张灵玉', email:'zhanglingyu@kingsoft.com',  deptPath:['行政部','综合组'],  workplace:'北京', title:'行政专员',     color:'#4be272', admin:false },
+  { uid:'C10000478', name:'董诗昀', email:'dongshiyun@kingsoft.com',   deptPath:['行政部','武汉组'],  workplace:'武汉', title:'行政专员',     color:'#ffcb00', admin:false },
+  { uid:'C10000541', name:'胡丽婷', email:'huliting@kingsoft.com',     deptPath:['行政部','深圳组'],  workplace:'深圳', title:'行政专员',     color:'#ff7a45', admin:false },
+  { uid:'S65765',    name:'范嘉璐', email:'fanjialu@kingsoft.com',     deptPath:['行政部','武汉组'],  workplace:'武汉', title:'设计实习生',   color:'#b37feb', admin:false },
+  { uid:'S66537',    name:'王阳',   email:'wangyang@kingsoft.com',     deptPath:['行政部','综合组'],  workplace:'北京', title:'行政实习生',   color:'#36cfc9', admin:false },
+  // 非行政部账号 · 用于验证准入拦截
+  { uid:'T90012',    name:'李泽宇', email:'lizeyu@kingsoft.com',      deptPath:['技术部','前端组'],  workplace:'北京', title:'前端工程师',   color:'#6B7280', admin:false }
+];
+
+function authSession(){
+  try { return JSON.parse(localStorage.getItem(AUTH_SESSION_KEY) || 'null'); } catch(e) { return null; }
+}
+
+function authDeptLabel(u){
+  if(!u) return '';
+  if(u.deptPath && u.deptPath.length) return u.deptPath.join(' / ');
+  return u.dept || '';
+}
+
+// 准入判定：部门树首级命中白名单即放行
+function authIsAllowed(u){
+  if(!u) return false;
+  var top = (u.deptPath && u.deptPath[0]) || u.dept || '';
+  return AUTH_ALLOWED_DEPTS.some(function(d){ return top === d; });
+}
+
+function authApplyUser(u){
+  var av = document.getElementById('sbUserAvatar');
+  var nm = document.getElementById('sbUserName');
+  var rl = document.getElementById('sbUserRole');
+  if(av){ av.textContent = (u.name || '?').charAt(0); av.style.background = u.color || '#5d53d2'; }
+  if(nm) nm.textContent = u.name || '';
+  if(rl) rl.textContent = [u.title, u.workplace].filter(Boolean).join(' · ');
+}
+
+function authShowStep(step){
+  ['authStepLogin','authStepPick','authStepDenied'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.style.display = (id === step) ? '' : 'none';
+  });
+}
+
+function authShowGate(){
+  var g = document.getElementById('authGate');
+  if(g) g.classList.add('show');
+}
+
+function authHideGate(){
+  var g = document.getElementById('authGate');
+  if(g) g.classList.remove('show');
+}
+
+function authGotoAuthorize(){
+  var s = document.getElementById('authSearch');
+  if(s) s.value = '';
+  authRenderPicker('');
+  authShowStep('authStepPick');
+  if(s) setTimeout(function(){ s.focus(); }, 60);
+}
+
+function authBackToLogin(){
+  authShowStep('authStepLogin');
+}
+
+function authRenderPicker(kw){
+  var box = document.getElementById('authPickList');
+  if(!box) return;
+  var q = (kw || '').trim().toLowerCase();
+  var list = AUTH_DIRECTORY.filter(function(u){
+    if(!q) return true;
+    return (u.name + ' ' + u.uid + ' ' + authDeptLabel(u) + ' ' + u.title + ' ' + u.workplace).toLowerCase().indexOf(q) >= 0;
+  });
+  if(!list.length){
+    box.innerHTML = '<div style="text-align:center;color:#a8adc0;font-size:12.5px;padding:30px 0">未找到匹配的账号</div>';
+    return;
+  }
+  box.innerHTML = list.map(function(u){
+    var ok = authIsAllowed(u);
+    var col = u.color || '#6B7280';
+    return '<div class="auth-pick" onclick="authLogin(&quot;' + u.uid + '&quot;)">'
+      + '<div class="auth-pick-av" style="background:' + col + '">' + (u.name || '?').charAt(0) + '</div>'
+      + '<div class="auth-pick-main">'
+      +   '<div class="auth-pick-name">' + u.name
+      +     '<span class="auth-pick-tag ' + (ok ? 'ok' : 'no') + '">' + (ok ? '行政部' : '非行政部') + '</span>'
+      +   '</div>'
+      +   '<div class="auth-pick-meta">' + authDeptLabel(u) + ' · ' + u.title + ' · ' + u.workplace + '</div>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+function authLogin(uid){
+  var u = AUTH_DIRECTORY.filter(function(x){ return x.uid === uid; })[0];
+  if(!u) return;
+  if(!authIsAllowed(u)){
+    var av = document.getElementById('authDenyAv');
+    var nm = document.getElementById('authDenyName');
+    var mt = document.getElementById('authDenyMeta');
+    if(av){ av.textContent = (u.name || '?').charAt(0); av.style.background = u.color || '#6B7280'; }
+    if(nm) nm.textContent = u.name + '（' + u.uid + '）';
+    if(mt) mt.textContent = authDeptLabel(u) + ' · ' + u.title;
+    authShowStep('authStepDenied');
+    return;
+  }
+  localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify({
+    uid: u.uid, name: u.name, email: u.email, deptPath: u.deptPath.slice(),
+    workplace: u.workplace, title: u.title, color: u.color, admin: u.admin,
+    loginAt: Date.now()
+  }));
+  authApplyUser(u);
+  authHideGate();
+  if(typeof renderWeekPeriod === 'function') renderWeekPeriod();
+  if(typeof renderP02 === 'function') renderP02();
+  showToast('✓ 已登录：' + u.name);
+}
+
+function authLogout(){
+  if(!confirm('确认退出登录？')) return;
+  localStorage.removeItem(AUTH_SESSION_KEY);
+  location.reload();
+}
+
+function authBoot(){
+  var u = authSession();
+  if(u && authIsAllowed(u)){
+    authApplyUser(u);
+    authHideGate();
+    return;
+  }
+  authShowGate();
+  authShowStep('authStepLogin');
+}
+
 /* ══════ INIT ══════ */
 mountSidebarIcons(); // 把侧栏 data-ic 占位替换为统一描线 SVG 图标
 renderWeekPeriod(); // Render week period card
 renderP02(); // Render default panel on load
 checkPendingReminders(); // Check for pending reminders
+authBoot(); // 校验登录态与部门准入
 
 // ══════ 复盘成果归档库 - 简化版 ══════
 function renderP12(){
