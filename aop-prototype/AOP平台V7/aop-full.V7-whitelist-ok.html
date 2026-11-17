@@ -6828,6 +6828,16 @@ tr:hover .p09-del-btn{opacity:1}
 #p31AddMemberModal .p31-modal-foot .p31-btn:active{transform:translateY(0) scale(.985)}
 #p31AddMemberModal .p31-modal-foot .p31-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(93,83,210,.18)}
 #p31AddMemberModal .p31-modal-foot .p31-btn.p31-cta:focus-visible{box-shadow:0 6px 16px rgba(93,83,210,.28),0 0 0 3px rgba(93,83,210,.22)}
+
+/* 弹窗动效 */
+@keyframes p31MaskIn{from{opacity:0}to{opacity:1}}
+@keyframes p31MaskOut{from{opacity:1}to{opacity:0}}
+@keyframes p31CardIn{from{opacity:0;transform:translateY(18px) scale(.965)}to{opacity:1;transform:none}}
+@keyframes p31CardOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(10px) scale(.985)}}
+#p31AddMemberModal{animation:p31MaskIn .2s ease-out}
+#p31AddMemberModal .p31-modal{animation:p31CardIn .26s cubic-bezier(.2,.9,.25,1)}
+#p31AddMemberModal.closing{animation:p31MaskOut .16s ease-in forwards;pointer-events:none}
+#p31AddMemberModal.closing .p31-modal{animation:p31CardOut .16s cubic-bezier(.4,0,1,1) forwards}
 #p31 .p31-pending{color:#b3b7c6}
 @media (max-width:1100px){
   #p31 .p31-stats{grid-template-columns:repeat(2,1fr)}
@@ -24991,12 +25001,12 @@ function p31OpenAddMember(){
 
   var m = document.createElement('div');
   m.id = 'p31AddMemberModal';
-  m.addEventListener('click', function(e){ if(e.target === m) m.remove(); });
+  m.addEventListener('click', function(e){ if(e.target === m) p31CloseAddMember(); });
   m.innerHTML = '<div class="p31-modal" role="dialog" aria-modal="true">'
     + '<div class="p31-modal-head">'
     +   '<div><div class="p31-modal-title">添加成员</div>'
     +     '<div class="p31-modal-sub">录入金山协作账号邮箱，该成员即可登录本平台</div></div>'
-    +   '<button class="p31-modal-x" type="button" title="关闭" onclick="document.getElementById(&quot;p31AddMemberModal&quot;).remove()">'
+    +   '<button class="p31-modal-x" type="button" title="关闭" onclick="p31CloseAddMember()">'
     +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>'
     +   '</button>'
     + '</div>'
@@ -25011,7 +25021,7 @@ function p31OpenAddMember(){
     +   '</label>'
     +   '<div class="p31-hint">部门、职位、职场将在该成员首次登录后自动同步</div>'
     +   '<div class="p31-modal-foot">'
-    +     '<button class="p31-btn" type="button" onclick="document.getElementById(&quot;p31AddMemberModal&quot;).remove()">取消</button>'
+    +     '<button class="p31-btn" type="button" onclick="p31CloseAddMember()">取消</button>'
     +     '<button class="p31-btn p31-cta" type="button" onclick="p31SubmitAddMember()">添加</button>'
     +   '</div>'
     + '</div>'
@@ -25024,6 +25034,13 @@ function p31OpenAddMember(){
     var el = document.getElementById(id);
     if(el) el.addEventListener('keydown', function(ev){ if(ev.key === 'Enter') p31SubmitAddMember(); });
   });
+}
+
+function p31CloseAddMember(){
+  var m = document.getElementById('p31AddMemberModal');
+  if(!m || m.classList.contains('closing')) return;
+  m.classList.add('closing');
+  setTimeout(function(){ if(m && m.parentNode) m.remove(); }, 170);
 }
 
 function p31SubmitAddMember(){
@@ -25060,8 +25077,7 @@ function p31SubmitAddMember(){
   p31Write(P31_WHITELIST_KEY, list);
   accessLog('add', { uid: '', name: name, email: email, deptPath: [] });
 
-  var m = document.getElementById('p31AddMemberModal');
-  if(m) m.remove();
+  p31CloseAddMember();
   renderP31();
   showToast('✓ 已加入白名单：' + name);
 }
