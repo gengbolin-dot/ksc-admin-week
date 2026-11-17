@@ -6721,8 +6721,8 @@ tr:hover .p09-del-btn{opacity:1}
   border:1px solid #e2e4f0;background:#fff;color:#535768;font-size:12.5px;font-weight:500;font-family:inherit;
   cursor:pointer;transition:all .16s;white-space:nowrap}
 #p31 .p31-btn:hover{background:#f7f7ff;border-color:#d5d6ea;color:#181b34}
-#p31 .p31-btn.primary{background:#5d53d2;border-color:#5d53d2;color:#fff;box-shadow:0 4px 12px rgba(93,83,210,.24)}
-#p31 .p31-btn.primary:hover{background:#4b41be;border-color:#4b41be}
+#p31 .p31-btn.p31-cta{background:#5d53d2;border-color:#5d53d2;color:#fff;box-shadow:0 4px 12px rgba(93,83,210,.24)}
+#p31 .p31-btn.p31-cta:hover{background:#4b41be;border-color:#4b41be}
 #p31 .p31-scroll{flex:1;overflow-y:auto;padding:20px 28px 44px;min-height:0}
 
 /* 概览卡 */
@@ -6813,7 +6813,21 @@ tr:hover .p09-del-btn{opacity:1}
 #p31AddMemberModal .p31-field-label i{color:#e0005c;font-style:normal;margin-left:1px}
 #p31AddMemberModal .p31-field .p31-search{flex:none;width:100%}
 #p31AddMemberModal .p31-hint{font-size:11.5px;color:#a8adc0;line-height:1.65;background:#fafbff;border:1px solid #f0f1f8;border-radius:9px;padding:9px 11px}
-#p31AddMemberModal .p31-modal-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:2px}
+/* 弹窗底部操作区 */
+#p31AddMemberModal .p31-modal-foot{display:flex;justify-content:flex-end;align-items:center;gap:10px;
+  margin-top:8px;padding-top:16px;border-top:1px solid #f0f1f8}
+#p31AddMemberModal .p31-modal-foot .p31-btn{height:40px;min-width:92px;padding:0 20px;
+  justify-content:center;border-radius:11px;font-size:13.5px;font-weight:500;letter-spacing:.01em;
+  transition:background .16s,border-color .16s,color .16s,box-shadow .16s,transform .16s}
+#p31AddMemberModal .p31-modal-foot .p31-btn:not(.p31-cta){background:#fff;border:1px solid #e2e4f0;color:#676879}
+#p31AddMemberModal .p31-modal-foot .p31-btn:not(.p31-cta):hover{background:#f7f7ff;border-color:#cfd1e6;color:#323338}
+#p31AddMemberModal .p31-modal-foot .p31-btn.p31-cta{border:none;color:#fff;font-weight:600;
+  background:linear-gradient(135deg,#6161ff,#5d53d2);box-shadow:0 6px 16px rgba(93,83,210,.28)}
+#p31AddMemberModal .p31-modal-foot .p31-btn.p31-cta:hover{filter:brightness(1.08);
+  box-shadow:0 8px 22px rgba(93,83,210,.36);transform:translateY(-1px)}
+#p31AddMemberModal .p31-modal-foot .p31-btn:active{transform:translateY(0) scale(.985)}
+#p31AddMemberModal .p31-modal-foot .p31-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(93,83,210,.18)}
+#p31AddMemberModal .p31-modal-foot .p31-btn.p31-cta:focus-visible{box-shadow:0 6px 16px rgba(93,83,210,.28),0 0 0 3px rgba(93,83,210,.22)}
 #p31 .p31-pending{color:#b3b7c6}
 @media (max-width:1100px){
   #p31 .p31-stats{grid-template-columns:repeat(2,1fr)}
@@ -8106,7 +8120,7 @@ html body #p13 .p13-detail-table td.col-rate,html body #p13 .p13-detail-table th
     </div>
     <div class="p31-head-actions">
       <button class="p31-btn" type="button" onclick="p31Refresh()">刷新</button>
-      <button class="p31-btn primary" type="button" onclick="p31OpenAddMember()">＋ 添加成员</button>
+      <button class="p31-btn p31-cta" type="button" onclick="p31OpenAddMember()">＋ 添加成员</button>
     </div>
   </div>
   <div class="p31-scroll" id="p31Scroll"></div>
@@ -24998,7 +25012,7 @@ function p31OpenAddMember(){
     +   '<div class="p31-hint">部门、职位、职场将在该成员首次登录后自动同步</div>'
     +   '<div class="p31-modal-foot">'
     +     '<button class="p31-btn" type="button" onclick="document.getElementById(&quot;p31AddMemberModal&quot;).remove()">取消</button>'
-    +     '<button class="p31-btn primary" type="button" onclick="p31SubmitAddMember()">添加</button>'
+    +     '<button class="p31-btn p31-cta" type="button" onclick="p31SubmitAddMember()">添加</button>'
     +   '</div>'
     + '</div>'
     + '</div>';
