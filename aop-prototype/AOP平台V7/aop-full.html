@@ -6806,6 +6806,15 @@ tr:hover .p09-del-btn{opacity:1}
 #p31GrantModal,#p31AddMemberModal .p31-grant-list{border:1px solid #ececf8;border-radius:12px;overflow-y:auto;max-height:340px;padding:6px}
 #p31GrantModal,#p31AddMemberModal .p31-grant-item{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;transition:background .14s}
 #p31GrantModal,#p31AddMemberModal .p31-grant-item:hover{background:#f7f7ff}
+
+/* 添加成员表单 */
+#p31AddMemberModal .p31-field{display:flex;flex-direction:column;gap:6px}
+#p31AddMemberModal .p31-field-label{font-size:12px;font-weight:600;color:#535768}
+#p31AddMemberModal .p31-field-label i{color:#e0005c;font-style:normal;margin-left:1px}
+#p31AddMemberModal .p31-field .p31-search{flex:none;width:100%}
+#p31AddMemberModal .p31-hint{font-size:11.5px;color:#a8adc0;line-height:1.65;background:#fafbff;border:1px solid #f0f1f8;border-radius:9px;padding:9px 11px}
+#p31AddMemberModal .p31-modal-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:2px}
+#p31 .p31-pending{color:#b3b7c6}
 @media (max-width:1100px){
   #p31 .p31-stats{grid-template-columns:repeat(2,1fr)}
 }
@@ -24623,6 +24632,7 @@ function authLogin(uid){
     loginAt: Date.now()
   }));
   authApplyUser(u);
+  try { p31SyncProfile(u); } catch(e) {}
   authHideGate();
   if(typeof renderWeekPeriod === 'function') renderWeekPeriod();
   if(typeof renderP02 === 'function') renderP02();
@@ -24662,6 +24672,10 @@ function p31Read(key, def){
 }
 function p31Write(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
 
+// 邮箱归一化：去空格 + 转小写，作为白名单唯一键
+function p31NormEmail(s){ return String(s == null ? '' : s).trim().toLowerCase(); }
+function p31IsEmail(s){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p31NormEmail(s)); }
+
 // 是否属于行政部（兼容二级部门：路径中任意一级命中即可）
 function p31IsDeptUser(u){ return ((u && u.deptPath) || []).indexOf('行政部') >= 0; }
 
@@ -24669,9 +24683,10 @@ function p31IsDeptUser(u){ return ((u && u.deptPath) || []).indexOf('行政部')
 function p31SeedWhitelist(){
   return AUTH_DIRECTORY.filter(p31IsDeptUser).map(function(u){
     return {
-      uid: u.uid, name: u.name, email: u.email,
+      email: p31NormEmail(u.email), name: u.name, uid: u.uid,
       deptPath: (u.deptPath || []).slice(), workplace: u.workplace,
       title: u.title, color: u.color, status: 'active',
+      profileStatus: 'complete',
       addedAt: new Date().toISOString(), addedBy: '系统初始化'
     };
   });
@@ -24681,11 +24696,23 @@ function p31SeedWhitelist(){
 function p31Whitelist(){
   var raw = localStorage.getItem(P31_WHITELIST_KEY);
   var list;
+
   if(raw === null){
     list = p31SeedWhitelist();
     p31Write(P31_WHITELIST_KEY, list);
   } else {
     try { list = JSON.parse(raw) || []; } catch(e) { list = []; }
+    // 兼容旧结构：邮箱归一化 + 补 profileStatus
+    var changed = false;
+    list.forEach(function(w){
+      var e = p31NormEmail(w.email);
+      if(w.email !== e){ w.email = e; changed = true; }
+      if(!w.profileStatus){
+        w.profileStatus = (w.deptPath && w.deptPath.length) ? 'complete' : 'pending';
+        changed = true;
+      }
+    });
+    if(changed) p31Write(P31_WHITELIST_KEY, list);
   }
 
   var legacyRaw = localStorage.getItem(P31_LEGACY_OVERRIDE_KEY);
@@ -24694,11 +24721,14 @@ function p31Whitelist(){
       var legacy = JSON.parse(legacyRaw) || [];
       legacy.forEach(function(o){
         if(!o || o.status !== 'active') return;
-        if(list.some(function(w){ return w.uid === o.uid; })) return;
+        var e = p31NormEmail(o.email);
+        if(!e) return;
+        if(list.some(function(w){ return p31NormEmail(w.email) === e; })) return;
         list.push({
-          uid: o.uid, name: o.name, email: o.email,
+          email: e, name: o.name, uid: o.uid || '',
           deptPath: (o.deptPath || []).slice(), workplace: o.workplace,
           title: o.title, color: o.color, status: 'active',
+          profileStatus: 'complete',
           addedAt: o.grantedAt || new Date().toISOString(),
           addedBy: o.grantedBy || '系统迁移'
         });
@@ -24711,15 +24741,44 @@ function p31Whitelist(){
   return list;
 }
 
-function p31IsWhitelisted(u){
-  if(!u) return false;
-  return p31Whitelist().some(function(w){ return w.uid === u.uid && w.status === 'active'; });
+function p31FindWhitelist(email){
+  var e = p31NormEmail(email);
+  if(!e) return null;
+  return p31Whitelist().filter(function(w){ return p31NormEmail(w.email) === e; })[0] || null;
 }
 
-/* ── 准入判定：只认白名单 ── */
+function p31IsWhitelisted(u){
+  if(!u) return false;
+  var w = p31FindWhitelist(u.email);
+  return !!(w && w.status === 'active');
+}
+
+/* ── 准入判定：只认白名单（按邮箱匹配） ── */
 function p31AccessOf(u){
   if(!u) return 'none';
   return p31IsWhitelisted(u) ? 'whitelist' : 'none';
+}
+
+/* ── 登录后补全资料 ── */
+function p31SyncProfile(u){
+  if(!u) return null;
+  var e = p31NormEmail(u.email);
+  if(!e) return null;
+  var list = p31Whitelist();
+  var w = list.filter(function(x){ return p31NormEmail(x.email) === e; })[0];
+  if(!w) return null;
+
+  w.name        = u.name || w.name;
+  w.uid         = u.uid || w.uid || '';
+  w.deptPath    = (u.deptPath || []).slice();
+  w.title       = u.title || w.title || '';
+  w.workplace   = u.workplace || w.workplace || '';
+  w.color       = u.color || w.color;
+  w.profileStatus = 'complete';
+  w.syncedAt    = new Date().toISOString();
+  w.lastLoginAt = new Date().toISOString();
+  p31Write(P31_WHITELIST_KEY, list);
+  return w;
 }
 
 function p31Logs(){ return p31Read(P31_LOG_KEY, []); }
@@ -24738,6 +24797,7 @@ function p31FmtTime(iso){
 }
 function p31Now(){ return new Date().toISOString(); }
 function p31Me(){ var s = authSession(); return s ? s.name : ''; }
+function p31Today(){ return p31Now().slice(0, 10); }
 
 // 统一审计写入：最多保留 200 条
 function accessLog(action, user){
@@ -24747,6 +24807,7 @@ function accessLog(action, user){
     at: p31Now(),
     uid: user ? (user.uid || '') : '',
     name: user ? (user.name || '') : '',
+    email: user ? (user.email || '') : '',
     dept: user ? ((user.deptPath || []).join(' / ') || user.dept || '') : '',
     action: action
   });
@@ -24785,16 +24846,16 @@ function p31Stat(label, num, color, sub){
 function p31RenderStats(){
   var el = document.getElementById('p31Stats'); if(!el) return;
   var list = p31Whitelist().filter(function(w){ return w.status === 'active'; });
-  var dept = list.filter(p31IsDeptUser).length;
-  var today = p31Now().slice(0, 10);
-  var deniedToday = p31Logs().filter(function(l){
-    return l.action === 'denied' && String(l.at || '').slice(0, 10) === today;
-  }).length;
+  var pending = list.filter(function(w){ return w.profileStatus !== 'complete'; }).length;
+  var today = p31Today();
+  var logs = p31Logs();
+  var loginToday = logs.filter(function(l){ return l.action === 'login' && String(l.at || '').slice(0, 10) === today; }).length;
+  var deniedToday = logs.filter(function(l){ return l.action === 'denied' && String(l.at || '').slice(0, 10) === today; }).length;
 
   el.innerHTML =
       p31Stat('可访问成员', list.length, '#12a150', '总人数')
-    + p31Stat('行政部成员', dept, '#5d53d2', '部门内')
-    + p31Stat('部门外成员', list.length - dept, '#eea935', '特批加入')
+    + p31Stat('待补全', pending, '#eea935', '未登录')
+    + p31Stat('今日登录', loginToday, '#5d53d2', '人次')
     + p31Stat('今日拦截', deniedToday, '#e0005c', '准入拒绝');
 }
 
@@ -24827,7 +24888,7 @@ function p31RenderBody(){
   var el = document.getElementById('p31Body'); if(!el) return;
   if(p31State.tab === 'logs'){ el.innerHTML = p31LogsHtml(); return; }
   el.innerHTML = '<div class="p31-toolbar">'
-    + '<input class="p31-search" id="p31SearchInput" type="text" autocomplete="off" placeholder="搜索姓名 / 工号 / 邮箱 / 职位" value="' + p31Esc(p31State.kw) + '" oninput="p31Search(this.value)">'
+    + '<input class="p31-search" id="p31SearchInput" type="text" autocomplete="off" placeholder="搜索姓名 / 邮箱 / 部门 / 职位" value="' + p31Esc(p31State.kw) + '" oninput="p31Search(this.value)">'
     + '<span class="p31-count" id="p31MemberCount"></span>'
     + '</div><div id="p31MemberTable"></div>';
   p31RenderMemberTable();
@@ -24844,7 +24905,7 @@ function p31RenderMemberTable(){
   var list = p31Whitelist().slice();
   if(q){
     list = list.filter(function(u){
-      return (u.name + ' ' + u.uid + ' ' + u.email + ' ' + u.title + ' ' + (u.workplace || '') + ' ' + (u.deptPath || []).join(' '))
+      return (u.name + ' ' + u.email + ' ' + (u.uid || '') + ' ' + (u.title || '') + ' ' + (u.workplace || '') + ' ' + (u.deptPath || []).join(' '))
         .toLowerCase().indexOf(q) >= 0;
     });
   }
@@ -24852,26 +24913,27 @@ function p31RenderMemberTable(){
   if(cnt) cnt.textContent = '共 ' + list.length + ' 人';
 
   var rows = list.map(function(u){
-    var isDept = p31IsDeptUser(u);
+    var done = u.profileStatus === 'complete';
+    var dept = done ? ((u.deptPath || []).join(' / ') || '—') : '<span class="p31-pending">待补全</span>';
     return '<tr>'
       + '<td><div class="p31-user">'
-      +   '<div class="p31-av" style="background:' + (u.color || '#6B7280') + '">' + p31Esc((u.name || '?').charAt(0)) + '</div>'
-      +   '<div><div class="p31-uname">' + p31Esc(u.name) + '</div><div class="p31-uid">' + p31Esc(u.uid) + '</div></div>'
+      +   '<div class="p31-av" style="background:' + (u.color || '#8a8fa3') + '">' + p31Esc((u.name || '?').charAt(0)) + '</div>'
+      +   '<div><div class="p31-uname">' + p31Esc(u.name) + '</div>'
+      +     (u.uid ? '<div class="p31-uid">' + p31Esc(u.uid) + '</div>' : '') + '</div>'
       + '</div></td>'
       + '<td>' + p31Esc(u.email) + '</td>'
-      + '<td>' + p31Esc((u.deptPath || []).join(' / ')) + '</td>'
-      + '<td>' + p31Esc(u.title) + '</td>'
-      + '<td>' + p31Esc(u.workplace) + '</td>'
-      + '<td><span class="p31-badge ' + (isDept ? 'ok' : 'pur') + '">' + (isDept ? '行政部' : '部门外') + '</span></td>'
+      + '<td>' + dept + '</td>'
+      + '<td>' + (done ? p31Esc(u.title || '—') : '<span class="p31-pending">—</span>') + '</td>'
+      + '<td>' + (done ? p31Esc(u.workplace || '—') : '<span class="p31-pending">—</span>') + '</td>'
       + '<td style="text-align:right;white-space:nowrap">'
-      +   '<button class="p31-link dan" type="button" onclick="p31RemoveMember(&quot;' + p31Esc(u.uid) + '&quot;)">移除</button>'
+      +   '<button class="p31-link dan" type="button" onclick="p31RemoveMember(&quot;' + p31Esc(u.email) + '&quot;)">移除</button>'
       + '</td></tr>';
   }).join('');
 
   el.innerHTML = '<table class="p31-table"><thead><tr>'
-    + '<th>成员</th><th>邮箱</th><th>部门</th><th>职位</th><th>职场</th><th>来源</th><th></th>'
+    + '<th>成员</th><th>邮箱</th><th>部门</th><th>职位</th><th>职场</th><th></th>'
     + '</tr></thead><tbody>'
-    + (rows || '<tr><td colspan="7" style="text-align:center;color:#a8adc0;padding:44px 0">白名单为空，点击右上角「＋ 添加成员」邀请成员</td></tr>')
+    + (rows || '<tr><td colspan="6" style="text-align:center;color:#a8adc0;padding:44px 0">白名单为空，点击右上角「＋ 添加成员」邀请成员</td></tr>')
     + '</tbody></table>';
 }
 
@@ -24896,7 +24958,7 @@ function p31LogsHtml(){
     return '<tr>'
       + '<td style="white-space:nowrap;font-variant-numeric:tabular-nums;color:#8a8fa3">' + p31FmtTime(l.at) + '</td>'
       + '<td>' + p31Esc(l.name || '—')
-      +   (l.uid ? '<span style="color:#c2c6d4;font-size:11px;margin-left:7px;font-variant-numeric:tabular-nums">' + p31Esc(l.uid) + '</span>' : '')
+      +   (l.email ? '<span style="color:#c2c6d4;font-size:11px;margin-left:7px">' + p31Esc(l.email) + '</span>' : '')
       + '</td>'
       + '<td>' + p31Esc(l.dept || '—') + '</td>'
       + '<td><span class="p31-badge ' + m.c + '">' + m.t + '</span></td>'
@@ -24908,7 +24970,7 @@ function p31LogsHtml(){
     + '</tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
-/* ── 添加成员（白名单）── */
+/* ── 添加成员（邮箱 + 姓名）── */
 function p31OpenAddMember(){
   var old = document.getElementById('p31AddMemberModal');
   if(old) old.remove();
@@ -24919,87 +24981,82 @@ function p31OpenAddMember(){
   m.innerHTML = '<div class="p31-modal" role="dialog" aria-modal="true">'
     + '<div class="p31-modal-head">'
     +   '<div><div class="p31-modal-title">添加成员</div>'
-    +     '<div class="p31-modal-sub">从金山协作通讯录选择成员加入白名单，加入后即可登录本平台</div></div>'
+    +     '<div class="p31-modal-sub">录入金山协作账号邮箱，该成员即可登录本平台</div></div>'
     +   '<button class="p31-modal-x" type="button" title="关闭" onclick="document.getElementById(&quot;p31AddMemberModal&quot;).remove()">'
     +     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>'
     +   '</button>'
     + '</div>'
     + '<div class="p31-modal-body">'
-    +   '<input class="p31-search" id="p31AddSearch" type="text" autocomplete="off" placeholder="搜索姓名 / 工号 / 部门" oninput="p31RenderAddList(this.value)">'
-    +   '<div class="p31-grant-list" id="p31AddList"></div>'
+    +   '<label class="p31-field">'
+    +     '<span class="p31-field-label">邮箱 <i>*</i></span>'
+    +     '<input class="p31-search" id="p31AddEmail" type="text" autocomplete="off" spellcheck="false" placeholder="例如 gengbolin@kingsoft.com">'
+    +   '</label>'
+    +   '<label class="p31-field">'
+    +     '<span class="p31-field-label">姓名 <i>*</i></span>'
+    +     '<input class="p31-search" id="p31AddName" type="text" autocomplete="off" placeholder="用于核对与列表展示">'
+    +   '</label>'
+    +   '<div class="p31-hint">部门、职位、职场将在该成员首次登录后自动同步</div>'
+    +   '<div class="p31-modal-foot">'
+    +     '<button class="p31-btn" type="button" onclick="document.getElementById(&quot;p31AddMemberModal&quot;).remove()">取消</button>'
+    +     '<button class="p31-btn primary" type="button" onclick="p31SubmitAddMember()">添加</button>'
+    +   '</div>'
     + '</div>'
     + '</div>';
   document.body.appendChild(m);
-  p31RenderAddList('');
-  var s = document.getElementById('p31AddSearch');
-  if(s) setTimeout(function(){ s.focus(); }, 60);
+
+  var e = document.getElementById('p31AddEmail');
+  if(e) setTimeout(function(){ e.focus(); }, 60);
+  ['p31AddEmail','p31AddName'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('keydown', function(ev){ if(ev.key === 'Enter') p31SubmitAddMember(); });
+  });
 }
 
-function p31RenderAddList(kw){
-  var box = document.getElementById('p31AddList'); if(!box) return;
-  var q = (kw || '').trim().toLowerCase();
-  var whiteMap = {};
-  p31Whitelist().forEach(function(w){ whiteMap[w.uid] = w; });
+function p31SubmitAddMember(){
+  var emailEl = document.getElementById('p31AddEmail');
+  var nameEl  = document.getElementById('p31AddName');
+  if(!emailEl || !nameEl) return;
 
-  var list = AUTH_DIRECTORY.filter(function(u){
-    if(whiteMap[u.uid] && whiteMap[u.uid].status === 'active') return false;
-    if(!q) return true;
-    return (u.name + ' ' + u.uid + ' ' + u.email + ' ' + u.title + ' ' + (u.deptPath || []).join(' '))
-      .toLowerCase().indexOf(q) >= 0;
-  });
+  var email = p31NormEmail(emailEl.value);
+  var name  = String(nameEl.value || '').trim();
 
-  if(!list.length){
-    box.innerHTML = '<div style="text-align:center;color:#a8adc0;font-size:12.5px;padding:32px 0">通讯录中没有可添加的成员</div>';
+  if(!p31IsEmail(email)){
+    showToast('请输入正确的邮箱地址');
+    emailEl.focus();
+    return;
+  }
+  if(!name){
+    showToast('请输入姓名');
+    nameEl.focus();
+    return;
+  }
+  if(p31FindWhitelist(email)){
+    showToast('该邮箱已在白名单中');
+    emailEl.focus();
     return;
   }
 
-  box.innerHTML = list.map(function(u){
-    var isDept = p31IsDeptUser(u);
-    return '<div class="p31-grant-item">'
-      + '<div class="p31-av" style="background:' + (u.color || '#6B7280') + '">' + p31Esc((u.name || '?').charAt(0)) + '</div>'
-      + '<div style="min-width:0;flex:1">'
-      +   '<div class="p31-uname">' + p31Esc(u.name)
-      +     '<span class="p31-badge ' + (isDept ? 'ok' : 'pur') + '" style="margin-left:7px">' + (isDept ? '行政部' : '部门外') + '</span>'
-      +   '</div>'
-      +   '<div class="p31-uid">' + p31Esc((u.deptPath || []).join(' / ')) + ' · ' + p31Esc(u.title) + '</div>'
-      + '</div>'
-      + '<button class="p31-link" type="button" onclick="p31AddMember(&quot;' + p31Esc(u.uid) + '&quot;)">添加</button>'
-      + '</div>';
-  }).join('');
-}
-
-function p31AddMember(uid){
-  var u = AUTH_DIRECTORY.filter(function(x){ return x.uid === uid; })[0];
-  if(!u) return;
   var list = p31Whitelist();
-  var exist = list.filter(function(w){ return w.uid === uid; })[0];
-  if(exist){
-    exist.status = 'active';
-    exist.addedAt = p31Now();
-    exist.addedBy = p31Me();
-  } else {
-    list.push({
-      uid: u.uid, name: u.name, email: u.email,
-      deptPath: (u.deptPath || []).slice(), workplace: u.workplace,
-      title: u.title, color: u.color, status: 'active',
-      addedAt: p31Now(), addedBy: p31Me()
-    });
-  }
+  list.push({
+    email: email, name: name, uid: '',
+    deptPath: [], workplace: '', title: '', color: '#8a8fa3',
+    status: 'active', profileStatus: 'pending',
+    addedAt: p31Now(), addedBy: p31Me()
+  });
   p31Write(P31_WHITELIST_KEY, list);
-  accessLog('add', u);
+  accessLog('add', { uid: '', name: name, email: email, deptPath: [] });
 
   var m = document.getElementById('p31AddMemberModal');
   if(m) m.remove();
   renderP31();
-  showToast('✓ 已加入白名单：' + u.name);
+  showToast('✓ 已加入白名单：' + name);
 }
 
-function p31RemoveMember(uid){
-  var list = p31Whitelist();
-  var w = list.filter(function(x){ return x.uid === uid; })[0];
+function p31RemoveMember(email){
+  var w = p31FindWhitelist(email);
   if(!w) return;
   if(!confirm('确认将「' + w.name + '」移出白名单？\n移出后该账号将无法再登录本平台。')) return;
-  p31Write(P31_WHITELIST_KEY, list.filter(function(x){ return x.uid !== uid; }));
+  p31Write(P31_WHITELIST_KEY, p31Whitelist().filter(function(x){ return p31NormEmail(x.email) !== p31NormEmail(email); }));
   accessLog('remove', w);
   renderP31();
   showToast('已移出白名单：' + w.name);
