@@ -6838,6 +6838,15 @@ tr:hover .p09-del-btn{opacity:1}
 #p31AddMemberModal .p31-modal{animation:p31CardIn .26s cubic-bezier(.2,.9,.25,1)}
 #p31AddMemberModal.closing{animation:p31MaskOut .16s ease-in forwards;pointer-events:none}
 #p31AddMemberModal.closing .p31-modal{animation:p31CardOut .16s cubic-bezier(.4,0,1,1) forwards}
+
+/* 表单校验与提交态 */
+#p31AddMemberModal .p31-field-error{display:none;font-size:12px;color:#d1304f;line-height:1.5;
+  padding:0 2px;margin-top:-2px}
+#p31AddMemberModal .p31-field-error.show{display:block}
+#p31AddMemberModal .p31-field.has-error .p31-search{border-color:#f0a8b5;background:#fffafa}
+#p31AddMemberModal .p31-field.has-error .p31-search:focus{border-color:#e8899b;box-shadow:0 0 0 3px rgba(209,48,79,.10)}
+#p31AddMemberModal .p31-modal-foot .p31-btn.p31-cta.done{background:#12a150;
+  box-shadow:0 6px 16px rgba(18,161,80,.30);filter:none;transform:none;cursor:default}
 #p31 .p31-pending{color:#b3b7c6}
 @media (max-width:1100px){
   #p31 .p31-stats{grid-template-columns:repeat(2,1fr)}
@@ -17268,7 +17277,7 @@ function saveOKRRecord(){
 // Toast提示
 function showToast(message){
   const msg = document.createElement('div');
-  msg.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--suc);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:10001;box-shadow:var(--shL)';
+  msg.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--suc);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:10010;box-shadow:var(--shL)';
   msg.textContent = message;
   document.body.appendChild(msg);
   setTimeout(() => msg.remove(), 2000);
@@ -24390,7 +24399,7 @@ function p25Export(){
 }
 function showToast(message){
   const msg = document.createElement('div');
-  msg.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--suc);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:10001;box-shadow:var(--shL)';
+  msg.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--suc);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:10010;box-shadow:var(--shL)';
   msg.textContent = message;
   document.body.appendChild(msg);
   setTimeout(() => msg.remove(), 2000);
@@ -25019,10 +25028,11 @@ function p31OpenAddMember(){
     +     '<span class="p31-field-label">姓名 <i>*</i></span>'
     +     '<input class="p31-search" id="p31AddName" type="text" autocomplete="off" placeholder="用于核对与列表展示">'
     +   '</label>'
-    +   '<div class="p31-hint">部门、职位、职场将在该成员首次登录后自动同步</div>'
+    +   '<div class="p31-field-error" id="p31AddError"></div>'
++   '<div class="p31-hint">部门、职位、职场将在该成员首次登录后自动同步</div>'
     +   '<div class="p31-modal-foot">'
     +     '<button class="p31-btn" type="button" onclick="p31CloseAddMember()">取消</button>'
-    +     '<button class="p31-btn p31-cta" type="button" onclick="p31SubmitAddMember()">添加</button>'
+    +     '<button class="p31-btn p31-cta" id="p31AddBtn" type="button" onclick="p31SubmitAddMember()">添加</button>'
     +   '</div>'
     + '</div>'
     + '</div>';
@@ -25033,6 +25043,7 @@ function p31OpenAddMember(){
   ['p31AddEmail','p31AddName'].forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.addEventListener('keydown', function(ev){ if(ev.key === 'Enter') p31SubmitAddMember(); });
+    if(el) el.addEventListener('input', function(){ p31SetAddError(''); });
   });
 }
 
@@ -25043,6 +25054,20 @@ function p31CloseAddMember(){
   setTimeout(function(){ if(m && m.parentNode) m.remove(); }, 170);
 }
 
+// 行内校验提示：msg 为空即清除
+function p31SetAddError(msg, fieldId){
+  var box = document.getElementById('p31AddError');
+  if(box){ box.textContent = msg || ''; box.classList.toggle('show', !!msg); }
+  ['p31AddEmail','p31AddName'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el && el.parentElement) el.parentElement.classList.toggle('has-error', id === fieldId && !!msg);
+  });
+  if(msg && fieldId){
+    var target = document.getElementById(fieldId);
+    if(target) target.focus();
+  }
+}
+
 function p31SubmitAddMember(){
   var emailEl = document.getElementById('p31AddEmail');
   var nameEl  = document.getElementById('p31AddName');
@@ -25051,21 +25076,12 @@ function p31SubmitAddMember(){
   var email = p31NormEmail(emailEl.value);
   var name  = String(nameEl.value || '').trim();
 
-  if(!p31IsEmail(email)){
-    showToast('请输入正确的邮箱地址');
-    emailEl.focus();
-    return;
-  }
-  if(!name){
-    showToast('请输入姓名');
-    nameEl.focus();
-    return;
-  }
-  if(p31FindWhitelist(email)){
-    showToast('该邮箱已在白名单中');
-    emailEl.focus();
-    return;
-  }
+  if(!email){ p31SetAddError('请输入邮箱', 'p31AddEmail'); return; }
+  if(!p31IsEmail(email)){ p31SetAddError('邮箱格式不正确，请检查后重试', 'p31AddEmail'); return; }
+  if(!name){ p31SetAddError('请输入姓名', 'p31AddName'); return; }
+  if(p31FindWhitelist(email)){ p31SetAddError('该邮箱已在白名单中，无需重复添加', 'p31AddEmail'); return; }
+
+  p31SetAddError('');
 
   var list = p31Whitelist();
   list.push({
@@ -25077,9 +25093,15 @@ function p31SubmitAddMember(){
   p31Write(P31_WHITELIST_KEY, list);
   accessLog('add', { uid: '', name: name, email: email, deptPath: [] });
 
-  p31CloseAddMember();
-  renderP31();
-  showToast('✓ 已加入白名单：' + name);
+  // 先在弹窗内给到明确成功反馈，再关闭
+  var okBtn = document.getElementById('p31AddBtn');
+  if(okBtn){ okBtn.textContent = '✓ 已添加'; okBtn.classList.add('done'); okBtn.disabled = true; }
+
+  setTimeout(function(){
+    p31CloseAddMember();
+    renderP31();
+    showToast('✓ 已加入白名单：' + name);
+  }, 420);
 }
 
 function p31RemoveMember(email){
