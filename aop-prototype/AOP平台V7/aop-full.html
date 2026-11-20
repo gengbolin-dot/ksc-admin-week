@@ -14193,14 +14193,26 @@ const kbProgColor = (p) => p >= 100 ? '#40ca6d' : p >= 60 ? '#5d53d2' : p > 0 ? 
 
 let kh = '';
 cols.forEach((c, ci) => {
-  const its = filteredItems.filter(i => i.status === c.key);
+  const isDone = c.key === 'done';
+  let its = filteredItems.filter(i => i.status === c.key);
+  if (isDone) its = its.slice().sort((a, b) => String(b.updated || '').localeCompare(String(a.updated || '')));
+  const doneExpanded = !!window._p06DoneExpanded;
+  const shown = isDone && !doneExpanded ? its.slice(0, 5) : its;
   kh += '<div class="p06-kb-col" data-k="' + c.key + '">';
   kh += '<div class="p06-kb-head">' + kbIcon.head + '<span>' + c.label + '</span><b>' + its.length + '</b></div>';
   kh += '<div class="p06-kb-body">';
   if (!its.length) {
     kh += '<div class="p06-kb-empty">暂无「' + c.label + '」事项</div>';
   }
-  its.forEach((it, idx) => {
+  shown.forEach((it, idx) => {
+    if (isDone) {
+      kh += '<div class="p06-kb-card p06-kb-done" style="animation-delay:' + (idx * 25) + 'ms" onclick="openBoardDetail(' + it.id + ')" title="查看事项概况">';
+      kh += '<span class="p06-kb-done-title" title="' + it.name + '">' + it.name + '</span>';
+      kh += '<span class="p06-kb-done-owner" style="background:' + (it.ownerColor || '#5d53d2') + '">' + (it.owner || '—').slice(0, 1) + '</span>';
+      kh += '<span class="p06-kb-done-date">' + (it.updated || '—') + '</span>';
+      kh += '</div>';
+      return;
+    }
     const pct = typeof it.pct === 'number' && it.pct >= 0 ? it.pct : null;
     kh += '<div class="p06-kb-card" style="animation-delay:' + (ci * 40 + idx * 35) + 'ms" onclick="openBoardDetail(' + it.id + ')" title="查看事项概况">';
     kh += '<div class="p06-kb-title">' + it.name + '</div>';
@@ -14225,6 +14237,9 @@ cols.forEach((c, ci) => {
     kh += '<div class="p06-kb-foot">' + kbIcon.clock + '更新于 ' + (it.updated || '—') + '</div>';
     kh += '</div>';
   });
+  if (isDone && its.length > 5) {
+    kh += '<button class="p06-kb-more" onclick="toggleP06Done()">' + (doneExpanded ? '收起' : '展开全部 ' + its.length + ' 条') + '</button>';
+  }
   kh += '</div></div>';
 });
 document.getElementById('p06Kanban').innerHTML = kh;
@@ -14235,6 +14250,11 @@ document.getElementById('p06Kanban').innerHTML = kh;
   const kv = document.getElementById('p06KanbanView');
   if(lv) lv.style.display = v==='list' ? '' : 'none';
   if(kv) kv.style.display = v==='kanban' ? '' : 'none';
+}
+
+function toggleP06Done(){
+  window._p06DoneExpanded = !window._p06DoneExpanded;
+  renderP06();
 }
 
 /* 运营看板：事项概览（只读），与「我的工作」的编辑抽屉分离 */
