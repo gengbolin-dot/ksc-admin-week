@@ -200,6 +200,14 @@
 }
 #p06 .p06-kb-foot svg{width:12px;height:12px;stroke:currentColor}
 
+/* ---------- 已完成列：数量折叠 ---------- */
+#p06 .p06-kb-more{
+  margin-top:2px;padding:9px 10px;border:1px dashed var(--kb-line);border-radius:8px;background:#fff;
+  color:var(--kb-muted);font-size:11.5px;font-weight:500;cursor:pointer;transition:all .18s;
+  font-family:inherit;
+}
+#p06 .p06-kb-more:hover{border-color:#c5c9ea;color:#5d53d2;background:#fafbff}
+
 /* ---------- 表格视图：与看板同一套字色 ---------- */
 #p06 .p06-list-wrap{padding:20px 28px 32px!important}
 #p06 .p06-table{border-color:var(--kb-line)!important}

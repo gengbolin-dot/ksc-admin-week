@@ -14156,6 +14156,10 @@ function toggleP06HighOnly(){
   window._p06HighOnly = !window._p06HighOnly;
   renderP06();
 }
+function toggleP06Done(){
+  window._p06DoneExpanded = !window._p06DoneExpanded;
+  renderP06();
+}
 function renderP06(){
   initP06Year();
   // 获取时间筛选参数
@@ -14230,14 +14234,18 @@ const kbProgColor = (p) => p >= 100 ? '#40ca6d' : p >= 60 ? '#5d53d2' : p > 0 ? 
 
 let kh = '';
 cols.forEach((c, ci) => {
-  const its = filteredItems.filter(i => i.status === c.key);
+  const isDone = c.key === 'done';
+  let its = filteredItems.filter(i => i.status === c.key);
+  if (isDone) its = its.slice().sort((a, b) => String(b.updated || '').localeCompare(String(a.updated || '')));
+  const doneExpanded = !!window._p06DoneExpanded;
+  const shown = isDone && !doneExpanded ? its.slice(0, 5) : its;
   kh += '<div class="p06-kb-col" data-k="' + c.key + '">';
   kh += '<div class="p06-kb-head">' + kbIcon.head + '<span>' + c.label + '</span><b>' + its.length + '</b></div>';
   kh += '<div class="p06-kb-body">';
   if (!its.length) {
     kh += '<div class="p06-kb-empty">暂无「' + c.label + '」事项</div>';
   }
-  its.forEach((it, idx) => {
+  shown.forEach((it, idx) => {
     const sig = getP06Signal(it);
     const pct = typeof it.pct === 'number' && it.pct >= 0 ? it.pct : null;
     kh += '<div class="p06-kb-card" style="animation-delay:' + (ci * 40 + idx * 35) + 'ms" onclick="openBoardDetail(' + it.id + ')" title="查看事项概况">';
@@ -14263,6 +14271,9 @@ cols.forEach((c, ci) => {
     kh += '<div class="p06-kb-foot">' + kbIcon.clock + '更新于 ' + (it.updated || '—') + '</div>';
     kh += '</div>';
   });
+  if (isDone && its.length > 5) {
+    kh += '<button class="p06-kb-more" type="button" onclick="toggleP06Done()">' + (doneExpanded ? '收起' : '仅看最近 5 条 · 展开全部 ' + its.length + ' 条') + '</button>';
+  }
   kh += '</div></div>';
 });
 document.getElementById('p06Kanban').innerHTML = kh;
