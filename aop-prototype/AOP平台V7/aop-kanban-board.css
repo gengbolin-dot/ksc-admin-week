@@ -112,6 +112,7 @@
   font-size:12px;color:var(--kb-text);cursor:pointer;transition:all .18s ease;
 }
 #p06 .p06-chip:hover{border-color:#c5c9ea;background:#f7f7fd}
+#p06 .p06-chip.active{border-color:#f0b8cd;background:#fde7ee;color:#c81e5b;font-weight:600}
 #p06 .p06-chip svg{width:14px;height:14px;stroke:currentColor}
 #p06 .p06-chip-dots{display:inline-flex;align-items:center;margin-left:-2px}
 #p06 .p06-chip-dots i{

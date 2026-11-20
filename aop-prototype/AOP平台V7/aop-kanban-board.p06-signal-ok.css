@@ -1,0 +1,216 @@
+/* ══════════════════════════════════════════════════════════════════
+   运营看板 · Kanban 视图（参考 monday 看板页的视觉规范）
+   - 顶部：看板名称 + 视图标签（列表 / 看板）+ 右侧协同动作
+   - 列：彩色列头 + 数量徽章
+   - 卡片：标题 + Owner / 截止 / 完成度 / 所属模块 字段行
+   仅作用于 #p06，不影响其他页面。
+   ══════════════════════════════════════════════════════════════════ */
+
+#p06{
+  --kb-done:#40ca6d;
+  --kb-doing:#f4d200;
+  --kb-stuck:#e0005c;
+  --kb-live:#5d53d2;
+  --kb-ink:#181b35;
+  --kb-text:#4b4f66;
+  --kb-muted:#7c8093;
+  --kb-line:#d8dbec;
+  --kb-track:#e7e9f5;
+}
+
+/* ---------- 顶部标题区 ---------- */
+#p06 .p06-topbar{
+  padding:20px 28px 12px!important;
+  background:#fff!important;
+  border-bottom:none!important;
+  align-items:flex-start!important;
+}
+#p06 .p06-topbar-left{gap:0!important;flex-direction:column;align-items:flex-start!important}
+#p06 .p06-topbar-icon{display:none}
+#p06 .p06-topbar-title{
+  font-size:26px!important;font-weight:700!important;color:var(--kb-ink)!important;
+  letter-spacing:-.03em!important;line-height:1.2;
+}
+#p06 .p06-topbar-sub{font-size:12.5px!important;color:var(--kb-muted)!important;margin-top:4px}
+#p06 .p06-topbar-right{gap:8px!important;align-self:center}
+#p06 .p06-period-sel{
+  height:34px;border-radius:8px!important;border-color:var(--kb-line)!important;
+  font-size:12.5px;color:var(--kb-text);padding:6px 12px;
+}
+#p06 .p06-period-sel:hover{border-color:#c5c9ea!important}
+#p06 .p06-export-btn{
+  height:34px!important;border-radius:8px!important;border:1px solid var(--kb-line)!important;
+  background:#fff!important;color:var(--kb-text)!important;font-size:12.5px!important;
+}
+
+/* ---------- 视图标签：贴近截图的 tab 结构 ---------- */
+#p06 #p06ModTabs .p06-toolbar,
+#p06 .p06-toolbar{
+  display:flex!important;gap:22px!important;padding:0 28px!important;
+  width:100%!important;box-sizing:border-box;
+  justify-content:flex-start!important;align-items:center;
+  background:#fff!important;border-radius:0!important;
+  border-bottom:1px solid var(--kb-line)!important;
+}
+#p06 .p06-vt-btn{
+  padding:10px 0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;font-size:13.5px!important;font-weight:500!important;
+  color:var(--kb-muted)!important;position:relative;display:inline-flex;align-items:center;gap:7px;
+}
+#p06 .p06-vt-btn::before{
+  content:'';width:14px;height:14px;flex:0 0 auto;background:currentColor;
+  -webkit-mask-repeat:no-repeat;-webkit-mask-position:center;-webkit-mask-size:14px;
+  mask-repeat:no-repeat;mask-position:center;mask-size:14px;
+}
+#p06 .p06-vt-btn[onclick*="'list'"]::before{
+  -webkit-mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'><path d='M3 6h18M3 12h18M3 18h18'/></svg>");
+          mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'><path d='M3 6h18M3 12h18M3 18h18'/></svg>");
+}
+#p06 .p06-vt-btn[onclick*="'kanban'"]::before{
+  -webkit-mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linejoin='round'><rect x='3' y='4' width='5' height='16' rx='1'/><rect x='10' y='4' width='5' height='11' rx='1'/><rect x='17' y='4' width='4' height='7' rx='1'/></svg>");
+          mask-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linejoin='round'><rect x='3' y='4' width='5' height='16' rx='1'/><rect x='10' y='4' width='5' height='11' rx='1'/><rect x='17' y='4' width='4' height='7' rx='1'/></svg>");
+}
+#p06 .p06-vt-btn:hover{color:var(--kb-text)!important}
+#p06 .p06-vt-btn.active{color:#5d53d2!important;font-weight:600!important}
+#p06 .p06-vt-btn.active::after{
+  content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;
+  background:#5d53d2;border-radius:2px 2px 0 0;
+}
+
+/* ---------- 次要视图入口：列表放右侧，弱化视觉权重 ---------- */
+#p06 .p06-view-switch{
+  margin-left:auto;display:flex;align-items:center;gap:8px;
+  padding-bottom:4px;
+}
+#p06 .p06-view-label{font-size:11.5px;color:var(--kb-muted)}
+#p06 .p06-vt-sub{
+  padding:5px 12px!important;
+  border:1px solid var(--kb-line)!important;
+  border-radius:100px!important;
+  font-size:12px!important;
+  font-weight:500!important;
+  color:var(--kb-text)!important;
+  background:#fff!important;
+  transition:all .18s ease;
+}
+#p06 .p06-vt-sub::before{display:none}
+#p06 .p06-vt-sub:hover{border-color:#c5c9ea!important;background:#f7f7fd!important}
+#p06 .p06-vt-sub.active{
+  border-color:#5d53d2!important;
+  color:#5d53d2!important;
+  background:#edebfb!important;
+}
+#p06 .p06-vt-sub.active::after{display:none}
+
+/* 右侧协同动作（与截图 Integrate / Automate 对应） */
+#p06 .p06-board-actions{
+  display:flex;align-items:center;gap:8px;padding-bottom:6px;
+}
+#p06 .p06-chip{
+  display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;
+  border:1px solid var(--kb-line);border-radius:100px;background:#fff;
+  font-size:12px;color:var(--kb-text);cursor:pointer;transition:all .18s ease;
+}
+#p06 .p06-chip:hover{border-color:#c5c9ea;background:#f7f7fd}
+#p06 .p06-chip.active{border-color:#f0b8cd;background:#fde7ee;color:#c81e5b;font-weight:600}
+#p06 .p06-chip svg{width:14px;height:14px;stroke:currentColor}
+#p06 .p06-chip-dots{display:inline-flex;align-items:center;margin-left:-2px}
+#p06 .p06-chip-dots i{
+  width:18px;height:18px;border-radius:50%;margin-left:-5px;
+  border:2px solid #fff;display:inline-block;
+}
+
+/* ---------- 看板容器 ---------- */
+#p06 .p06-scroll{background:#f7f8fd!important}
+#p06 .p06-kanban-wrap{padding:20px 28px 32px!important}
+#p06 .p06-kanban{display:flex;gap:14px;align-items:flex-start;overflow-x:auto;padding-bottom:8px}
+
+/* ---------- 列头：整条彩色 ---------- */
+#p06 .p06-kb-col{
+  flex:1 1 0;min-width:248px;background:#f2f4fb;border-radius:12px;
+  padding:0 0 10px;display:flex;flex-direction:column;
+}
+#p06 .p06-kb-head{
+  display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;
+  border-radius:12px 12px 0 0;color:#fff;font-size:13px;font-weight:600;
+  letter-spacing:-.01em;
+}
+#p06 .p06-kb-head b{
+  margin-left:auto;font-size:11.5px;font-weight:600;
+  background:rgba(255,255,255,.26);border-radius:100px;padding:2px 8px;
+}
+#p06 .p06-kb-head svg{width:15px;height:15px;stroke:currentColor;opacity:.95}
+#p06 .p06-kb-col[data-k="not-started"] .p06-kb-head{background:linear-gradient(135deg,#8b8fa6,#6f7488)}
+#p06 .p06-kb-col[data-k="in-progress"] .p06-kb-head{background:linear-gradient(135deg,#f9ca00,#eeb600);color:#3d3200}
+#p06 .p06-kb-col[data-k="in-progress"] .p06-kb-head b{background:rgba(61,50,0,.14)}
+#p06 .p06-kb-col[data-k="done"] .p06-kb-head{background:linear-gradient(135deg,#4be272,#33b95f)}
+#p06 .p06-kb-body{padding:10px 10px 0;display:flex;flex-direction:column;gap:8px}
+#p06 .p06-kb-empty{
+  padding:26px 12px;text-align:center;font-size:12px;color:var(--kb-muted);
+  border:1px dashed var(--kb-line);border-radius:10px;background:#fff;
+}
+
+/* ---------- 卡片 ---------- */
+#p06 .p06-kb-card{
+  background:#fff;border:1px solid var(--kb-line);border-radius:10px;
+  padding:12px 13px 11px;cursor:pointer;
+  transition:box-shadow .22s cubic-bezier(.22,.61,.36,1),transform .22s cubic-bezier(.22,.61,.36,1),border-color .22s;
+  animation:kbCardIn .4s cubic-bezier(.22,.61,.36,1) both;
+}
+#p06 .p06-kb-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(24,27,53,.10);
+  border-color:#c5c9ea;
+}
+@keyframes kbCardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+#p06 .p06-kb-title{
+  font-size:13.5px;font-weight:600;color:var(--kb-ink);line-height:1.4;
+  margin-bottom:9px;word-break:break-word;
+}
+#p06 .p06-kb-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+#p06 .p06-kb-tag{
+  font-size:10.5px;font-weight:500;padding:2px 7px;border-radius:4px;
+  background:#eef0f8;color:var(--kb-text);white-space:nowrap;
+}
+#p06 .p06-kb-rows{display:flex;flex-direction:column;gap:7px}
+#p06 .p06-kb-row{
+  display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--kb-text);
+  min-width:0;
+}
+#p06 .p06-kb-row > svg{width:13px;height:13px;flex:0 0 auto;stroke:var(--kb-muted)}
+#p06 .p06-kb-row .lbl{color:var(--kb-muted);flex:0 0 44px}
+#p06 .p06-kb-row .val{color:var(--kb-ink);font-weight:500;min-width:0;word-break:break-word}
+
+/* 负责人头像 */
+#p06 .p06-kb-av{
+  width:18px;height:18px;border-radius:50%;color:#fff;font-size:9.5px;
+  font-weight:600;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+}
+
+/* 完成度条 */
+#p06 .p06-kb-prog{flex:1 1 auto;height:6px;background:var(--kb-track);border-radius:100px;overflow:hidden;min-width:40px}
+#p06 .p06-kb-prog i{display:block;height:100%;border-radius:100px;transition:width .7s cubic-bezier(.22,.61,.36,1)}
+#p06 .p06-kb-pct{font-size:11px;font-weight:700;color:var(--kb-ink);font-variant-numeric:tabular-nums;flex:0 0 auto}
+
+/* 卡片底部：更新时间 */
+#p06 .p06-kb-foot{
+  display:flex;align-items:center;gap:6px;margin-top:10px;padding-top:9px;
+  border-top:1px dashed #eceff8;font-size:10.5px;color:var(--kb-muted);
+}
+#p06 .p06-kb-foot svg{width:12px;height:12px;stroke:currentColor}
+
+/* ---------- 表格视图：与看板同一套字色 ---------- */
+#p06 .p06-list-wrap{padding:20px 28px 32px!important}
+#p06 .p06-table{border-color:var(--kb-line)!important}
+#p06 .p06-table th{
+  background:#f7f8fd!important;color:var(--kb-muted)!important;
+  font-size:11.5px!important;letter-spacing:.04em!important;
+}
+#p06 .p06-table td{font-size:13px!important;color:var(--kb-text)!important}
+#p06 .p06-table tbody td:first-child{color:var(--kb-ink)!important;font-weight:600!important}
+#p06 .p06-table tbody tr:hover td{background:#f7f8fd!important}
+
+@media (max-width:1200px){
+  #p06 .p06-kb-col{min-width:220px}
+}

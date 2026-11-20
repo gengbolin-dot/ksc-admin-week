@@ -14086,7 +14086,8 @@ function filterItemsByPeriod(items, period){
 // 导出运营看板数据
 function exportDashboard(){
   const period = document.getElementById('p06Period')?.value || 'all';
-  const filteredItems = filterItemsByPeriod(ITEMS, period);
+  let filteredItems = filterItemsByPeriod(ITEMS, period);
+  if(window._p06HighOnly) filteredItems = filteredItems.filter(it => it.priority === 'high');
 
   // 构建导出数据
   const exportData = filteredItems.map(item => ({
@@ -14124,11 +14125,43 @@ function exportDashboard(){
   setTimeout(() => msg.remove(), 2000);
 }
 
+// 运营看板：客观关注信号（逾期 / 截止 / 风险 / 长期未更新）
+function p06ParseMD(s){
+  var p = String(s || '').split('-');
+  if(p.length >= 3) return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+  if(p.length === 2) return new Date(new Date().getFullYear(), parseInt(p[0], 10) - 1, parseInt(p[1], 10));
+  return null;
+}
+function getP06Signal(it){
+  if(!it || it.status === 'done') return null;
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  var dl = p06ParseMD(it.deadline);
+  if(dl){
+    dl.setHours(0, 0, 0, 0);
+    var diff = Math.round((dl - today) / 86400000);
+    if(diff < 0) return { text: '逾期' + (-diff) + '天', bg: '#fde7ee', color: '#c81e5b' };
+    if(diff === 0) return { text: '今日截止', bg: '#fff4e5', color: '#b25e00' };
+    if(diff === 1) return { text: '明日截止', bg: '#fff4e5', color: '#b25e00' };
+  }
+  if(it.risk) return { text: '有风险', bg: '#fde7ee', color: '#c81e5b' };
+  var up = p06ParseMD(it.updated);
+  if(up){
+    up.setHours(0, 0, 0, 0);
+    var days = Math.round((today - up) / 86400000);
+    if(days >= 7) return { text: days + '天未更新', bg: '#eef0f8', color: '#6b7280' };
+  }
+  return null;
+}
+function toggleP06HighOnly(){
+  window._p06HighOnly = !window._p06HighOnly;
+  renderP06();
+}
 function renderP06(){
   initP06Year();
   // 获取时间筛选参数
   const period = document.getElementById('p06Period')?.value || 'all';
-  const filteredItems = filterItemsByPeriod(ITEMS, period);
+  let filteredItems = filterItemsByPeriod(ITEMS, period);
+  if(window._p06HighOnly) filteredItems = filteredItems.filter(it => it.priority === 'high');
 
   // 顶部仅保留视图切换（列表 / 看板）
   const curView = window._p06View || 'kanban';
@@ -14139,6 +14172,7 @@ function renderP06(){
       <div class="p06-vt-btn p06-vt-sub${curView==='list'?' active':''}" onclick="toggleViewP06('list')">列表</div>
     </div>
     <div class="p06-board-actions">
+      <span class="p06-chip${window._p06HighOnly ? ' active' : ''}" onclick="toggleP06HighOnly()"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg>仅看高优先级</span>
       <span class="p06-chip" onclick="exportDashboard()"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>导出</span>
       <span class="p06-chip"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4"/><path d="M15 3h4a2 2 0 0 1 2 2v4"/><path d="M9 21H5a2 2 0 0 1-2-2v-4"/><path d="M15 21h4a2 2 0 0 0 2-2v-4"/></svg>同步我的工作
         <span class="p06-chip-dots"><i style="background:#5d53d2"></i><i style="background:#3ea4fb"></i><i style="background:#40ca6d"></i></span>
@@ -14204,12 +14238,13 @@ cols.forEach((c, ci) => {
     kh += '<div class="p06-kb-empty">暂无「' + c.label + '」事项</div>';
   }
   its.forEach((it, idx) => {
+    const sig = getP06Signal(it);
     const pct = typeof it.pct === 'number' && it.pct >= 0 ? it.pct : null;
     kh += '<div class="p06-kb-card" style="animation-delay:' + (ci * 40 + idx * 35) + 'ms" onclick="openBoardDetail(' + it.id + ')" title="查看事项概况">';
     kh += '<div class="p06-kb-title">' + it.name + '</div>';
     kh += '<div class="p06-kb-tags">'
         + '<span class="p06-kb-tag" style="background:' + (it.type === 'project' ? '#edebfb' : '#e8f8ee') + ';color:' + (it.type === 'project' ? '#5d53d2' : '#1d8f47') + '">' + (it.type === 'project' ? '重点项目' : '日常运营') + '</span>'
-        + (it.priority === 'high' ? '<span class="p06-kb-tag" style="background:#fde7ee;color:#c81e5b">高优先级</span>' : '')
+        + (sig ? '<span class="p06-kb-tag" style="background:' + sig.bg + ';color:' + sig.color + '">' + sig.text + '</span>' : '')
         + '</div>';
     kh += '<div class="p06-kb-rows">';
     kh += '<div class="p06-kb-row">' + kbIcon.owner + '<span class="lbl">负责人</span>'
