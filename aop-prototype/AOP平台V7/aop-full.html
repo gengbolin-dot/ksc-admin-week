@@ -9805,6 +9805,9 @@ function markItemEdited(){
   _lastEditTime = Date.now();
   renderWeekPeriod();
 
+  // 同步刷新运营看板（仅在已渲染过时）
+  if(window._p06Rendered) renderP06();
+
   // 自动同步到重点专项（防抖，500ms内只触发一次）
   clearTimeout(window._autoSyncTimer);
   window._autoSyncTimer = setTimeout(() => {
