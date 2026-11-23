@@ -15592,6 +15592,20 @@ function dc2SumCard(o){
     + '</div>';
 }
 
+function dc2IndexRow(o){
+  let metrics = '';
+  (o.metrics || []).forEach(function(x){
+    const p = (x.value == null || x.value === '');
+    metrics += '<div class="dc2-idx-metric"><b' + (p ? ' class="dc2-pending"' : '') + '>' + (p ? '待接入' : x.value) + '</b><span>' + x.label + '</span></div>';
+  });
+  return '<div class="dc2-idx-row" style="--c:' + o.color + '" onclick="dc2Switch(\'module\',\'' + o.id + '\')">'
+    + '<div class="dc2-idx-icon">' + o.icon + '</div>'
+    + '<div class="dc2-idx-info"><div class="dc2-idx-title">' + o.title + '</div><div class="dc2-idx-src" title="' + o.src + '">' + o.src + '</div></div>'
+    + '<div class="dc2-idx-metrics">' + metrics + '</div>'
+    + '<span class="dc2-idx-go">进入看板 ' + DC2_ICON.arrow + '</span>'
+    + '</div>';
+}
+
 function dc2CountUp(){
   document.querySelectorAll('#p32 [data-cu]').forEach(function(el){
     const target = parseFloat(el.getAttribute('data-cu'));
@@ -15755,92 +15769,67 @@ function dc2RenderCockpit(mods){
 
   h += '</div>';
 
-  /* 二、六大业务板块摘要 */
-  h += '<div class="dc2-block-head" style="margin-top:26px"><div class="dc2-block-title">六大业务板块摘要</div><div class="dc2-block-desc">进入看板查看详细数据</div></div>';
-  h += '<div class="dc2-summary">';
+  /* 二、六大业务板块摘要（轻量索引列表） */
+  h += '<div class="dc2-block-head" style="margin-top:30px"><div class="dc2-block-title">六大业务板块摘要</div><div class="dc2-block-desc">按板块快速进入对应看板</div></div>';
+  h += '<div class="dc2-index">';
 
-  h += dc2SumCard({
+  h += dc2IndexRow({
     id:'service', title:'行政服务台', color:'#5d53d2', icon:DC2_ICON.service, src:'金山协作服务台后台',
     metrics:[
-      ['创建工单', sTotal ? sTotal + ' 单' : null],
-      ['解决率', solveRate],
-      ['机器人拦截率', botRate ? botRate + '%' : null]
-    ],
-    viz: '<div class="dc2-sum-chart">' + dc2MiniLine(weekly.map(function(w){ return { value: w.total }; }), '#5d53d2') + '</div>',
-    hint: '工单创建趋势',
-    delay: 0
+      { label:'创建工单', value: sTotal ? sTotal + ' 单' : null },
+      { label:'机器人拦截率', value: botRate ? botRate + '%' : null },
+      { label:'解决率', value: solveRate }
+    ]
   });
 
-  h += dc2SumCard({
+  h += dc2IndexRow({
     id:'workplace', title:'职场运营', color:'#3ea4fb', icon:DC2_ICON.building, src:'行政总览 · 职场运营',
     metrics:[
-      ['职场数量', dc2KpiVal(workplace, /职场数量/)],
-      ['总面积', dc2KpiVal(workplace, /总面积/)],
-      ['总工位数', wpSeats ? wpSeats + ' 个' : null],
-      ['入驻人数', wpPeople ? wpPeople + ' 人' : null],
-      ['工位利用率', wpUtil ? wpUtil + '%' : null]
-    ],
-    viz: '<div class="dc2-rings">' + dc2Ring(parseFloat(wpUtil) || 0, '#3ea4fb', '工位利用率', 68) + '</div>',
-    hint: '入驻 ' + wpPeople + ' / 工位 ' + wpSeats,
-    delay: 60
+      { label:'职场数量', value: dc2KpiVal(workplace, /职场数量/) ? dc2KpiVal(workplace, /职场数量/) + ' 个' : null },
+      { label:'总面积', value: dc2KpiVal(workplace, /总面积/) },
+      { label:'工位总数', value: wpSeats ? wpSeats + ' 个' : null },
+      { label:'工位利用率', value: wpUtil ? wpUtil + '%' : null }
+    ]
   });
 
-  h += dc2SumCard({
+  h += dc2IndexRow({
     id:'employee', title:'员工体验', color:'#e0a800', icon:DC2_ICON.smile, src:'重点活动台账',
     metrics:[
-      ['年度活动', dc2KpiVal(employee, /年度活动/)],
-      ['累计参与', empPeople],
-      ['平均满意度', empSat],
-      ['北京', bj.events != null ? bj.events + ' 场 / ' + bj.people + ' 人' : null],
-      ['武汉', wh.events != null ? wh.events + ' 场 / ' + wh.people + ' 人' : null]
-    ],
-    viz: dc2Stack([
-      { label: '北京', value: bj.people || 0, color: '#f4d200' },
-      { label: '武汉', value: wh.people || 0, color: '#eea935' }
-    ]),
-    hint: '双城活动参与分布',
-    delay: 120
+      { label:'年度活动', value: dc2KpiVal(employee, /年度活动/) ? dc2KpiVal(employee, /年度活动/) + ' 场' : null },
+      { label:'累计参与', value: empPeople },
+      { label:'平均满意度', value: empSat }
+    ]
   });
 
-  h += dc2SumCard({
+  h += dc2IndexRow({
     id:'travel', title:'差旅运营', color:'#eea935', icon:DC2_ICON.plane, src:'差旅平台 + 人工维护',
-    metricsClass: 'dc2-sum-metrics--travel',
     metrics:[
       { label:'年度总费用', value: tTotal ? '¥' + tTotal.toFixed(1) + '万' : null },
-      { label:'机票', value: tTotal ? (shFlight.val / tTotal * 100).toFixed(1) + '%' : null, color:'#5d53d2' },
-      { label:'酒店', value: tTotal ? (shHotel.val / tTotal * 100).toFixed(1) + '%' : null, color:'#3ea4fb' },
-      { label:'火车', value: tTotal ? (shTrain.val / tTotal * 100).toFixed(1) + '%' : null, color:'#40ca6d' },
-      { label:'用车', value: tTotal ? (shCar.val / tTotal * 100).toFixed(1) + '%' : null, color:'#eea935' }
-    ],
-    viz: '<div class="dc2-sum-chart dc2-sum-chart--travel">' + dc2MiniBars(monthly.map(function(x){ return { value: Math.round(x.amount / 10000) }; }), '#eea935') + '</div>',
-    hint: '月度费用趋势 · 四场景并列',
-    delay: 180
+      { label:'机票占比', value: tTotal ? (shFlight.val / tTotal * 100).toFixed(1) + '%' : null },
+      { label:'酒店占比', value: tTotal ? (shHotel.val / tTotal * 100).toFixed(1) + '%' : null },
+      { label:'火车占比', value: tTotal ? (shTrain.val / tTotal * 100).toFixed(1) + '%' : null },
+      { label:'用车占比', value: tTotal ? (shCar.val / tTotal * 100).toFixed(1) + '%' : null }
+    ]
   });
 
-  h += dc2SumCard({
+  h += dc2IndexRow({
     id:'investment', title:'行政采购', color:'#4be272', icon:DC2_ICON.wallet, src:'人工维护',
     metrics:[
-      ['年度总预算', invTotal],
-      ['实际支出', invSpent],
-      ['预算执行率', invRate],
-      ['剩余预算', invLeft]
-    ],
-    viz: '<div class="dc2-rings">' + dc2Ring(parseFloat(invRate) || 0, '#4be272', '预算执行率', 68) + '</div>',
-    hint: '支出 ' + (invSpent || '—') + ' / 预算 ' + (invTotal || '—'),
-    delay: 240
+      { label:'年度总预算', value: invTotal },
+      { label:'实际支出', value: invSpent },
+      { label:'预算执行率', value: invRate },
+      { label:'剩余预算', value: invLeft }
+    ]
   });
 
-  h += dc2SumCard({
+  h += dc2IndexRow({
     id:'digital', title:'数字化运营项目', color:'#7ed4fe', icon:DC2_ICON.cpu, src:'系统接口 + 人工维护',
     metrics:[
-      ['上线系统', dSys ? dSys + ' 个' : null],
-      ['AI 应用', dAi ? dAi + ' 个' : null],
-      ['自动化流程', dAuto ? dAuto + ' 个' : null],
-      ['覆盖用户数', null]
-    ],
-    viz: (digital.table || []).length ? ('<div class="dc2-app-list">' + (digital.table || []).slice(0, 3).map(function(x){ return '<span class="dc2-app-item">' + x.name + '<b>' + x.status + '</b></span>'; }).join('') + '</div>') : '',
-    hint: '重点应用状态',
-    delay: 300
+      { label:'上线系统', value: dSys ? dSys + ' 个' : null },
+      { label:'AI 应用', value: dAi ? dAi + ' 个' : null },
+      { label:'自动化流程', value: dAuto ? dAuto + ' 个' : null },
+      { label:'覆盖用户数', value: null }
+    ]
   });
 
   h += '</div>';

@@ -408,6 +408,27 @@
 #p32 .dc2-sum-link:hover{background:#f3f2ff}
 #p32 .dc2-sum-link svg{width:11px;height:11px;stroke:currentColor}
 #p32 .dc2-sum-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 8px;padding-top:14px}
+/* 六大业务板块摘要：轻量索引列表（与上方指标卡形成层级差） */
+#p32 .dc2-index{background:#fff;border:1px solid #e8eaf3;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(24,27,53,.03)}
+#p32 .dc2-idx-row{position:relative;display:flex;align-items:center;gap:16px;padding:13px 22px;cursor:pointer;transition:background .18s}
+#p32 .dc2-idx-row + .dc2-idx-row{border-top:1px solid #f2f4fa}
+#p32 .dc2-idx-row::before{content:'';position:absolute;left:0;top:50%;width:3px;height:0;border-radius:0 3px 3px 0;background:var(--c,#5d53d2);transform:translateY(-50%);transition:height .2s}
+#p32 .dc2-idx-row:hover{background:#fafbff}
+#p32 .dc2-idx-row:hover::before{height:58%}
+#p32 .dc2-idx-icon{width:36px;height:36px;border-radius:10px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--c,#5d53d2) 9%,#fff);color:color-mix(in srgb,var(--c,#5d53d2) 78%,#181b34)}
+#p32 .dc2-idx-icon svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.7}
+#p32 .dc2-idx-info{flex:0 0 178px;min-width:0}
+#p32 .dc2-idx-title{font-size:13.5px;font-weight:700;color:#181b34;white-space:nowrap;letter-spacing:-.01em}
+#p32 .dc2-idx-src{font-size:10px;color:#a2a7ba;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#p32 .dc2-idx-metrics{flex:0 1 auto;margin-left:auto;display:flex;align-items:center;min-width:0;overflow:hidden}
+#p32 .dc2-idx-metric{flex:0 0 auto;min-width:68px;padding-right:16px;margin-right:16px;border-right:1px solid #eef1f8}
+#p32 .dc2-idx-metric:last-child{border-right:0;padding-right:0;margin-right:0}
+#p32 .dc2-idx-metric b{display:block;font-size:15px;font-weight:700;color:#3b4059;font-variant-numeric:tabular-nums;white-space:nowrap}
+#p32 .dc2-idx-metric span{display:block;font-size:10px;color:#9aa0b4;margin-top:2px;white-space:nowrap}
+#p32 .dc2-idx-go{flex:0 0 auto;margin-left:0;font-size:11px;font-weight:600;color:color-mix(in srgb,var(--c,#5d53d2) 76%,#181b34);display:inline-flex;align-items:center;gap:3px;opacity:.86;transition:opacity .18s,transform .18s;white-space:nowrap}
+#p32 .dc2-idx-go svg{width:11px;height:11px;stroke:currentColor}
+#p32 .dc2-idx-row:hover .dc2-idx-go{opacity:1;transform:translateX(2px)}
+
 /* 差旅：总额独占一行，四场景等宽并列 */
 #p32 .dc2-sum-metrics--travel{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 10px}
 #p32 .dc2-sum-metrics--travel .dc2-sum-metric:first-child{
