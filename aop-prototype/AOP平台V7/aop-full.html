@@ -15526,6 +15526,26 @@ function dc2KpiCard(o){
     + '<div class="dc2-kpi-foot">' + (o.foot || '') + '</div></div>';
 }
 
+function dc2GroupCard(o){
+  let m = '';
+  o.metrics.forEach(function(x){
+    const isPend = (x.value == null || x.value === '');
+    m += '<div class="dc2-g-metric' + (x.main ? ' main' : '') + '">'
+      + '<div class="dc2-g-val">' + (isPend ? '<span class="dc2-pending">待接入</span>' : x.value) + (x.unit ? '<i>' + x.unit + '</i>' : '') + '</div>'
+      + '<em>' + x.label + '</em></div>';
+  });
+  return '<div class="dc2-group" style="--c:' + o.color + ';animation-delay:' + (o.delay || 0) + 'ms">'
+    + '<div class="dc2-group-head">'
+    + '<div class="dc2-group-icon">' + o.icon + '</div>'
+    + '<div style="min-width:0"><div class="dc2-group-title">' + o.title + '</div><div class="dc2-group-src" title="' + o.src + '">' + o.src + '</div></div>'
+    + '<span class="dc2-group-link" onclick="dc2Switch(\'module\',\'' + o.id + '\')">进入看板 ' + DC2_ICON.arrow + '</span>'
+    + '</div>'
+    + '<div class="dc2-group-metrics">' + m + '</div>'
+    + '<div class="dc2-group-viz">' + (o.viz || '') + '</div>'
+    + '<div class="dc2-group-foot">' + (o.foot || '') + '<span>统计周期：' + window._dc2Year + ' 年度</span></div>'
+    + '</div>';
+}
+
 function dc2SumCard(o){
   let m = '';
   o.metrics.forEach(function(pair){
@@ -15580,6 +15600,7 @@ function dc2RenderCockpit(mods){
   const wpSeats = wpTable.reduce((a, r) => a + dc2Num(r.seats), 0);
   const wpPeople = wpTable.reduce((a, r) => a + dc2Num(r.people), 0);
   const wpUtil = wpSeats ? (wpPeople / wpSeats * 100).toFixed(1) : null;
+  const wpCount = dc2Num(dc2KpiVal(workplace, /职场数量/));
 
   const empPeople = dc2KpiVal(employee, /参与/);
   const empSat = dc2KpiVal(employee, /满意度/);
@@ -15611,62 +15632,100 @@ function dc2RenderCockpit(mods){
 
   let h = '';
 
-  /* 一、九项核心指标 */
-  h += '<div class="dc2-block-head"><div class="dc2-block-title">核心运营指标</div><div class="dc2-block-desc">固定配置 · 共 9 项</div></div>';
-  h += '<div class="dc2-kpis dc2-kpis-9">';
+  /* 一、六大板块核心指标（按板块整合） */
+  h += '<div class="dc2-block-head"><div class="dc2-block-title">核心运营指标</div><div class="dc2-block-desc">按业务板块整合 · 6 大板块 / 9 项指标</div></div>';
+  h += '<div class="dc2-groups">';
 
-  const wpCount = dc2Num(dc2KpiVal(workplace, /职场数量/));
-  const kpiDefs = [
-    /* 1. 工单数：周度折线，看节奏 */
-    { dept:'行政服务台', label:'年度创建工单数', value:sTotal || null, unit:'单', color:'#5d53d2', icon:DC2_ICON.service,
-      viz: dc2VizLine(weekly.map(function(w){ return { value: w.total }; }), '#5d53d2'),
-      foot:'近 ' + weekly.length + ' 周 · 来源：金山协作服务台' },
-    /* 2. 解决率：环形骨架，明确待接入 */
-    { dept:'行政服务台', label:'工单解决率', value:solveRate, unit:'%', color:'#5d53d2', icon:DC2_ICON.check,
-      viz: dc2VizSkeleton('解决率数据待接入'),
-      foot:'来源：服务台后台' },
-    /* 3. 职场数量：点阵，一城一点 */
-    { dept:'职场运营', label:'运营职场数量', value:wpCount || null, unit:'个', color:'#3ea4fb', icon:DC2_ICON.building,
-      viz: dc2VizDots(wpCount, '#3ea4fb'),
-      foot:'覆盖 ' + wpCount + ' 个城市职场' },
-    /* 4. 工位利用率：环形进度 */
-    { dept:'职场运营', label:'整体工位利用率', value:wpUtil ? parseFloat(wpUtil) : null, dec:1, unit:'%', color:'#3ea4fb', icon:DC2_ICON.grid,
-      viz: dc2VizRing(parseFloat(wpUtil) || 0, '#3ea4fb', 44),
-      foot:'入驻 ' + (wpPeople || '—') + ' / 工位 ' + (wpSeats || '—') },
-    /* 5. 活动参与：双城对比条 */
-    { dept:'员工体验', label:'年度活动参与人次', value:empPeople, unit:'人次', color:'#e0a800', icon:DC2_ICON.users,
-      viz: dc2VizDual([
-        { label:'北京', value:bj.people || 0, display:(bj.people || 0).toLocaleString() },
-        { label:'武汉', value:wh.people || 0, display:(wh.people || 0).toLocaleString() }
-      ], '#e0a800'),
-      foot:'北京 ' + (bj.events || 0) + ' 场 / 武汉 ' + (wh.events || 0) + ' 场' },
-    /* 6. 满意度：半圆仪表盘 */
-    { dept:'员工体验', label:'平均满意度', value:empSat ? parseFloat(empSat) : null, unit:'%', color:'#e0a800', icon:DC2_ICON.smile,
-      viz: dc2VizGauge(parseFloat(empSat) || 0, '#e0a800'),
-      foot:'基于已纳入台账的重点活动' },
-    /* 7. 差旅费用：构成堆叠条 */
-    { dept:'差旅运营', label:'年度差旅总费用', value:tTotal || null, dec:1, pre:'¥', unit:'万', color:'#eea935', icon:DC2_ICON.plane,
-      viz: dc2VizStack([
-        { label:'机票', value:shFlight.val, color:'#5d53d2' },
-        { label:'酒店', value:shHotel.val, color:'#3ea4fb' },
-        { label:'火车', value:shTrain.val, color:'#40ca6d' },
-        { label:'用车', value:shCar.val, color:'#eea935' }
-      ]),
-      foot: ['机票','酒店','火车','用车'].map(function(l, k){ var v = [shFlight, shHotel, shTrain, shCar][k].val; return l + ' ' + (tTotal ? (v / tTotal * 100).toFixed(1) : '—') + '%'; }).join(' · ') },
-    /* 8. 预算执行率：横向进度条 */
-    { dept:'行政采购', label:'年度预算执行率', value:invRate ? parseFloat(invRate) : null, dec:1, unit:'%', color:'#4be272', icon:DC2_ICON.wallet,
-      viz: dc2VizProgress(parseFloat(invRate) || 0, '#4be272', '已支出 ' + (invSpent || '—'), '预算 ' + (invTotal || '—')),
-      foot:'剩余 ' + (invLeft || '—') },
-    /* 9. 数字化：三类分项块 */
-    { dept:'数字化运营', label:'已上线系统及应用总量', value:dTotal || null, unit:'个', color:'#7ed4fe', icon:DC2_ICON.cpu,
-      viz: dc2VizChips([
-        { label:'系统', value:dSys, color:'#3ea4fb' },
-        { label:'AI 应用', value:dAi, color:'#7ed4fe' },
-        { label:'自动化', value:dAuto, color:'#5d53d2' }
-      ]),
-      foot:'覆盖用户数待接入' }
-  ];
-  kpiDefs.forEach(function(o, k){ o.delay = k * 45; h += dc2KpiCard(o); });
+  /* 1. 行政服务台 */
+  h += dc2GroupCard({
+    id:'service', title:'行政服务台', color:'#5d53d2', icon:DC2_ICON.service, src:'金山协作服务台后台',
+    metrics:[
+      { label:'年度创建工单数', value: sTotal ? sTotal.toLocaleString() : null, unit:'单', main:true },
+      { label:'机器人拦截率', value: botRate ? botRate + '%' : null },
+      { label:'工单解决率', value: solveRate }
+    ],
+    viz: dc2VizLine(weekly.map(function(w){ return { value: w.total }; }), '#5d53d2'),
+    foot:'近 ' + weekly.length + ' 周工单趋势',
+    delay: 0
+  });
+
+  /* 2. 职场运营 */
+  h += dc2GroupCard({
+    id:'workplace', title:'职场运营', color:'#3ea4fb', icon:DC2_ICON.building, src:'行政总览 · 职场运营',
+    metrics:[
+      { label:'整体工位利用率', value: wpUtil ? wpUtil + '%' : null, main:true },
+      { label:'运营职场数量', value: wpCount ? wpCount + ' 个' : null },
+      { label:'入驻人数', value: wpPeople ? wpPeople + ' 人' : null }
+    ],
+    viz: dc2VizRing(parseFloat(wpUtil) || 0, '#3ea4fb', 52),
+    foot:'工位 ' + (wpSeats || '—') + ' 个 · 入驻 ' + (wpPeople || '—') + ' 人',
+    delay: 60
+  });
+
+  /* 3. 员工体验 */
+  h += dc2GroupCard({
+    id:'employee', title:'员工体验', color:'#e0a800', icon:DC2_ICON.users, src:'重点活动台账',
+    metrics:[
+      { label:'年度活动参与人次', value: empPeople || null, main:true },
+      { label:'平均满意度', value: empSat || null },
+      { label:'年度活动', value: dc2KpiVal(employee, /年度活动/) || null }
+    ],
+    viz: dc2VizDual([
+      { label:'北京', value: bj.people || 0, display:(bj.people || 0).toLocaleString() },
+      { label:'武汉', value: wh.people || 0, display:(wh.people || 0).toLocaleString() }
+    ], '#e0a800'),
+    foot:'北京 ' + (bj.events || 0) + ' 场 · 武汉 ' + (wh.events || 0) + ' 场',
+    delay: 120
+  });
+
+  /* 4. 差旅运营 */
+  h += dc2GroupCard({
+    id:'travel', title:'差旅运营', color:'#eea935', icon:DC2_ICON.plane, src:'差旅平台 + 人工维护',
+    metrics:[
+      { label:'年度差旅总费用', value: tTotal ? '¥' + tTotal.toFixed(1) + '万' : null, main:true },
+      { label:'机票占比', value: tTotal ? (shFlight.val / tTotal * 100).toFixed(1) + '%' : null },
+      { label:'酒店占比', value: tTotal ? (shHotel.val / tTotal * 100).toFixed(1) + '%' : null }
+    ],
+    viz: dc2VizStack([
+      { label:'机票', value: shFlight.val, color:'#5d53d2' },
+      { label:'酒店', value: shHotel.val, color:'#3ea4fb' },
+      { label:'火车', value: shTrain.val, color:'#40ca6d' },
+      { label:'用车', value: shCar.val, color:'#eea935' }
+    ]),
+    foot:'火车 ' + (tTotal ? (shTrain.val / tTotal * 100).toFixed(1) : '—') + '% · 用车 ' + (tTotal ? (shCar.val / tTotal * 100).toFixed(1) : '—') + '%',
+    delay: 180
+  });
+
+  /* 5. 行政采购 */
+  h += dc2GroupCard({
+    id:'investment', title:'行政采购', color:'#4be272', icon:DC2_ICON.wallet, src:'人工维护',
+    metrics:[
+      { label:'年度预算执行率', value: invRate || null, main:true },
+      { label:'年度总预算', value: invTotal || null },
+      { label:'实际支出', value: invSpent || null }
+    ],
+    viz: dc2VizProgress(parseFloat(invRate) || 0, '#4be272', '已支出 ' + (invSpent || '—'), '预算 ' + (invTotal || '—')),
+    foot:'剩余预算 ' + (invLeft || '—'),
+    delay: 240
+  });
+
+  /* 6. 数字化运营 */
+  h += dc2GroupCard({
+    id:'digital', title:'数字化运营项目', color:'#7ed4fe', icon:DC2_ICON.cpu, src:'系统接口 + 人工维护',
+    metrics:[
+      { label:'已上线系统及应用总量', value: dTotal ? dTotal + ' 个' : null, main:true },
+      { label:'AI 应用', value: dAi ? dAi + ' 个' : null },
+      { label:'自动化流程', value: dAuto ? dAuto + ' 个' : null }
+    ],
+    viz: dc2VizChips([
+      { label:'系统', value: dSys, color:'#3ea4fb' },
+      { label:'AI 应用', value: dAi, color:'#7ed4fe' },
+      { label:'自动化', value: dAuto, color:'#5d53d2' }
+    ]),
+    foot:'覆盖用户数待接入',
+    delay: 300
+  });
+
   h += '</div>';
 
   /* 二、六大业务板块摘要 */
