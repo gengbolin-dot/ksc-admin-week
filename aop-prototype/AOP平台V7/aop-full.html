@@ -15566,7 +15566,7 @@ function dc2GroupCard(o){
     + '</div>'
     + '<div class="dc2-g-subs' + (o.subsGrid ? ' dc2-g-subs--grid' : '') + '">' + subsHtml + '</div>'
     + '</div>'
-    + '<div class="dc2-group-viz">' + (o.viz || '') + '</div>'
+    + (o.viz ? '<div class="dc2-group-viz">' + o.viz + '</div>' : '')
     + '<div class="dc2-group-foot"><span>' + (o.foot || '') + '</span><span>统计周期：' + window._dc2Year + ' 年度</span></div>'
     + '</div>';
 }
@@ -15603,6 +15603,52 @@ function dc2IndexRow(o){
     + '<div class="dc2-idx-info"><div class="dc2-idx-title">' + o.title + '</div><div class="dc2-idx-src" title="' + o.src + '">' + o.src + '</div></div>'
     + '<div class="dc2-idx-metrics">' + metrics + '</div>'
     + '<span class="dc2-idx-go">进入看板 ' + DC2_ICON.arrow + '</span>'
+    + '</div>';
+}
+
+function dc2TrendLine(data, color){
+  const W = 400, H = 172, L = 30, R = 8, T = 12, B = 24;
+  const max = Math.max.apply(null, data.map(d => d.value)) || 1;
+  const step = (W - L - R) / Math.max(1, data.length - 1);
+  const y = v => T + (H - T - B) * (1 - v / max);
+  const pts = data.map((d, i) => [L + i * step, y(d.value)]);
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const area = line + ' L' + pts[pts.length - 1][0].toFixed(1) + ' ' + (H - B) + ' L' + pts[0][0].toFixed(1) + ' ' + (H - B) + ' Z';
+  const grid = [0, .5, 1].map(p => {
+    const yy = T + (H - T - B) * p;
+    return '<line x1="' + L + '" y1="' + yy.toFixed(1) + '" x2="' + (W - R) + '" y2="' + yy.toFixed(1) + '" stroke="#eef0f7" stroke-width="1"/>';
+  }).join('');
+  const labels = data.map((d, i) => '<text x="' + (L + i * step).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle" font-size="9" fill="#a6abbd">' + d.label + '</text>').join('');
+  const dots = pts.map((p, i) => '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3" fill="#fff" stroke="' + color + '" stroke-width="2"><title>' + data[i].label + ': ' + (data[i].display || data[i].value) + '</title></circle>').join('');
+  return '<svg class="dc2-trend-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">'
+    + '<defs><linearGradient id="dc2TrendArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="' + color + '" stop-opacity=".32"/><stop offset="100%" stop-color="' + color + '" stop-opacity="0"/></linearGradient></defs>'
+    + grid
+    + '<path d="' + area + '" fill="url(#dc2TrendArea)"/>'
+    + '<path d="' + line + '" fill="none" stroke="' + color + '" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'
+    + dots + labels
+    + '</svg>';
+}
+function dc2TrendDual(items){
+  const max = Math.max.apply(null, items.map(x => x.value)) || 1;
+  return '<div class="dc2-trend-dual">' + items.map(x =>
+    '<div class="dc2-trend-dual-row">'
+    + '<div class="dc2-trend-dual-top"><span><i style="background:' + x.color + '"></i>' + x.label + '</span><b>' + x.display + '</b></div>'
+    + '<div class="dc2-trend-dual-track"><span style="width:' + (x.value / max * 100).toFixed(1) + '%;background:' + x.color + '"></span></div>'
+    + '</div>'
+  ).join('') + '</div>';
+}
+function dc2TrendCard(o){
+  return '<div class="dc2-trend-card" style="--c:' + o.color + '">'
+    + '<div class="dc2-trend-head"><span class="dc2-trend-dot"></span><div class="dc2-trend-title">' + o.title + '</div><div class="dc2-trend-desc">' + o.desc + '</div></div>'
+    + '<div class="dc2-trend-body">' + o.body + '</div>'
+    + '<div class="dc2-trend-foot"><span>' + o.foot + '</span><span>统计周期 ' + window._dc2Year + ' 年度</span></div>'
+    + '</div>';
+}
+function dc2EntryTile(o){
+  return '<div class="dc2-entry" style="--c:' + o.color + '" onclick="dc2Switch(\'module\',\'' + o.id + '\')">'
+    + '<div class="dc2-entry-icon">' + o.icon + '</div>'
+    + '<div class="dc2-entry-info"><div class="dc2-entry-title">' + o.title + '</div><div class="dc2-entry-src">' + o.src + '</div></div>'
+    + '<span class="dc2-entry-go">' + DC2_ICON.arrow + '</span>'
     + '</div>';
 }
 
@@ -15684,8 +15730,7 @@ function dc2RenderCockpit(mods){
       { label:'机器人拦截率', value: botRate ? botRate + '%' : null },
       { label:'工单解决率', value: solveRate }
     ],
-    viz: dc2VizLine(weekly.map(function(w){ return { value: w.total }; }), '#5d53d2'),
-    foot:'近 ' + weekly.length + ' 周工单趋势',
+    foot:'数据来源 金山协作服务台后台',
     delay: 0
   });
 
@@ -15697,10 +15742,6 @@ function dc2RenderCockpit(mods){
       { label:'运营职场数量', value: wpCount ? wpCount + ' 个' : null },
       { label:'工位总数', value: wpSeats ? wpSeats + ' 个' : null }
     ],
-    viz: dc2VizRingWithLegend(parseFloat(wpUtil) || 0, '#3ea4fb', [
-      { label:'已占工位', value: (wpPeople || 0) + ' 个', color:'#3ea4fb' },
-      { label:'空置工位', value: Math.max(0, (wpSeats || 0) - (wpPeople || 0)) + ' 个', color:'#dfe4f2' }
-    ]),
     foot:'工位 ' + (wpSeats || '—') + ' 个 · 已入驻 ' + (wpPeople || '—') + ' 人',
     delay: 60
   });
@@ -15713,10 +15754,6 @@ function dc2RenderCockpit(mods){
       { label:'平均满意度', value: empSat || null },
       { label:'年度活动', value: dc2KpiVal(employee, /年度活动/) || null }
     ],
-    viz: dc2VizDual([
-      { label:'北京', value: bj.people || 0, display:(bj.people || 0).toLocaleString() },
-      { label:'武汉', value: wh.people || 0, display:(wh.people || 0).toLocaleString() }
-    ], '#e0a800'),
     foot:'北京 ' + (bj.events || 0) + ' 场 · 武汉 ' + (wh.events || 0) + ' 场',
     delay: 120
   });
@@ -15732,8 +15769,7 @@ function dc2RenderCockpit(mods){
       { label:'火车', value: tTotal ? (shTrain.val / tTotal * 100).toFixed(1) + '%' : null, color:'#40ca6d' },
       { label:'用车', value: tTotal ? (shCar.val / tTotal * 100).toFixed(1) + '%' : null, color:'#eea935' }
     ],
-    viz: dc2VizLine(monthly.map(function(x){ return { value: Math.round(x.amount / 10000) }; }), '#eea935'),
-    foot:'月度费用趋势 · ' + monthly.length + ' 个月',
+    foot:'四场景费用构成',
     delay: 180
   });
 
@@ -15745,7 +15781,6 @@ function dc2RenderCockpit(mods){
       { label:'年度总预算', value: invTotal || null },
       { label:'实际支出', value: invSpent || null }
     ],
-    viz: dc2VizProgress(parseFloat(invRate) || 0, '#4be272', '已支出 ' + (invSpent || '—'), '预算 ' + (invTotal || '—')),
     foot:'剩余预算 ' + (invLeft || '—'),
     delay: 240
   });
@@ -15758,80 +15793,48 @@ function dc2RenderCockpit(mods){
       { label:'AI 应用', value: dAi ? dAi + ' 个' : null },
       { label:'自动化流程', value: dAuto ? dAuto + ' 个' : null }
     ],
-    viz: dc2VizChips([
-      { label:'系统', value: dSys, color:'#3ea4fb' },
-      { label:'AI 应用', value: dAi, color:'#7ed4fe' },
-      { label:'自动化', value: dAuto, color:'#5d53d2' }
-    ]),
     foot:'覆盖用户数待接入',
     delay: 300
   });
 
   h += '</div>';
 
-  /* 二、六大业务板块摘要（轻量索引列表） */
-  h += '<div class="dc2-block-head" style="margin-top:30px"><div class="dc2-block-title">六大业务板块摘要</div><div class="dc2-block-desc">按板块快速进入对应看板</div></div>';
-  h += '<div class="dc2-index">';
+  /* 二、运营趋势分析（走势与结构） */
+  h += '<div class="dc2-block-head" style="margin-top:30px"><div class="dc2-block-title">运营趋势分析</div><div class="dc2-block-desc">近 6 周工单 · 月度差旅 · 双城活动</div></div>';
+  h += '<div class="dc2-trends">';
 
-  h += dc2IndexRow({
-    id:'service', title:'行政服务台', color:'#5d53d2', icon:DC2_ICON.service, src:'金山协作服务台后台',
-    metrics:[
-      { label:'创建工单', value: sTotal ? sTotal + ' 单' : null },
-      { label:'机器人拦截率', value: botRate ? botRate + '%' : null },
-      { label:'解决率', value: solveRate }
-    ]
+  h += dc2TrendCard({
+    title:'工单创建趋势', desc:'近 ' + weekly.length + ' 周', color:'#5d53d2',
+    body: weekly.length ? dc2TrendLine(weekly.map(function(w){ return { label: w.week, value: w.total, display: w.total + ' 单' }; }), '#5d53d2') : '<div class="dc2-empty">暂无趋势数据</div>',
+    foot:'数据来源 金山协作服务台'
   });
 
-  h += dc2IndexRow({
-    id:'workplace', title:'职场运营', color:'#3ea4fb', icon:DC2_ICON.building, src:'行政总览 · 职场运营',
-    metrics:[
-      { label:'职场数量', value: dc2KpiVal(workplace, /职场数量/) ? dc2KpiVal(workplace, /职场数量/) + ' 个' : null },
-      { label:'总面积', value: dc2KpiVal(workplace, /总面积/) },
-      { label:'工位总数', value: wpSeats ? wpSeats + ' 个' : null },
-      { label:'工位利用率', value: wpUtil ? wpUtil + '%' : null }
-    ]
+  h += dc2TrendCard({
+    title:'差旅月度费用', desc:'单位：万元', color:'#eea935',
+    body: monthly.length ? dc2Bars(monthly.map(function(x){ return { label: parseInt(String(x.month).split('-')[1], 10) + '月', value: Math.round(x.amount / 10000), display: Math.round(x.amount / 10000) }; }), '#eea935') : '<div class="dc2-empty">暂无趋势数据</div>',
+    foot:'数据来源 差旅平台'
   });
 
-  h += dc2IndexRow({
-    id:'employee', title:'员工体验', color:'#e0a800', icon:DC2_ICON.smile, src:'重点活动台账',
-    metrics:[
-      { label:'年度活动', value: dc2KpiVal(employee, /年度活动/) ? dc2KpiVal(employee, /年度活动/) + ' 场' : null },
-      { label:'累计参与', value: empPeople },
-      { label:'平均满意度', value: empSat }
-    ]
+  h += dc2TrendCard({
+    title:'员工活动参与分布', desc:'双城对比', color:'#e0a800',
+    body: dc2TrendDual([
+      { label:'北京', value: bj.people || 0, display: (bj.people || 0).toLocaleString() + ' 人次', color:'#f4d200' },
+      { label:'武汉', value: wh.people || 0, display: (wh.people || 0).toLocaleString() + ' 人次', color:'#eea935' }
+    ]),
+    foot:'北京 ' + (bj.events || 0) + ' 场 · 武汉 ' + (wh.events || 0) + ' 场'
   });
 
-  h += dc2IndexRow({
-    id:'travel', title:'差旅运营', color:'#eea935', icon:DC2_ICON.plane, src:'差旅平台 + 人工维护',
-    metrics:[
-      { label:'年度总费用', value: tTotal ? '¥' + tTotal.toFixed(1) + '万' : null },
-      { label:'机票占比', value: tTotal ? (shFlight.val / tTotal * 100).toFixed(1) + '%' : null },
-      { label:'酒店占比', value: tTotal ? (shHotel.val / tTotal * 100).toFixed(1) + '%' : null },
-      { label:'火车占比', value: tTotal ? (shTrain.val / tTotal * 100).toFixed(1) + '%' : null },
-      { label:'用车占比', value: tTotal ? (shCar.val / tTotal * 100).toFixed(1) + '%' : null }
-    ]
-  });
+  h += '</div>';
 
-  h += dc2IndexRow({
-    id:'investment', title:'行政采购', color:'#4be272', icon:DC2_ICON.wallet, src:'人工维护',
-    metrics:[
-      { label:'年度总预算', value: invTotal },
-      { label:'实际支出', value: invSpent },
-      { label:'预算执行率', value: invRate },
-      { label:'剩余预算', value: invLeft }
-    ]
-  });
-
-  h += dc2IndexRow({
-    id:'digital', title:'数字化运营项目', color:'#7ed4fe', icon:DC2_ICON.cpu, src:'系统接口 + 人工维护',
-    metrics:[
-      { label:'上线系统', value: dSys ? dSys + ' 个' : null },
-      { label:'AI 应用', value: dAi ? dAi + ' 个' : null },
-      { label:'自动化流程', value: dAuto ? dAuto + ' 个' : null },
-      { label:'覆盖用户数', value: null }
-    ]
-  });
-
+  /* 三、六大业务板块入口（纯导航，不重复指标） */
+  h += '<div class="dc2-block-head" style="margin-top:30px"><div class="dc2-block-title">六大业务板块入口</div><div class="dc2-block-desc">点击进入对应数据看板</div></div>';
+  h += '<div class="dc2-entries">';
+  h += dc2EntryTile({ id:'service', title:'行政服务台', color:'#5d53d2', icon:DC2_ICON.service, src:'金山协作服务台后台' });
+  h += dc2EntryTile({ id:'workplace', title:'职场运营', color:'#3ea4fb', icon:DC2_ICON.building, src:'行政总览 · 职场运营' });
+  h += dc2EntryTile({ id:'employee', title:'员工体验', color:'#e0a800', icon:DC2_ICON.smile, src:'重点活动台账' });
+  h += dc2EntryTile({ id:'travel', title:'差旅运营', color:'#eea935', icon:DC2_ICON.plane, src:'差旅平台 + 人工维护' });
+  h += dc2EntryTile({ id:'investment', title:'行政采购', color:'#4be272', icon:DC2_ICON.wallet, src:'人工维护' });
+  h += dc2EntryTile({ id:'digital', title:'数字化运营项目', color:'#7ed4fe', icon:DC2_ICON.cpu, src:'系统接口 + 人工维护' });
   h += '</div>';
 
   /* 三、口径说明 */
