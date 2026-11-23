@@ -193,6 +193,20 @@
   font-variant-numeric:tabular-nums;flex:0 0 auto;
 }
 #p32 .dc2-g-sub span{font-size:10.5px;color:#9aa0b4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 圆形指标：中心数值 + 语义图例 */
+#p32 .dc2-g-dot{display:inline-block;width:6px;height:6px;border-radius:50%;flex:0 0 auto;margin-right:5px;vertical-align:1px}
+#p32 .dc2-ring-legend{display:flex;align-items:center;justify-content:center;gap:18px;width:100%;height:100%}
+#p32 .dc2-ring-legend .dc2-ring{flex:0 0 auto}
+#p32 .dc2-ring-legend-list{display:flex;flex-direction:column;gap:7px;flex:0 1 auto;min-width:0}
+#p32 .dc2-ring-legend-item{display:flex;align-items:center;gap:7px;font-size:10.5px;color:#9aa0b4;line-height:1.2;white-space:nowrap}
+#p32 .dc2-ring-legend-item i{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+#p32 .dc2-ring-legend-item b{margin-left:auto;padding-left:12px;font-weight:700;color:#3b4059;font-variant-numeric:tabular-nums}
+
+/* 四场景等权 2×2（差旅） */
+#p32 .dc2-g-subs--grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 14px;align-content:center}
+#p32 .dc2-g-subs--grid .dc2-g-sub{display:flex;align-items:baseline;gap:6px;min-width:0}
+#p32 .dc2-g-subs--grid .dc2-g-sub b{font-size:15.5px;line-height:1.05}
+#p32 .dc2-g-subs--grid .dc2-g-sub span{max-width:100%}
 
 /* 图表承托 */
 #p32 .dc2-group-viz{
@@ -394,6 +408,20 @@
 #p32 .dc2-sum-link:hover{background:#f3f2ff}
 #p32 .dc2-sum-link svg{width:11px;height:11px;stroke:currentColor}
 #p32 .dc2-sum-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 8px;padding-top:14px}
+/* 差旅：总额独占一行，四场景等宽并列 */
+#p32 .dc2-sum-metrics--travel{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 10px}
+#p32 .dc2-sum-metrics--travel .dc2-sum-metric:first-child{
+  grid-column:1 / -1;display:flex;align-items:baseline;gap:10px;
+  padding:9px 14px;border-radius:10px;background:#fff8ec;
+}
+#p32 .dc2-sum-metrics--travel .dc2-sum-metric:first-child b{font-size:20px;color:#b8791a}
+#p32 .dc2-sum-metrics--travel .dc2-sum-metric:first-child span{color:#b58e56}
+#p32 .dc2-sum-metrics--travel .dc2-sum-metric:not(:first-child){padding-left:2px}
+#p32 .dc2-sum-metrics--travel .dc2-sum-metric:not(:first-child) b{font-size:16px}
+#p32 .dc2-sum-metrics--travel .dc2-sum-metric:not(:first-child) span{display:inline-flex;align-items:center;gap:5px}
+#p32 .dc2-sum-metrics--travel .dc2-sum-metric:not(:first-child) span::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--mc,#eea935);flex:0 0 auto}
+#p32 .dc2-sum-chart.dc2-sum-chart--travel{height:88px}
+#p32 .dc2-sum-chart--travel .dc2-mini-bars{height:88px}
 #p32 .dc2-sum-metric b{
   display:block;font-size:15px;font-weight:700;color:#181b34;letter-spacing:-.015em;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;

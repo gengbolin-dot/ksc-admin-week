@@ -15458,6 +15458,24 @@ function dc2VizRing(pct, color, size){
     + 'stroke-dasharray="' + c.toFixed(1) + '" style="--c0:' + c.toFixed(1) + ';--c1:' + off.toFixed(1) + '" transform="rotate(-90 ' + cx + ' ' + cx + ')"/>'
     + '</svg>';
 }
+function dc2VizRingWithLegend(pct, color, items){
+  const size = 54, cx = size / 2, r = 22.5;
+  const val = Math.max(0, Math.min(100, pct || 0));
+  const c = 2 * Math.PI * r;
+  const off = c * (1 - val / 100);
+  let list = '';
+  (items || []).forEach(function(x){
+    list += '<div class="dc2-ring-legend-item"><i style="background:' + x.color + '"></i><span>' + x.label + '</span><b>' + x.value + '</b></div>';
+  });
+  return '<div class="dc2-ring-legend">'
+    + '<svg class="dc2-ring" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">'
+    + '<circle cx="' + cx + '" cy="' + cx + '" r="' + r + '" fill="none" stroke="#eef0f7" stroke-width="5"/>'
+    + '<circle class="dc2-ring-fill" cx="' + cx + '" cy="' + cx + '" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="5" stroke-linecap="round" stroke-dasharray="' + c.toFixed(1) + '" style="--c0:' + c.toFixed(1) + ';--c1:' + off.toFixed(1) + '" transform="rotate(-90 ' + cx + ' ' + cx + ')"/>'
+    + '<text class="dc2-ring-txt" x="50%" y="50%" text-anchor="middle" dominant-baseline="central">' + val.toFixed(1) + '%</text>'
+    + '</svg>'
+    + '<div class="dc2-ring-legend-list">' + list + '</div>'
+    + '</div>';
+}
 function dc2VizGauge(pct, color){
   const W = 96, H = 48, cx = W / 2, cy = H - 3, r = 38;
   const val = Math.max(0, Math.min(100, pct || 0));
@@ -15533,7 +15551,7 @@ function dc2GroupCard(o){
   let subsHtml = '';
   subs.forEach(function(x){
     const p = isPend(x.value);
-    subsHtml += '<div class="dc2-g-sub"><b' + (p ? ' class="dc2-pending"' : '') + '>' + (p ? '待接入' : x.value) + '</b><span>' + x.label + '</span></div>';
+    subsHtml += '<div class="dc2-g-sub"><b' + (p ? ' class="dc2-pending"' : '') + '>' + (p ? '待接入' : x.value) + '</b><span>' + (x.color ? '<i class="dc2-g-dot" style="background:' + x.color + '"></i>' : '') + x.label + '</span></div>';
   });
   return '<div class="dc2-group" style="--c:' + o.color + ';animation-delay:' + (o.delay || 0) + 'ms">'
     + '<div class="dc2-group-head">'
@@ -15546,7 +15564,7 @@ function dc2GroupCard(o){
     + '<div class="dc2-g-main-val">' + (isPend(main.value) ? '<span class="dc2-pending">待接入</span>' : main.value) + (main.unit ? '<i>' + main.unit + '</i>' : '') + '</div>'
     + '<div class="dc2-g-main-lbl">' + (main.label || '') + '</div>'
     + '</div>'
-    + '<div class="dc2-g-subs">' + subsHtml + '</div>'
+    + '<div class="dc2-g-subs' + (o.subsGrid ? ' dc2-g-subs--grid' : '') + '">' + subsHtml + '</div>'
     + '</div>'
     + '<div class="dc2-group-viz">' + (o.viz || '') + '</div>'
     + '<div class="dc2-group-foot"><span>' + (o.foot || '') + '</span><span>统计周期：' + window._dc2Year + ' 年度</span></div>'
@@ -15556,9 +15574,10 @@ function dc2GroupCard(o){
 function dc2SumCard(o){
   let m = '';
   o.metrics.forEach(function(pair){
-    const label = pair[0], val = pair[1];
+    const item = Array.isArray(pair) ? { label: pair[0], value: pair[1], color: pair[2] } : pair;
+    const label = item.label, val = item.value;
     const isPend = (val == null || val === '');
-    m += '<div class="dc2-sum-metric"><b' + (isPend ? ' class="dc2-pending"' : '') + '>' + (isPend ? '待接入' : val) + '</b><span>' + label + '</span></div>';
+    m += '<div class="dc2-sum-metric"' + (item.color ? ' style="--mc:' + item.color + '"' : '') + '><b' + (isPend ? ' class="dc2-pending"' : '') + '>' + (isPend ? '待接入' : val) + '</b><span>' + label + '</span></div>';
   });
   return '<div class="dc2-sum-card" style="--c:' + o.color + ';animation-delay:' + (o.delay || 0) + 'ms">'
     + '<div class="dc2-sum-head">'
@@ -15566,7 +15585,7 @@ function dc2SumCard(o){
     + '<div style="min-width:0"><div class="dc2-sum-title">' + o.title + '</div><div class="dc2-sum-src" title="' + o.src + '">' + o.src + '</div></div>'
     + '<span class="dc2-sum-link" onclick="dc2Switch(\'module\',\'' + o.id + '\')">进入看板 ' + DC2_ICON.arrow + '</span>'
     + '</div>'
-    + '<div class="dc2-sum-metrics">' + m + '</div>'
+    + '<div class="dc2-sum-metrics' + (o.metricsClass ? ' ' + o.metricsClass : '') + '">' + m + '</div>'
     + (o.viz || '')
     + '<div class="dc2-sum-foot"><span class="dc2-sum-period">统计周期：' + window._dc2Year + ' 年度</span>'
     + '<span class="dc2-sum-hint">' + (o.hint || '') + '</span></div>'
@@ -15662,10 +15681,13 @@ function dc2RenderCockpit(mods){
     metrics:[
       { label:'整体工位利用率', value: wpUtil ? wpUtil + '%' : null, main:true },
       { label:'运营职场数量', value: wpCount ? wpCount + ' 个' : null },
-      { label:'入驻人数', value: wpPeople ? wpPeople + ' 人' : null }
+      { label:'工位总数', value: wpSeats ? wpSeats + ' 个' : null }
     ],
-    viz: dc2VizRing(parseFloat(wpUtil) || 0, '#3ea4fb', 52),
-    foot:'工位 ' + (wpSeats || '—') + ' 个 · 入驻 ' + (wpPeople || '—') + ' 人',
+    viz: dc2VizRingWithLegend(parseFloat(wpUtil) || 0, '#3ea4fb', [
+      { label:'已占工位', value: (wpPeople || 0) + ' 个', color:'#3ea4fb' },
+      { label:'空置工位', value: Math.max(0, (wpSeats || 0) - (wpPeople || 0)) + ' 个', color:'#dfe4f2' }
+    ]),
+    foot:'工位 ' + (wpSeats || '—') + ' 个 · 已入驻 ' + (wpPeople || '—') + ' 人',
     delay: 60
   });
 
@@ -15688,18 +15710,16 @@ function dc2RenderCockpit(mods){
   /* 4. 差旅运营 */
   h += dc2GroupCard({
     id:'travel', title:'差旅运营', color:'#eea935', icon:DC2_ICON.plane, src:'差旅平台 + 人工维护',
+    subsGrid: true,
     metrics:[
       { label:'年度差旅总费用', value: tTotal ? '¥' + tTotal.toFixed(1) + '万' : null, main:true },
-      { label:'机票占比', value: tTotal ? (shFlight.val / tTotal * 100).toFixed(1) + '%' : null },
-      { label:'酒店占比', value: tTotal ? (shHotel.val / tTotal * 100).toFixed(1) + '%' : null }
+      { label:'机票', value: tTotal ? (shFlight.val / tTotal * 100).toFixed(1) + '%' : null, color:'#5d53d2' },
+      { label:'酒店', value: tTotal ? (shHotel.val / tTotal * 100).toFixed(1) + '%' : null, color:'#3ea4fb' },
+      { label:'火车', value: tTotal ? (shTrain.val / tTotal * 100).toFixed(1) + '%' : null, color:'#40ca6d' },
+      { label:'用车', value: tTotal ? (shCar.val / tTotal * 100).toFixed(1) + '%' : null, color:'#eea935' }
     ],
-    viz: dc2VizStack([
-      { label:'机票', value: shFlight.val, color:'#5d53d2' },
-      { label:'酒店', value: shHotel.val, color:'#3ea4fb' },
-      { label:'火车', value: shTrain.val, color:'#40ca6d' },
-      { label:'用车', value: shCar.val, color:'#eea935' }
-    ]),
-    foot:'火车 ' + (tTotal ? (shTrain.val / tTotal * 100).toFixed(1) : '—') + '% · 用车 ' + (tTotal ? (shCar.val / tTotal * 100).toFixed(1) : '—') + '%',
+    viz: dc2VizLine(monthly.map(function(x){ return { value: Math.round(x.amount / 10000) }; }), '#eea935'),
+    foot:'月度费用趋势 · ' + monthly.length + ' 个月',
     delay: 180
   });
 
@@ -15756,8 +15776,8 @@ function dc2RenderCockpit(mods){
     metrics:[
       ['职场数量', dc2KpiVal(workplace, /职场数量/)],
       ['总面积', dc2KpiVal(workplace, /总面积/)],
-      ['总工位数', dc2KpiVal(workplace, /工位数量/)],
-      ['入驻人数', dc2KpiVal(workplace, /入驻人数/)],
+      ['总工位数', wpSeats ? wpSeats + ' 个' : null],
+      ['入驻人数', wpPeople ? wpPeople + ' 人' : null],
       ['工位利用率', wpUtil ? wpUtil + '%' : null]
     ],
     viz: '<div class="dc2-rings">' + dc2Ring(parseFloat(wpUtil) || 0, '#3ea4fb', '工位利用率', 68) + '</div>',
@@ -15784,17 +15804,16 @@ function dc2RenderCockpit(mods){
 
   h += dc2SumCard({
     id:'travel', title:'差旅运营', color:'#eea935', icon:DC2_ICON.plane, src:'差旅平台 + 人工维护',
+    metricsClass: 'dc2-sum-metrics--travel',
     metrics:[
-      ['年度总费用', tTotal ? '¥' + tTotal.toFixed(1) + '万' : null],
-      ['机票占比', tTotal ? (shFlight.val / tTotal * 100).toFixed(1) + '%' : null],
-      ['酒店占比', tTotal ? (shHotel.val / tTotal * 100).toFixed(1) + '%' : null],
-      ['火车占比', tTotal ? (shTrain.val / tTotal * 100).toFixed(1) + '%' : null],
-      ['用车占比', tTotal ? (shCar.val / tTotal * 100).toFixed(1) + '%' : null]
+      { label:'年度总费用', value: tTotal ? '¥' + tTotal.toFixed(1) + '万' : null },
+      { label:'机票', value: tTotal ? (shFlight.val / tTotal * 100).toFixed(1) + '%' : null, color:'#5d53d2' },
+      { label:'酒店', value: tTotal ? (shHotel.val / tTotal * 100).toFixed(1) + '%' : null, color:'#3ea4fb' },
+      { label:'火车', value: tTotal ? (shTrain.val / tTotal * 100).toFixed(1) + '%' : null, color:'#40ca6d' },
+      { label:'用车', value: tTotal ? (shCar.val / tTotal * 100).toFixed(1) + '%' : null, color:'#eea935' }
     ],
-    viz: dc2Stack([shFlight, shHotel, shTrain, shCar].map(function(x, k){
-      return { label: ['机票','酒店','火车','用车'][k], value: x.val, color: x.color };
-    })) + '<div class="dc2-sum-chart" style="height:48px;margin-top:10px">' + dc2MiniBars(monthly.map(function(x){ return { value: Math.round(x.amount / 10000) }; }), '#eea935') + '</div>',
-    hint: '月度费用趋势',
+    viz: '<div class="dc2-sum-chart dc2-sum-chart--travel">' + dc2MiniBars(monthly.map(function(x){ return { value: Math.round(x.amount / 10000) }; }), '#eea935') + '</div>',
+    hint: '月度费用趋势 · 四场景并列',
     delay: 180
   });
 
