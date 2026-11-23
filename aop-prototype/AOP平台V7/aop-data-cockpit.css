@@ -107,6 +107,32 @@
 #p32 .dc2-chg.up{color:#1d9a54}
 #p32 .dc2-chg.down{color:#cd2d58}
 
+/* 核心指标：每项独立的可视化容器 */
+#p32 .dc2-kpi-viz{height:48px;display:flex;align-items:center;margin:2px 0 8px;width:100%;min-width:0}
+#p32 .dc2-kpi-viz > svg{display:block;flex:0 0 auto}
+#p32 .dc2-dots{display:flex;flex-wrap:wrap;gap:5px;align-items:center;max-height:44px;overflow:hidden}
+#p32 .dc2-dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+#p32 .dc2-dual{display:flex;flex-direction:column;gap:7px;width:100%}
+#p32 .dc2-dual-row{display:flex;align-items:center;gap:7px;font-size:10px;color:#8b90a6;min-width:0}
+#p32 .dc2-dual-lbl{width:24px;flex:0 0 auto}
+#p32 .dc2-dual-track{flex:1 1 auto;height:6px;border-radius:100px;background:#f2f4fa;overflow:hidden;min-width:0}
+#p32 .dc2-dual-fill{display:block;height:100%;border-radius:100px}
+#p32 .dc2-dual-val{flex:0 0 auto;font-weight:600;color:#5b6180;font-variant-numeric:tabular-nums}
+#p32 .dc2-vstack{display:flex;height:9px;border-radius:100px;overflow:hidden;width:100%;background:#f2f4fa}
+#p32 .dc2-vstack i{height:100%}
+#p32 .dc2-prog{width:100%}
+#p32 .dc2-prog-track{height:8px;border-radius:100px;background:#f2f4fa;overflow:hidden}
+#p32 .dc2-prog-fill{display:block;height:100%;border-radius:100px}
+#p32 .dc2-prog-meta{
+  display:flex;justify-content:space-between;gap:8px;font-size:9.5px;color:#a6abbd;
+  margin-top:5px;white-space:nowrap;overflow:hidden;
+}
+#p32 .dc2-chips{display:flex;gap:6px;width:100%}
+#p32 .dc2-chip-item{flex:1 1 0;border-radius:8px;padding:5px 4px;text-align:center;min-width:0}
+#p32 .dc2-chip-item b{display:block;font-size:13px;font-weight:700;line-height:1.25;font-variant-numeric:tabular-nums}
+#p32 .dc2-chip-item span{display:block;font-size:9px;color:#8b90a6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#p32 .dc2-skel{display:flex;align-items:center;gap:9px;color:#b0b5c6;font-size:10px}
+
 /* ---------- 区块 ---------- */
 #p32 .dc2-sec{margin-top:24px}
 #p32 .dc2-sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}

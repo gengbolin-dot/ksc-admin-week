@@ -15435,9 +15435,75 @@ function dc2Stack(items){
   return '<div class="dc2-stack">' + items.map(x => '<i style="width:' + ((x.value || 0) / total * 100).toFixed(1) + '%;background:' + x.color + '"></i>').join('') + '</div>'
     + '<div class="dc2-legend">' + items.map(x => '<span class="dc2-legend-item"><i class="dc2-legend-dot" style="background:' + x.color + '"></i>' + x.label + ' <b>' + ((x.value || 0) / total * 100).toFixed(1) + '%</b></span>').join('') + '</div>';
 }
-function dc2Spark(values){
-  const max = Math.max.apply(null, values) || 1;
-  return '<div class="dc2-kpi-spark">' + values.map(v => '<i style="height:' + Math.max(8, v / max * 100).toFixed(0) + '%"></i>').join('') + '</div>';
+/* —— 核心指标可视化组件（每项匹配不同呈现方式） —— */
+function dc2VizLine(data, color){
+  if(!data.length) return '';
+  const W = 150, H = 44, L = 1, R = 1, T = 5, B = 5;
+  const max = Math.max.apply(null, data.map(d => d.value)) || 1;
+  const step = (W - L - R) / Math.max(1, data.length - 1);
+  const y = v => T + (H - T - B) * (1 - v / max);
+  const d = data.map((x, k) => (k ? 'L' : 'M') + (L + k * step).toFixed(1) + ' ' + y(x.value).toFixed(1)).join(' ');
+  return '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" style="width:100%;height:44px"><path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></svg>';
+}
+function dc2VizRing(pct, color, size){
+  size = size || 44;
+  const val = Math.max(0, Math.min(100, pct || 0));
+  const r = (size - 9) / 2;
+  const c = 2 * Math.PI * r;
+  const off = c * (1 - val / 100);
+  const cx = size / 2;
+  return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">'
+    + '<circle cx="' + cx + '" cy="' + cx + '" r="' + r + '" fill="none" stroke="#eef0f7" stroke-width="5"/>'
+    + '<circle class="dc2-ring-fill" cx="' + cx + '" cy="' + cx + '" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="5" stroke-linecap="round" '
+    + 'stroke-dasharray="' + c.toFixed(1) + '" style="--c0:' + c.toFixed(1) + ';--c1:' + off.toFixed(1) + '" transform="rotate(-90 ' + cx + ' ' + cx + ')"/>'
+    + '</svg>';
+}
+function dc2VizGauge(pct, color){
+  const W = 96, H = 48, cx = W / 2, cy = H - 3, r = 38;
+  const val = Math.max(0, Math.min(100, pct || 0));
+  const len = Math.PI * r;
+  const off = len * (1 - val / 100);
+  const arc = 'M' + (cx - r) + ' ' + cy + ' A' + r + ' ' + r + ' 0 0 1 ' + (cx + r) + ' ' + cy;
+  return '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">'
+    + '<path d="' + arc + '" fill="none" stroke="#eef0f7" stroke-width="7" stroke-linecap="round"/>'
+    + '<path class="dc2-ring-fill" d="' + arc + '" fill="none" stroke="' + color + '" stroke-width="7" stroke-linecap="round" '
+    + 'stroke-dasharray="' + len.toFixed(1) + '" style="--c0:' + len.toFixed(1) + ';--c1:' + off.toFixed(1) + '"/>'
+    + '</svg>';
+}
+function dc2VizDots(count, color){
+  const n = Math.max(0, Math.min(12, count || 0));
+  let d = '';
+  for(let k = 0; k < n; k++) d += '<i class="dc2-dot" style="background:' + color + ';opacity:' + (1 - k * 0.055).toFixed(2) + '"></i>';
+  return '<div class="dc2-dots">' + d + '</div>';
+}
+function dc2VizDual(pairs, color){
+  const max = Math.max.apply(null, pairs.map(p => p.value)) || 1;
+  return '<div class="dc2-dual">' + pairs.map(p =>
+    '<div class="dc2-dual-row"><span class="dc2-dual-lbl">' + p.label + '</span>'
+    + '<span class="dc2-dual-track"><span class="dc2-dual-fill" style="width:' + ((p.value || 0) / max * 100).toFixed(0) + '%;background:' + color + '"></span></span>'
+    + '<span class="dc2-dual-val">' + p.display + '</span></div>'
+  ).join('') + '</div>';
+}
+function dc2VizStack(items){
+  const total = items.reduce((a, x) => a + (x.value || 0), 0) || 1;
+  return '<div class="dc2-vstack">' + items.map(x => '<i style="width:' + ((x.value || 0) / total * 100).toFixed(1) + '%;background:' + x.color + '"></i>').join('') + '</div>';
+}
+function dc2VizProgress(pct, color, left, right){
+  const val = Math.max(0, Math.min(100, pct || 0));
+  return '<div class="dc2-prog">'
+    + '<div class="dc2-prog-track"><div class="dc2-prog-fill" style="width:' + val.toFixed(1) + '%;background:linear-gradient(90deg,' + color + 'b3,' + color + ')"></div></div>'
+    + '<div class="dc2-prog-meta"><span>' + left + '</span><span>' + right + '</span></div>'
+    + '</div>';
+}
+function dc2VizChips(items){
+  return '<div class="dc2-chips">' + items.map(x =>
+    '<div class="dc2-chip-item" style="background:' + x.color + '12;color:' + x.color + '"><b>' + x.value + '</b><span>' + x.label + '</span></div>'
+  ).join('') + '</div>';
+}
+function dc2VizSkeleton(label){
+  return '<div class="dc2-skel">'
+    + '<svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="none" stroke="#e6e9f3" stroke-width="5" stroke-dasharray="4 5" stroke-linecap="round"/></svg>'
+    + '<span>' + (label || '等待数据源接入') + '</span></div>';
 }
 
 function dc2KpiCard(o){
@@ -15456,7 +15522,7 @@ function dc2KpiCard(o){
     + '<div class="dc2-kpi-top"><div class="dc2-kpi-dept">' + o.dept + '</div><div class="dc2-kpi-ico">' + o.icon + '</div></div>'
     + '<div class="dc2-kpi-label">' + o.label + '</div>'
     + '<div class="dc2-kpi-val">' + valHtml + '</div>'
-    + (o.spark ? dc2Spark(o.spark) : '')
+    + (o.viz ? '<div class="dc2-kpi-viz">' + o.viz + '</div>' : '')
     + '<div class="dc2-kpi-foot">' + (o.foot || '') + '</div></div>';
 }
 
@@ -15549,16 +15615,56 @@ function dc2RenderCockpit(mods){
   h += '<div class="dc2-block-head"><div class="dc2-block-title">核心运营指标</div><div class="dc2-block-desc">固定配置 · 共 9 项</div></div>';
   h += '<div class="dc2-kpis dc2-kpis-9">';
 
+  const wpCount = dc2Num(dc2KpiVal(workplace, /职场数量/));
   const kpiDefs = [
-    { dept:'行政服务台', label:'年度创建工单数', value:sTotal || null, unit:'单', color:'#5d53d2', icon:DC2_ICON.service, spark:[42,55,48,68,72,85,78,100], foot:'来源：金山协作服务台' },
-    { dept:'行政服务台', label:'工单解决率', value:solveRate, unit:'%', color:'#5d53d2', icon:DC2_ICON.check, spark:[70,72,74,76,78,80,82,84], foot:'来源：服务台后台' },
-    { dept:'职场运营', label:'运营职场数量', value:dc2Num(dc2KpiVal(workplace, /职场数量/)) || null, unit:'个', color:'#3ea4fb', icon:DC2_ICON.building, spark:[50,50,62,62,75,75,88,100], foot:'来源：行政总览 · 职场运营' },
-    { dept:'职场运营', label:'整体工位利用率', value:wpUtil ? parseFloat(wpUtil) : null, dec:1, unit:'%', color:'#3ea4fb', icon:DC2_ICON.grid, spark:[70,72,75,78,80,83,85,86], foot:'入驻 ' + (wpPeople || '—') + ' / 工位 ' + (wpSeats || '—') },
-    { dept:'员工体验', label:'年度活动参与人次', value:empPeople, unit:'人次', color:'#e0a800', icon:DC2_ICON.users, spark:[55,62,70,66,78,84,90,100], foot:'来源：重点活动台账' },
-    { dept:'员工体验', label:'平均满意度', value:empSat ? parseFloat(empSat) : null, unit:'%', color:'#e0a800', icon:DC2_ICON.smile, spark:[88,90,89,92,91,93,92,92], foot:'基于已纳入台账的重点活动' },
-    { dept:'差旅运营', label:'年度差旅总费用', value:tTotal || null, dec:1, pre:'¥', unit:'万', color:'#eea935', icon:DC2_ICON.plane, spark:[100,56,78,100,94,84,77,70], foot:'来源：差旅平台' },
-    { dept:'行政采购', label:'年度预算执行率', value:invRate ? parseFloat(invRate) : null, dec:1, unit:'%', color:'#4be272', icon:DC2_ICON.wallet, spark:[25,30,35,38,42,45,47,49], foot:'来源：人工维护' },
-    { dept:'数字化运营', label:'已上线系统及应用总量', value:dTotal || null, unit:'个', color:'#7ed4fe', icon:DC2_ICON.cpu, spark:[40,50,60,70,80,90,100], foot:'系统 ' + dSys + ' · AI ' + dAi + ' · 流程 ' + dAuto }
+    /* 1. 工单数：周度折线，看节奏 */
+    { dept:'行政服务台', label:'年度创建工单数', value:sTotal || null, unit:'单', color:'#5d53d2', icon:DC2_ICON.service,
+      viz: dc2VizLine(weekly.map(function(w){ return { value: w.total }; }), '#5d53d2'),
+      foot:'近 ' + weekly.length + ' 周 · 来源：金山协作服务台' },
+    /* 2. 解决率：环形骨架，明确待接入 */
+    { dept:'行政服务台', label:'工单解决率', value:solveRate, unit:'%', color:'#5d53d2', icon:DC2_ICON.check,
+      viz: dc2VizSkeleton('解决率数据待接入'),
+      foot:'来源：服务台后台' },
+    /* 3. 职场数量：点阵，一城一点 */
+    { dept:'职场运营', label:'运营职场数量', value:wpCount || null, unit:'个', color:'#3ea4fb', icon:DC2_ICON.building,
+      viz: dc2VizDots(wpCount, '#3ea4fb'),
+      foot:'覆盖 ' + wpCount + ' 个城市职场' },
+    /* 4. 工位利用率：环形进度 */
+    { dept:'职场运营', label:'整体工位利用率', value:wpUtil ? parseFloat(wpUtil) : null, dec:1, unit:'%', color:'#3ea4fb', icon:DC2_ICON.grid,
+      viz: dc2VizRing(parseFloat(wpUtil) || 0, '#3ea4fb', 44),
+      foot:'入驻 ' + (wpPeople || '—') + ' / 工位 ' + (wpSeats || '—') },
+    /* 5. 活动参与：双城对比条 */
+    { dept:'员工体验', label:'年度活动参与人次', value:empPeople, unit:'人次', color:'#e0a800', icon:DC2_ICON.users,
+      viz: dc2VizDual([
+        { label:'北京', value:bj.people || 0, display:(bj.people || 0).toLocaleString() },
+        { label:'武汉', value:wh.people || 0, display:(wh.people || 0).toLocaleString() }
+      ], '#e0a800'),
+      foot:'北京 ' + (bj.events || 0) + ' 场 / 武汉 ' + (wh.events || 0) + ' 场' },
+    /* 6. 满意度：半圆仪表盘 */
+    { dept:'员工体验', label:'平均满意度', value:empSat ? parseFloat(empSat) : null, unit:'%', color:'#e0a800', icon:DC2_ICON.smile,
+      viz: dc2VizGauge(parseFloat(empSat) || 0, '#e0a800'),
+      foot:'基于已纳入台账的重点活动' },
+    /* 7. 差旅费用：构成堆叠条 */
+    { dept:'差旅运营', label:'年度差旅总费用', value:tTotal || null, dec:1, pre:'¥', unit:'万', color:'#eea935', icon:DC2_ICON.plane,
+      viz: dc2VizStack([
+        { label:'机票', value:shFlight.val, color:'#5d53d2' },
+        { label:'酒店', value:shHotel.val, color:'#3ea4fb' },
+        { label:'火车', value:shTrain.val, color:'#40ca6d' },
+        { label:'用车', value:shCar.val, color:'#eea935' }
+      ]),
+      foot: ['机票','酒店','火车','用车'].map(function(l, k){ var v = [shFlight, shHotel, shTrain, shCar][k].val; return l + ' ' + (tTotal ? (v / tTotal * 100).toFixed(1) : '—') + '%'; }).join(' · ') },
+    /* 8. 预算执行率：横向进度条 */
+    { dept:'行政采购', label:'年度预算执行率', value:invRate ? parseFloat(invRate) : null, dec:1, unit:'%', color:'#4be272', icon:DC2_ICON.wallet,
+      viz: dc2VizProgress(parseFloat(invRate) || 0, '#4be272', '已支出 ' + (invSpent || '—'), '预算 ' + (invTotal || '—')),
+      foot:'剩余 ' + (invLeft || '—') },
+    /* 9. 数字化：三类分项块 */
+    { dept:'数字化运营', label:'已上线系统及应用总量', value:dTotal || null, unit:'个', color:'#7ed4fe', icon:DC2_ICON.cpu,
+      viz: dc2VizChips([
+        { label:'系统', value:dSys, color:'#3ea4fb' },
+        { label:'AI 应用', value:dAi, color:'#7ed4fe' },
+        { label:'自动化', value:dAuto, color:'#5d53d2' }
+      ]),
+      foot:'覆盖用户数待接入' }
   ];
   kpiDefs.forEach(function(o, k){ o.delay = k * 45; h += dc2KpiCard(o); });
   h += '</div>';
