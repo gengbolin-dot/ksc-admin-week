@@ -15384,50 +15384,201 @@ function dc2Switch(view, moduleId){
   if(sc) sc.scrollTop = 0;
 }
 
-/* ---------- 驾驶舱 ---------- */
+/* ---------- 驾驶舱（固定配置 V1.0） ---------- */
+function dc2KpiVal(mod, re){
+  const k = ((mod && mod.kpis) || []).find(x => re.test(x.label));
+  return k ? k.val : null;
+}
+function dc2Num(v){
+  const n = parseFloat(String(v == null ? '' : v).replace(/[^\d.]/g, ''));
+  return isFinite(n) ? n : 0;
+}
+function dc2MiniLine(data, color){
+  if(!data.length) return '';
+  const W = 300, H = 70, L = 2, R = 2, T = 6, B = 6;
+  const max = Math.max.apply(null, data.map(d => d.value)) || 1;
+  const step = (W - L - R) / Math.max(1, data.length - 1);
+  const y = v => T + (H - T - B) * (1 - v / max);
+  const d = data.map((x, k) => (k ? 'L' : 'M') + (L + k * step).toFixed(1) + ' ' + y(x.value).toFixed(1)).join(' ');
+  return '<svg class="dc2-mini-line" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none"><path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+function dc2MiniBars(data, color){
+  if(!data.length) return '';
+  const max = Math.max.apply(null, data.map(d => d.value)) || 1;
+  return '<div class="dc2-mini-bars">' + data.map(d => '<div class="dc2-mini-bar" style="height:' + Math.max(5, d.value / max * 100).toFixed(0) + '%;background:' + color + '"></div>').join('') + '</div>';
+}
+function dc2Pend(){ return '<span class="dc2-pending">待接入</span>'; }
+
+function dc2KpiCard(dept, label, value, unit, color, foot){
+  const has = value !== null && value !== undefined && value !== '';
+  return '<div class="dc2-kpi dc2-kpi-v1" style="--c:' + color + '">'
+    + '<div class="dc2-kpi-dept">' + dept + '</div>'
+    + '<div class="dc2-kpi-label">' + label + '</div>'
+    + '<div class="dc2-kpi-val">' + (has ? value : dc2Pend()) + (has && unit ? '<span class="dc2-kpi-unit">' + unit + '</span>' : '') + '</div>'
+    + '<div class="dc2-kpi-foot">' + (foot || '') + '</div></div>';
+}
+
+function dc2SumCard(o){
+  let m = '';
+  o.metrics.forEach(function(pair){
+    const label = pair[0], val = pair[1];
+    const isPend = (val == null || val === '');
+    m += '<div class="dc2-sum-metric"><b' + (isPend ? ' class="dc2-pending"' : '') + '>' + (isPend ? '待接入' : val) + '</b><span>' + label + '</span></div>';
+  });
+  return '<div class="dc2-sum-card">'
+    + '<div class="dc2-sum-head">'
+    + '<div class="dc2-sum-icon" style="background:' + o.color + '18;color:' + o.color + '">' + o.icon + '</div>'
+    + '<div class="dc2-sum-title">' + o.title + '</div>'
+    + '<div class="dc2-sum-src" title="' + o.src + '">' + o.src + '</div>'
+    + '</div>'
+    + '<div class="dc2-sum-metrics">' + m + '</div>'
+    + (o.chart ? '<div class="dc2-sum-chart">' + o.chart + '</div>' : '')
+    + (o.extra || '')
+    + '<div class="dc2-sum-foot"><span class="dc2-sum-period">统计周期：' + window._dc2Year + ' 年度</span>'
+    + '<span class="dc2-sum-link" onclick="dc2Switch(\'module\',\'' + o.id + '\')">进入看板 ' + DC2_ICON.arrow + '</span></div>'
+    + '</div>';
+}
+
 function dc2RenderCockpit(mods){
-  const get = id => mods.find(m => m.id === id) || {kpis:[]};
-  const service = get('service'), workplace = get('workplace'), employee = get('employee'), travel = get('travel');
+  const get = id => mods.find(m => m.id === id) || { kpis: [] };
+  const service = get('service'), workplace = get('workplace'), employee = get('employee'),
+        travel = get('travel'), investment = get('investment'), digital = get('digital');
+
+  /* 核心指标计算 */
+  const sTotal = dc2Num(dc2KpiVal(service, /创建工单/));
+  const sBot = dc2Num(dc2KpiVal(service, /机器人拦截/));
+  const solveRate = dc2KpiVal(service, /解决率/);
+  const botRate = sTotal ? (sBot / sTotal * 100).toFixed(1) : null;
+
+  const wpTable = workplace.table || [];
+  const wpSeats = wpTable.reduce((a, r) => a + dc2Num(r.seats), 0);
+  const wpPeople = wpTable.reduce((a, r) => a + dc2Num(r.people), 0);
+  const wpUtil = wpSeats ? (wpPeople / wpSeats * 100).toFixed(1) : null;
+
+  const empPeople = dc2KpiVal(employee, /参与/);
+  const empSat = dc2KpiVal(employee, /满意度/);
+  const empCities = employee.cities || [];
+  const bj = empCities.find(c => /北京/.test(c.name)) || {};
+  const wh = empCities.find(c => /武汉/.test(c.name)) || {};
+
+  const tTotal = dc2Num(dc2KpiVal(travel, /总费用/));
+  const share = function(re, color){
+    const v = dc2Num(dc2KpiVal(travel, re));
+    return { val: v, color: color, pct: tTotal ? (v / tTotal * 100).toFixed(1) : null };
+  };
+  const shFlight = share(/机票/, '#5d53d2');
+  const shHotel = share(/酒店/, '#3ea4fb');
+  const shTrain = share(/火车/, '#40ca6d');
+  const shCar = share(/用车/, '#eea935');
+
+  const invTotal = dc2KpiVal(investment, /年度总预算/);
+  const invSpent = dc2KpiVal(investment, /实际支出/);
+  const invRate = dc2KpiVal(investment, /执行率/);
+  const invLeft = dc2KpiVal(investment, /剩余/);
+
+  const dSys = dc2Num(dc2KpiVal(digital, /上线系统/));
+  const dAi = dc2Num(dc2KpiVal(digital, /AI/));
+  const dAuto = dc2Num(dc2KpiVal(digital, /自动化/));
+  const dTotal = dSys + dAi + dAuto;
 
   let h = '';
-  // 区域一：核心指标
-  h += '<div class="dc2-kpis">';
-  h += dc2Kpi('服务总量', '103', '单', '#5d53d2', '<span class="dc2-chg up">+15.0%</span> 较上周期');
-  h += dc2Kpi('职场数量', '8', '个', '#3ea4fb', '覆盖 8 个城市');
-  h += dc2Kpi('差旅订单量', '1,286', '单', '#eea935', '<span class="dc2-chg up">+8.3%</span> 较上周期');
-  h += dc2Kpi('重点活动满意度', '92', '%', '#4be272', '基于 5 场重点活动');
+
+  /* 一、九项核心指标 */
+  h += '<div class="dc2-block-head"><div class="dc2-block-title">核心运营指标</div><div class="dc2-block-desc">固定配置 · 共 9 项</div></div>';
+  h += '<div class="dc2-kpis dc2-kpis-9">';
+  h += dc2KpiCard('行政服务台', '年度创建工单数', sTotal ? sTotal.toLocaleString() : null, '单', '#5d53d2', '来源：金山协作服务台');
+  h += dc2KpiCard('行政服务台', '工单解决率', solveRate, '%', '#5d53d2', '来源：服务台后台');
+  h += dc2KpiCard('职场运营', '运营职场数量', dc2KpiVal(workplace, /职场数量/), '个', '#3ea4fb', '来源：行政总览 · 职场运营');
+  h += dc2KpiCard('职场运营', '整体工位利用率', wpUtil, '%', '#3ea4fb', '入驻 ' + (wpPeople || '—') + ' / 工位 ' + (wpSeats || '—'));
+  h += dc2KpiCard('员工体验', '年度活动参与人次', empPeople, '人次', '#c9a800', '来源：重点活动台账');
+  h += dc2KpiCard('员工体验', '平均满意度', empSat, '', '#c9a800', '基于已纳入台账的重点活动');
+  h += dc2KpiCard('差旅运营', '年度差旅总费用', tTotal ? '¥' + tTotal.toFixed(1) + '万' : null, '', '#eea935', '来源：差旅平台');
+  h += dc2KpiCard('行政采购', '年度预算执行率', invRate, '', '#4be272', '来源：人工维护');
+  h += dc2KpiCard('数字化运营', '已上线系统及应用总量', dTotal || null, '个', '#3ea4fb', '系统 ' + dSys + ' · AI ' + dAi + ' · 流程 ' + dAuto);
   h += '</div>';
 
-  // 区域二：趋势分析
-  h += '<div class="dc2-sec"><div class="dc2-sec-head"><div class="dc2-sec-title">运营趋势分析</div><div class="dc2-sec-desc">按周 / 月度观察核心指标变化</div></div>';
-  h += '<div class="dc2-chart-grid">';
-  const weekly = (service.weeklyHistory || []).slice().reverse();
-  h += '<div class="dc2-card"><div class="dc2-chart-head"><div class="dc2-chart-title">服务台工单趋势</div><div class="dc2-chart-meta">近 ' + weekly.length + ' 周 · 单位：单</div></div>'
-    + dc2Line(weekly.map(w => ({label: w.week, value: w.total, display: w.total + ' 单'})), '#5d53d2') + '</div>';
-  const monthly = (travel.trend && travel.trend.monthly) || [];
-  h += '<div class="dc2-card"><div class="dc2-chart-head"><div class="dc2-chart-title">差旅月度费用</div><div class="dc2-chart-meta">单位：万元</div></div>'
-    + dc2Bars(monthly.map(m => ({label: m.month.slice(5) + '月', value: Math.round(m.amount / 10000), display: Math.round(m.amount / 10000) + '万'})), '#eea935') + '</div>';
-  h += '</div></div>';
+  /* 二、六大业务板块摘要 */
+  h += '<div class="dc2-block-head" style="margin-top:26px"><div class="dc2-block-title">六大业务板块摘要</div><div class="dc2-block-desc">进入看板查看详细数据</div></div>';
+  h += '<div class="dc2-summary">';
 
-  // 区域三：六大板块入口
-  h += '<div class="dc2-sec"><div class="dc2-sec-head"><div class="dc2-sec-title">六大业务板块</div><div class="dc2-sec-desc">点击进入独立数据看板</div></div>';
-  h += '<div class="dc2-mods">';
-  mods.forEach(m => {
-    const k1 = m.kpis[0] || {val:'—', label:''}, k2 = m.kpis[1] || {val:'—', label:''};
-    h += '<div class="dc2-mod" onclick="dc2Switch(\'module\',\'' + m.id + '\')">'
-      + '<div class="dc2-mod-icon" style="background:' + m.color + '18;color:' + m.color + '">' + m.icon + '</div>'
-      + '<div class="dc2-mod-arrow">' + DC2_ICON.arrow + '</div>'
-      + '<div class="dc2-mod-title">' + dc2Name(m) + '</div>'
-      + '<div class="dc2-mod-desc">' + (m.desc || '') + '</div>'
-      + '<div class="dc2-mod-metrics">'
-      + '<div class="dc2-mod-metric"><b>' + k1.val + '</b><span>' + k1.label + '</span></div>'
-      + '<div class="dc2-mod-metric"><b>' + k2.val + '</b><span>' + k2.label + '</span></div>'
-      + '</div></div>';
+  h += dc2SumCard({
+    id: 'service', title: '行政服务台', color: '#5d53d2', icon: DC2_ICON.service,
+    src: '金山协作服务台后台',
+    metrics: [
+      ['创建工单', sTotal ? sTotal + ' 单' : null],
+      ['解决率', solveRate],
+      ['机器人拦截率', botRate ? botRate + '%' : null]
+    ],
+    chart: dc2MiniLine(((service.weeklyHistory || []).slice().reverse()).map(w => ({ value: w.total })), '#5d53d2')
   });
-  h += '</div></div>';
 
-  // 数据说明
-  h += '<div class="dc2-ledger-note" style="margin-top:24px">说明：带「模拟」标记的指标为页面效果验证数据，待接口接入后替换为真实数据。员工体验板块仅统计已纳入重点活动台账的活动。</div>';
+  h += dc2SumCard({
+    id: 'workplace', title: '职场运营', color: '#3ea4fb', icon: DC2_ICON.building,
+    src: '行政总览 · 职场运营',
+    metrics: [
+      ['职场数量', dc2KpiVal(workplace, /职场数量/)],
+      ['总面积', dc2KpiVal(workplace, /总面积/)],
+      ['总工位数', dc2KpiVal(workplace, /工位数量/)],
+      ['入驻人数', dc2KpiVal(workplace, /入驻人数/)],
+      ['工位利用率', wpUtil ? wpUtil + '%' : null]
+    ]
+  });
+
+  h += dc2SumCard({
+    id: 'employee', title: '员工体验', color: '#c9a800', icon: DC2_ICON.smile,
+    src: '重点活动台账',
+    metrics: [
+      ['年度活动', dc2KpiVal(employee, /年度活动/)],
+      ['累计参与', empPeople],
+      ['平均满意度', empSat],
+      ['北京', bj.events != null ? bj.events + ' 场 / ' + bj.people + ' 人' : null],
+      ['武汉', wh.events != null ? wh.events + ' 场 / ' + wh.people + ' 人' : null]
+    ]
+  });
+
+  h += dc2SumCard({
+    id: 'travel', title: '差旅运营', color: '#eea935', icon: DC2_ICON.plane,
+    src: '差旅平台 + 人工维护',
+    metrics: [
+      ['年度总费用', tTotal ? '¥' + tTotal.toFixed(1) + '万' : null],
+      ['机票占比', shFlight.pct ? shFlight.pct + '%' : null],
+      ['酒店占比', shHotel.pct ? shHotel.pct + '%' : null],
+      ['火车占比', shTrain.pct ? shTrain.pct + '%' : null],
+      ['用车占比', shCar.pct ? shCar.pct + '%' : null]
+    ],
+    chart: dc2MiniBars(((travel.trend && travel.trend.monthly) || []).map(x => ({ value: Math.round(x.amount / 10000) })), '#eea935')
+  });
+
+  h += dc2SumCard({
+    id: 'investment', title: '行政采购', color: '#4be272', icon: DC2_ICON.wallet,
+    src: '人工维护',
+    metrics: [
+      ['年度总预算', invTotal],
+      ['实际支出', invSpent],
+      ['预算执行率', invRate],
+      ['剩余预算', invLeft]
+    ]
+  });
+
+  h += dc2SumCard({
+    id: 'digital', title: '数字化运营项目', color: '#3ea4fb', icon: DC2_ICON.cpu,
+    src: '系统接口 + 人工维护',
+    metrics: [
+      ['上线系统', dSys ? dSys + ' 个' : null],
+      ['AI 应用', dAi ? dAi + ' 个' : null],
+      ['自动化流程', dAuto ? dAuto + ' 个' : null],
+      ['覆盖用户数', null]
+    ],
+    extra: (digital.table || []).length ? ('<div class="dc2-app-list">' + (digital.table || []).slice(0, 3).map(x => '<span class="dc2-app-item">' + x.name + '<b>' + x.status + '</b></span>').join('') + '</div>') : ''
+  });
+
+  h += '</div>';
+
+  /* 三、口径说明 */
+  h += '<div class="dc2-ledger-note" style="margin-top:24px">'
+    + '<b style="color:#5b6180">统计口径</b>：服务台按工单创建时间、职场按当前在管职场、员工体验按已纳入重点活动台账的活动、差旅按报销入账时间、采购按预算年度、数字化按已上线系统与应用数量。'
+    + '标注「待接入」的指标暂无真实数据源，接入后自动展示，不使用模拟数据替代。'
+    + '</div>';
   return h;
 }
 
