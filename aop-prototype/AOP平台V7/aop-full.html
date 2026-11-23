@@ -15527,22 +15527,29 @@ function dc2KpiCard(o){
 }
 
 function dc2GroupCard(o){
-  let m = '';
-  o.metrics.forEach(function(x){
-    const isPend = (x.value == null || x.value === '');
-    m += '<div class="dc2-g-metric' + (x.main ? ' main' : '') + '">'
-      + '<div class="dc2-g-val">' + (isPend ? '<span class="dc2-pending">待接入</span>' : x.value) + (x.unit ? '<i>' + x.unit + '</i>' : '') + '</div>'
-      + '<em>' + x.label + '</em></div>';
+  const main = o.metrics[0] || {};
+  const subs = o.metrics.slice(1);
+  const isPend = function(v){ return v == null || v === ''; };
+  let subsHtml = '';
+  subs.forEach(function(x){
+    const p = isPend(x.value);
+    subsHtml += '<div class="dc2-g-sub"><b' + (p ? ' class="dc2-pending"' : '') + '>' + (p ? '待接入' : x.value) + '</b><span>' + x.label + '</span></div>';
   });
   return '<div class="dc2-group" style="--c:' + o.color + ';animation-delay:' + (o.delay || 0) + 'ms">'
     + '<div class="dc2-group-head">'
     + '<div class="dc2-group-icon">' + o.icon + '</div>'
-    + '<div style="min-width:0"><div class="dc2-group-title">' + o.title + '</div><div class="dc2-group-src" title="' + o.src + '">' + o.src + '</div></div>'
+    + '<div class="dc2-group-headinfo"><div class="dc2-group-title">' + o.title + '</div><div class="dc2-group-src" title="' + o.src + '">' + o.src + '</div></div>'
     + '<span class="dc2-group-link" onclick="dc2Switch(\'module\',\'' + o.id + '\')">进入看板 ' + DC2_ICON.arrow + '</span>'
     + '</div>'
-    + '<div class="dc2-group-metrics">' + m + '</div>'
+    + '<div class="dc2-group-metrics">'
+    + '<div class="dc2-g-main">'
+    + '<div class="dc2-g-main-val">' + (isPend(main.value) ? '<span class="dc2-pending">待接入</span>' : main.value) + (main.unit ? '<i>' + main.unit + '</i>' : '') + '</div>'
+    + '<div class="dc2-g-main-lbl">' + (main.label || '') + '</div>'
+    + '</div>'
+    + '<div class="dc2-g-subs">' + subsHtml + '</div>'
+    + '</div>'
     + '<div class="dc2-group-viz">' + (o.viz || '') + '</div>'
-    + '<div class="dc2-group-foot">' + (o.foot || '') + '<span>统计周期：' + window._dc2Year + ' 年度</span></div>'
+    + '<div class="dc2-group-foot"><span>' + (o.foot || '') + '</span><span>统计周期：' + window._dc2Year + ' 年度</span></div>'
     + '</div>';
 }
 
