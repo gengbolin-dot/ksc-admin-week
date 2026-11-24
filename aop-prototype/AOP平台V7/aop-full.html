@@ -15904,7 +15904,6 @@ function dc2RenderModule(m){
     h += dc2ModNote('服务台运营数据由金山协作服务台后台统一维护，驾驶舱仅同步汇总结果。');
   } else if(m.id === 'workplace'){
     const rows = m.table || [];
-    h += dc2ModChart('各职场工位利用率', '入驻人数 ÷ 工位数量', dc2Ranks(rows.map(function(r){ return {label:r.name, value:parseFloat(r.util)||0, display:r.util}; }), brand));
     h += dc2ModTable(
       th([{name:'职场',cls:'col-name'},{name:'面积',cls:'col-area'},{name:'工位数量',cls:'col-num'},{name:'入驻人数',cls:'col-num'},{name:'利用率',cls:'col-pct'},{name:'㎡/工位',cls:'col-eff'}]),
       rows.map(function(r){ return '<tr>' + td(r.name, 'col-name') + td(r.area, 'col-area') + td(r.seats, 'col-num') + td(r.people, 'col-num') + '<td class="col-pct">' + dc2PctCell(r.util) + '</td>' + '<td class="col-eff">' + dc2EffCell(r, rows) + '</td>' + '</tr>'; }).join('')
