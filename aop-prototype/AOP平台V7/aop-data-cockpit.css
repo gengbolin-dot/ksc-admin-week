@@ -526,6 +526,32 @@
 @keyframes dc2Rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes dc2Ring{from{stroke-dashoffset:var(--c0)}to{stroke-dashoffset:var(--c1)}}
 
+/* ---------- 板块详情页（复用行政运营数据中心卡片样式） ---------- */
+#p32 .dc2-mod-page{max-width:1560px}
+#p32 .dc2-mod-page .p09-mod{border-radius:16px;border-color:#e8eaf3;box-shadow:0 1px 3px rgba(24,27,53,.04)}
+#p32 .dc2-mod-page .p09-mod:hover{box-shadow:0 10px 26px rgba(24,27,53,.07);border-color:#dfe2f0}
+#p32 .dc2-mod-page .p09-mod-head{padding:18px 22px 14px}
+#p32 .dc2-mod-page .p09-mod-meta{padding:0 22px 14px}
+#p32 .dc2-mod-page .p09-mod-body{padding:2px 22px 22px}
+#p32 .dc2-mod-page .p09-kpi-row{gap:10px;margin-bottom:16px}
+#p32 .dc2-mod-page .p09-kpi{padding:14px 16px}
+#p32 .dc2-mod-page .p09-kpi-val{font-size:24px}
+#p32 .dc2-mod-chart{margin:4px 0 14px}
+#p32 .dc2-mod-chart-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+#p32 .dc2-mod-chart-title{font-size:13px;font-weight:600;color:#3b4059}
+#p32 .dc2-mod-chart-desc{font-size:11px;color:#9aa0b4}
+#p32 .dc2-mod-chart-body{background:#f8f9fd;border-radius:12px;padding:14px 16px}
+#p32 .dc2-mod-chart-body .dc2-line{height:180px}
+#p32 .dc2-mod-chart-body .dc2-bars{height:180px}
+#p32 .dc2-mod-chart-body .dc2-ranks{gap:10px;margin-top:0}
+#p32 .dc2-mod-table{margin-top:2px}
+#p32 .dc2-mod-page .p09-tbl{font-size:12.5px}
+#p32 .dc2-mod-page .p09-tbl thead th{padding:0 14px 9px}
+#p32 .dc2-mod-page .p09-tbl tbody td{padding:12px 14px}
+#p32 .dc2-mod-subtitle{font-size:12px;font-weight:600;color:#3b4059;margin:6px 0 10px}
+#p32 .dc2-mod-page .p09-city-row{padding:8px 0}
+#p32 .dc2-mod-note{margin-top:12px;padding:10px 14px;border-radius:10px;background:#f5f6fb;font-size:11px;color:#7c8093;line-height:1.6}
+
 /* ---------- 响应式 ---------- */
 @media (max-width:1280px){
   #p32 .dc2-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}

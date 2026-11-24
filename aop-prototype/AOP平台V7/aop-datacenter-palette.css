@@ -49,11 +49,11 @@
 }
 #p09 .p09-mod:nth-of-type(1) .p09-mod-icon{background:#5d53d2!important;box-shadow:0 4px 12px rgba(93,83,210,.32)!important}
 #p09 .p09-mod:nth-of-type(2) .p09-mod-icon{background:#3ea4fb!important;box-shadow:0 4px 12px rgba(62,164,251,.34)!important}
-#p09 .p09-mod:nth-of-type(3) .p09-mod-icon{background:#f4d200!important;color:#181b35!important;box-shadow:0 4px 12px rgba(244,210,0,.38)!important}
-#p09 .p09-mod:nth-of-type(4) .p09-mod-icon{background:#eea935!important;box-shadow:0 4px 12px rgba(238,169,53,.36)!important}
+#p09 .p09-mod:nth-of-type(3) .p09-mod-icon{background:#e0a800!important;color:#181b35!important;box-shadow:0 4px 12px rgba(224,168,0,.38)!important}
+#p09 .p09-mod:nth-of-type(4) .p09-mod-icon{background:#d94f96!important;box-shadow:0 4px 12px rgba(217,79,150,.36)!important}
 #p09 .p09-mod:nth-of-type(5) .p09-mod-icon{background:#4be272!important;color:#0f3d22!important;box-shadow:0 4px 12px rgba(75,226,114,.36)!important}
-#p09 .p09-mod:nth-of-type(6) .p09-mod-icon{background:#e0005c!important;box-shadow:0 4px 12px rgba(224,0,92,.32)!important}
-#p09 .p09-mod:nth-of-type(7) .p09-mod-icon{background:#7ed4fe!important;color:#0b3d5e!important;box-shadow:0 4px 12px rgba(126,212,254,.40)!important}
+#p09 .p09-mod:nth-of-type(6) .p09-mod-icon{background:#7ed4fe!important;color:#0b3d5e!important;box-shadow:0 4px 12px rgba(126,212,254,.40)!important}
+#p09 .p09-mod:nth-of-type(7) .p09-mod-icon{background:#8b93a8!important;box-shadow:0 4px 12px rgba(139,147,168,.36)!important}
 
 /* 板块顶部一条同色细带，呼应图标，强化识别 */
 #p09 .p09-mod{position:relative}
@@ -63,15 +63,15 @@
 }
 #p09 .p09-mod:nth-of-type(1)::before{background:#5d53d2}
 #p09 .p09-mod:nth-of-type(2)::before{background:#3ea4fb}
-#p09 .p09-mod:nth-of-type(3)::before{background:#f4d200}
-#p09 .p09-mod:nth-of-type(4)::before{background:#eea935}
+#p09 .p09-mod:nth-of-type(3)::before{background:#e0a800}
+#p09 .p09-mod:nth-of-type(4)::before{background:#d94f96}
 #p09 .p09-mod:nth-of-type(5)::before{background:#4be272}
-#p09 .p09-mod:nth-of-type(6)::before{background:#e0005c}
-#p09 .p09-mod:nth-of-type(7)::before{background:#7ed4fe}
+#p09 .p09-mod:nth-of-type(6)::before{background:#7ed4fe}
+#p09 .p09-mod:nth-of-type(7)::before{background:#8b93a8}
 
 /* 头部操作图标（编辑 / 刷新 / 删除） */
 #p09 .p09-mod-edit{color:var(--dc-muted)!important}
-#p09 .p09-mod-edit:hover{color:var(--dc-indigo)!important;background:rgba(93,83,210,.08)!important}
+#p09 .p09-mod-edit:hover{color:var(--ac,#5d53d2)!important;background:color-mix(in srgb,var(--ac,#5d53d2) 8%,transparent)!important}
 #p09 .p09-mod-edit svg{stroke:currentColor!important}
 
 /* ---------- 模块标题与说明 ---------- */
@@ -208,7 +208,7 @@
 
 /* 城市统计：蓝 */
 #p09 .p09-city-bar{background:#e8f3fe!important}
-#p09 .p09-city-fill{background:linear-gradient(90deg,#7ed4fe,#3ea4fb)!important}
+#p09 .p09-city-fill{background:linear-gradient(90deg,color-mix(in srgb,var(--ac,#5d53d2) 62%,#fff),var(--ac,#5d53d2))!important}
 #p09 .p09-city-name{color:#181b35!important;font-weight:600!important}
 #p09 .p09-city-val{color:#7c8093!important}
 
