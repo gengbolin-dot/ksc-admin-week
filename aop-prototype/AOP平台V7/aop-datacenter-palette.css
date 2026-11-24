@@ -283,3 +283,142 @@
 #p09 th{color:var(--dc-text)!important}
 #p09 td{color:#2c304c!important}
 #p09 tbody tr:hover{background:#f7f7fd!important}
+
+/* ══════════════════════════════════════════════════════════════════
+   P32 综合数据驾驶舱 · 板块详情
+   与 P09 行政运营数据中心共用同一套 pz-* 可视化组件
+   （pz-stats / pz-gauges / pz-cols / pz-split 等仅在 #p09 下补过细节，
+     这里为 #p32 补齐，保证两页呈现完全一致）
+   ══════════════════════════════════════════════════════════════════ */
+#p32{
+  --dc-indigo:#5d53d2;
+  --dc-blue:#3ea4fb;
+  --dc-sky:#7ed4fe;
+  --dc-green:#4be272;
+  --dc-lime:#40ca6d;
+  --dc-yellow:#f4d200;
+  --dc-orange:#eea935;
+  --dc-magenta:#e0005c;
+  --dc-rose:#cd2d58;
+  --dc-ink:#181b35;
+  --dc-text:#4b4f66;
+  --dc-muted:#7c8093;
+  --dc-track:#e7e9f5;
+  --dc-line:#d8dbec;
+}
+
+/* 模块左侧品牌色带 */
+#p32 .p09-mod{position:relative}
+#p32 .p09-mod::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--ac,#5d53d2);opacity:.9;
+}
+
+/* 模块头部 */
+#p32 .p09-mod-icon{
+  width:42px!important;height:42px!important;border-radius:12px!important;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 12px rgba(24,27,53,.14);
+}
+#p32 .p09-mod-icon svg{width:20px!important;height:20px!important}
+#p32 .p09-mod-edit:hover{color:var(--ac,#5d53d2)!important;background:color-mix(in srgb,var(--ac,#5d53d2) 8%,transparent)!important}
+#p32 .p09-mod-edit svg{stroke:currentColor!important}
+#p32 .p09-mod-title{color:var(--dc-ink)!important;font-weight:700!important}
+#p32 .p09-mod-desc,
+#p32 .p09-mod-meta,
+#p32 .p09-sync-period,
+#p32 .p09-sync-time,
+#p32 .p09-mod-owner{color:var(--dc-muted)!important}
+
+/* 来源 / 同步标签 */
+#p32 .p09-src-badge{background:rgba(93,83,210,.10)!important;color:var(--dc-indigo)!important;border-radius:4px!important;font-weight:500!important}
+#p32 .p09-src-dot{background:var(--dc-indigo)!important}
+#p32 .p09-src-system{background:rgba(62,164,251,.12)!important;color:#1a7fc4!important}
+#p32 .p09-src-system .p09-src-dot{background:var(--dc-blue)!important}
+#p32 .p09-src-manual{background:rgba(238,169,53,.16)!important;color:#96631a!important}
+#p32 .p09-src-manual .p09-src-dot{background:var(--dc-orange)!important}
+#p32 .p09-sync-tag{background:rgba(75,226,114,.16)!important;color:#1d8f47!important;border-radius:4px!important}
+#p32 .p09-sync-timer{background:rgba(244,210,0,.20)!important;color:#8a7200!important;border-radius:4px!important}
+#p32 .p09-sync-pending{background:rgba(224,0,92,.10)!important;color:var(--dc-magenta)!important;border-radius:4px!important}
+
+/* 图表标题 / 图例 */
+#p32 .pz-head svg{color:var(--ac,#5d53d2)!important;stroke-width:1.8!important;width:17px;height:17px}
+#p32 .pz-head .pz-title,
+#p32 .pz-title{color:var(--dc-ink)!important}
+#p32 .pz-meta,#p32 .pz-note{color:var(--dc-muted)!important}
+#p32 .pz-meta i{background:var(--dc-line)!important}
+#p32 .pz-ring-c b{color:var(--dc-ink)!important}
+#p32 .pz-ring-c span{color:var(--dc-muted)!important}
+#p32 .pz-legend-row{color:var(--dc-text)!important;border-bottom-color:#f0f1f8!important}
+#p32 .pz-legend-row b{color:var(--dc-ink)!important}
+#p32 .pz-legend-row em{color:var(--dc-muted)!important}
+#p32 .pz-legend-row.is-total{color:var(--dc-muted)!important;border-top-color:var(--dc-line)!important}
+
+/* 职场运营：概览三卡 + 环形矩阵 */
+#p32 .pz-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
+#p32 .pz-stat{
+  background:#f8f9fe;border:1px solid var(--dc-line);border-radius:12px;
+  padding:14px 16px 15px;display:flex;flex-direction:column;gap:4px;
+}
+#p32 .pz-stat-lbl{font-size:11.5px;color:var(--dc-muted)}
+#p32 .pz-stat-num{font-size:26px;font-weight:700;color:var(--dc-ink);line-height:1.15;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+#p32 .pz-stat-num small{font-size:12px;font-weight:500;color:var(--dc-muted);margin-left:3px;letter-spacing:0}
+#p32 .pz-stat-sub{font-size:11.5px;color:var(--dc-muted);font-variant-numeric:tabular-nums}
+
+#p32 .pz-gauges{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px}
+#p32 .pz-gauge{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:16px 8px 14px;border:1px solid var(--dc-line);border-radius:12px;
+  background:#fff;transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+}
+#p32 .pz-gauge:hover{border-color:#c5c9ea;box-shadow:0 6px 18px rgba(24,27,53,.08);transform:translateY(-2px)}
+#p32 .pz-gauge-ring{position:relative;width:84px;height:84px}
+#p32 .pz-gauge-ring svg{width:84px;height:84px;display:block}
+#p32 .pz-gauge-ring svg circle{transition:stroke-width .2s ease}
+#p32 .pz-gauge:hover .pz-gauge-ring svg circle:nth-child(2){stroke-width:10}
+#p32 .pz-gauge-c{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:700;color:var(--dc-ink);letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+}
+#p32 .pz-gauge-c i{font-style:normal;font-size:10.5px;font-weight:600;color:var(--dc-muted);margin-left:1px}
+#p32 .pz-gauge-name{font-size:12.5px;font-weight:600;color:var(--dc-ink);text-align:center;line-height:1.35;max-width:100%;word-break:break-word}
+#p32 .pz-gauge-sub{font-size:11px;color:var(--dc-muted);font-variant-numeric:tabular-nums}
+
+/* 员工体验：满意度竖柱 */
+#p32 .pz-cols{position:relative;display:flex;align-items:flex-end;gap:14px;height:168px;padding:0 2px;border-bottom:1px solid var(--dc-line)}
+#p32 .pz-col-lbls{display:flex;gap:14px;margin-top:10px;padding:0 2px;align-items:flex-start}
+#p32 .pz-col-lbls span{
+  flex:1 1 0;min-width:0;text-align:center;
+  font-size:11.5px;color:var(--dc-text)!important;
+  white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+  word-break:break-word;line-height:1.4;
+}
+#p32 .pz-col-val{font-size:12.5px;font-weight:700;color:var(--dc-ink)!important}
+#p32 .pz-col-track{position:relative}
+#p32 .pz-col-bar{box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+#p32 .pz-note b i{width:10px;height:10px;border-radius:3px}
+
+/* 差旅运营：费用构成 */
+#p32 .pz-split{grid-template-columns:236px minmax(0,1fr)}
+
+/* 数字化：状态分段条 + 胶囊 */
+#p32 .pz-seg{background:var(--dc-track)!important}
+#p32 .pz-pill{background:#fff!important;border-color:var(--dc-line)!important;color:var(--dc-text)!important}
+#p32 .pz-pill b{color:var(--dc-ink)!important}
+
+/* 服务台：外部入口卡 */
+#p32 .pz-entry{background:#f7f7fd!important;border-color:var(--dc-line)!important}
+#p32 .pz-entry-ic{background:rgba(93,83,210,.10)!important;color:var(--dc-indigo)!important}
+#p32 .pz-entry-txt b{color:var(--dc-ink)!important}
+#p32 .pz-entry-txt span{color:var(--dc-muted)!important}
+#p32 .pz-entry-btn{background:var(--dc-indigo)!important}
+#p32 .pz-entry-btn:hover{background:#463cb8!important}
+
+@media (max-width:900px){
+  #p32 .pz-stats{grid-template-columns:1fr}
+  #p32 .pz-gauges{grid-template-columns:repeat(auto-fit,minmax(96px,1fr))}
+}
+@media (max-width:1200px){
+  #p32 .pz-split{grid-template-columns:1fr}
+}

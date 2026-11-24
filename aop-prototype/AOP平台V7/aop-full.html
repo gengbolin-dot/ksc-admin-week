@@ -15945,8 +15945,204 @@ function dc2RenderModule(m){
     );
   }
 
-  h += '</div></div></div>';
+  h += '</div>';
+
+  /* 与 P09 行政运营数据中心共用同一套 pz-* 可视化 */
+  const viz = dc2P09Viz(m.id, m);
+  if(viz) h += '<div class="p09viz">' + viz + '</div>';
+
+  h += '</div></div>';
   return h;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   P32 板块详情可视化：逐项复用 P09 的组件结构与配色
+   - 职场运营：整体概览三卡 + 各职场利用率环形矩阵
+   - 员工体验：活动满意度竖向柱 + 均值图例
+   - 差旅运营：费用构成环形 + 金额图例
+   - 数字化：上线状态分段条 + 胶囊
+   - 服务台：外部后台入口卡
+   ══════════════════════════════════════════════════════════════════ */
+function dc2P09Viz(id, m){
+  const C = { blue:'#3ea4fb', sky:'#7ed4fe', green:'#4be272', lime:'#40ca6d', orange:'#eea935', yellow:'#f4d200', purple:'#5d53d2', indigo:'#699efa', gray:'#c7cade' };
+  const fmt = function(v){ return Number(v || 0).toLocaleString(); };
+  const n = function(v){
+    const x = parseFloat(String(v == null ? '' : v).replace(/[^\d.]/g, ''));
+    return isFinite(x) ? x : 0;
+  };
+  const ICON = {
+    chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-5"/><path d="M12 16V8"/><path d="M17 16v-9"/></svg>',
+    users: DC2_ICON.users,
+    plane: DC2_ICON.plane,
+    cpu: DC2_ICON.cpu,
+    headset: DC2_ICON.service,
+    arrow: DC2_ICON.arrow
+  };
+  let html = '';
+
+  /* A. 职场运营 */
+  if(id === 'workplace'){
+    const list = (m.table || []).map(function(r){
+      return { name:r.name, area:n(r.area), seats:n(r.seats), people:n(r.people), util:n(r.util) };
+    }).filter(function(r){ return r.seats > 0; });
+    if(!list.length) return '';
+
+    const totSeats = list.reduce(function(a, r){ return a + r.seats; }, 0);
+    const totPeople = list.reduce(function(a, r){ return a + r.people; }, 0);
+    const totArea = list.reduce(function(a, r){ return a + r.area; }, 0);
+    const overall = totSeats ? totPeople / totSeats * 100 : 0;
+    const sortedRing = list.slice().sort(function(a, b){ return b.util - a.util; });
+    const toneOf = function(u){
+      if(u >= 90) return C.orange;
+      if(u >= overall) return C.blue;
+      if(u >= 75) return C.sky;
+      return C.green;
+    };
+
+    html += '<div class="pz-head">' + ICON.chart + '<span class="pz-title">工位利用率</span>'
+      + '<span class="pz-meta">' + list.length + ' 个职场<i></i>入驻人数 \u00f7 工位数量</span></div>';
+
+    html += '<div class="pz-stats">'
+      + '<div class="pz-stat"><span class="pz-stat-lbl">整体入驻率</span><b class="pz-stat-num">' + overall.toFixed(1) + '<small>%</small></b>'
+      + '<span class="pz-stat-sub">已入驻 ' + fmt(totPeople) + ' / 工位 ' + fmt(totSeats) + '</span></div>'
+      + '<div class="pz-stat"><span class="pz-stat-lbl">闲置工位</span><b class="pz-stat-num">' + fmt(totSeats - totPeople) + '<small>个</small></b>'
+      + '<span class="pz-stat-sub">占总工位 ' + (totSeats ? ((totSeats - totPeople) / totSeats * 100).toFixed(1) : 0) + '%</span></div>'
+      + '<div class="pz-stat"><span class="pz-stat-lbl">平均每工位面积</span><b class="pz-stat-num">' + (totSeats ? (totArea / totSeats).toFixed(1) : '0') + '<small>\u33a1</small></b>'
+      + '<span class="pz-stat-sub">总面积 ' + fmt(totArea) + ' \u33a1</span></div>'
+      + '</div>';
+
+    html += '<div class="pz-gauges">';
+    sortedRing.forEach(function(r){
+      const R3 = 34, C3 = 2 * Math.PI * R3, SW3 = 8;
+      const off3 = C3 * (1 - Math.min(r.util, 100) / 100);
+      const tone = toneOf(r.util);
+      html += '<div class="pz-gauge" title="' + r.name + '\uff5c入驻 ' + fmt(r.people) + ' 人\uff5c闲置 ' + fmt(r.seats - r.people) + ' 个工位">'
+        + '<div class="pz-gauge-ring"><svg viewBox="0 0 84 84">'
+        + '<circle cx="42" cy="42" r="' + R3 + '" fill="none" stroke="#eaecf6" stroke-width="' + SW3 + '"></circle>'
+        + '<circle cx="42" cy="42" r="' + R3 + '" fill="none" stroke="' + tone + '" stroke-width="' + SW3 + '" stroke-linecap="round"'
+        + ' stroke-dasharray="' + C3.toFixed(2) + '" stroke-dashoffset="' + off3.toFixed(2) + '" transform="rotate(-90 42 42)"></circle>'
+        + '</svg><span class="pz-gauge-c">' + r.util + '<i>%</i></span></div>'
+        + '<div class="pz-gauge-name">' + r.name + '</div>'
+        + '<div class="pz-gauge-sub">' + fmt(r.people) + '/' + fmt(r.seats) + ' 工位</div>'
+        + '</div>';
+    });
+    html += '</div>';
+
+    html += '<div class="pz-note">'
+      + '<b><i style="background:' + C.orange + '"></i>\u226590% 席位紧张</b>'
+      + '<b><i style="background:' + C.blue + '"></i>\u2265' + overall.toFixed(0) + '% 接近饱和</b>'
+      + '<b><i style="background:' + C.sky + '"></i>75\u2013' + (overall > 75 ? (Math.ceil(overall) - 1) : 75) + '% 仍有余量</b>'
+      + '<b><i style="background:' + C.green + '"></i>&lt;75% 较为宽裕</b>'
+      + '<span>按利用率从高到低排列</span></div>';
+    return html;
+  }
+
+  /* B. 员工体验 */
+  if(id === 'employee'){
+    const acts = (window._dc2Activities || []).map(function(a){
+      return { name:a.name, city:a.type || '', people:n(a.people), sat:n(a.satisfaction) };
+    });
+    if(!acts.length) return '';
+    const avgSat = (function(){
+      const t = acts.filter(function(a){ return a.sat > 0; });
+      return t.length ? t.reduce(function(x, a){ return x + a.sat; }, 0) / t.length : 0;
+    })();
+
+    html += '<div class="pz-head">' + ICON.users + '<span class="pz-title">活动满意度</span>'
+      + '<span class="pz-meta">' + acts.length + ' 场活动<i></i>均值 ' + avgSat.toFixed(1) + '%</span></div>';
+    html += '<div class="pz-cols">';
+    acts.forEach(function(a){
+      const h = a.sat > 0 ? Math.max(4, Math.min(100, a.sat)) : 3;
+      const tone = a.sat <= 0 ? C.gray : (a.sat > avgSat ? C.green : C.orange);
+      html += '<div class="pz-col" title="' + a.name + '\uff5c' + a.city + '\uff5c' + a.people + ' 人">'
+        + '<span class="pz-col-val">' + (a.sat > 0 ? a.sat + '%' : '\u2014') + '</span>'
+        + '<span class="pz-col-track"><span class="pz-col-bar" style="height:' + h + '%;background:' + tone + '"></span></span>'
+        + '</div>';
+    });
+    html += '</div>';
+    html += '<div class="pz-col-lbls">';
+    acts.forEach(function(a){ html += '<span title="' + a.name + '">' + a.name + '</span>'; });
+    html += '</div>';
+    html += '<div class="pz-note"><b><i style="background:' + C.green + '"></i>高于均值</b>'
+      + '<b><i style="background:' + C.orange + '"></i>低于均值</b>'
+      + '<b><i style="background:' + C.gray + '"></i>暂无数据</b>'
+      + '<span>均值 ' + avgSat.toFixed(1) + '%</span></div>';
+    return html;
+  }
+
+  /* C. 差旅运营 */
+  if(id === 'travel'){
+    const ks = (m.kpis || []).map(function(k){ return { v:k.val, l:k.label, num:n(k.val) }; });
+    const items = ks.slice(1).filter(function(k){ return k.num > 0; });
+    if(!items.length) return '';
+    const total = items.reduce(function(a, k){ return a + k.num; }, 0) || 1;
+    const PC = [C.indigo, C.sky, C.purple, C.orange, C.green];
+    const R2 = 48, C2 = 2 * Math.PI * R2;
+    let acc = 0;
+
+    html += '<div class="pz-head">' + ICON.plane + '<span class="pz-title">费用构成</span>'
+      + '<span class="pz-meta">合计 ' + (ks[0] ? ks[0].v : '') + '</span></div>';
+    html += '<div class="pz-split pz-split-donut">';
+    html += '<div class="pz-ring pz-ring-lg"><svg viewBox="0 0 132 132">';
+    html += '<circle cx="66" cy="66" r="' + R2 + '" fill="none" stroke="#eff1f5" stroke-width="18"></circle>';
+    items.forEach(function(k, i){
+      const frac = k.num / total;
+      const dash = (frac * C2).toFixed(2), gap = (C2 - frac * C2).toFixed(2);
+      html += '<circle class="pz-arc" cx="66" cy="66" r="' + R2 + '" fill="none" stroke="' + PC[i % PC.length] + '" stroke-width="18"'
+        + ' stroke-dasharray="' + dash + ' ' + gap + '" stroke-dashoffset="0" transform="rotate(' + (-90 + acc * 360).toFixed(2) + ' 66 66)">'
+        + '<title>' + k.l + ' ' + k.v + ' \u00b7 ' + (frac * 100).toFixed(1) + '%</title></circle>';
+      acc += frac;
+    });
+    html += '</svg><div class="pz-ring-c"><b>' + (ks[0] ? ks[0].v : '') + '</b><span>总费用</span></div></div>';
+    html += '<div class="pz-legend pz-legend-wide">';
+    items.forEach(function(k, i){
+      html += '<div class="pz-legend-row"><i style="background:' + PC[i % PC.length] + '"></i><span>' + k.l + '</span>'
+        + '<b>' + k.v + '</b><em>' + (k.num / total * 100).toFixed(1) + '%</em></div>';
+    });
+    html += '</div></div>';
+    return html;
+  }
+
+  /* D. 数字化运营 */
+  if(id === 'digital'){
+    const rs = (m.table || []).map(function(r){ return [r.name, r.func, r.status, r.users]; });
+    if(!rs.length) return '';
+    const bucketOrder = ['已上线', '对接中', '开发中', '未开始'];
+    const counts = {};
+    rs.forEach(function(r){ const k = r[2] || '未开始'; counts[k] = (counts[k] || 0) + 1; });
+    const tot = rs.length || 1;
+    const toneMap = { '已上线': C.lime, '对接中': C.indigo, '开发中': C.yellow, '未开始': C.gray };
+
+    html += '<div class="pz-head">' + ICON.cpu + '<span class="pz-title">系统上线状态</span>'
+      + '<span class="pz-meta">共 ' + tot + ' 个系统</span></div>';
+    html += '<div class="pz-seg">';
+    bucketOrder.forEach(function(k){
+      if(!counts[k]) return;
+      html += '<span class="pz-seg-part" style="width:' + (counts[k] / tot * 100).toFixed(1) + '%;background:' + toneMap[k] + '" title="' + k + ' ' + counts[k] + ' 个">'
+        + (counts[k] / tot > 0.12 ? '<em>' + counts[k] + '</em>' : '') + '</span>';
+    });
+    html += '</div>';
+    html += '<div class="pz-pills">';
+    bucketOrder.forEach(function(k){
+      if(!counts[k]) return;
+      html += '<span class="pz-pill"><i style="background:' + toneMap[k] + '"></i>' + k + '<b>' + counts[k] + '</b></span>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  /* E. 行政服务台 */
+  if(id === 'service'){
+    html += '<div class="pz-head">' + ICON.headset + '<span class="pz-title">数据来源</span></div>'
+      + '<div class="pz-entry">'
+      + '<span class="pz-entry-ic">' + ICON.headset + '</span>'
+      + '<span class="pz-entry-txt"><b>金山协作 \u00b7 行政服务台</b><span>工单、满意度等数据在服务台后台直接查看</span></span>'
+      + '<a class="pz-entry-btn" href="javascript:void(0)" onclick="showToast&&showToast(\'请在金山协作行政服务台后台查看\')">打开后台' + ICON.arrow + '</a>'
+      + '</div>';
+    return html;
+  }
+
+  return '';
 }
 
 function dc2ModChart(title, desc, body){
