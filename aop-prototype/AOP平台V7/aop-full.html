@@ -15760,7 +15760,7 @@ function dc2RenderCockpit(mods){
 
   /* 4. 差旅运营 */
   h += dc2GroupCard({
-    id:'travel', title:'差旅运营', color:'#eea935', icon:DC2_ICON.plane, src:'差旅平台 + 人工维护',
+    id:'travel', title:'差旅运营', color:'#d94f96', icon:DC2_ICON.plane, src:'差旅平台 + 人工维护',
     subsGrid: true,
     metrics:[
       { label:'年度差旅总费用', value: tTotal ? '¥' + tTotal.toFixed(1) + '万' : null, main:true },
@@ -15810,8 +15810,8 @@ function dc2RenderCockpit(mods){
   });
 
   h += dc2TrendCard({
-    title:'差旅月度费用', desc:'单位：万元', color:'#eea935',
-    body: monthly.length ? dc2Bars(monthly.map(function(x){ return { label: parseInt(String(x.month).split('-')[1], 10) + '月', value: Math.round(x.amount / 10000), display: Math.round(x.amount / 10000) }; }), '#eea935') : '<div class="dc2-empty">暂无趋势数据</div>',
+    title:'差旅月度费用', desc:'单位：万元', color:'#d94f96',
+    body: monthly.length ? dc2Bars(monthly.map(function(x){ return { label: parseInt(String(x.month).split('-')[1], 10) + '月', value: Math.round(x.amount / 10000), display: Math.round(x.amount / 10000) }; }), '#d94f96') : '<div class="dc2-empty">暂无趋势数据</div>',
     foot:'数据来源 差旅平台'
   });
 
@@ -15832,7 +15832,7 @@ function dc2RenderCockpit(mods){
   h += dc2EntryTile({ id:'service', title:'行政服务台', color:'#5d53d2', icon:DC2_ICON.service, src:'金山协作服务台后台' });
   h += dc2EntryTile({ id:'workplace', title:'职场运营', color:'#3ea4fb', icon:DC2_ICON.building, src:'行政总览 · 职场运营' });
   h += dc2EntryTile({ id:'employee', title:'员工体验', color:'#e0a800', icon:DC2_ICON.smile, src:'重点活动台账' });
-  h += dc2EntryTile({ id:'travel', title:'差旅运营', color:'#eea935', icon:DC2_ICON.plane, src:'差旅平台 + 人工维护' });
+  h += dc2EntryTile({ id:'travel', title:'差旅运营', color:'#d94f96', icon:DC2_ICON.plane, src:'差旅平台 + 人工维护' });
   h += dc2EntryTile({ id:'investment', title:'行政采购', color:'#4be272', icon:DC2_ICON.wallet, src:'人工维护' });
   h += dc2EntryTile({ id:'digital', title:'数字化运营项目', color:'#7ed4fe', icon:DC2_ICON.cpu, src:'系统接口 + 人工维护' });
   h += '</div>';
