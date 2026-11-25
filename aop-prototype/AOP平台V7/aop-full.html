@@ -15917,7 +15917,6 @@ function dc2RenderModule(m){
         h += '<div class="p09-city-row"><div class="p09-city-name">' + (c.name||'') + '</div><div class="p09-city-bar"><div class="p09-city-fill" style="width:' + (c.pct||0) + '%"></div></div><div class="p09-city-val">' + (c.events||0) + '场 · ' + (c.people||0) + '人</div></div>';
       });
     }
-    h += dc2ModChart('重点活动参与情况', '仅统计已纳入台账的重点活动', dc2Ranks(acts.map(function(a){ return {label:a.name, value:a.people||0, display:(a.people||0) + ' 人'}; }), brand));
     h += dc2ModTable(
       th([{name:'活动名称'},{name:'活动时间'},{name:'类型'},{name:'参与人数',cls:'num'},{name:'满意度',cls:'num'},{name:'有效问卷',cls:'num'}]),
       acts.map(function(a){ return '<tr>' + td(a.name) + td(a.date) + td(a.type) + td(a.people, 'num') + '<td class="num p09-sat-cell">' + (window.satBarHTML ? window.satBarHTML(a.satisfaction) : (a.satisfaction || '—')) + '</td>' + td(a.surveys || '—', 'num') + '</tr>'; }).join('')
