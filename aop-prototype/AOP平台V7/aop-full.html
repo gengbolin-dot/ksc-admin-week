@@ -15413,7 +15413,7 @@ function renderP32(){
     + '<div class="dc2-sub">数据来源：全员「我的工作」自动汇聚 · 统计周期 ' + window._dc2Year + ' 年度 · 最近更新 2026-11-20 16:00</div>'
     + '</div><div class="dc2-top-actions">'
     + '<select class="dc2-select" onchange="dc2SetYear(this.value)"><option value="2026"' + (window._dc2Year===2026?' selected':'') + '>2026 年度</option><option value="2025"' + (window._dc2Year===2025?' selected':'') + '>2025 年度</option></select>'
-    + '<button class="dc2-btn" onclick="dc2Switch(\'ledger\')">' + DC2_ICON.list + ' 数据维护</button>'
+    + '<button class="dc2-btn" onclick="dc2Switch(\'maint\')">' + DC2_ICON.list + ' 数据维护</button>'
     + '</div></div>';
 
   // 视图 tabs
@@ -15422,12 +15422,12 @@ function renderP32(){
   mods.forEach(m => {
     h += '<div class="dc2-tab' + (window._dc2View === 'module' && window._dc2Module === m.id ? ' active' : '') + '" onclick="dc2Switch(\'module\',\'' + m.id + '\')">' + dc2Name(m) + '</div>';
   });
-  h += '<div class="dc2-tab' + (window._dc2View === 'ledger' ? ' active' : '') + '" onclick="dc2Switch(\'ledger\')">重点活动台账</div>';
+  h += '<div class="dc2-tab' + (window._dc2View === 'maint' ? ' active' : '') + '" onclick="dc2Switch(\'maint\')">数据维护</div>';
   h += '</div></div>';
 
   h += '<div class="dc2-body">';
-  if(window._dc2View === 'ledger'){
-    h += dc2RenderLedger();
+  if(window._dc2View === 'maint'){
+    h += dc2RenderMaint();
   } else if(window._dc2View === 'module' && window._dc2Module){
     const m = mods.find(x => x.id === window._dc2Module);
     h += m ? dc2RenderModule(m) : '<div class="dc2-empty">未找到该板块</div>';
@@ -15446,8 +15446,10 @@ function dc2SetYear(y){
   renderP32();
 }
 function dc2Switch(view, moduleId){
+  if(view === 'ledger'){ view = 'maint'; moduleId = 'employee'; }
   window._dc2View = view;
   window._dc2Module = moduleId || null;
+  if(view === 'maint' && moduleId) window._dc2MaintModule = moduleId;
   const sc = document.getElementById('dc2Scroll');
   renderP32();
   if(sc) sc.scrollTop = 0;
@@ -16337,6 +16339,338 @@ function dc2RenderLedger(){
   h += '</tbody></table></div>';
   return h;
 }
+
+/* ══════ 数据维护工作台 ══════ */
+const DC2_MAINT_EDITABLE = { service:false, workplace:true, employee:true, travel:true, investment:true, digital:true, archive:false };
+
+function dc2MaintEscape(v){
+  return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+function dc2MaintModuleList(){
+  return (DATA_CENTER.modules || []).filter(function(m){
+    return ['service','workplace','employee','travel','investment','digital'].indexOf(m.id) !== -1;
+  });
+}
+function dc2MaintDraft(){
+  const id = window._dc2MaintModule || 'investment';
+  const m = (DATA_CENTER.modules || []).find(function(x){ return x.id === id; });
+  if(!m) return null;
+  if(window._maintDraftId !== id || !window._maintDraft){
+    window._maintDraft = JSON.parse(JSON.stringify({
+      id: m.id,
+      owner: m.owner || '',
+      source: m.source || '',
+      kpis: m.kpis || [],
+      table: m.table || [],
+      trend: m.trend || null
+    }));
+    window._maintDraftId = id;
+  }
+  return window._maintDraft;
+}
+function dc2MaintSelect(id){
+  if(id === window._dc2MaintModule) return;
+  if(window._maintDirty && !confirm('当前板块有未保存的修改，确定切换吗？')){
+    // 重新渲染，恢复被点击前的选中态
+    renderP32();
+    return;
+  }
+  window._dc2MaintModule = id;
+  window._maintDraft = null;
+  window._maintDraftId = null;
+  window._maintDirty = false;
+  renderP32();
+}
+
+function dc2RenderMaint(){
+  const mods = dc2MaintModuleList();
+  const cur = window._dc2MaintModule || 'investment';
+  window._dc2MaintModule = mods.some(function(x){ return x.id === cur; }) ? cur : 'investment';
+  const m = mods.find(function(x){ return x.id === window._dc2MaintModule; }) || mods[0];
+
+  let h = '<div class="dc2-maint">';
+  h += '<div class="dc2-maint-nav">'
+    + '<div class="dc2-maint-nav-head"><div class="dc2-maint-nav-title">数据维护</div>'
+    + '<div class="dc2-maint-nav-sub">按板块维护指标与明细</div></div>';
+  mods.forEach(function(x){
+    const brand = dc2Brand(x.id, x.color);
+    h += '<div class="dc2-maint-item' + (x.id === m.id ? ' active' : '') + '" style="--c:' + brand + '" onclick="dc2MaintSelect(\'' + x.id + '\')">'
+      + '<span class="dc2-maint-ic">' + x.icon + '</span>'
+      + '<span class="dc2-maint-name">' + dc2Name(x) + '</span>'
+      + '<span class="dc2-maint-dot' + (DC2_MAINT_EDITABLE[x.id] ? ' on' : '') + '"></span>'
+      + '</div>';
+  });
+  h += '<div class="dc2-maint-tip"><i class="on"></i>可手工维护<br><i></i>系统 / 平台同步</div>';
+  h += '</div>';
+  h += '<div class="dc2-maint-panel">' + dc2MaintPanel(m) + '</div>';
+  h += '</div>';
+  return h;
+}
+
+function dc2MaintField(label, field, val, editable){
+  return '<div class="dc2-maint-field"><label>' + label + '</label>'
+    + '<input data-mfield="' + field + '" value="' + dc2MaintEscape(val) + '"' + (editable ? '' : ' readonly') + '></div>';
+}
+
+function dc2MaintPanel(m){
+  const d = dc2MaintDraft();
+  if(!d) return '<div class="dc2-empty">未找到该板块</div>';
+  const editable = !!DC2_MAINT_EDITABLE[m.id];
+  const brand = dc2Brand(m.id, m.color);
+
+  let h = '<div class="dc2-maint-head">'
+    + '<div class="dc2-maint-icon" style="background:' + brand + '18;color:' + brand + '">' + m.icon + '</div>'
+    + '<div style="min-width:0"><div class="dc2-maint-title">' + dc2Name(m) + '</div>'
+    + '<div class="dc2-maint-desc">' + (m.desc || '') + '</div></div>'
+    + '<span class="dc2-maint-badge ' + (editable ? 'ok' : 'ro') + '">' + (editable ? '可手工维护' : '只读同步') + '</span>'
+    + '</div>';
+
+  h += '<div class="dc2-maint-sec"><div class="dc2-maint-sec-title">基础信息</div><div class="dc2-maint-fields">'
+    + dc2MaintField('负责人', 'owner', d.owner, editable)
+    + dc2MaintField('数据来源', 'source', d.source, editable)
+    + dc2MaintField('统计周期', 'period', window._dc2Year + ' 年度', false)
+    + dc2MaintField('最近更新', 'lastUpdate', editable ? '保存时自动更新' : (m.lastUpdate || '—'), false)
+    + '</div></div>';
+
+  h += '<div class="dc2-maint-sec"><div class="dc2-maint-sec-title">核心指标</div><div class="dc2-maint-kpis">';
+  (d.kpis || []).forEach(function(k, i){
+    h += '<div class="dc2-maint-kpi"><label>' + dc2MaintEscape(k.label) + '</label>'
+      + '<input data-mkpi="' + i + '" value="' + dc2MaintEscape(k.val) + '"' + (editable ? '' : ' readonly') + '></div>';
+  });
+  h += '</div></div>';
+
+  h += dc2MaintDetail(m, d, editable);
+
+  h += '<div class="dc2-maint-actions">'
+    + '<span class="dc2-maint-hint">' + (editable
+        ? '修改后点击「保存」写入本地数据；保存时按明细重算关联指标'
+        : '该板块由系统同步，暂不支持手工维护') + '</span>'
+    + (editable
+        ? '<button class="dc2-btn" onclick="dc2MaintReset()">重置</button>'
+          + '<button class="dc2-btn primary" onclick="dc2MaintSave()">保存</button>'
+        : '')
+    + '</div>';
+  return h;
+}
+
+function dc2MaintDetail(m, d, editable){
+  if(m.id === 'employee'){
+    return '<div class="dc2-maint-sec"><div class="dc2-maint-sec-title">重点活动台账</div>'
+      + '<div class="dc2-maint-note" style="margin-bottom:12px">员工体验的重点活动与台账共用同一份数据，增删改后两页同步生效。</div>'
+      + dc2RenderLedger() + '</div>';
+  }
+  if(m.id === 'service'){
+    return '<div class="dc2-maint-sec"><div class="dc2-maint-sec-title">数据来源</div>'
+      + '<div class="dc2-maint-note">工单、满意度等数据由金山协作服务台后台统一维护，驾驶舱仅同步汇总结果。'
+      + '<br>如需校正，请联系服务台管理员在后台修改后重新同步。</div></div>';
+  }
+  if(m.id === 'travel') return dc2MaintTravelTable(d, editable);
+
+  const cfg = {
+    workplace: {
+      cols: [
+        { k:'name', l:'职场' },
+        { k:'area', l:'面积' },
+        { k:'seats', l:'工位数量', t:'number' },
+        { k:'people', l:'入驻人数', t:'number' }
+      ],
+      auto: [
+        { l:'利用率', fn:function(r){ const a = dc2Num(r.seats), b = dc2Num(r.people); return a ? (b / a * 100).toFixed(0) + '%' : '—'; } },
+        { l:'㎡/工位', fn:function(r){ const a = dc2Num(r.area), b = dc2Num(r.seats); return b ? (a / b).toFixed(1) : '—'; } }
+      ]
+    },
+    investment: {
+      cols: [
+        { k:'name', l:'项目' },
+        { k:'budget', l:'预算' },
+        { k:'spent', l:'已用' },
+        { k:'status', l:'状态', t:'select', opts:['已完成','进行中','未开始','暂停'] }
+      ],
+      auto: [
+        { l:'执行率', fn:function(r){ const b = dc2Num(r.budget), s = dc2Num(r.spent); return b ? (s / b * 100).toFixed(0) + '%' : '—'; } }
+      ]
+    },
+    digital: {
+      cols: [
+        { k:'name', l:'系统' },
+        { k:'func', l:'功能' },
+        { k:'status', l:'状态', t:'select', opts:['已上线','对接中','开发中','未开始'] },
+        { k:'users', l:'覆盖用户' }
+      ],
+      auto: []
+    }
+  }[m.id];
+  if(!cfg) return '';
+
+  const rows = d.table || [];
+  let h = '<div class="dc2-maint-sec"><div class="dc2-maint-sec-title">明细数据</div>'
+    + '<div class="dc2-maint-table"><table><thead><tr>';
+  cfg.cols.forEach(function(c){ h += '<th>' + c.l + '</th>'; });
+  cfg.auto.forEach(function(c){ h += '<th>' + c.l + '</th>'; });
+  if(editable) h += '<th style="width:44px"></th>';
+  h += '</tr></thead><tbody>';
+
+  rows.forEach(function(r, i){
+    h += '<tr>';
+    cfg.cols.forEach(function(c){
+      h += '<td>';
+      if(!editable){
+        h += '<span class="dc2-maint-auto">' + dc2MaintEscape(r[c.k]) + '</span>';
+      } else if(c.t === 'select'){
+        h += '<select data-mrow="' + i + '" data-mcell="' + c.k + '">'
+          + c.opts.map(function(o){ return '<option' + (String(r[c.k]) === o ? ' selected' : '') + '>' + o + '</option>'; }).join('')
+          + '</select>';
+      } else {
+        h += '<input data-mrow="' + i + '" data-mcell="' + c.k + '" type="' + (c.t === 'number' ? 'number' : 'text') + '" value="' + dc2MaintEscape(r[c.k]) + '">';
+      }
+      h += '</td>';
+    });
+    cfg.auto.forEach(function(c){ h += '<td><span class="dc2-maint-auto">' + c.fn(r) + '</span></td>'; });
+    if(editable) h += '<td><button class="dc2-maint-del" onclick="dc2MaintDelRow(' + i + ')" title="删除">' + DC2_ICON.trash + '</button></td>';
+    h += '</tr>';
+  });
+
+  h += '</tbody></table></div>';
+  if(editable) h += '<button class="dc2-maint-add" onclick="dc2MaintAddRow()">＋ 新增一行</button>';
+  h += '</div>';
+  return h;
+}
+
+function dc2MaintTravelTable(d, editable){
+  const rows = (d.trend && d.trend.monthly) || [];
+  let h = '<div class="dc2-maint-sec"><div class="dc2-maint-sec-title">月度费用（元）</div>'
+    + '<div class="dc2-maint-table"><table><thead><tr>'
+    + '<th>月份</th><th>费用（元）</th><th>同比</th><th>环比</th></tr></thead><tbody>';
+  rows.forEach(function(r, i){
+    h += '<tr><td><span class="dc2-maint-auto">' + (r.month || '') + '</span></td>';
+    h += '<td>' + (editable
+      ? '<input data-mmonth="' + i + '" type="number" value="' + dc2MaintEscape(r.amount) + '">'
+      : '<span class="dc2-maint-auto">¥' + Number(r.amount || 0).toLocaleString() + '</span>') + '</td>';
+    h += '<td><span class="dc2-maint-auto">' + (r.yoy >= 0 ? '+' : '') + r.yoy + '%</span></td>';
+    h += '<td><span class="dc2-maint-auto">' + (r.mom >= 0 ? '+' : '') + r.mom + '%</span></td></tr>';
+  });
+  h += '</tbody></table></div></div>';
+  return h;
+}
+
+function dc2MaintAddRow(){
+  const d = window._maintDraft;
+  if(!d) return;
+  d.table = d.table || [];
+  if(d.id === 'workplace') d.table.push({ name:'新职场', area:'0㎡', seats:0, people:0, util:'0%' });
+  else if(d.id === 'investment') d.table.push({ name:'新项目', budget:'¥0万', spent:'¥0万', rate:'0%', status:'未开始' });
+  else if(d.id === 'digital') d.table.push({ name:'新系统', func:'', status:'未开始', users:'—' });
+  renderP32();
+}
+function dc2MaintDelRow(i){
+  const d = window._maintDraft;
+  if(!d || !d.table) return;
+  d.table.splice(i, 1);
+  renderP32();
+}
+function dc2MaintSetKpi(m, re, val){
+  const k = (m.kpis || []).find(function(x){ return re.test(x.label || ''); });
+  if(k) k.val = val;
+}
+function dc2MaintRecalc(m){
+  const rows = m.table || [];
+  const num = function(v){ const n = parseFloat(String(v == null ? '' : v).replace(/[^\d.]/g, '')); return isFinite(n) ? n : 0; };
+  if(m.id === 'workplace'){
+    const seats = rows.reduce(function(a, r){ return a + num(r.seats); }, 0);
+    const people = rows.reduce(function(a, r){ return a + num(r.people); }, 0);
+    const area = rows.reduce(function(a, r){ return a + num(r.area); }, 0);
+    dc2MaintSetKpi(m, /职场数量/, String(rows.length));
+    dc2MaintSetKpi(m, /工位数/, String(seats));
+    dc2MaintSetKpi(m, /入驻人数/, String(people));
+    dc2MaintSetKpi(m, /总面积/, area.toLocaleString() + '㎡');
+  } else if(m.id === 'investment'){
+    const b = rows.reduce(function(a, r){ return a + num(r.budget); }, 0);
+    const s = rows.reduce(function(a, r){ return a + num(r.spent); }, 0);
+    dc2MaintSetKpi(m, /总预算/, '¥' + b + '万');
+    dc2MaintSetKpi(m, /实际支出/, '¥' + s + '万');
+    dc2MaintSetKpi(m, /执行率/, (b ? (s / b * 100).toFixed(1) : '0') + '%');
+    dc2MaintSetKpi(m, /剩余/, '¥' + (b - s) + '万');
+  } else if(m.id === 'travel'){
+    // 总费用 = 四类场景之和（月度趋势是独立明细，不参与总额重算）
+    const kv = function(re){ const k = (m.kpis || []).find(function(x){ return re.test(x.label || ''); }); return k ? num(k.val) : 0; };
+    const total = kv(/机票/) + kv(/酒店/) + kv(/火车/) + kv(/用车/);
+    dc2MaintSetKpi(m, /总费用/, '¥' + total.toFixed(1) + '万');
+  }
+}
+function dc2MaintToday(){
+  const dt = new Date();
+  return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+}
+function dc2MaintSave(){
+  const d = window._maintDraft;
+  if(!d) return;
+  const m = (DATA_CENTER.modules || []).find(function(x){ return x.id === d.id; });
+  if(!m) return;
+  m.owner = d.owner;
+  m.source = d.source;
+  if(d.kpis) m.kpis = d.kpis;
+  if(d.table) m.table = d.table;
+  if(d.trend) m.trend = d.trend;
+  m.lastUpdate = dc2MaintToday();
+  dc2MaintRecalc(m);
+  persistDataCenter();
+  window._maintDraft = null;
+  window._maintDraftId = null;
+  window._maintDirty = false;
+  renderP32();
+  if(typeof showToast === 'function') showToast('✓ 已保存，并按明细重算指标');
+}
+function dc2MaintReset(){
+  window._maintDraft = null;
+  window._maintDraftId = null;
+  window._maintDirty = false;
+  renderP32();
+  if(typeof showToast === 'function') showToast('已重置为上次保存的数据');
+}
+
+function dc2MaintMarkDirty(){
+  // 仅当维护工作台正在显示时才记录脏状态
+  if(!document.querySelector('#p32 .dc2-maint-panel')) return;
+  window._maintDirty = true;
+  const hint = document.querySelector('#p32 .dc2-maint-hint');
+  if(hint){
+    hint.textContent = '● 有未保存的修改，点击「保存」生效';
+    hint.classList.add('is-dirty');
+  }
+}
+document.addEventListener('input', function(e){
+  const t = e.target;
+  if(!t || !window._maintDraft) return;
+  dc2MaintMarkDirty();
+  if(t.dataset.mfield){ window._maintDraft[t.dataset.mfield] = t.value; return; }
+  if(t.dataset.mkpi != null && t.dataset.mkpi !== ''){
+    const i = parseInt(t.dataset.mkpi, 10);
+    if(window._maintDraft.kpis && window._maintDraft.kpis[i]) window._maintDraft.kpis[i].val = t.value;
+    return;
+  }
+  if(t.dataset.mrow != null && t.dataset.mrow !== ''){
+    const i = parseInt(t.dataset.mrow, 10);
+    const k = t.dataset.mcell;
+    if(window._maintDraft.table && window._maintDraft.table[i]) window._maintDraft.table[i][k] = t.value;
+    return;
+  }
+  if(t.dataset.mmonth != null && t.dataset.mmonth !== ''){
+    const i = parseInt(t.dataset.mmonth, 10);
+    if(window._maintDraft.trend && window._maintDraft.trend.monthly && window._maintDraft.trend.monthly[i]){
+      window._maintDraft.trend.monthly[i].amount = parseFloat(t.value) || 0;
+    }
+  }
+});
+document.addEventListener('change', function(e){
+  const t = e.target;
+  if(!t || !window._maintDraft || t.tagName !== 'SELECT') return;
+  dc2MaintMarkDirty();
+  if(t.dataset.mrow != null && t.dataset.mrow !== ''){
+    const i = parseInt(t.dataset.mrow, 10);
+    const k = t.dataset.mcell;
+    if(window._maintDraft.table && window._maintDraft.table[i]) window._maintDraft.table[i][k] = t.value;
+  }
+});
 
 function dc2OpenActivity(id){
   const acts = window._dc2Activities || [];
