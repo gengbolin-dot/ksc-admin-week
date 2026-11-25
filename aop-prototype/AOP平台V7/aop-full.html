@@ -15896,7 +15896,6 @@ function dc2RenderModule(m){
 
   if(m.id === 'service'){
     const weekly = (m.weeklyHistory || []).slice().reverse();
-    h += dc2ModChart('周度工单趋势', '创建工单 / 人工 / 机器人拦截', dc2Line(weekly.map(function(w){ return {label:w.week, value:w.total, display:w.total + ' 单'}; }), brand));
     h += dc2ModTable(
       th([{name:'周次'},{name:'日期区间'},{name:'创建工单',cls:'num'},{name:'人工工单',cls:'num'},{name:'机器人拦截',cls:'num'},{name:'满意度',cls:'num'}]),
       weekly.map(function(w){ return '<tr>' + td(w.week) + td(w.date) + td(w.total, 'num') + td(w.manual, 'num') + td(w.bot, 'num') + td((w.satisfaction||0) + '%', 'num') + '</tr>'; }).join('')
@@ -15923,14 +15922,12 @@ function dc2RenderModule(m){
     );
   } else if(m.id === 'travel'){
     const monthly = (m.trend && m.trend.monthly) || [];
-    h += dc2ModChart('月度差旅费用', '单位：万元', dc2Bars(monthly.map(function(x){ return {label:x.month.slice(5) + '月', value:Math.round(x.amount/10000), display:Math.round(x.amount/10000) + '万'}; }), brand));
     h += dc2ModTable(
       th([{name:'月份'},{name:'费用（元）',cls:'num'},{name:'同比',cls:'num'},{name:'环比',cls:'num'}]),
       monthly.map(function(x){ return '<tr>' + td(x.month) + td('¥' + x.amount.toLocaleString(), 'num') + td(x.yoy + '%', 'num') + td(x.mom + '%', 'num') + '</tr>'; }).join('')
     );
   } else if(m.id === 'investment'){
     const rows = m.table || [];
-    h += dc2ModChart('项目预算执行率', '实际支出 ÷ 预算', dc2Ranks(rows.map(function(r){ return {label:r.name, value:parseFloat(r.rate)||0, display:r.rate}; }), brand));
     h += dc2ModTable(
       th([{name:'项目',cls:'col-name'},{name:'预算',cls:'col-num'},{name:'已用',cls:'col-num'},{name:'执行率',cls:'col-pct'},{name:'状态',cls:'col-status'}]),
       rows.map(function(r){ return '<tr>' + td(r.name, 'col-name') + td(r.budget, 'num') + td(r.spent, 'num') + '<td class="col-pct">' + dc2PctCell(r.rate) + '</td>' + '<td class="col-status">' + dc2Chip(r.status) + '</td>' + '</tr>'; }).join('')
