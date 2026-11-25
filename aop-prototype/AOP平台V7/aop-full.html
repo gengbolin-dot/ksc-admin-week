@@ -15258,26 +15258,63 @@ function dc2Name(m){
   return map[m.id] || m.title || '';
 }
 
+/* 活动数据：全站唯一数据源（P09 员工体验表 / P32 重点活动台账共用同一份） */
+function dc2NormalizeActivity(a, i){
+  const name = (a && a.name) || '';
+  const typeMap = (n) => /家庭日/.test(n) ? '家庭日' : /生日/.test(n) ? '生日会' : /端午|中秋|六一/.test(n) ? '节日关怀' : /大赛|团建/.test(n) ? '竞赛团建' : '其他';
+  const desc = (a && (a.desc || a.note)) || '';
+  return {
+    id: a && a.id != null ? a.id : (9100 + i),
+    name: name,
+    date: (a && a.date) || '',
+    type: (a && a.type) || typeMap(name),
+    city: (a && a.city) || '全员',
+    people: a && a.people != null ? a.people : 0,
+    satisfaction: a && a.satisfaction != null ? a.satisfaction : '—',
+    surveys: a && a.surveys != null ? a.surveys : Math.round(((a && a.people) || 0) * 0.42),
+    desc: desc,
+    note: desc
+  };
+}
+function dc2BindActivities(){
+  const empMod = (DATA_CENTER.modules || []).find(m => m.id === 'employee');
+  if(empMod) empMod.activities = window._dc2Activities || [];
+  return window._dc2Activities || [];
+}
 function dc2LoadActivities(){
+  let list = null;
   try{
     const raw = localStorage.getItem(DC2_LS_KEY);
-    if(raw){ window._dc2Activities = JSON.parse(raw); return; }
+    if(raw){ const parsed = JSON.parse(raw); if(Array.isArray(parsed)) list = parsed; }
   }catch(e){}
-  // 默认从员工体验模块的活动数据初始化
-  const emp = (DATA_CENTER.modules || []).find(m => m.id === 'employee');
-  const acts = (emp && emp.activities) || [];
-  const typeMap = (name) => /家庭日/.test(name) ? '家庭日' : /生日/.test(name) ? '生日会' : /端午|中秋|六一/.test(name) ? '节日关怀' : /大赛|团建/.test(name) ? '竞赛团建' : '其他';
-  window._dc2Activities = acts.map((a, i) => ({
-    id: 9100 + i,
-    name: a.name,
-    date: '2026-' + String(9 - i).padStart(2, '0') + '-15',
-    type: typeMap(a.name),
-    people: a.people,
-    satisfaction: a.satisfaction,
-    surveys: Math.round(a.people * 0.42),
-    note: a.desc || ''
-  }));
+  // 兼容旧版：首次迁移时读取数据中心快照里的员工体验活动
+  if(!list){
+    try{
+      const legacy = JSON.parse(localStorage.getItem('aop_data_center_v1') || '[]');
+      if(Array.isArray(legacy)){
+        const lm = legacy.find(x => x && x.id === 'employee');
+        if(lm && Array.isArray(lm.activities) && lm.activities.length) list = lm.activities;
+      }
+    }catch(e){}
+  }
+  if(!list){
+    const emp = (DATA_CENTER.modules || []).find(m => m.id === 'employee');
+    list = (emp && emp.activities) || [];
+  }
+  window._dc2Activities = list.map(dc2NormalizeActivity);
+  dc2BindActivities();
   dc2SaveActivities();
+}
+function dc2EnsureActivities(){
+  if(!window._dc2Activities) dc2LoadActivities();
+  return dc2BindActivities();
+}
+/* 两页共用一份活动数据：任一页改动后，已渲染的另一个视图同步刷新 */
+function dc2RefreshP32(){
+  if(window._p32Rendered){ try{ renderP32(); }catch(e){ console.warn('renderP32', e); } }
+}
+function dc2RefreshP09(){
+  if(window._p09Rendered){ try{ renderP09(); }catch(e){ console.warn('renderP09', e); } }
 }
 function dc2SaveActivities(){
   try{ localStorage.setItem(DC2_LS_KEY, JSON.stringify(window._dc2Activities || [])); }catch(e){}
@@ -15366,7 +15403,7 @@ function dc2Kpi(label, value, unit, color, foot){
 function renderP32(){
   const el = document.getElementById('dc2Scroll');
   if(!el) return;
-  if(!window._dc2Activities) dc2LoadActivities();
+  dc2EnsureActivities();
   const mods = (DATA_CENTER.modules || []).filter(m => ['service','workplace','employee','travel','investment','digital'].indexOf(m.id) !== -1);
 
   let h = '';
@@ -16279,19 +16316,23 @@ function dc2SaveActivity(id){
   const name = (document.getElementById('dc2ActName').value || '').trim();
   if(!name){ alert('请输入活动名称'); return; }
   const sat = (document.getElementById('dc2ActSat').value || '').trim();
+  const noteText = (document.getElementById('dc2ActNote').value || '').trim();
+  const acts = window._dc2Activities || (window._dc2Activities = []);
+  const current = id ? acts.find(a => String(a.id) === String(id)) : null;
   const data = {
     name: name,
     date: document.getElementById('dc2ActDate').value || '',
     type: document.getElementById('dc2ActType').value || '其他',
+    // 城市 / 活动描述由 P09 员工体验表维护，这里保持原值
+    city: current && current.city ? current.city : '全员',
     people: parseInt(document.getElementById('dc2ActPeople').value, 10) || 0,
     satisfaction: sat ? sat + '%' : '—',
     surveys: parseInt(document.getElementById('dc2ActSurveys').value, 10) || 0,
-    note: (document.getElementById('dc2ActNote').value || '').trim()
+    note: noteText,
+    desc: noteText
   };
-  const acts = window._dc2Activities || (window._dc2Activities = []);
   if(id){
-    const target = acts.find(a => String(a.id) === String(id));
-    if(target) Object.assign(target, data);
+    if(current) Object.assign(current, data);
   } else {
     data.id = 'act_' + Date.now();
     acts.push(data);
@@ -16299,13 +16340,17 @@ function dc2SaveActivity(id){
   dc2SaveActivities();
   dc2CloseModal();
   renderP32();
+  dc2RefreshP09();
   if(typeof showToast === 'function') showToast('✓ 已保存「' + name + '」');
 }
 function dc2DeleteActivity(id){
   if(!confirm('确定删除该活动吗？删除后不再参与员工体验看板统计。')) return;
-  window._dc2Activities = (window._dc2Activities || []).filter(a => String(a.id) !== String(id));
+  const acts = window._dc2Activities || (window._dc2Activities = []);
+  const idx = acts.findIndex(a => String(a.id) === String(id));
+  if(idx >= 0) acts.splice(idx, 1);
   dc2SaveActivities();
   renderP32();
+  dc2RefreshP09();
   if(typeof showToast === 'function') showToast('✓ 已删除');
 }
 
@@ -16317,6 +16362,7 @@ function renderP09(){
     try{ loadDataCenter(); loadArchiveManual(); }catch(e){ console.warn(e); }
     window._p09DataLoaded = true;
   }
+  dc2EnsureActivities();
   const data = DATA_CENTER;
   if(!data || !data.modules) {
     el.innerHTML = '<div style="padding:24px;color:var(--dan)">数据加载失败</div>';
@@ -16911,7 +16957,7 @@ function saveDataCenterEdit(moduleId, btn){
 function persistDataCenter(){
   try{
     const snapshot = DATA_CENTER.modules.map(m=>{
-      const o = {id:m.id, owner:m.owner, lastUpdate:m.lastUpdate, source:m.source, kpis:m.kpis, table:m.table, activities:m.activities, cities:m.cities, weeklyHistory:m.weeklyHistory};
+      const o = {id:m.id, owner:m.owner, lastUpdate:m.lastUpdate, source:m.source, kpis:m.kpis, table:m.table, cities:m.cities, weeklyHistory:m.weeklyHistory};
       return o;
     });
     localStorage.setItem('aop_data_center_v1', JSON.stringify(snapshot));
@@ -16953,7 +16999,7 @@ function loadDataCenter(){
     saved.forEach(s=>{
       const mod = DATA_CENTER.modules.find(m=>m.id===s.id);
       if(!mod) return;
-      ['owner','lastUpdate','source','kpis','table','activities','cities','weeklyHistory'].forEach(k=>{
+      ['owner','lastUpdate','source','kpis','table','cities','weeklyHistory'].forEach(k=>{
         if(s[k]!==undefined && s[k]!==null) mod[k] = s[k];
       });
     });
@@ -17080,12 +17126,17 @@ document.addEventListener('click', function(e){
       if(modId === 'employee'){
         const empMod = DATA_CENTER.modules.find(m => m.id === 'employee');
         if(empMod && empMod.activities && empMod.activities[rowIdx]){
+          const rec = empMod.activities[rowIdx];
           if(field === 'people'){
-            empMod.activities[rowIdx][field] = parseInt(newVal) || 0;
+            rec[field] = parseInt(newVal) || 0;
           } else {
-            empMod.activities[rowIdx][field] = newVal;
+            rec[field] = newVal;
           }
+          // 活动描述与台账备注是同一字段
+          if(field === 'desc') rec.note = newVal;
           e.target.textContent = newVal;
+          dc2SaveActivities();
+          dc2RefreshP32();
         }
       }
       if(modId === 'investment'){
@@ -17131,21 +17182,23 @@ document.addEventListener('click', function(e){
 
 // ══════ ACTIVITY TABLE EDITING ══════
 function deleteActivity(rowIdx){
-  const empMod = DATA_CENTER.modules.find(m => m.id === 'employee');
-  if(!empMod || !empMod.activities) return;
+  const acts = dc2EnsureActivities();
+  if(!acts.length) return;
   if(!confirm('确定删除此活动？')) return;
-  empMod.activities.splice(rowIdx, 1);
+  acts.splice(rowIdx, 1);
+  dc2SaveActivities();
   persistDataCenter();
   renderP09();
+  dc2RefreshP32();
 }
 
 function addActivity(){
-  const empMod = DATA_CENTER.modules.find(m => m.id === 'employee');
-  if(!empMod) return;
-  if(!empMod.activities) empMod.activities = [];
-  empMod.activities.push({name:'新活动',city:'全员',people:0,satisfaction:'—',desc:'点击编辑描述'});
+  const acts = dc2EnsureActivities();
+  acts.push({ id:'act_' + Date.now(), name:'新活动', date:'', type:'其他', city:'全员', people:0, satisfaction:'—', surveys:0, desc:'点击编辑描述', note:'点击编辑描述' });
+  dc2SaveActivities();
   persistDataCenter();
   renderP09();
+  dc2RefreshP32();
 }
 
 // ══════ INVESTMENT TABLE EDITING ══════
