@@ -15319,6 +15319,33 @@ function dc2Bars(data, color){
       + '<span class="dc2-bar-lbl">' + d.label + '</span></div>';
   }).join('') + '</div>';
 }
+/* 差旅运营：月度费用柱状图（数值直读 + 悬停同比/环比） */
+function dc2TravelBars(monthly, color){
+  if(!monthly || !monthly.length) return '<div class="dc2-empty">暂无数据</div>';
+  const max = Math.max.apply(null, monthly.map(function(d){ return d.amount || 0; })) || 1;
+  let s = '<div class="dc2-tbar" style="--ac:' + color + '"><div class="dc2-tbar-plot">';
+  s += '<div class="dc2-tbar-grid">' + '<i></i>'.repeat(5) + '</div>';
+  s += '<div class="dc2-tbar-cols">';
+  monthly.forEach(function(d, i){
+    const v = d.amount || 0;
+    const h = Math.max(4, v / max * 176);
+    const last = i === monthly.length - 1;
+    const sign = function(x){ return (x >= 0 ? '+' : '') + x; };
+    const tip = d.month + ' · ¥' + Number(v).toLocaleString() + ' · 同比 ' + sign(d.yoy) + '% · 环比 ' + sign(d.mom) + '%';
+    s += '<div class="dc2-tbar-col" title="' + tip + '">'
+      + '<span class="dc2-tbar-val">' + (v / 10000).toFixed(1) + '</span>'
+      + '<span class="dc2-tbar-fill' + (last ? ' is-last' : '') + '" style="height:' + h.toFixed(1) + 'px"></span>'
+      + '</div>';
+  });
+  s += '</div></div>';
+  s += '<div class="dc2-tbar-lbls">';
+  monthly.forEach(function(d){
+    s += '<span>' + Number(String(d.month).split('-')[1]) + '月</span>';
+  });
+  s += '</div></div>';
+  return s;
+}
+
 function dc2Ranks(data, color){
   const max = Math.max.apply(null, data.map(d => d.value)) || 1;
   return '<div class="dc2-ranks">' + data.map(d => {
@@ -15922,10 +15949,7 @@ function dc2RenderModule(m){
     );
   } else if(m.id === 'travel'){
     const monthly = (m.trend && m.trend.monthly) || [];
-    h += dc2ModTable(
-      th([{name:'月份'},{name:'费用（元）',cls:'num'},{name:'同比',cls:'num'},{name:'环比',cls:'num'}]),
-      monthly.map(function(x){ return '<tr>' + td(x.month) + td('¥' + x.amount.toLocaleString(), 'num') + td(x.yoy + '%', 'num') + td(x.mom + '%', 'num') + '</tr>'; }).join('')
-    );
+    h += dc2ModChart('月度费用趋势', '单位：万元 · 悬停查看当月同比 / 环比', dc2TravelBars(monthly, brand));
   } else if(m.id === 'investment'){
     const rows = m.table || [];
     h += dc2ModTable(

@@ -261,6 +261,24 @@
 #p32 .dc2-bar-val{font-size:10px;color:#6b7086;font-weight:600;white-space:nowrap}
 #p32 .dc2-bar-lbl{font-size:10px;color:#a6abbd;white-space:nowrap}
 
+/* 差旅运营：月度费用柱状图 */
+#p32 .dc2-tbar{display:flex;flex-direction:column;margin-top:4px}
+#p32 .dc2-tbar-plot{position:relative;height:214px}
+#p32 .dc2-tbar-grid{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+#p32 .dc2-tbar-grid i{display:block;height:0;border-top:1px dashed #eef0f7}
+#p32 .dc2-tbar-cols{position:absolute;inset:0;display:flex;align-items:flex-end;gap:12px;padding:0 4px}
+#p32 .dc2-tbar-col{flex:1 1 0;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;cursor:default}
+#p32 .dc2-tbar-val{font-size:11px;font-weight:600;color:#3b4059;margin-bottom:7px;font-variant-numeric:tabular-nums;white-space:nowrap}
+#p32 .dc2-tbar-fill{
+  display:block;width:100%;max-width:56px;min-height:4px;border-radius:6px 6px 2px 2px;
+  background:linear-gradient(180deg,var(--ac,#5d53d2),color-mix(in srgb,var(--ac,#5d53d2) 58%,#fff));
+  opacity:.62;transition:height .7s cubic-bezier(.22,.61,.36,1),opacity .18s ease;
+}
+#p32 .dc2-tbar-fill.is-last{opacity:1;box-shadow:0 6px 16px color-mix(in srgb,var(--ac,#5d53d2) 28%,transparent)}
+#p32 .dc2-tbar-col:hover .dc2-tbar-fill{opacity:1}
+#p32 .dc2-tbar-lbls{display:flex;gap:12px;padding:9px 4px 0;border-top:1px solid #e6e9ef}
+#p32 .dc2-tbar-lbls span{flex:1 1 0;min-width:0;text-align:center;font-size:10.5px;color:#a6abbd;white-space:nowrap}
+
 /* 横向排行 */
 #p32 .dc2-ranks{display:flex;flex-direction:column;gap:12px;margin-top:6px}
 #p32 .dc2-rank{display:grid;grid-template-columns:96px 1fr 46px;align-items:center;gap:10px}
