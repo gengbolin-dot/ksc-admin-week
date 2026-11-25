@@ -1320,7 +1320,7 @@ body{font-family:Poppins,Arial,'PingFang SC','Noto Sans SC','Microsoft YaHei',sa
 /* Progress bar */
 .p09-pct-cell{display:inline-flex;align-items:center;gap:10px;justify-content:flex-end;width:100%}
 .p09-pct-track{width:56px;height:5px;border-radius:1.5rem;background:#E6E9EF;overflow:hidden;flex-shrink:0}
-.p09-pct-fill{height:100%;border-radius:1.5rem;transition:width .5s ease}
+.p09-pct-fill{display:block;height:100%;border-radius:1.5rem;transition:width .5s ease}
 .p09-pct-num{font-weight:500;font-variant-numeric:tabular-nums;font-size:13px;min-width:34px;text-align:right}
 /* 状态徽章 */
 .p09-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:1.5rem;font-size:12px;font-weight:500;line-height:1.5;white-space:nowrap}
@@ -5320,7 +5320,7 @@ tr:hover .p09-del-btn{opacity:1}
 .p09-tbl thead th.col-eff{text-align:right}
 .eff-cell{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end;width:100%}
 .eff-bar{width:52px;height:6px;border-radius:100px;background:#f2f4f9;overflow:hidden;flex:0 0 auto}
-.eff-fill{height:100%;border-radius:100px;transition:width .45s cubic-bezier(.515,.147,.25,1)}
+.eff-fill{display:block;height:100%;border-radius:100px;transition:width .45s cubic-bezier(.515,.147,.25,1)}
 .eff-val{font-size:12.5px;color:#323338;font-variant-numeric:tabular-nums;min-width:34px;text-align:right}
 
 /* 职场三维对比 */
@@ -15438,6 +15438,7 @@ function renderP32(){
 
   el.innerHTML = h;
   requestAnimationFrame(dc2CountUp);
+  requestAnimationFrame(dc2PlayMotion);
 }
 
 function dc2SetYear(y){
@@ -15714,6 +15715,57 @@ function dc2EntryTile(o){
     + '<div class="dc2-entry-info"><div class="dc2-entry-title">' + o.title + '</div><div class="dc2-entry-src">' + o.src + '</div></div>'
     + '<span class="dc2-entry-go">' + DC2_ICON.arrow + '</span>'
     + '</div>';
+}
+
+/* 渲染后统一触发：柱/条生长、折线描边、表格错峰、卡片微交互 */
+function dc2PlayMotion(){
+  const root = document.getElementById('dc2Scroll');
+  if(!root) return;
+  const reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  const growY = [].slice.call(root.querySelectorAll('.dc2-bar-track, .dc2-tbar-fill, .dc2-mini-bar, .dc2-kpi-spark i, .pz-col-bar'));
+  const growX = [].slice.call(root.querySelectorAll('.dc2-rank-fill, .dc2-dual-fill, .dc2-prog-fill, .dc2-trend-dual-track > span, .dc2-stack > i, .dc2-vstack > i, .p09-pct-fill, .eff-fill, .pz-bar-fill, .pz-row-fill, .pz-seg-part'));
+
+  const apply = function(el, cls, i){
+    if(reduce) return;
+    const vertical = cls === 'dc2-grow-y';
+    try{
+      el.animate(
+        [{ transform: vertical ? 'scaleY(.001)' : 'scaleX(.001)' }, { transform: 'none' }],
+        {
+          duration: vertical ? 760 : 820,
+          delay: Math.min(i * 22, 260),
+          easing: 'cubic-bezier(.22,.61,.36,1)',
+          fill: 'both'
+        }
+      );
+    }catch(e){}
+  };
+  growY.forEach(function(el, i){ apply(el, 'dc2-grow-y', i); });
+  growX.forEach(function(el, i){ apply(el, 'dc2-grow-x', i); });
+
+  // 折线：描边生长 + 面积淡入
+  [].slice.call(root.querySelectorAll('.dc2-trend-svg')).forEach(function(svg, i){
+    svg.classList.add('dc2-on');
+    const path = svg.querySelector('path[stroke]');
+    if(!path || reduce) return;
+    try{
+      const len = path.getTotalLength();
+      path.style.strokeDasharray = len;
+      path.style.strokeDashoffset = len;
+      path.style.transition = 'stroke-dashoffset 1.05s cubic-bezier(.22,.61,.36,1) ' + Math.min(i * 80, 240) + 'ms';
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ path.style.strokeDashoffset = 0; });
+      });
+    }catch(e){}
+  });
+
+  // 表格行错峰淡入（最多 12 行，避免长表拖沓）
+  [].slice.call(root.querySelectorAll('.p09-tbl tbody tr, .dc2-table tbody tr')).forEach(function(tr, i){
+    if(i > 11) return;
+    tr.classList.add('dc2-row-in');
+    tr.style.animationDelay = Math.min(i * 32, 320) + 'ms';
+  });
 }
 
 function dc2CountUp(){

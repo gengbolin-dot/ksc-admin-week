@@ -584,3 +584,48 @@
   #p32 .dc2-mods{grid-template-columns:1fr}
   #p32 .dc2-modal-body{grid-template-columns:1fr}
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   动效：图表生长 / 折线描边 / 表格错峰 / 卡片微交互
+   （统一由 dc2PlayMotion() 在渲染后触发，prefers-reduced-motion 下自动降级）
+   ══════════════════════════════════════════════════════════════════ */
+/* 图表生长动画由 dc2PlayMotion() 通过 Web Animations API 驱动 */
+
+/* 迷你柱 / KPI 迷你走势：补上生长过渡 */
+#p32 .dc2-mini-bar{transition:transform .78s cubic-bezier(.22,.61,.36,1),opacity .2s}
+#p32 .dc2-kpi-spark i{transition:transform .7s cubic-bezier(.22,.61,.36,1),opacity .2s}
+
+/* 表格行错峰淡入 */
+#p32 .dc2-row-in{animation:dc2RowIn .46s cubic-bezier(.22,.61,.36,1) both}
+@keyframes dc2RowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* 折线：面积淡入 */
+#p32 .dc2-trend-svg path[fill^="url"]{opacity:0;transition:opacity .9s ease .18s}
+#p32 .dc2-trend-svg.dc2-on path[fill^="url"]{opacity:1}
+
+/* KPI 卡片：图标微动 + 顶部色条流光 */
+#p32 .dc2-kpi .dc2-kpi-ico{transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .28s}
+#p32 .dc2-kpi:hover .dc2-kpi-ico{transform:translateY(-1px) scale(1.08) rotate(-4deg)}
+#p32 .dc2-kpi::before{background-size:200% 100%;transition:background-position .6s ease}
+#p32 .dc2-kpi:hover::before{background-position:100% 0}
+
+/* 板块 / 摘要 / 入口：图标微动 */
+#p32 .dc2-group-icon,
+#p32 .dc2-sum-icon,
+#p32 .dc2-mod-icon{transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .28s}
+#p32 .dc2-group:hover .dc2-group-icon,
+#p32 .dc2-sum-card:hover .dc2-sum-icon,
+#p32 .dc2-mod:hover .dc2-mod-icon{transform:translateY(-1px) scale(1.06)}
+
+/* P09 复用组件：满意度柱 / 环形图入场 */
+#p32 .pz-col-bar{transition:transform .75s cubic-bezier(.22,.61,.36,1),height .7s cubic-bezier(.22,.61,.36,1),filter .18s ease}
+#p32 .pz-ring svg,
+#p32 .pz-gauge-ring svg{transform-origin:center;animation:dc2RingIn .85s cubic-bezier(.22,.61,.36,1) both}
+#p32 .pz-ring svg{animation-delay:.06s}
+#p32 .pz-gauge:nth-child(2n) .pz-gauge-ring svg{animation-delay:.06s}
+#p32 .pz-gauge:nth-child(3n) .pz-gauge-ring svg{animation-delay:.12s}
+@keyframes dc2RingIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:none}}
+
+/* 视图切换：内容整体上浮 */
+#p32 .dc2-body{animation:dc2FadeUp .44s cubic-bezier(.22,.61,.36,1) both}
+@keyframes dc2FadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
