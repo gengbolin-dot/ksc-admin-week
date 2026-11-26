@@ -15200,7 +15200,7 @@ function syncArchiveData(arcMod){
   (arcMod.sections||[]).forEach(sec=>{
     if(sec.title==='活动档案' && emp){
       let actTotal=0,people=0,bj=0,wh=0;
-      (emp.cities||[]).forEach(c=>{actTotal+=c.events||0;people+=c.people||0;if((c.name||'').includes('北京'))bj=c.events||0;if((c.name||'').includes('武汉'))wh=c.events||0;});
+      dc2CityStats(emp.activities||[]).forEach(c=>{actTotal+=c.events||0;people+=c.people||0;if((c.name||'').includes('北京'))bj=c.events||0;if((c.name||'').includes('武汉'))wh=c.events||0;});
       const sat=(emp.activities||[]).filter(a=>a.satisfaction&&a.satisfaction!=='—').length;
       const map={'全年活动数量':actTotal+'场','北京活动数量':bj+'场','武汉活动数量':wh+'场','累计参与人数':people+'人','有满意度调研活动':sat+'场'};
       (sec.items||[]).forEach(it=>{if(map[it.label]!==undefined)it.val=map[it.label];});
@@ -15259,59 +15259,38 @@ function dc2Name(m){
 }
 
 /* 活动数据：全站唯一数据源（P09 员工体验表 / P32 重点活动台账共用同一份） */
-/* 重点活动类型体系：分组 + 每类采集维度 */
-const DC2_ACTIVITY_TYPE_GROUPS = [
-  { group:'文化运营', color:'#5d53d2', types:[
-    { key:'家庭日',   dims:['参与人数','满意度','有效问卷'] },
-    { key:'生日会',   dims:['参与人数','满意度'] },
-    { key:'节日关怀', dims:['参与人数','满意度','礼品份数'] },
-    { key:'团建拓展', dims:['参与人数','满意度'] },
-    { key:'竞赛赛事', dims:['报名数','参与人数','满意度'] },
-    { key:'文化公益', dims:['参与人次','志愿时长'] }
-  ]},
-  { group:'员工福利', color:'#e0a800', types:[
-    { key:'福利发放', dims:['覆盖人数','发放份数','满意度'] },
-    { key:'健康关怀', dims:['参与人数','满意度'] },
-    { key:'餐饮茶歇', dims:['覆盖人次','满意度'] }
-  ]},
-  { group:'组织建设', color:'#3ea4fb', types:[
-    { key:'全员大会', dims:['参与人数','满意度'] },
-    { key:'培训讲座', dims:['参与人数','满意度','课时'] },
-    { key:'入职/周年', dims:['参与人数'] }
-  ]},
-  { group:'其他', color:'#8b90a6', types:[
-    { key:'其他', dims:['参与人数'] }
-  ]}
-];
-const DC2_ACTIVITY_TYPE_META = {};
-DC2_ACTIVITY_TYPE_GROUPS.forEach(function(g){
-  g.types.forEach(function(x){ DC2_ACTIVITY_TYPE_META[x.key] = { group:g.group, color:g.color, dims:x.dims }; });
-});
-const DC2_ACTIVITY_TYPES = Object.keys(DC2_ACTIVITY_TYPE_META);
-// 兼容历史类型命名
-const DC2_ACTIVITY_LEGACY = { '竞赛团建':'竞赛赛事', '团建':'团建拓展' };
-function dc2NormalizeType(t){
-  const v = DC2_ACTIVITY_LEGACY[t] || t;
-  return DC2_ACTIVITY_TYPE_META[v] ? v : '其他';
+/* 重点活动：城市维度（北京 / 武汉 / 双城） */
+const DC2_ACTIVITY_CITIES = ['北京','武汉','双城'];
+function dc2NormalizeCity(c){
+  const v = String(c == null ? '' : c);
+  if(/北京/.test(v) && /武汉/.test(v)) return '双城';
+  if(/北京/.test(v)) return '北京';
+  if(/武汉/.test(v)) return '武汉';
+  return '双城';
 }
-function dc2ActivityTypeColor(t){
-  const meta = DC2_ACTIVITY_TYPE_META[dc2NormalizeType(t)];
-  return meta ? meta.color : '#8b90a6';
-}
-function dc2ActivityDims(t){
-  const meta = DC2_ACTIVITY_TYPE_META[dc2NormalizeType(t)];
-  return meta ? meta.dims : [];
+/* 按台账活动汇总城市统计（双城单列，不拆分人数） */
+function dc2CityStats(acts){
+  const base = { '北京':{name:'北京',events:0,people:0}, '武汉':{name:'武汉',events:0,people:0}, '双城':{name:'双城',events:0,people:0} };
+  (acts || []).forEach(function(a){
+    const key = dc2NormalizeCity(a && a.city);
+    const row = base[key] || base['双城'];
+    row.events += 1;
+    row.people += Number(a && a.people) || 0;
+  });
+  const totalEvents = DC2_ACTIVITY_CITIES.reduce(function(sum, k){ return sum + base[k].events; }, 0) || 1;
+  return DC2_ACTIVITY_CITIES.map(function(k){
+    return { name:base[k].name, events:base[k].events, people:base[k].people, pct: Math.round(base[k].events / totalEvents * 100) };
+  }).filter(function(x){ return x.events > 0; });
 }
 function dc2NormalizeActivity(a, i){
   const name = (a && a.name) || '';
-  const typeMap = (n) => /家庭日/.test(n) ? '家庭日' : /生日/.test(n) ? '生日会' : /端午|中秋|六一|节日/.test(n) ? '节日关怀' : /大赛|竞赛/.test(n) ? '竞赛赛事' : /团建/.test(n) ? '团建拓展' : /公益/.test(n) ? '文化公益' : /体检|健康/.test(n) ? '健康关怀' : /大会/.test(n) ? '全员大会' : /培训|讲座/.test(n) ? '培训讲座' : '其他';
   const desc = (a && (a.desc || a.note)) || '';
   return {
     id: a && a.id != null ? a.id : (9100 + i),
     name: name,
     date: (a && a.date) || '',
-    type: dc2NormalizeType((a && a.type) || typeMap(name)),
-    city: (a && a.city) || '全员',
+    city: dc2NormalizeCity((a && a.city) || '双城'),
+    theme: (a && a.theme) || '',
     people: a && a.people != null ? a.people : 0,
     satisfaction: a && a.satisfaction != null ? a.satisfaction : '—',
     surveys: a && a.surveys != null ? a.surveys : Math.round(((a && a.people) || 0) * 0.42),
@@ -15854,7 +15833,7 @@ function dc2RenderCockpit(mods){
 
   const empPeople = dc2KpiVal(employee, /参与/);
   const empSat = dc2KpiVal(employee, /满意度/);
-  const empCities = employee.cities || [];
+  const empCities = dc2CityStats(window._dc2Activities || []);
   const bj = empCities.find(c => /北京/.test(c.name)) || {};
   const wh = empCities.find(c => /武汉/.test(c.name)) || {};
   const cityTotal = (bj.people || 0) + (wh.people || 0) || 1;
@@ -16070,7 +16049,7 @@ function dc2RenderModule(m){
     );
   } else if(m.id === 'employee'){
     const acts = window._dc2Activities || [];
-    const cities = m.cities || [];
+    const cities = dc2CityStats(acts);
     if(cities.length){
       h += '<div class="dc2-mod-subtitle">年度城市统计</div>';
       cities.forEach(function(c){
@@ -16078,8 +16057,8 @@ function dc2RenderModule(m){
       });
     }
     h += dc2ModTable(
-      th([{name:'活动名称'},{name:'活动时间'},{name:'类型'},{name:'参与人数',cls:'num'},{name:'满意度',cls:'num'},{name:'有效问卷',cls:'num'}]),
-      acts.map(function(a){ return '<tr>' + td(a.name) + td(a.date) + td(a.type) + td(a.people, 'num') + '<td class="num p09-sat-cell">' + (window.satBarHTML ? window.satBarHTML(a.satisfaction) : (a.satisfaction || '—')) + '</td>' + td(a.surveys || '—', 'num') + '</tr>'; }).join('')
+      th([{name:'活动名称'},{name:'活动时间'},{name:'城市'},{name:'主题'},{name:'参与人数',cls:'num'},{name:'满意度',cls:'num'},{name:'有效问卷',cls:'num'}]),
+      acts.map(function(a){ return '<tr>' + td(a.name) + td(a.date) + td(dc2NormalizeCity(a.city)) + td(a.theme || '—') + td(a.people, 'num') + '<td class="num p09-sat-cell">' + (window.satBarHTML ? window.satBarHTML(a.satisfaction) : (a.satisfaction || '—')) + '</td>' + td(a.surveys || '—', 'num') + '</tr>'; }).join('')
     );
   } else if(m.id === 'travel'){
     const monthly = (m.trend && m.trend.monthly) || [];
@@ -16359,16 +16338,17 @@ function dc2RenderLedger(){
     + '</div>';
   h += '<div class="dc2-ledger-note">仅「已纳入台账」的重点活动参与员工体验看板统计。日常活动无需录入，未纳入统计的活动不会出现在看板中。</div>';
   h += '<div class="dc2-table-wrap"><table class="dc2-table"><thead><tr>'
-    + '<th>活动名称</th><th>活动时间</th><th>类型</th><th>参与人数</th><th>满意度</th><th>有效问卷</th><th>备注</th><th style="text-align:right">操作</th>'
+    + '<th>活动名称</th><th>活动时间</th><th>城市</th><th>主题</th><th>参与人数</th><th>满意度</th><th>有效问卷</th><th>备注</th><th style="text-align:right">操作</th>'
     + '</tr></thead><tbody>';
   if(!acts.length){
-    h += '<tr><td colspan="8"><div class="dc2-empty">暂无重点活动，点击「新增活动」开始录入</div></td></tr>';
+    h += '<tr><td colspan="9"><div class="dc2-empty">暂无重点活动，点击「新增活动」开始录入</div></td></tr>';
   } else {
     acts.forEach(a => {
       h += '<tr>'
         + '<td><b style="color:#181b34;font-weight:600">' + a.name + '</b></td>'
         + '<td class="num">' + (a.date || '—') + '</td>'
-        + '<td><span class="dc2-tag" style="background:' + dc2ActivityTypeColor(a.type) + '18;color:' + dc2ActivityTypeColor(a.type) + '">' + (dc2NormalizeType(a.type) || '其他') + '</span></td>'
+        + '<td><span class="dc2-tag" style="background:#eef0ff;color:#5d53d2">' + dc2NormalizeCity(a.city) + '</span></td>'
+        + '<td style="color:#5b6180;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + (a.theme || '') + '">' + (a.theme || '—') + '</td>'
         + '<td class="num">' + (a.people || '—') + '</td>'
         + '<td class="num">' + (a.satisfaction || '—') + '</td>'
         + '<td class="num">' + (a.surveys || '—') + '</td>'
@@ -16718,14 +16698,10 @@ document.addEventListener('change', function(e){
 function dc2OpenActivity(id){
   const acts = window._dc2Activities || [];
   const act = id ? acts.find(a => String(a.id) === String(id)) : null;
-  const a = act || {name:'', date:'', type:'其他', people:'', satisfaction:'', surveys:'', note:''};
-  const curType = dc2NormalizeType(a.type);
-  const typeOptions = DC2_ACTIVITY_TYPE_GROUPS.map(function(g){
-    return '<optgroup label="' + g.group + '">'
-      + g.types.map(function(x){
-          return '<option value="' + x.key + '"' + (curType === x.key ? ' selected' : '') + '>' + x.key + '</option>';
-        }).join('')
-      + '</optgroup>';
+  const a = act || { name:'', date:'', city:'双城', theme:'', people:'', satisfaction:'', surveys:'', note:'' };
+  const curCity = dc2NormalizeCity(a.city || '双城');
+  const cityOptions = DC2_ACTIVITY_CITIES.map(function(c){
+    return '<option value="' + c + '"' + (curCity === c ? ' selected' : '') + '>' + c + '</option>';
   }).join('');
   const modal = document.getElementById('dc2Modal');
   modal.innerHTML = '<div class="dc2-modal-head"><div class="dc2-modal-title">' + (act ? '编辑重点活动' : '新增重点活动') + '</div>'
@@ -16733,8 +16709,8 @@ function dc2OpenActivity(id){
     + '<div class="dc2-modal-body">'
     + '<div class="dc2-field full"><label>活动名称 *</label><input id="dc2ActName" value="' + (a.name || '') + '" placeholder="如：第十二届家庭日"></div>'
     + '<div class="dc2-field"><label>活动时间</label><input id="dc2ActDate" type="date" value="' + (a.date || '') + '"></div>'
-    + '<div class="dc2-field"><label>活动类型</label><select id="dc2ActType" onchange="dc2ActTypeChange()">' + typeOptions + '</select></div>'
-    + '<div class="dc2-field full"><div class="dc2-act-dims" id="dc2ActDims">统计维度：' + dc2ActivityDims(curType).join(' · ') + '</div></div>'
+    + '<div class="dc2-field"><label>城市</label><select id="dc2ActCity">' + cityOptions + '</select></div>'
+    + '<div class="dc2-field"><label>主题</label><input id="dc2ActTheme" value="' + (a.theme || '') + '" placeholder="如：春日限定"></div>'
     + '<div class="dc2-field"><label>参与人数</label><input id="dc2ActPeople" type="number" min="0" value="' + (a.people || '') + '" placeholder="0"></div>'
     + '<div class="dc2-field"><label>满意度（%）</label><input id="dc2ActSat" type="number" min="0" max="100" value="' + String(a.satisfaction || '').replace('%','') + '" placeholder="0"></div>'
     + '<div class="dc2-field"><label>有效问卷数量</label><input id="dc2ActSurveys" type="number" min="0" value="' + (a.surveys || '') + '" placeholder="0"></div>'
@@ -16743,14 +16719,7 @@ function dc2OpenActivity(id){
     + '<div class="dc2-modal-foot"><button class="dc2-btn" onclick="dc2CloseModal()">取消</button>'
     + '<button class="dc2-btn primary" onclick="dc2SaveActivity(' + (act ? "'" + act.id + "'" : 'null') + ')">保存</button></div>';
   document.getElementById('dc2Mask').classList.add('show');
-  dc2ActTypeChange();
   setTimeout(() => { const inp = document.getElementById('dc2ActName'); if(inp) inp.focus(); }, 80);
-}
-function dc2ActTypeChange(){
-  const sel = document.getElementById('dc2ActType');
-  const hint = document.getElementById('dc2ActDims');
-  if(!sel || !hint) return;
-  hint.textContent = '统计维度：' + dc2ActivityDims(sel.value).join(' · ');
 }
 function dc2CloseModal(){
   const mask = document.getElementById('dc2Mask');
@@ -16766,9 +16735,8 @@ function dc2SaveActivity(id){
   const data = {
     name: name,
     date: document.getElementById('dc2ActDate').value || '',
-    type: document.getElementById('dc2ActType').value || '其他',
-    // 城市 / 活动描述由 P09 员工体验表维护，这里保持原值
-    city: current && current.city ? current.city : '全员',
+    city: document.getElementById('dc2ActCity').value || '双城',
+    theme: (document.getElementById('dc2ActTheme').value || '').trim(),
     people: parseInt(document.getElementById('dc2ActPeople').value, 10) || 0,
     satisfaction: sat ? sat + '%' : '—',
     surveys: parseInt(document.getElementById('dc2ActSurveys').value, 10) || 0,
@@ -16946,9 +16914,10 @@ function renderP09(){
     }
 
     // Module-specific content
-    if(mod.id === 'employee' && mod.cities && mod.cities.length > 0){
+    const empCityStats = mod.id === 'employee' ? dc2CityStats(window._dc2Activities || []) : [];
+    if(mod.id === 'employee' && empCityStats.length > 0){
       h += `<div style="margin-bottom:16px"><div class="p09-city-title" style="font-size:12px;font-weight:500;color:var(--t2);margin-bottom:8px"><svg class="ic-inline" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l5-3v16"/><path d="M14 21V11l5 3v7"/><path d="M7 11h1M7 15h1"/></svg>️ 年度城市统计</div>`;
-      mod.cities.forEach(c => {
+      empCityStats.forEach(c => {
         h += `<div class="p09-city-row">
           <div class="p09-city-name">${c.name||''}</div>
           <div class="p09-city-bar"><div class="p09-city-fill" style="width:${c.pct||0}%"></div></div>
