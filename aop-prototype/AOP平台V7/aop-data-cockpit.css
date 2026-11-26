@@ -372,6 +372,7 @@
   color:#3b4059;font-family:inherit;background:#fff;transition:all .16s;
 }
 #p32 .dc2-field textarea{height:auto;padding:9px 11px;resize:vertical;min-height:64px;line-height:1.5}
+#p32 .dc2-act-dims{font-size:11px;color:#8b90a6;background:#f8f9fd;border:1px dashed #e2e5f0;border-radius:8px;padding:8px 10px;line-height:1.6}
 #p32 .dc2-field input:focus,#p32 .dc2-field select:focus,#p32 .dc2-field textarea:focus{
   outline:none;border-color:#b9b2f0;box-shadow:0 0 0 3px rgba(93,83,210,.1);
 }

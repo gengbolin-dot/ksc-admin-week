@@ -15259,15 +15259,58 @@ function dc2Name(m){
 }
 
 /* 活动数据：全站唯一数据源（P09 员工体验表 / P32 重点活动台账共用同一份） */
+/* 重点活动类型体系：分组 + 每类采集维度 */
+const DC2_ACTIVITY_TYPE_GROUPS = [
+  { group:'文化运营', color:'#5d53d2', types:[
+    { key:'家庭日',   dims:['参与人数','满意度','有效问卷'] },
+    { key:'生日会',   dims:['参与人数','满意度'] },
+    { key:'节日关怀', dims:['参与人数','满意度','礼品份数'] },
+    { key:'团建拓展', dims:['参与人数','满意度'] },
+    { key:'竞赛赛事', dims:['报名数','参与人数','满意度'] },
+    { key:'文化公益', dims:['参与人次','志愿时长'] }
+  ]},
+  { group:'员工福利', color:'#e0a800', types:[
+    { key:'福利发放', dims:['覆盖人数','发放份数','满意度'] },
+    { key:'健康关怀', dims:['参与人数','满意度'] },
+    { key:'餐饮茶歇', dims:['覆盖人次','满意度'] }
+  ]},
+  { group:'组织建设', color:'#3ea4fb', types:[
+    { key:'全员大会', dims:['参与人数','满意度'] },
+    { key:'培训讲座', dims:['参与人数','满意度','课时'] },
+    { key:'入职/周年', dims:['参与人数'] }
+  ]},
+  { group:'其他', color:'#8b90a6', types:[
+    { key:'其他', dims:['参与人数'] }
+  ]}
+];
+const DC2_ACTIVITY_TYPE_META = {};
+DC2_ACTIVITY_TYPE_GROUPS.forEach(function(g){
+  g.types.forEach(function(x){ DC2_ACTIVITY_TYPE_META[x.key] = { group:g.group, color:g.color, dims:x.dims }; });
+});
+const DC2_ACTIVITY_TYPES = Object.keys(DC2_ACTIVITY_TYPE_META);
+// 兼容历史类型命名
+const DC2_ACTIVITY_LEGACY = { '竞赛团建':'竞赛赛事', '团建':'团建拓展' };
+function dc2NormalizeType(t){
+  const v = DC2_ACTIVITY_LEGACY[t] || t;
+  return DC2_ACTIVITY_TYPE_META[v] ? v : '其他';
+}
+function dc2ActivityTypeColor(t){
+  const meta = DC2_ACTIVITY_TYPE_META[dc2NormalizeType(t)];
+  return meta ? meta.color : '#8b90a6';
+}
+function dc2ActivityDims(t){
+  const meta = DC2_ACTIVITY_TYPE_META[dc2NormalizeType(t)];
+  return meta ? meta.dims : [];
+}
 function dc2NormalizeActivity(a, i){
   const name = (a && a.name) || '';
-  const typeMap = (n) => /家庭日/.test(n) ? '家庭日' : /生日/.test(n) ? '生日会' : /端午|中秋|六一/.test(n) ? '节日关怀' : /大赛|团建/.test(n) ? '竞赛团建' : '其他';
+  const typeMap = (n) => /家庭日/.test(n) ? '家庭日' : /生日/.test(n) ? '生日会' : /端午|中秋|六一|节日/.test(n) ? '节日关怀' : /大赛|竞赛/.test(n) ? '竞赛赛事' : /团建/.test(n) ? '团建拓展' : /公益/.test(n) ? '文化公益' : /体检|健康/.test(n) ? '健康关怀' : /大会/.test(n) ? '全员大会' : /培训|讲座/.test(n) ? '培训讲座' : '其他';
   const desc = (a && (a.desc || a.note)) || '';
   return {
     id: a && a.id != null ? a.id : (9100 + i),
     name: name,
     date: (a && a.date) || '',
-    type: (a && a.type) || typeMap(name),
+    type: dc2NormalizeType((a && a.type) || typeMap(name)),
     city: (a && a.city) || '全员',
     people: a && a.people != null ? a.people : 0,
     satisfaction: a && a.satisfaction != null ? a.satisfaction : '—',
@@ -16325,7 +16368,7 @@ function dc2RenderLedger(){
       h += '<tr>'
         + '<td><b style="color:#181b34;font-weight:600">' + a.name + '</b></td>'
         + '<td class="num">' + (a.date || '—') + '</td>'
-        + '<td><span class="dc2-tag" style="background:#eef0ff;color:#5d53d2">' + (a.type || '其他') + '</span></td>'
+        + '<td><span class="dc2-tag" style="background:' + dc2ActivityTypeColor(a.type) + '18;color:' + dc2ActivityTypeColor(a.type) + '">' + (dc2NormalizeType(a.type) || '其他') + '</span></td>'
         + '<td class="num">' + (a.people || '—') + '</td>'
         + '<td class="num">' + (a.satisfaction || '—') + '</td>'
         + '<td class="num">' + (a.surveys || '—') + '</td>'
@@ -16675,15 +16718,23 @@ document.addEventListener('change', function(e){
 function dc2OpenActivity(id){
   const acts = window._dc2Activities || [];
   const act = id ? acts.find(a => String(a.id) === String(id)) : null;
-  const a = act || {name:'', date:'', type:'团建', people:'', satisfaction:'', surveys:'', note:''};
-  const types = ['家庭日','生日会','节日关怀','竞赛团建','其他'];
+  const a = act || {name:'', date:'', type:'其他', people:'', satisfaction:'', surveys:'', note:''};
+  const curType = dc2NormalizeType(a.type);
+  const typeOptions = DC2_ACTIVITY_TYPE_GROUPS.map(function(g){
+    return '<optgroup label="' + g.group + '">'
+      + g.types.map(function(x){
+          return '<option value="' + x.key + '"' + (curType === x.key ? ' selected' : '') + '>' + x.key + '</option>';
+        }).join('')
+      + '</optgroup>';
+  }).join('');
   const modal = document.getElementById('dc2Modal');
   modal.innerHTML = '<div class="dc2-modal-head"><div class="dc2-modal-title">' + (act ? '编辑重点活动' : '新增重点活动') + '</div>'
     + '<button class="dc2-modal-x" onclick="dc2CloseModal()">✕</button></div>'
     + '<div class="dc2-modal-body">'
     + '<div class="dc2-field full"><label>活动名称 *</label><input id="dc2ActName" value="' + (a.name || '') + '" placeholder="如：第十二届家庭日"></div>'
     + '<div class="dc2-field"><label>活动时间</label><input id="dc2ActDate" type="date" value="' + (a.date || '') + '"></div>'
-    + '<div class="dc2-field"><label>活动类型</label><select id="dc2ActType">' + types.map(t => '<option value="' + t + '"' + (a.type === t ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></div>'
+    + '<div class="dc2-field"><label>活动类型</label><select id="dc2ActType" onchange="dc2ActTypeChange()">' + typeOptions + '</select></div>'
+    + '<div class="dc2-field full"><div class="dc2-act-dims" id="dc2ActDims">统计维度：' + dc2ActivityDims(curType).join(' · ') + '</div></div>'
     + '<div class="dc2-field"><label>参与人数</label><input id="dc2ActPeople" type="number" min="0" value="' + (a.people || '') + '" placeholder="0"></div>'
     + '<div class="dc2-field"><label>满意度（%）</label><input id="dc2ActSat" type="number" min="0" max="100" value="' + String(a.satisfaction || '').replace('%','') + '" placeholder="0"></div>'
     + '<div class="dc2-field"><label>有效问卷数量</label><input id="dc2ActSurveys" type="number" min="0" value="' + (a.surveys || '') + '" placeholder="0"></div>'
@@ -16692,7 +16743,14 @@ function dc2OpenActivity(id){
     + '<div class="dc2-modal-foot"><button class="dc2-btn" onclick="dc2CloseModal()">取消</button>'
     + '<button class="dc2-btn primary" onclick="dc2SaveActivity(' + (act ? "'" + act.id + "'" : 'null') + ')">保存</button></div>';
   document.getElementById('dc2Mask').classList.add('show');
+  dc2ActTypeChange();
   setTimeout(() => { const inp = document.getElementById('dc2ActName'); if(inp) inp.focus(); }, 80);
+}
+function dc2ActTypeChange(){
+  const sel = document.getElementById('dc2ActType');
+  const hint = document.getElementById('dc2ActDims');
+  if(!sel || !hint) return;
+  hint.textContent = '统计维度：' + dc2ActivityDims(sel.value).join(' · ');
 }
 function dc2CloseModal(){
   const mask = document.getElementById('dc2Mask');
