@@ -15250,6 +15250,7 @@ const DC2_ICON = {
   list: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>',
   check: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
   grid: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-5"/><path d="M12 16V8"/><path d="M17 16v-9"/></svg>',
   users: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
 };
 
@@ -15268,10 +15269,190 @@ function dc2NormalizeCity(c){
   if(/武汉/.test(v)) return '武汉';
   return '双城';
 }
-/* 按台账活动汇总城市统计（双城单列，不拆分人数） */
+﻿/* ══════ 员工体验：项目计划 + 活动场次 + 特色下午茶 ══════
+   数据分层：
+   - 项目计划 plan：年初制定，name / owner / planDate / planCity / statsReq
+   - 活动场次 session：实际举办记录，通过 planId 关联项目
+   - 下午茶记录 tea：独立维护，不参与重点活动统计
+   统计口径：仅「已提交」场次纳入正式数据；满意度按有效问卷加权。 */
+const DC2_PLAN_LS = 'aop_dc2_emp_plans';
+const DC2_TEA_LS = 'aop_dc2_emp_tea';
+const DC2_ACTIVITY_STATUS = ['待执行','待提交','已提交'];
+const DC2_TEA_TYPES = ['日常下午茶','节日特色','四季茶饮'];
+const DC2_TEA_CITY_OPTIONS = ['北京','武汉','双城'];
+/* 示例台账的时间 / 主题（仅当历史数据缺失时补全，便于原型演示） */
+const DC2_SEED_META = {
+  '第十二届家庭日': { date:'2026-05-20', theme:'双城同办 · 沉浸式体验' },
+  '第五届黑马大赛': { date:'2026-06-12', theme:'企业 + 高校双赛道' },
+  '端午节礼品发放': { date:'2026-06-18', theme:'端午礼盒 · 双城派发' },
+  '六一儿童节': { date:'2026-06-01', theme:'亲子嘉年华' },
+  'Q2生日会': { date:'2026-06-28', theme:'季度生日会 · 夏日主题' }
+};
+
+function dc2Uid(prefix){
+  return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+function dc2NumOf(v){
+  const n = parseFloat(String(v == null ? '' : v).replace(/[^\d.-]/g, ''));
+  return isFinite(n) ? n : 0;
+}
+function dc2EmpYearOf(rec){
+  const raw = String((rec && (rec.date || rec.planDate)) || '');
+  const m = raw.match(/(\d{4})/);
+  return m ? parseInt(m[1], 10) : null;
+}
+function dc2EmpInYear(rec, year){
+  if(!year) return true;
+  const y = dc2EmpYearOf(rec);
+  return y === null ? true : y === Number(year);
+}
+function dc2EmpPlans(){
+  if(!Array.isArray(window._dc2Plans)) window._dc2Plans = [];
+  return window._dc2Plans;
+}
+function dc2EmpTea(){
+  if(!Array.isArray(window._dc2Tea)) window._dc2Tea = [];
+  return window._dc2Tea;
+}
+function dc2EmpPlanOf(planId){
+  return dc2EmpPlans().find(function(p){ return String(p.planId) === String(planId); }) || null;
+}
+function dc2EmpSessionsOf(planId){
+  return (window._dc2Activities || []).filter(function(a){ return String(a.planId) === String(planId); });
+}
+function dc2EmpSubmittedOf(planId, year){
+  return dc2EmpSessionsOf(planId).filter(function(a){
+    return a.status === '已提交' && dc2EmpInYear(a, year);
+  });
+}
+function dc2EmpStatusOf(planId){
+  const list = dc2EmpSessionsOf(planId);
+  if(!list.length) return '待执行';
+  if(list.some(function(a){ return a.status === '待提交'; })) return '待提交';
+  if(list.every(function(a){ return a.status === '已提交'; })) return '已提交';
+  return '待执行';
+}
+/* 满意度按有效问卷加权：Σ(满意度×有效问卷) / Σ有效问卷 */
+function dc2EmpWeightedSat(list){
+  let num = 0, den = 0;
+  const vals = [];
+  (list || []).forEach(function(s){
+    const sat = dc2NumOf(s && s.satisfaction);
+    const q = dc2NumOf(s && s.surveys);
+    if(sat > 0){
+      vals.push(sat);
+      if(q > 0){ num += sat * q; den += q; }
+    }
+  });
+  if(den > 0) return { value: num / den, weighted: true, surveys: den, samples: vals.length };
+  if(vals.length) return { value: vals.reduce(function(a, b){ return a + b; }, 0) / vals.length, weighted: false, surveys: 0, samples: vals.length };
+  return { value: null, weighted: false, surveys: 0, samples: 0 };
+}
+function dc2EmpSum(list, key){
+  return (list || []).reduce(function(a, x){ return a + dc2NumOf(x && x[key]); }, 0);
+}
+function dc2EmpDateRange(list){
+  const ds = (list || []).map(function(x){ return x.date; }).filter(Boolean).sort();
+  if(!ds.length) return '—';
+  return ds[0] === ds[ds.length - 1] ? ds[0] : ds[0] + ' ~ ' + ds[ds.length - 1];
+}
+function dc2EmpCityOfList(list){
+  const set = [];
+  (list || []).forEach(function(x){
+    const c = dc2NormalizeCity(x.city);
+    if(set.indexOf(c) < 0) set.push(c);
+  });
+  return set.length ? set.join(' / ') : '—';
+}
+/* 项目维度汇总（仅已提交场次参与统计） */
+function dc2EmpProjectStats(year){
+  const plans = dc2EmpPlans().slice();
+  const out = plans.map(function(p){
+    const list = dc2EmpSubmittedOf(p.planId, year);
+    if(!list.length) return null;
+    const sat = dc2EmpWeightedSat(list);
+    const range = dc2EmpDateRange(list);
+    return {
+      planId: p.planId,
+      plan: p,
+      name: p.name || (list[0] && list[0].name) || '未命名项目',
+      owner: p.owner || '',
+      date: range === '—' ? (p.planDate || '—') : range,
+      city: dc2EmpCityOfList(list),
+      events: list.length,
+      people: dc2EmpSum(list, 'people'),
+      surveys: dc2EmpSum(list, 'surveys'),
+      sat: sat.value,
+      weighted: sat.weighted,
+      sessions: list
+    };
+  }).filter(Boolean);
+  out.sort(function(a, b){
+    const da = String(a.plan.planDate || (a.sessions[0] && a.sessions[0].date) || '');
+    const db = String(b.plan.planDate || (b.sessions[0] && b.sessions[0].date) || '');
+    return db.localeCompare(da);
+  });
+  return out;
+}
+function dc2EmpYearStats(year){
+  const list = (window._dc2Activities || []).filter(function(a){
+    return a.status === '已提交' && dc2EmpInYear(a, year);
+  });
+  const sat = dc2EmpWeightedSat(list);
+  const planIds = [];
+  list.forEach(function(a){ if(planIds.indexOf(a.planId) < 0) planIds.push(a.planId); });
+  return {
+    sessions: list,
+    events: list.length,
+    people: dc2EmpSum(list, 'people'),
+    surveys: dc2EmpSum(list, 'surveys'),
+    sat: sat.value,
+    weighted: sat.weighted,
+    projects: planIds.length,
+    planTotal: dc2EmpPlans().filter(function(p){ return dc2EmpInYear(p, year); }).length
+  };
+}
+/* 城市统计：按场次归属城市汇总，双城单列避免人数重复计算 */
+function dc2EmpCitySummary(year){
+  const base = {
+    '北京':{ name:'北京', events:0, people:0, color:'#3ea4fb' },
+    '武汉':{ name:'武汉', events:0, people:0, color:'#d94f96' },
+    '双城':{ name:'双城', events:0, people:0, color:'#5d53d2' }
+  };
+  (window._dc2Activities || []).forEach(function(a){
+    if(a.status !== '已提交' || !dc2EmpInYear(a, year)) return;
+    const key = dc2NormalizeCity(a && a.city);
+    const row = base[key] || base['双城'];
+    row.events += 1;
+    row.people += dc2NumOf(a && a.people);
+  });
+  const total = DC2_ACTIVITY_CITIES.reduce(function(s, k){ return s + base[k].events; }, 0) || 1;
+  return DC2_ACTIVITY_CITIES.map(function(k){
+    return {
+      name: base[k].name,
+      events: base[k].events,
+      people: base[k].people,
+      color: base[k].color,
+      pct: Math.round(base[k].events / total * 100)
+    };
+  }).filter(function(x){ return x.events > 0; });
+}
+/* 月度场次分布（用于概览迷你柱） */
+function dc2EmpMonthly(year){
+  const arr = new Array(12).fill(0);
+  (window._dc2Activities || []).forEach(function(a){
+    if(a.status !== '已提交' || !dc2EmpInYear(a, year)) return;
+    const m = String(a.date || '').match(/^\d{4}-(\d{1,2})/);
+    if(m){ const i = parseInt(m[1], 10) - 1; if(i >= 0 && i < 12) arr[i] += 1; }
+  });
+  return arr;
+}
+
+/* 兼容旧接口：按活动台账汇总城市统计（P09 使用） */
 function dc2CityStats(acts){
   const base = { '北京':{name:'北京',events:0,people:0}, '武汉':{name:'武汉',events:0,people:0}, '双城':{name:'双城',events:0,people:0} };
   (acts || []).forEach(function(a){
+    if(a && a.status && a.status !== '已提交') return;
     const key = dc2NormalizeCity(a && a.city);
     const row = base[key] || base['双城'];
     row.events += 1;
@@ -15285,18 +15466,48 @@ function dc2CityStats(acts){
 function dc2NormalizeActivity(a, i){
   const name = (a && a.name) || '';
   const desc = (a && (a.desc || a.note)) || '';
+  const satRaw = a && a.satisfaction != null ? a.satisfaction : '—';
+  const satNum = dc2NumOf(satRaw);
+  const satTxt = String(satRaw).indexOf('%') >= 0 || satRaw === '—' ? String(satRaw) : (satNum ? satNum + '%' : '—');
   return {
     id: a && a.id != null ? a.id : (9100 + i),
+    planId: (a && a.planId) || ('plan_' + ((a && a.id != null) ? a.id : (9100 + i))),
     name: name,
-    date: (a && a.date) || '',
+    date: (a && a.date) || ((DC2_SEED_META[name] || {}).date || ''),
     city: dc2NormalizeCity((a && a.city) || '双城'),
-    theme: (a && a.theme) || '',
+    theme: (a && a.theme) || ((DC2_SEED_META[name] || {}).theme || ''),
     people: a && a.people != null ? a.people : 0,
-    satisfaction: a && a.satisfaction != null ? a.satisfaction : '—',
-    surveys: a && a.surveys != null ? a.surveys : Math.round(((a && a.people) || 0) * 0.42),
+    satisfaction: satTxt,
+    surveys: a && a.surveys != null ? a.surveys : 0,
+    status: (a && a.status) || '已提交',
+    images: Array.isArray(a && a.images) ? a.images : [],
+    history: Array.isArray(a && a.history) ? a.history : [],
     desc: desc,
     note: desc
   };
+}
+function dc2EmpEnsurePlans(){
+  const plans = dc2EmpPlans();
+  (window._dc2Activities || []).forEach(function(a){
+    if(!a.planId) a.planId = 'plan_' + a.id;
+    if(!dc2EmpPlanOf(a.planId)){
+      plans.push({
+        planId: a.planId,
+        name: a.name || '未命名项目',
+        owner: '',
+        planDate: a.date || '',
+        planCity: dc2NormalizeCity(a.city),
+        statsReq: '参与人数、满意度、有效问卷',
+        desc: a.note || '',
+        taskId: 'task_' + String(a.planId).replace(/^plan_/, ''),
+        taskSynced: true
+      });
+    }
+  });
+  /* 计划与「我的工作」任务通过唯一 ID 自动关联 */
+  plans.forEach(function(p){
+    if(!p.taskId){ p.taskId = 'task_' + String(p.planId).replace(/^plan_/, ''); p.taskSynced = true; }
+  });
 }
 function dc2BindActivities(){
   const empMod = (DATA_CENTER.modules || []).find(m => m.id === 'employee');
@@ -15309,7 +15520,6 @@ function dc2LoadActivities(){
     const raw = localStorage.getItem(DC2_LS_KEY);
     if(raw){ const parsed = JSON.parse(raw); if(Array.isArray(parsed)) list = parsed; }
   }catch(e){}
-  // 兼容旧版：首次迁移时读取数据中心快照里的员工体验活动
   if(!list){
     try{
       const legacy = JSON.parse(localStorage.getItem('aop_data_center_v1') || '[]');
@@ -15324,11 +15534,35 @@ function dc2LoadActivities(){
     list = (emp && emp.activities) || [];
   }
   window._dc2Activities = list.map(dc2NormalizeActivity);
+  try{
+    const plans = JSON.parse(localStorage.getItem(DC2_PLAN_LS) || 'null');
+    window._dc2Plans = Array.isArray(plans) ? plans : [];
+  }catch(e){ window._dc2Plans = []; }
+  try{
+    const tea = JSON.parse(localStorage.getItem(DC2_TEA_LS) || 'null');
+    window._dc2Tea = Array.isArray(tea) ? tea : [];
+  }catch(e){ window._dc2Tea = []; }
+  /* 首次进入时补充特色下午茶示例记录（独立于重点活动统计） */
+  try{
+    if(!window._dc2Tea.length && !localStorage.getItem('aop_dc2_tea_seeded')){
+      window._dc2Tea = [
+        { id:'tea_demo_1', name:'春日限定 · 樱花乌龙', date:'2026-03-20', city:'北京', type:'四季茶饮', desc:'春季限定茶饮搭配樱花酥，午后的第一杯春意。', images:[] },
+        { id:'tea_demo_2', name:'端午安康 · 艾草青团', date:'2026-06-18', city:'双城', type:'节日特色', desc:'北京、武汉同步派发艾草青团与端午香囊，双城共度传统佳节。', images:[] },
+        { id:'tea_demo_3', name:'秋日桂花 · 手作茶点', date:'2026-09-15', city:'武汉', type:'四季茶饮', desc:'桂花乌龙配手作糕点，秋日午后的小憩时光。', images:[] },
+        { id:'tea_demo_4', name:'周五日常 · 水果茶歇', date:'2026-11-06', city:'北京', type:'日常下午茶', desc:'当季水果与气泡水，为周五的收尾加一点轻松。', images:[] }
+      ];
+      localStorage.setItem('aop_dc2_tea_seeded', '1');
+    }
+  }catch(e){}
+  dc2EmpEnsurePlans();
   dc2BindActivities();
   dc2SaveActivities();
 }
 function dc2EnsureActivities(){
   if(!window._dc2Activities) dc2LoadActivities();
+  dc2EmpPlans();
+  dc2EmpTea();
+  dc2EmpEnsurePlans();
   return dc2BindActivities();
 }
 /* 两页共用一份活动数据：任一页改动后，已渲染的另一个视图同步刷新 */
@@ -15339,7 +15573,15 @@ function dc2RefreshP09(){
   if(window._p09Rendered){ try{ renderP09(); }catch(e){ console.warn('renderP09', e); } }
 }
 function dc2SaveActivities(){
-  try{ localStorage.setItem(DC2_LS_KEY, JSON.stringify(window._dc2Activities || [])); }catch(e){}
+  dc2EmpEnsurePlans();
+  const warn = function(){
+    if(window._dc2QuotaWarned) return;
+    window._dc2QuotaWarned = true;
+    if(typeof showToast === 'function') showToast('⚠ 本地存储空间不足，请减少图片上传数量后重试');
+  };
+  try{ localStorage.setItem(DC2_LS_KEY, JSON.stringify(window._dc2Activities || [])); }catch(e){ warn(); }
+  try{ localStorage.setItem(DC2_PLAN_LS, JSON.stringify(window._dc2Plans || [])); }catch(e){ warn(); }
+  try{ localStorage.setItem(DC2_TEA_LS, JSON.stringify(window._dc2Tea || [])); }catch(e){ warn(); }
 }
 
 /* ---------- 图表工具 ---------- */
@@ -15989,7 +16231,599 @@ function dc2RenderCockpit(mods){
 }
 
 /* ---------- 板块详情 ---------- */
+﻿/* ══════════════════════════════════════════════════════════════
+   员工体验页面（六段结构）
+   1 年度整体概况 · 2 年度城市统计 · 3 重点活动项目汇总
+   4 满意度分析 · 5 特色下午茶 · 6 统计口径
+   ══════════════════════════════════════════════════════════════ */
+function dc2EmpEscape(v){
+  return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function dc2EmpPct(v){
+  if(v == null || !isFinite(v)) return '—';
+  return (Math.round(v * 10) / 10).toFixed(1) + '%';
+}
+function dc2EmpStatusChip(status){
+  const s = status || '待执行';
+  const cls = s === '已提交' ? 'ok' : (s === '待提交' ? 'doing' : 'plan');
+  return '<span class="dc2emp-status dc2emp-status-' + cls + '"><i></i>' + s + '</span>';
+}
+function dc2EmpKpiCard(cfg){
+  const isNum = typeof cfg.value === 'number';
+  return '<div class="dc2emp-kpi" style="--c:' + cfg.color + '">'
+    + '<div class="dc2emp-kpi-top"><span class="dc2emp-kpi-ico">' + cfg.icon + '</span><span class="dc2emp-kpi-label">' + cfg.label + '</span></div>'
+    + '<div class="dc2emp-kpi-value">' + (isNum ? cfg.value.toLocaleString() : cfg.value) + (cfg.unit ? '<span>' + cfg.unit + '</span>' : '') + '</div>'
+    + '<div class="dc2emp-kpi-foot">' + cfg.foot + '</div>'
+    + '<div class="dc2emp-spark">' + (cfg.spark || []).map(function(v){
+        return '<i style="height:' + Math.max(8, Math.round(v / (cfg.max || 1) * 100)) + '%"></i>';
+      }).join('') + '</div>'
+    + '</div>';
+}
+function dc2EmpTeaCover(rec){
+  const typeIdx = Math.max(0, DC2_TEA_TYPES.indexOf(rec.type || ''));
+  const palettes = [
+    ['#ffd76e', '#f2a33c', '#8a5b12'],
+    ['#ff9ec4', '#f2618f', '#7c2246'],
+    ['#8ee3c1', '#39b98c', '#12513c']
+  ];
+  const p = palettes[typeIdx % palettes.length];
+  const cover = (rec.images && rec.images[0]) ? rec.images[0] : '';
+  return '<div class="dc2emp-tea-cover' + (cover ? ' has-img' : '') + '" style="--g1:' + p[0] + ';--g2:' + p[1] + ';--g3:' + p[2] + '">'
+    + (cover ? '<img src="' + cover + '" alt="' + dc2EmpEscape(rec.name) + '">' : '<span class="dc2emp-tea-emoji">' + ['🍵', '🎉', '🍂'][typeIdx % 3] + '</span>')
+    + '<span class="dc2emp-tea-type">' + dc2EmpEscape(rec.type || '日常下午茶') + '</span>'
+    + (rec.images && rec.images.length ? '<span class="dc2emp-tea-shot">' + rec.images.length + ' 图</span>' : '')
+    + '</div>';
+}
+
+function dc2RenderEmployeePage(m){
+  const brand = dc2Brand('employee', '#e0a800');
+  const year = window._dc2Year || 2026;
+  const stats = dc2EmpYearStats(year);
+  const projects = dc2EmpProjectStats(year);
+  const cities = dc2EmpCitySummary(year);
+  const monthly = dc2EmpMonthly(year);
+  const maxMonth = Math.max.apply(null, monthly.concat([1]));
+
+  let h = '<div class="dc2-mod-page dc2emp-page">';
+  h += '<div class="p09-mod" style="--ac:' + brand + '">';
+  h += '<div class="p09-mod-head">'
+    + '<div class="p09-mod-icon" style="background:' + brand + '18;color:' + brand + '">' + DC2_ICON.smile + '</div>'
+    + '<div class="p09-mod-info"><div class="p09-mod-title">员工体验</div>'
+    + '<div class="p09-mod-desc">年度重点活动项目、城市分布与特色下午茶 · 数据来源「我的工作」重点活动任务</div></div>'
+    + '<button class="p09-mod-edit" onclick="dc2Switch(\'cockpit\')">' + DC2_ICON.back + ' 返回驾驶舱</button>'
+    + '</div>';
+  h += '<div class="p09-mod-meta">'
+    + '<span class="p09-src-badge p09-src-manual"><span class="p09-src-dot"></span>重点活动台账 + 我的工作</span>'
+    + '<span class="p09-sync"><span class="p09-sync-tag p09-sync-live">自动汇总</span><span class="p09-sync-period">' + year + ' 年度</span></span>'
+    + '<span class="p09-sync-time">更新于 ' + dc2MaintToday() + '</span>'
+    + '<span class="p09-mod-owner">' + DC2_ICON.users + ' 行政部</span>'
+    + '</div>';
+  h += '<div class="p09-mod-body dc2emp-body">';
+
+  h += '<section class="dc2emp-sec">';
+  h += '<div class="dc2emp-sec-head">'
+    + '<div class="dc2emp-sec-title"><span class="dc2emp-sec-ico" style="--c:' + brand + '">' + DC2_ICON.chart + '</span>年度整体概况'
+    + '<span class="dc2emp-sec-tag">' + year + ' 年度</span></div>'
+    + '<div class="dc2emp-sec-desc">仅统计已提交场次 · 满意度按有效问卷加权</div></div>';
+  h += '<div class="dc2emp-kpis">';
+  h += dc2EmpKpiCard({ label:'重点活动项目', value:stats.projects, unit:'个', color:'#e0a800', icon:DC2_ICON.grid,
+    foot:'计划 ' + stats.planTotal + ' 个 · 已提交 ' + stats.projects + ' 个', spark:monthly, max:maxMonth });
+  h += dc2EmpKpiCard({ label:'年度活动场次', value:stats.events, unit:'场', color:'#3ea4fb', icon:DC2_ICON.chart,
+    foot:'项目数与场次分开统计', spark:monthly, max:maxMonth });
+  h += dc2EmpKpiCard({ label:'累计参与人次', value:stats.people, unit:'人次', color:'#4be272', icon:DC2_ICON.users,
+    foot:'按各场次参与人数累加', spark:monthly, max:maxMonth });
+  h += dc2EmpKpiCard({ label:'活动平均满意度', value:stats.sat == null ? '—' : Math.round(stats.sat * 10) / 10,
+    unit:stats.sat == null ? '' : '%', color:'#d94f96', icon:DC2_ICON.smile,
+    foot:stats.weighted ? '基于 ' + stats.surveys.toLocaleString() + ' 份有效问卷加权' : '暂未收集有效问卷', spark:monthly, max:maxMonth });
+  h += '</div></section>';
+
+  h += '<section class="dc2emp-sec">';
+  h += '<div class="dc2emp-sec-head">'
+    + '<div class="dc2emp-sec-title"><span class="dc2emp-sec-ico" style="--c:#3ea4fb">' + DC2_ICON.building + '</span>年度城市统计</div>'
+    + '<div class="dc2emp-sec-desc">按场次实际举办城市归属，双城只计一次避免人数重复</div></div>';
+  if(!cities.length){
+    h += '<div class="dc2emp-empty">' + year + ' 年度暂无已提交的活动场次</div>';
+  } else {
+    h += '<div class="dc2emp-cities">';
+    cities.forEach(function(c){
+      h += '<div class="dc2emp-city" style="--c:' + c.color + '">'
+        + '<div class="dc2emp-city-top"><span class="dc2emp-city-name">' + c.name + '</span><span class="dc2emp-city-pct">' + c.pct + '%</span></div>'
+        + '<div class="dc2emp-city-num">' + c.events + '<span>场</span></div>'
+        + '<div class="dc2emp-city-sub">累计参与 <b>' + c.people.toLocaleString() + '</b> 人次</div>'
+        + '<div class="dc2emp-city-track"><i style="width:' + c.pct + '%"></i></div>'
+        + '</div>';
+    });
+    h += '</div>';
+  }
+  h += '</section>';
+
+  h += '<section class="dc2emp-sec">';
+  h += '<div class="dc2emp-sec-head">'
+    + '<div class="dc2emp-sec-title"><span class="dc2emp-sec-ico" style="--c:#5d53d2">' + DC2_ICON.list + '</span>年度重点活动项目汇总</div>'
+    + '<div class="dc2emp-sec-desc">点击项目查看各城市 / 各场次执行结果</div></div>';
+  if(!projects.length){
+    h += '<div class="dc2emp-empty">暂无已提交的重点活动项目</div>';
+  } else {
+    h += '<div class="dc2emp-tablewrap"><table class="dc2emp-table"><thead><tr>'
+      + '<th>活动项目</th><th>活动时间</th><th>城市</th><th class="num">场次</th><th class="num">参与人数</th><th>满意度</th><th class="num">有效问卷</th><th></th>'
+      + '</tr></thead><tbody>';
+    projects.forEach(function(p, i){
+      const tone = ['#e0a800', '#3ea4fb', '#4be272', '#d94f96', '#5d53d2', '#eea935'][i % 6];
+      h += '<tr class="dc2emp-row" onclick="dc2empOpenProject(\'' + p.planId + '\')">'
+        + '<td><div class="dc2emp-pname"><span class="dc2emp-dot" style="background:' + tone + '"></span>' + dc2EmpEscape(p.name) + '</div>'
+        + (p.owner ? '<div class="dc2emp-powner">负责人 ' + dc2EmpEscape(p.owner) + '</div>' : '') + '</td>'
+        + '<td class="dc2emp-dim">' + dc2EmpEscape(p.date) + '</td>'
+        + '<td><span class="dc2emp-citytag">' + dc2EmpEscape(p.city) + '</span></td>'
+        + '<td class="num">' + p.events + '</td>'
+        + '<td class="num">' + p.people.toLocaleString() + '</td>'
+        + '<td><div class="dc2emp-sat"><span class="dc2emp-sat-track"><i style="width:' + Math.min(100, p.sat || 0) + '%;background:' + tone + '"></i></span><b>' + dc2EmpPct(p.sat) + '</b></div></td>'
+        + '<td class="num">' + p.surveys.toLocaleString() + '</td>'
+        + '<td class="dc2emp-go">详情 →</td>'
+        + '</tr>';
+    });
+    h += '</tbody></table></div>';
+  }
+  h += '</section>';
+
+  h += '<section class="dc2emp-sec">';
+  h += '<div class="dc2emp-sec-head">'
+    + '<div class="dc2emp-sec-title"><span class="dc2emp-sec-ico" style="--c:#d94f96">' + DC2_ICON.chart + '</span>重点活动满意度分析</div>'
+    + '<div class="dc2emp-sec-desc">按项目展示年度满意度 · 点击柱体查看场次明细</div></div>';
+  if(!projects.length){
+    h += '<div class="dc2emp-empty">暂无满意度数据</div>';
+  } else {
+    const avg = stats.sat || 0;
+    h += '<div class="dc2emp-chart">';
+    h += '<div class="dc2emp-chart-plot">';
+    h += '<div class="dc2emp-chart-grid">' + '<i></i>'.repeat(5) + '</div>';
+    h += '<div class="dc2emp-chart-cols">';
+    h += '<div class="dc2emp-chart-avg" style="bottom:' + Math.min(92, Math.max(8, avg)) + '%"><span>均值 ' + dc2EmpPct(avg) + '</span></div>';
+    projects.forEach(function(p, i){
+      const tone = ['#e0a800', '#3ea4fb', '#4be272', '#d94f96', '#5d53d2', '#eea935'][i % 6];
+      const v = p.sat || 0;
+      h += '<div class="dc2emp-chart-col" onclick="dc2empOpenProject(\'' + p.planId + '\')" title="' + dc2EmpEscape(p.name) + '｜' + (v > 0 ? dc2EmpPct(v) : '暂无数据') + '">'
+        + '<span class="dc2emp-chart-val">' + (v > 0 ? dc2EmpPct(v) : '—') + '</span>'
+        + '<span class="dc2emp-chart-bar" style="height:' + Math.max(4, v) + '%;--h:' + Math.max(4, v) + ';--c:' + tone + '"></span>'
+        + '</div>';
+    });
+    h += '</div></div>';
+    h += '<div class="dc2emp-chart-lbls">' + projects.map(function(p){ return '<span title="' + dc2EmpEscape(p.name) + '">' + dc2EmpEscape(p.name) + '</span>'; }).join('') + '</div>';
+    h += '<div class="dc2emp-chart-note"><i style="background:#e0a800"></i>柱高为项目满意度（按有效问卷加权）<span>·</span><i style="background:#c7cade"></i>虚线为年度均值</div>';
+  }
+  h += '</section>';
+
+  const filter = window._dc2TeaFilter || (window._dc2TeaFilter = { month:'all', city:'all', type:'all' });
+  const teaAll = dc2EmpTea().filter(function(t){ return dc2EmpInYear(t, year); });
+  const teaList = teaAll.filter(function(t){
+    if(filter.city !== 'all' && dc2NormalizeCity(t.city) !== filter.city) return false;
+    if(filter.type !== 'all' && (t.type || '') !== filter.type) return false;
+    if(filter.month !== 'all'){
+      const mm = String(t.date || '').match(/^\d{4}-(\d{1,2})/);
+      if(!mm || parseInt(mm[1], 10) !== Number(filter.month)) return false;
+    }
+    return true;
+  }).sort(function(a, b){ return String(b.date || '').localeCompare(String(a.date || '')); });
+
+  h += '<section class="dc2emp-sec dc2emp-sec-tea">';
+  h += '<div class="dc2emp-sec-head dc2emp-tea-head">'
+    + '<div class="dc2emp-sec-title"><span class="dc2emp-sec-ico" style="--c:#eea935">' + DC2_ICON.smile + '</span>特色下午茶'
+    + '<span class="dc2emp-sec-tag is-tea">独立记录 · 不计入满意度</span></div>'
+    + '<div class="dc2emp-tea-filters">'
+    + '<select class="dc2emp-select" onchange="dc2empTeaFilter(\'month\',this.value)"><option value="all">全部月份</option>'
+    + Array.from({ length: 12 }).map(function(_, i){ return '<option value="' + (i + 1) + '"' + (String(filter.month) === String(i + 1) ? ' selected' : '') + '>' + (i + 1) + ' 月</option>'; }).join('')
+    + '</select>'
+    + '<select class="dc2emp-select" onchange="dc2empTeaFilter(\'city\',this.value)"><option value="all">全部城市</option>'
+    + DC2_TEA_CITY_OPTIONS.map(function(c){ return '<option value="' + c + '"' + (filter.city === c ? ' selected' : '') + '>' + c + '</option>'; }).join('')
+    + '</select>'
+    + '<select class="dc2emp-select" onchange="dc2empTeaFilter(\'type\',this.value)"><option value="all">全部类型</option>'
+    + DC2_TEA_TYPES.map(function(t){ return '<option value="' + t + '"' + (filter.type === t ? ' selected' : '') + '>' + t + '</option>'; }).join('')
+    + '</select>'
+    + '<button class="dc2emp-add" onclick="dc2empEditTea()">' + DC2_ICON.plus + ' 新增记录</button>'
+    + '</div></div>';
+  h += '<div class="dc2emp-tea-summary">共 <b>' + teaList.length + '</b> 条记录（' + year + ' 年度）· 记录类型：日常下午茶 / 节日特色 / 四季茶饮</div>';
+  if(!teaList.length){
+    h += '<div class="dc2emp-empty">当前筛选条件下暂无下午茶记录</div>';
+  } else {
+    h += '<div class="dc2emp-tea-grid">';
+    teaList.forEach(function(t){
+      h += '<article class="dc2emp-tea-card" onclick="dc2empOpenTea(\'' + t.id + '\')">'
+        + dc2EmpTeaCover(t)
+        + '<div class="dc2emp-tea-body">'
+        + '<div class="dc2emp-tea-name">' + dc2EmpEscape(t.name || '未命名记录') + '</div>'
+        + '<div class="dc2emp-tea-meta"><span>' + dc2EmpEscape(t.date || '—') + '</span><span class="dot"></span><span>' + dc2EmpEscape(dc2NormalizeCity(t.city)) + '</span></div>'
+        + (t.desc ? '<div class="dc2emp-tea-desc">' + dc2EmpEscape(t.desc) + '</div>' : '')
+        + '</div></article>';
+    });
+    h += '</div>';
+  }
+  h += '</section>';
+
+  h += '<div class="dc2emp-rules">'
+    + '<div class="dc2emp-rules-title">统计口径</div>'
+    + '<ul>'
+    + '<li>活动项目数与实际活动场次分开统计，一个项目可包含多个城市、多个场次。</li>'
+    + '<li>参与人数按场次累加，统计为参与人次；满意度按有效问卷数量加权计算。</li>'
+    + '<li>城市统计依据场次实际举办城市归属，双城只计一次，避免人数重复。</li>'
+    + '<li>未提交的活动结果不纳入正式数据统计；已提交数据可修改并保留修改记录。</li>'
+    + '<li>特色下午茶独立维护和展示，不影响重点活动核心指标。</li>'
+    + '<li>年度总览、项目详情及城市统计统一读取底层活动记录，避免重复录入和重复计算。</li>'
+    + '</ul></div>';
+
+  h += '</div></div></div>';
+  return h;
+}
+
+function dc2empTeaFilter(key, val){
+  if(!window._dc2TeaFilter) window._dc2TeaFilter = { month:'all', city:'all', type:'all' };
+  window._dc2TeaFilter[key] = val;
+  renderP32();
+}
+
+function dc2empOpenProject(planId){
+  const p = dc2EmpPlanOf(planId);
+  if(!p) return;
+  const sessions = dc2EmpSessionsOf(planId).slice().sort(function(a, b){ return String(b.date || '').localeCompare(String(a.date || '')); });
+  const submitted = sessions.filter(function(s){ return s.status === '已提交'; });
+  const sat = dc2EmpWeightedSat(submitted);
+  const people = dc2EmpSum(submitted, 'people');
+  const surveys = dc2EmpSum(submitted, 'surveys');
+  const history = [];
+  sessions.forEach(function(s){
+    (s.history || []).forEach(function(x){ history.push({ at:x.at || '', by:x.by || '当前用户', action:x.action || '修改', status:(x.after || {}).status || '' }); });
+  });
+  history.sort(function(a, b){ return String(b.at).localeCompare(String(a.at)); });
+  const modal = document.getElementById('dc2Modal');
+  modal.className = 'dc2-modal dc2emp-wide';
+  let h = '<div class="dc2-modal-head dc2emp-modal-head">'
+    + '<div><div class="dc2-modal-title">' + dc2EmpEscape(p.name || '未命名项目') + '</div>'
+    + '<div class="dc2emp-modal-sub">' + dc2EmpStatusChip(dc2EmpStatusOf(planId))
+    + '<span>负责人 ' + dc2EmpEscape(p.owner || '—') + '</span>'
+    + '<span>计划 ' + dc2EmpEscape(p.planDate || '—') + '</span>'
+    + '<span>' + dc2EmpEscape(dc2NormalizeCity(p.planCity || '双城')) + '</span>'
+    + (p.taskId ? '<span class="dc2emp-taskid">任务 ' + dc2EmpEscape(p.taskId) + '</span>' : '') + '</div></div>'
+    + '<button class="dc2-modal-x" onclick="dc2CloseModal()">✕</button></div>';
+  h += '<div class="dc2emp-modal-body">';
+  h += '<div class="dc2emp-detail-kpis">'
+    + '<div class="dc2emp-dkpi"><span>活动场次</span><b>' + submitted.length + '<i>场</i></b><em>共 ' + sessions.length + ' 场</em></div>'
+    + '<div class="dc2emp-dkpi"><span>参与人次</span><b>' + people.toLocaleString() + '</b><em>已提交场次累计</em></div>'
+    + '<div class="dc2emp-dkpi"><span>满意度</span><b>' + dc2EmpPct(sat.value) + '</b><em>' + (sat.weighted ? '按问卷加权' : '无有效问卷') + '</em></div>'
+    + '<div class="dc2emp-dkpi"><span>有效问卷</span><b>' + surveys.toLocaleString() + '</b><em>' + (sat.samples || 0) + ' 场有调研</em></div>'
+    + '</div>';
+  h += '<div class="dc2emp-detail-sec"><div class="dc2emp-detail-title">场次执行明细<span>按时间倒序</span></div>';
+  if(!sessions.length){
+    h += '<div class="dc2emp-empty">尚未录入执行场次</div>';
+  } else {
+    h += '<div class="dc2emp-tablewrap"><table class="dc2emp-table dc2emp-table-sm"><thead><tr>'
+      + '<th>举办时间</th><th>城市</th><th>活动主题</th><th class="num">参与人数</th><th>满意度</th><th class="num">有效问卷</th><th>状态</th><th style="text-align:right">操作</th>'
+      + '</tr></thead><tbody>';
+    sessions.forEach(function(s){
+      h += '<tr>'
+        + '<td>' + dc2EmpEscape(s.date || '—') + '</td>'
+        + '<td><span class="dc2emp-citytag">' + dc2EmpEscape(dc2NormalizeCity(s.city)) + '</span></td>'
+        + '<td>' + dc2EmpEscape(s.theme || '—') + '</td>'
+        + '<td class="num">' + (dc2NumOf(s.people) || 0).toLocaleString() + '</td>'
+        + '<td>' + dc2EmpPct(dc2NumOf(s.satisfaction) || null) + '</td>'
+        + '<td class="num">' + (dc2NumOf(s.surveys) || 0).toLocaleString() + '</td>'
+        + '<td>' + dc2EmpStatusChip(s.status) + (s.images && s.images.length ? '<span class="dc2emp-imgnum">' + s.images.length + ' 图</span>' : '') + '</td>'
+        + '<td style="text-align:right;white-space:nowrap">'
+        + '<button class="dc2emp-mini" onclick="dc2empEditSession(\'' + planId + '\',\'' + s.id + '\')">编辑</button>'
+        + '<button class="dc2emp-mini danger" onclick="dc2empDeleteSession(\'' + planId + '\',\'' + s.id + '\')">删除</button>'
+        + '</td></tr>';
+    });
+    h += '</tbody></table></div>';
+  }
+  h += '</div>';
+  if(history.length){
+    h += '<div class="dc2emp-detail-sec"><div class="dc2emp-detail-title">修改记录<span>最近 ' + Math.min(6, history.length) + ' 条</span></div><ul class="dc2emp-history">';
+    history.slice(0, 6).forEach(function(x){
+      h += '<li><b>' + dc2EmpEscape(x.at) + '</b><span>' + dc2EmpEscape(x.by) + ' · ' + dc2EmpEscape(x.action) + (x.status ? '（' + dc2EmpEscape(x.status) + '）' : '') + '</span></li>';
+    });
+    h += '</ul></div>';
+  }
+  h += '<div class="dc2emp-detail-note"><b>统计要求</b>' + dc2EmpEscape(p.statsReq || '—') + (p.desc ? '<br><b>项目说明</b>' + dc2EmpEscape(p.desc) : '') + '</div>';
+  h += '</div>';
+  h += '<div class="dc2-modal-foot dc2emp-modal-foot">'
+    + '<button class="dc2-btn" onclick="dc2empSyncTask(\'' + planId + '\')">' + (p.taskSynced ? '✓ 已关联我的工作' : '同步到我的工作') + '</button>'
+    + '<button class="dc2-btn" onclick="dc2empEditPlan(\'' + planId + '\')">编辑项目</button>'
+    + '<button class="dc2-btn" onclick="dc2empEditSession(\'' + planId + '\')">+ 新增场次</button>'
+    + '<button class="dc2-btn primary" onclick="dc2CloseModal()">关闭</button>'
+    + '</div>';
+  modal.innerHTML = h;
+  document.getElementById('dc2Mask').classList.add('show');
+}
+
+function dc2empEditPlan(planId){
+  const p = dc2EmpPlanOf(planId) || { planId:planId, name:'', owner:'', planDate:'', planCity:'双城', statsReq:'参与人数、满意度、有效问卷', desc:'' };
+  const cityOptions = DC2_TEA_CITY_OPTIONS.map(function(c){
+    return '<option value="' + c + '"' + (dc2NormalizeCity(p.planCity) === c ? ' selected' : '') + '>' + c + '</option>';
+  }).join('');
+  const modal = document.getElementById('dc2Modal');
+  modal.className = 'dc2-modal';
+  modal.innerHTML = '<div class="dc2-modal-head"><div class="dc2-modal-title">' + (planId ? '编辑活动项目' : '新增活动项目') + '</div>'
+    + '<button class="dc2-modal-x" onclick="dc2CloseModal()">✕</button></div>'
+    + '<div class="dc2-modal-body">'
+    + '<div class="dc2-field full"><label>项目名称 *</label><input id="dc2empPlanName" value="' + dc2EmpEscape(p.name) + '" placeholder="如：第十二届家庭日"></div>'
+    + '<div class="dc2-field"><label>负责人</label><input id="dc2empPlanOwner" value="' + dc2EmpEscape(p.owner) + '" placeholder="姓名"></div>'
+    + '<div class="dc2-field"><label>计划时间</label><input id="dc2empPlanDate" type="date" value="' + dc2EmpEscape(p.planDate) + '"></div>'
+    + '<div class="dc2-field"><label>计划城市</label><select id="dc2empPlanCity">' + cityOptions + '</select></div>'
+    + '<div class="dc2-field"><label>统计要求</label><input id="dc2empPlanReq" value="' + dc2EmpEscape(p.statsReq) + '"></div>'
+    + '<div class="dc2-field full"><label>项目说明</label><textarea id="dc2empPlanDesc" placeholder="项目背景、目标等">' + dc2EmpEscape(p.desc) + '</textarea></div>'
+    + '</div>'
+    + '<div class="dc2-modal-foot"><button class="dc2-btn" onclick="dc2empOpenProject(\'' + planId + '\')">返回</button>'
+    + '<button class="dc2-btn primary" onclick="dc2empSavePlan(\'' + planId + '\')">保存</button></div>';
+  document.getElementById('dc2Mask').classList.add('show');
+}
+function dc2empSavePlan(planId){
+  const name = (document.getElementById('dc2empPlanName').value || '').trim();
+  if(!name){ alert('请输入项目名称'); return; }
+  const plans = dc2EmpPlans();
+  let p = dc2EmpPlanOf(planId);
+  if(!p){
+    p = { planId: dc2Uid('plan'), taskId:'', taskSynced:false };
+    plans.push(p);
+  }
+  if(!p.taskId){ p.taskId = 'task_' + String(p.planId).replace(/^plan_/, ''); p.taskSynced = true; }
+  p.name = name;
+  p.owner = (document.getElementById('dc2empPlanOwner').value || '').trim();
+  p.planDate = document.getElementById('dc2empPlanDate').value || '';
+  p.planCity = document.getElementById('dc2empPlanCity').value || '双城';
+  p.statsReq = (document.getElementById('dc2empPlanReq').value || '').trim();
+  p.desc = (document.getElementById('dc2empPlanDesc').value || '').trim();
+  dc2EmpSessionsOf(p.planId).forEach(function(s){ s.name = name; });
+  dc2SaveActivities();
+  renderP32();
+  dc2RefreshP09();
+  dc2empOpenProject(p.planId);
+  if(typeof showToast === 'function') showToast('✓ 已保存活动项目「' + name + '」');
+}
+function dc2empDeletePlan(planId){
+  if(!confirm('删除项目会同时删除其下所有场次记录，确定继续？')) return;
+  window._dc2Plans = dc2EmpPlans().filter(function(p){ return String(p.planId) !== String(planId); });
+  window._dc2Activities = (window._dc2Activities || []).filter(function(a){ return String(a.planId) !== String(planId); });
+  dc2SaveActivities();
+  dc2CloseModal();
+  renderP32();
+  dc2RefreshP09();
+  if(typeof showToast === 'function') showToast('✓ 已删除活动项目');
+}
+
+function dc2empEditSession(planId, sessionId){
+  const p = dc2EmpPlanOf(planId);
+  if(!p){ alert('请先创建活动项目'); return; }
+  const s = sessionId ? (window._dc2Activities || []).find(function(x){ return String(x.id) === String(sessionId); }) : null;
+  const rec = s || { date: p.planDate || '', city: p.planCity || '双城', theme:'', people:'', satisfaction:'', surveys:'', status:'待提交', images:[], note:'' };
+  window._dc2FormImages = Array.isArray(rec.images) ? rec.images.slice() : [];
+  const cityOptions = DC2_TEA_CITY_OPTIONS.map(function(c){
+    return '<option value="' + c + '"' + (dc2NormalizeCity(rec.city) === c ? ' selected' : '') + '>' + c + '</option>';
+  }).join('');
+  const statusOptions = DC2_ACTIVITY_STATUS.map(function(x){
+    return '<option value="' + x + '"' + ((rec.status || '待提交') === x ? ' selected' : '') + '>' + x + '</option>';
+  }).join('');
+  const modal = document.getElementById('dc2Modal');
+  modal.className = 'dc2-modal';
+  modal.innerHTML = '<div class="dc2-modal-head"><div class="dc2-modal-title">' + (s ? '编辑活动场次' : '新增活动场次') + ' · ' + dc2EmpEscape(p.name) + '</div>'
+    + '<button class="dc2-modal-x" onclick="dc2CloseModal()">✕</button></div>'
+    + '<div class="dc2-modal-body">'
+    + '<div class="dc2-field"><label>举办时间 *</label><input id="dc2empSesDate" type="date" value="' + dc2EmpEscape(rec.date) + '"></div>'
+    + '<div class="dc2-field"><label>举办城市</label><select id="dc2empSesCity">' + cityOptions + '</select></div>'
+    + '<div class="dc2-field full"><label>活动主题</label><input id="dc2empSesTheme" value="' + dc2EmpEscape(rec.theme) + '" placeholder="如：春日限定 · 双城联动"></div>'
+    + '<div class="dc2-field"><label>参与人数</label><input id="dc2empSesPeople" type="number" min="0" value="' + (dc2NumOf(rec.people) || '') + '"></div>'
+    + '<div class="dc2-field"><label>有效问卷数量</label><input id="dc2empSesSurveys" type="number" min="0" value="' + (dc2NumOf(rec.surveys) || '') + '"></div>'
+    + '<div class="dc2-field"><label>满意度（%）</label><input id="dc2empSesSat" type="number" min="0" max="100" value="' + (dc2NumOf(rec.satisfaction) || '') + '"></div>'
+    + '<div class="dc2-field"><label>任务状态</label><select id="dc2empSesStatus">' + statusOptions + '</select></div>'
+    + '<div class="dc2-field full"><label>现场图片</label>'
+    + '<div class="dc2emp-upload" onclick="document.getElementById(\'dc2empSesFile\').click()">＋ 上传图片（最多 8 张，自动压缩）</div>'
+    + '<input type="file" id="dc2empSesFile" accept="image/*" multiple style="display:none" onchange="dc2empHandleImages(this,\'dc2empSesShots\')">'
+    + '<div class="dc2emp-shots" id="dc2empSesShots">' + dc2empShotsHTML(window._dc2FormImages) + '</div></div>'
+    + '<div class="dc2-field full"><label>执行说明</label><textarea id="dc2empSesNote" placeholder="活动亮点、执行结果等">' + dc2EmpEscape(rec.note) + '</textarea></div>'
+    + '</div>'
+    + '<div class="dc2-modal-foot"><button class="dc2-btn" onclick="dc2empOpenProject(\'' + planId + '\')">返回</button>'
+    + '<button class="dc2-btn primary" onclick="dc2empSaveSession(\'' + planId + '\',' + (s ? "'" + s.id + "'" : 'null') + ')">保存</button></div>';
+  document.getElementById('dc2Mask').classList.add('show');
+}
+function dc2empShotsHTML(images){
+  if(!images || !images.length) return '<span class="dc2emp-shots-empty">暂无图片</span>';
+  return images.map(function(src, i){
+    return '<span class="dc2emp-shot"><img src="' + src + '" alt=""><button type="button" onclick="dc2empRemoveImage(' + i + ',\'dc2empSesShots\')">✕</button></span>';
+  }).join('');
+}
+function dc2empRemoveImage(i, targetId){
+  window._dc2FormImages = (window._dc2FormImages || []).filter(function(_, idx){ return idx !== i; });
+  const el = document.getElementById(targetId);
+  if(el) el.innerHTML = dc2empShotsHTML(window._dc2FormImages);
+}
+function dc2empHandleImages(input, targetId){
+  const files = Array.prototype.slice.call(input.files || []);
+  if(!files.length) return;
+  let remain = files.length;
+  const out = [];
+  files.slice(0, 8).forEach(function(file){
+    const reader = new FileReader();
+    reader.onload = function(){
+      const img = new Image();
+      img.onload = function(){
+        try{
+          const max = 1000;
+          const scale = Math.min(1, max / Math.max(img.width, img.height));
+          const cv = document.createElement('canvas');
+          cv.width = Math.max(1, Math.round(img.width * scale));
+          cv.height = Math.max(1, Math.round(img.height * scale));
+          cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+          out.push(cv.toDataURL('image/jpeg', 0.72));
+        }catch(e){ out.push(reader.result); }
+        if(--remain === 0) dc2empApplyImages(out, targetId);
+      };
+      img.onerror = function(){ out.push(reader.result); if(--remain === 0) dc2empApplyImages(out, targetId); };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function dc2empApplyImages(list, targetId){
+  window._dc2FormImages = (window._dc2FormImages || []).concat(list).slice(0, 8);
+  const el = document.getElementById(targetId);
+  if(el) el.innerHTML = dc2empShotsHTML(window._dc2FormImages);
+  if(typeof showToast === 'function') showToast('✓ 已添加 ' + list.length + ' 张图片');
+}
+function dc2empSaveSession(planId, sessionId){
+  const p = dc2EmpPlanOf(planId);
+  if(!p) return;
+  const date = document.getElementById('dc2empSesDate').value || '';
+  if(!date){ alert('请选择举办时间'); return; }
+  const sat = document.getElementById('dc2empSesSat').value;
+  const note = (document.getElementById('dc2empSesNote').value || '').trim();
+  const data = {
+    planId: planId,
+    name: p.name,
+    date: date,
+    city: document.getElementById('dc2empSesCity').value || '双城',
+    theme: (document.getElementById('dc2empSesTheme').value || '').trim(),
+    people: parseInt(document.getElementById('dc2empSesPeople').value, 10) || 0,
+    satisfaction: sat ? dc2NumOf(sat) + '%' : '—',
+    surveys: parseInt(document.getElementById('dc2empSesSurveys').value, 10) || 0,
+    status: document.getElementById('dc2empSesStatus').value || '待提交',
+    images: (window._dc2FormImages || []).slice(),
+    note: note,
+    desc: note
+  };
+  const acts = window._dc2Activities || (window._dc2Activities = []);
+  const now = new Date();
+  const stamp = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+  if(sessionId){
+    const cur = acts.find(function(x){ return String(x.id) === String(sessionId); });
+    if(cur){
+      const before = { people:cur.people, satisfaction:cur.satisfaction, surveys:cur.surveys, status:cur.status };
+      Object.assign(cur, data);
+      cur.history = Array.isArray(cur.history) ? cur.history : [];
+      cur.history.push({ at: stamp, by: '当前用户', action: '修改执行结果', before: before, after: { people:data.people, satisfaction:data.satisfaction, surveys:data.surveys, status:data.status } });
+    }
+  } else {
+    data.id = dc2Uid('ses');
+    data.history = [{ at: stamp, by: '当前用户', action: '新增场次', after: { people:data.people, satisfaction:data.satisfaction, surveys:data.surveys, status:data.status } }];
+    acts.push(data);
+  }
+  dc2SaveActivities();
+  renderP32();
+  dc2RefreshP09();
+  dc2empOpenProject(planId);
+  if(typeof showToast === 'function') showToast('✓ 已保存活动场次');
+}
+function dc2empDeleteSession(planId, sessionId){
+  if(!confirm('确定删除该场次记录？')) return;
+  window._dc2Activities = (window._dc2Activities || []).filter(function(a){ return String(a.id) !== String(sessionId); });
+  dc2SaveActivities();
+  renderP32();
+  dc2RefreshP09();
+  dc2empOpenProject(planId);
+  if(typeof showToast === 'function') showToast('✓ 已删除场次');
+}
+function dc2empSyncTask(planId){
+  const p = dc2EmpPlanOf(planId);
+  if(!p) return;
+  if(!p.taskId) p.taskId = 'task_' + String(planId).replace(/^plan_/, '');
+  p.taskSynced = true;
+  dc2SaveActivities();
+  dc2empOpenProject(planId);
+  if(typeof showToast === 'function') showToast('✓ 已生成「我的工作」任务并关联 ' + p.taskId);
+}
+
+function dc2empOpenTea(id){
+  const rec = dc2EmpTea().find(function(t){ return String(t.id) === String(id); });
+  if(!rec) return;
+  const modal = document.getElementById('dc2Modal');
+  modal.className = 'dc2-modal dc2emp-wide';
+  let h = '<div class="dc2-modal-head dc2emp-modal-head">'
+    + '<div><div class="dc2-modal-title">' + dc2EmpEscape(rec.name || '未命名记录') + '</div>'
+    + '<div class="dc2emp-modal-sub"><span class="dc2emp-teatag">' + dc2EmpEscape(rec.type || '日常下午茶') + '</span>'
+    + '<span>' + dc2EmpEscape(rec.date || '—') + '</span><span>' + dc2EmpEscape(dc2NormalizeCity(rec.city)) + '</span>'
+    + '<span>' + (rec.images ? rec.images.length : 0) + ' 张图片</span></div></div>'
+    + '<button class="dc2-modal-x" onclick="dc2CloseModal()">✕</button></div>';
+  h += '<div class="dc2emp-modal-body">';
+  h += '<div class="dc2emp-gallery">';
+  if(rec.images && rec.images.length){
+    rec.images.forEach(function(src, i){
+      h += '<figure class="dc2emp-gallery-item' + (i === 0 ? ' is-main' : '') + '"><img src="' + src + '" alt="' + dc2EmpEscape(rec.name) + ' ' + (i + 1) + '"></figure>';
+    });
+  } else {
+    h += '<div class="dc2emp-gallery-empty">' + dc2EmpTeaCover(rec) + '<span>暂无现场图片，可点击「编辑记录」补充</span></div>';
+  }
+  h += '</div>';
+  h += '<div class="dc2emp-tea-detail"><div class="dc2emp-detail-title">记录详情</div>'
+    + '<p>' + dc2EmpEscape(rec.desc || '暂无内容介绍') + '</p></div>';
+  h += '</div>';
+  h += '<div class="dc2-modal-foot dc2emp-modal-foot">'
+    + '<button class="dc2-btn" style="color:#cd2d58" onclick="dc2empDeleteTea(\'' + rec.id + '\')">删除记录</button>'
+    + '<button class="dc2-btn" onclick="dc2empEditTea(\'' + rec.id + '\')">编辑记录</button>'
+    + '<button class="dc2-btn primary" onclick="dc2CloseModal()">关闭</button></div>';
+  modal.innerHTML = h;
+  document.getElementById('dc2Mask').classList.add('show');
+}
+function dc2empEditTea(id){
+  const rec = id ? dc2EmpTea().find(function(t){ return String(t.id) === String(id); }) : null;
+  const r = rec || { name:'', date:'', city:'北京', type:'日常下午茶', desc:'', images:[] };
+  window._dc2FormImages = Array.isArray(r.images) ? r.images.slice() : [];
+  const cityOptions = DC2_TEA_CITY_OPTIONS.map(function(c){
+    return '<option value="' + c + '"' + (dc2NormalizeCity(r.city) === c ? ' selected' : '') + '>' + c + '</option>';
+  }).join('');
+  const typeOptions = DC2_TEA_TYPES.map(function(t){
+    return '<option value="' + t + '"' + ((r.type || '') === t ? ' selected' : '') + '>' + t + '</option>';
+  }).join('');
+  const modal = document.getElementById('dc2Modal');
+  modal.className = 'dc2-modal';
+  modal.innerHTML = '<div class="dc2-modal-head"><div class="dc2-modal-title">' + (rec ? '编辑下午茶记录' : '新增下午茶记录') + '</div>'
+    + '<button class="dc2-modal-x" onclick="dc2CloseModal()">✕</button></div>'
+    + '<div class="dc2-modal-body">'
+    + '<div class="dc2-field full"><label>记录名称 *</label><input id="dc2empTeaName" value="' + dc2EmpEscape(r.name) + '" placeholder="如：秋日限定 · 桂花乌龙"></div>'
+    + '<div class="dc2-field"><label>举办时间</label><input id="dc2empTeaDate" type="date" value="' + dc2EmpEscape(r.date) + '"></div>'
+    + '<div class="dc2-field"><label>城市</label><select id="dc2empTeaCity">' + cityOptions + '</select></div>'
+    + '<div class="dc2-field"><label>记录类型</label><select id="dc2empTeaType">' + typeOptions + '</select></div>'
+    + '<div class="dc2-field"><label>图片数量</label><input value="最多 8 张，自动压缩" readonly></div>'
+    + '<div class="dc2-field full"><label>内容介绍</label><textarea id="dc2empTeaDesc" placeholder="茶点搭配、现场氛围、特色说明">' + dc2EmpEscape(r.desc) + '</textarea></div>'
+    + '<div class="dc2-field full"><label>现场图片</label>'
+    + '<div class="dc2emp-upload" onclick="document.getElementById(\'dc2empTeaFile\').click()">＋ 上传图片（最多 8 张）</div>'
+    + '<input type="file" id="dc2empTeaFile" accept="image/*" multiple style="display:none" onchange="dc2empHandleImages(this,\'dc2empTeaShots\')">'
+    + '<div class="dc2emp-shots" id="dc2empTeaShots">' + dc2empShotsHTML(window._dc2FormImages) + '</div></div>'
+    + '</div>'
+    + '<div class="dc2-modal-foot"><button class="dc2-btn" onclick="dc2CloseModal()">取消</button>'
+    + '<button class="dc2-btn primary" onclick="dc2empSaveTea(' + (rec ? "'" + rec.id + "'" : 'null') + ')">保存</button></div>';
+  document.getElementById('dc2Mask').classList.add('show');
+}
+function dc2empSaveTea(id){
+  const name = (document.getElementById('dc2empTeaName').value || '').trim();
+  if(!name){ alert('请输入记录名称'); return; }
+  const tea = dc2EmpTea();
+  const data = {
+    name: name,
+    date: document.getElementById('dc2empTeaDate').value || '',
+    city: document.getElementById('dc2empTeaCity').value || '北京',
+    type: document.getElementById('dc2empTeaType').value || '日常下午茶',
+    desc: (document.getElementById('dc2empTeaDesc').value || '').trim(),
+    images: (window._dc2FormImages || []).slice()
+  };
+  if(id){
+    const cur = tea.find(function(t){ return String(t.id) === String(id); });
+    if(cur) Object.assign(cur, data);
+  } else {
+    data.id = dc2Uid('tea');
+    tea.push(data);
+  }
+  dc2SaveActivities();
+  dc2CloseModal();
+  renderP32();
+  if(typeof showToast === 'function') showToast('✓ 已保存下午茶记录「' + name + '」');
+}
+function dc2empDeleteTea(id){
+  if(!confirm('确定删除该下午茶记录？')) return;
+  window._dc2Tea = dc2EmpTea().filter(function(t){ return String(t.id) !== String(id); });
+  dc2SaveActivities();
+  dc2CloseModal();
+  renderP32();
+  if(typeof showToast === 'function') showToast('✓ 已删除下午茶记录');
+}
+
 function dc2RenderModule(m){
+  /* 员工体验：独立的六段式页面 */
+  if(m.id === 'employee') return dc2RenderEmployeePage(m);
   const brand = dc2Brand(m.id, m.color);
   const srcMap = {
     platform:{cls:'platform',label:m.sourceLabel||'平台关联'},
@@ -16326,41 +17160,126 @@ function dc2Table(headers, rows){
     + '</tbody></table></div>';
 }
 
-/* ---------- 重点活动台账 ---------- */
+﻿/* ---------- 重点活动 / 场次 / 下午茶 台账 ---------- */
 function dc2RenderLedger(){
-  const acts = window._dc2Activities || [];
+  const plans = dc2EmpPlans();
+  const sessions = (window._dc2Activities || []).slice();
+  const tea = dc2EmpTea();
+  const year = window._dc2Year || 2026;
+
   let h = '';
   h += '<div class="dc2-detail-head">'
     + '<div class="dc2-detail-icon" style="background:#f4d20018;color:#c9a800">' + DC2_ICON.smile + '</div>'
     + '<div><div class="dc2-detail-title">重点活动数据台账</div>'
-    + '<div class="dc2-detail-meta"><span>数据来源：<b>人工维护</b></span><span>统计口径：<b>仅纳入台账的重点活动</b></span><span>最近更新：<b>2026-11-20</b></span></div></div>'
-    + '<button class="dc2-btn primary" style="margin-left:auto" onclick="dc2OpenActivity()">' + DC2_ICON.plus + ' 新增活动</button>'
-    + '</div>';
-  h += '<div class="dc2-ledger-note">仅「已纳入台账」的重点活动参与员工体验看板统计。日常活动无需录入，未纳入统计的活动不会出现在看板中。</div>';
+    + '<div class="dc2-detail-meta"><span>数据来源：<b>我的工作 + 人工维护</b></span><span>统计口径：<b>仅已提交场次</b></span><span>年度：<b>' + year + '</b></span></div></div>'
+    + '<div class="dc2emp-ledger-actions">'
+    + '<button class="dc2-btn" onclick="dc2empNewSession()">' + DC2_ICON.plus + ' 新增场次</button>'
+    + '<button class="dc2-btn primary" onclick="dc2empEditPlan(\'\')">' + DC2_ICON.plus + ' 新增项目</button>'
+    + '</div></div>';
+  h += '<div class="dc2-ledger-note">年初制定重点活动计划并关联「我的工作」任务；负责人按实际场次回填后直接同步，无需管理者审核。未提交场次不纳入正式统计，已提交数据可修改并保留记录。</div>';
+
+  /* 项目计划 */
+  h += '<div class="dc2emp-ledger-sec"><div class="dc2emp-ledger-title">重点活动项目计划<span>' + plans.length + ' 个项目</span></div>';
   h += '<div class="dc2-table-wrap"><table class="dc2-table"><thead><tr>'
-    + '<th>活动名称</th><th>活动时间</th><th>城市</th><th>主题</th><th>参与人数</th><th>满意度</th><th>有效问卷</th><th>备注</th><th style="text-align:right">操作</th>'
+    + '<th>项目名称</th><th>负责人</th><th>计划时间</th><th>计划城市</th><th>场次</th><th>参与人次</th><th>满意度</th><th>状态</th><th style="text-align:right">操作</th>'
     + '</tr></thead><tbody>';
-  if(!acts.length){
-    h += '<tr><td colspan="9"><div class="dc2-empty">暂无重点活动，点击「新增活动」开始录入</div></td></tr>';
+  if(!plans.length){
+    h += '<tr><td colspan="9"><div class="dc2-empty">暂无活动项目，点击「新增项目」开始制定年度计划</div></td></tr>';
   } else {
-    acts.forEach(a => {
+    plans.forEach(function(p){
+      const list = dc2EmpSessionsOf(p.planId);
+      const submitted = list.filter(function(s){ return s.status === '已提交'; });
+      const sat = dc2EmpWeightedSat(submitted);
       h += '<tr>'
-        + '<td><b style="color:#181b34;font-weight:600">' + a.name + '</b></td>'
-        + '<td class="num">' + (a.date || '—') + '</td>'
-        + '<td><span class="dc2-tag" style="background:#eef0ff;color:#5d53d2">' + dc2NormalizeCity(a.city) + '</span></td>'
-        + '<td style="color:#5b6180;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + (a.theme || '') + '">' + (a.theme || '—') + '</td>'
-        + '<td class="num">' + (a.people || '—') + '</td>'
-        + '<td class="num">' + (a.satisfaction || '—') + '</td>'
-        + '<td class="num">' + (a.surveys || '—') + '</td>'
-        + '<td style="color:#8b90a6;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + (a.note || '') + '">' + (a.note || '—') + '</td>'
+        + '<td><b style="color:#181b34;font-weight:600">' + dc2EmpEscape(p.name || '未命名项目') + '</b>'
+        + (p.taskId ? '<div class="dc2emp-taskid">任务 ' + dc2EmpEscape(p.taskId) + '</div>' : '') + '</td>'
+        + '<td>' + dc2EmpEscape(p.owner || '—') + '</td>'
+        + '<td class="num">' + dc2EmpEscape(p.planDate || '—') + '</td>'
+        + '<td><span class="dc2-tag" style="background:#eef0ff;color:#5d53d2">' + dc2EmpEscape(dc2NormalizeCity(p.planCity || '双城')) + '</span></td>'
+        + '<td class="num">' + submitted.length + ' / ' + list.length + '</td>'
+        + '<td class="num">' + dc2EmpSum(submitted, 'people').toLocaleString() + '</td>'
+        + '<td class="num">' + dc2EmpPct(sat.value) + '</td>'
+        + '<td>' + dc2EmpStatusChip(dc2EmpStatusOf(p.planId)) + '</td>'
         + '<td style="text-align:right;white-space:nowrap">'
-        + '<button class="dc2-btn" style="height:26px;padding:0 8px;margin-right:6px" onclick="dc2OpenActivity(' + a.id + ')" title="编辑">' + DC2_ICON.edit + '</button>'
-        + '<button class="dc2-btn" style="height:26px;padding:0 8px;color:#cd2d58" onclick="dc2DeleteActivity(' + a.id + ')" title="删除">' + DC2_ICON.trash + '</button>'
+        + '<button class="dc2-btn" style="height:26px;padding:0 8px;margin-right:6px" onclick="dc2empOpenProject(\'' + p.planId + '\')" title="查看">查看</button>'
+        + '<button class="dc2-btn" style="height:26px;padding:0 8px;margin-right:6px" onclick="dc2empEditSession(\'' + p.planId + '\')" title="新增场次">+ 场次</button>'
+        + '<button class="dc2-btn" style="height:26px;padding:0 8px;color:#cd2d58" onclick="dc2empDeletePlan(\'' + p.planId + '\')" title="删除">' + DC2_ICON.trash + '</button>'
         + '</td></tr>';
     });
   }
-  h += '</tbody></table></div>';
+  h += '</tbody></table></div></div>';
+
+  /* 场次执行 */
+  h += '<div class="dc2emp-ledger-sec"><div class="dc2emp-ledger-title">活动场次执行<span>' + sessions.length + ' 条场次</span></div>';
+  h += '<div class="dc2-table-wrap"><table class="dc2-table"><thead><tr>'
+    + '<th>所属项目</th><th>举办时间</th><th>城市</th><th>活动主题</th><th>参与人数</th><th>满意度</th><th>有效问卷</th><th>状态</th><th style="text-align:right">操作</th>'
+    + '</tr></thead><tbody>';
+  if(!sessions.length){
+    h += '<tr><td colspan="9"><div class="dc2-empty">暂无场次记录</div></td></tr>';
+  } else {
+    sessions.slice().sort(function(a, b){ return String(b.date || '').localeCompare(String(a.date || '')); }).forEach(function(s){
+      h += '<tr>'
+        + '<td>' + dc2EmpEscape(s.name || '—') + '</td>'
+        + '<td class="num">' + dc2EmpEscape(s.date || '—') + '</td>'
+        + '<td><span class="dc2-tag" style="background:#eef0ff;color:#5d53d2">' + dc2EmpEscape(dc2NormalizeCity(s.city)) + '</span></td>'
+        + '<td style="color:#5b6180;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + dc2EmpEscape(s.theme || '') + '">' + dc2EmpEscape(s.theme || '—') + '</td>'
+        + '<td class="num">' + (dc2NumOf(s.people) || 0).toLocaleString() + '</td>'
+        + '<td class="num">' + dc2EmpPct(dc2NumOf(s.satisfaction) || null) + '</td>'
+        + '<td class="num">' + (dc2NumOf(s.surveys) || 0).toLocaleString() + '</td>'
+        + '<td>' + dc2EmpStatusChip(s.status) + '</td>'
+        + '<td style="text-align:right;white-space:nowrap">'
+        + '<button class="dc2-btn" style="height:26px;padding:0 8px;margin-right:6px" onclick="dc2empEditSession(\'' + s.planId + '\',\'' + s.id + '\')">编辑</button>'
+        + '<button class="dc2-btn" style="height:26px;padding:0 8px;color:#cd2d58" onclick="dc2empDeleteSession(\'' + s.planId + '\',\'' + s.id + '\')">' + DC2_ICON.trash + '</button>'
+        + '</td></tr>';
+    });
+  }
+  h += '</tbody></table></div></div>';
+
+  /* 特色下午茶 */
+  h += '<div class="dc2emp-ledger-sec"><div class="dc2emp-ledger-title">特色下午茶记录<span>' + tea.length + ' 条记录 · 独立统计</span>'
+    + '<button class="dc2-btn" style="margin-left:auto" onclick="dc2empEditTea()">' + DC2_ICON.plus + ' 新增记录</button></div>';
+  h += '<div class="dc2-table-wrap"><table class="dc2-table"><thead><tr>'
+    + '<th>记录名称</th><th>举办时间</th><th>城市</th><th>记录类型</th><th>内容介绍</th><th>图片</th><th style="text-align:right">操作</th>'
+    + '</tr></thead><tbody>';
+  if(!tea.length){
+    h += '<tr><td colspan="7"><div class="dc2-empty">暂无下午茶记录</div></td></tr>';
+  } else {
+    tea.slice().sort(function(a, b){ return String(b.date || '').localeCompare(String(a.date || '')); }).forEach(function(t){
+      h += '<tr>'
+        + '<td><b style="color:#181b34;font-weight:600">' + dc2EmpEscape(t.name || '未命名记录') + '</b></td>'
+        + '<td class="num">' + dc2EmpEscape(t.date || '—') + '</td>'
+        + '<td>' + dc2EmpEscape(dc2NormalizeCity(t.city)) + '</td>'
+        + '<td><span class="dc2-tag" style="background:#fff6e0;color:#a57400">' + dc2EmpEscape(t.type || '日常下午茶') + '</span></td>'
+        + '<td style="color:#8b90a6;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + dc2EmpEscape(t.desc || '') + '">' + dc2EmpEscape(t.desc || '—') + '</td>'
+        + '<td class="num">' + ((t.images && t.images.length) || 0) + '</td>'
+        + '<td style="text-align:right;white-space:nowrap">'
+        + '<button class="dc2-btn" style="height:26px;padding:0 8px;margin-right:6px" onclick="dc2empEditTea(\'' + t.id + '\')">编辑</button>'
+        + '<button class="dc2-btn" style="height:26px;padding:0 8px;color:#cd2d58" onclick="dc2empDeleteTea(\'' + t.id + '\')">' + DC2_ICON.trash + '</button>'
+        + '</td></tr>';
+    });
+  }
+  h += '</tbody></table></div></div>';
   return h;
+}
+
+function dc2empNewSession(){
+  const plans = dc2EmpPlans();
+  if(!plans.length){ alert('请先新增活动项目'); return; }
+  if(plans.length === 1){ dc2empEditSession(plans[0].planId); return; }
+  const modal = document.getElementById('dc2Modal');
+  modal.className = 'dc2-modal';
+  modal.innerHTML = '<div class="dc2-modal-head"><div class="dc2-modal-title">选择活动项目</div>'
+    + '<button class="dc2-modal-x" onclick="dc2CloseModal()">✕</button></div>'
+    + '<div class="dc2emp-planpick">'
+    + plans.map(function(p){
+        return '<button class="dc2emp-planpick-item" onclick="dc2empEditSession(\'' + p.planId + '\')">'
+          + '<b>' + dc2EmpEscape(p.name || '未命名项目') + '</b>'
+          + '<span>' + dc2EmpEscape(p.planDate || '未设定时间') + ' · ' + dc2EmpEscape(dc2NormalizeCity(p.planCity || '双城')) + '</span>'
+          + '</button>';
+      }).join('')
+    + '</div>'
+    + '<div class="dc2-modal-foot"><button class="dc2-btn" onclick="dc2CloseModal()">取消</button></div>';
+  document.getElementById('dc2Mask').classList.add('show');
 }
 
 /* ══════ 数据维护工作台 ══════ */
@@ -16479,7 +17398,7 @@ function dc2MaintPanel(m){
 function dc2MaintDetail(m, d, editable){
   if(m.id === 'employee'){
     return '<div class="dc2-maint-sec"><div class="dc2-maint-sec-title">重点活动台账</div>'
-      + '<div class="dc2-maint-note" style="margin-bottom:12px">员工体验的重点活动与台账共用同一份数据，增删改后两页同步生效。</div>'
+      + '<div class="dc2-maint-note" style="margin-bottom:12px">按「项目计划 → 活动场次」两层维护：先建年度项目，再录入各城市实际场次；场次提交后自动进入员工体验看板统计，未提交不计入。特色下午茶独立维护。</div>'
       + dc2RenderLedger() + '</div>';
   }
   if(m.id === 'service'){
