@@ -16621,7 +16621,7 @@ function dc2RenderLedger(){
     h += '<tr><td colspan="9"><div class="dc2-empty">暂无重点活动，点击「新增活动」开始录入</div></td></tr>';
   } else {
     acts.forEach(a => {
-      h += '<tr>'
+      h += '<tr class="dc2-ledger-row" onclick="dc2OpenActivity(\'' + a.id + '\')" title="点击编辑该活动">'
         + '<td><b style="color:#181b34;font-weight:600">' + a.name + '</b></td>'
         + '<td class="num">' + (a.date || '—') + '</td>'
         + '<td><span class="dc2-tag" style="background:#eef0ff;color:#5d53d2">' + dc2NormalizeCity(a.city) + '</span></td>'
@@ -16631,8 +16631,8 @@ function dc2RenderLedger(){
         + '<td class="num">' + (a.surveys || '—') + '</td>'
         + '<td style="color:#8b90a6;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + (a.note || '') + '">' + (a.note || '—') + '</td>'
         + '<td style="text-align:right;white-space:nowrap">'
-        + '<button class="dc2-btn" style="height:26px;padding:0 8px;margin-right:6px" onclick="dc2OpenActivity(' + a.id + ')" title="编辑">' + DC2_ICON.edit + '</button>'
-        + '<button class="dc2-btn" style="height:26px;padding:0 8px;color:#cd2d58" onclick="dc2DeleteActivity(' + a.id + ')" title="删除">' + DC2_ICON.trash + '</button>'
+        + '<button class="dc2-btn" style="height:26px;padding:0 8px;margin-right:6px" onclick="event.stopPropagation();dc2OpenActivity(\'' + a.id + '\')" title="编辑">' + DC2_ICON.edit + ' 编辑</button>'
+        + '<button class="dc2-btn" style="height:26px;padding:0 8px;color:#cd2d58" onclick="event.stopPropagation();dc2DeleteActivity(\'' + a.id + '\')" title="删除">' + DC2_ICON.trash + '</button>'
         + '</td></tr>';
     });
   }
@@ -16995,12 +16995,16 @@ function dc2OpenActivity(id){
     + '</div>'
     + '<div class="dc2-modal-foot"><button class="dc2-btn" onclick="dc2CloseModal()">取消</button>'
     + '<button class="dc2-btn primary" onclick="dc2SaveActivity(' + (act ? "'" + act.id + "'" : 'null') + ')">保存</button></div>';
-  document.getElementById('dc2Mask').classList.add('show');
+  const mask = document.getElementById('dc2Mask');
+  mask.style.transition = 'none';
+  mask.style.opacity = '1';
+  mask.style.visibility = 'visible';
+  mask.classList.add('show');
   setTimeout(() => { const inp = document.getElementById('dc2ActName'); if(inp) inp.focus(); }, 80);
 }
 function dc2CloseModal(){
   const mask = document.getElementById('dc2Mask');
-  if(mask) mask.classList.remove('show');
+  if(mask){ mask.classList.remove('show'); mask.style.transition = ''; mask.style.opacity = ''; mask.style.visibility = ''; }
   const modal = document.getElementById('dc2Modal');
   if(modal) modal.className = 'dc2-modal';
 }

@@ -766,3 +766,8 @@
   #p32 .dc2-tea-filters{margin-left:0;width:100%}
   #p32 .dc2-tea-pic.is-main{grid-column:span 1;grid-row:span 1;min-height:0}
 }
+
+/* 重点活动台账：整行可点击编辑 */
+#p32 .dc2-ledger-row{cursor:pointer;transition:background .14s}
+#p32 .dc2-ledger-row:hover td{background:#fffdf5}
+#p32 .dc2-ledger-row td:last-child button{position:relative;z-index:1}
