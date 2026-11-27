@@ -15324,6 +15324,20 @@ function dc2CityStats(acts){
     return { name:base[k].name, events:base[k].events, people:base[k].people, pct: Math.round(base[k].events / totalEvents * 100) };
   }).filter(function(x){ return x.events > 0; });
 }
+/* 员工体验城市统计：双城场次分别计入北京与武汉 */
+function dc2EmployeeCityStats(acts){
+  const base = { '北京':{ name:'北京', events:0, people:0 }, '武汉':{ name:'武汉', events:0, people:0 } };
+  (acts || []).forEach(function(a){
+    const city = dc2NormalizeCity(a && a.city);
+    const people = Number(a && a.people) || 0;
+    if(city === '北京' || city === '双城'){ base['北京'].events += 1; base['北京'].people += people; }
+    if(city === '武汉' || city === '双城'){ base['武汉'].events += 1; base['武汉'].people += people; }
+  });
+  const totalEvents = base['北京'].events + base['武汉'].events || 1;
+  return ['北京','武汉'].map(function(k){
+    return { name:base[k].name, events:base[k].events, people:base[k].people, pct: Math.round(base[k].events / totalEvents * 100) };
+  }).filter(function(x){ return x.events > 0; });
+}
 function dc2NormalizeActivity(a, i){
   const name = (a && a.name) || '';
   const desc = (a && (a.desc || a.note)) || '';
@@ -16308,7 +16322,7 @@ function dc2RenderModule(m){
     );
   } else if(m.id === 'employee'){
     const acts = window._dc2Activities || [];
-    const cities = dc2CityStats(acts);
+    const cities = dc2EmployeeCityStats(acts);
     if(cities.length){
       h += '<div class="dc2-mod-subtitle">年度城市统计</div>';
       cities.forEach(function(c){
@@ -17179,7 +17193,7 @@ function renderP09(){
     }
 
     // Module-specific content
-    const empCityStats = mod.id === 'employee' ? dc2CityStats(window._dc2Activities || []) : [];
+    const empCityStats = mod.id === 'employee' ? dc2EmployeeCityStats(window._dc2Activities || []) : [];
     if(mod.id === 'employee' && empCityStats.length > 0){
       h += `<div style="margin-bottom:16px"><div class="p09-city-title" style="font-size:12px;font-weight:500;color:var(--t2);margin-bottom:8px"><svg class="ic-inline" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l5-3v16"/><path d="M14 21V11l5 3v7"/><path d="M7 11h1M7 15h1"/></svg>️ 年度城市统计</div>`;
       empCityStats.forEach(c => {
